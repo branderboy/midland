@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Midland Floor Care — 90-Day Plan</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="A 90-day plan to fix indexation, mobile speed, and capture the carpet cleaning market across the DMV.">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#0b0f17;
+  --panel:#111827;
+  --line:#1f2937;
+  --ink:#e7eaf0;
+  --muted:#9aa3b2;
+  --accent:#22d3ee;
+  --warn:#f59e0b;
+  --good:#10b981;
+  --bad:#ef4444;
+}
+html{background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%}
+body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-feature-settings:"ss01","cv11"}
+.wrap{max-width:880px;margin:0 auto;padding:48px 24px 96px}
+header{padding:0 0 32px;border-bottom:1px solid var(--line);margin-bottom:40px}
+.eyebrow{color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin:0 0 12px}
+h1{font-size:clamp(28px,4.5vw,44px);line-height:1.15;margin:0 0 16px;letter-spacing:-.02em;font-weight:700}
+h2{font-size:clamp(20px,2.6vw,26px);line-height:1.25;margin:48px 0 16px;letter-spacing:-.01em;font-weight:700}
+h3{font-size:17px;margin:24px 0 8px;font-weight:600}
+p{margin:0 0 16px;color:#cdd3dd}
+ul,ol{margin:0 0 16px;padding-left:20px;color:#cdd3dd}
+li{margin:6px 0}
+strong{color:#fff}
+.lede{font-size:18px;color:#cdd3dd;max-width:64ch}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:16px 0 8px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.stat .k{display:block;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.stat .v{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.stat .v.bad{color:var(--bad)}
+.stat .v.warn{color:var(--warn)}
+.stat .v.good{color:var(--good)}
+.stat .v small{display:block;font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0;margin-top:2px}
+table{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.scope{display:grid;gap:10px}
+.scope .row{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.scope .num{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.scope h3{margin:0 0 4px}
+.scope p{margin:0;color:var(--muted);font-size:14px}
+.timeline{display:grid;gap:8px}
+.tl{display:grid;grid-template-columns:80px 1fr;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.tl span:first-child{color:var(--accent);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.tl span:last-child{color:#cdd3dd;font-size:14px}
+.results{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+@media (max-width:640px){.results{grid-template-columns:1fr}}
+.results .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.results h3{margin-top:0;color:var(--accent)}
+.results ul{margin:0;padding-left:18px}
+.results li{font-size:14px;color:#cdd3dd}
+.price{margin:48px 0;padding:32px;background:linear-gradient(135deg,#0b1120 0%,#111827 100%);border:1px solid #2a3447;border-radius:14px;text-align:center}
+.price .amount{font-size:clamp(48px,9vw,80px);font-weight:800;letter-spacing:-.04em;line-height:1;color:#fff;margin:8px 0}
+.price .amount span{color:var(--muted);font-size:.4em;font-weight:500;vertical-align:super;margin-left:4px}
+.price .note{color:var(--muted);font-size:14px;margin:0}
+.signbox{margin-top:48px;padding:28px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.signbox h2{margin-top:0}
+.field{display:block;margin:14px 0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.field input,.field textarea{width:100%;background:#0b0f17;color:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font:inherit;font-size:15px}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.sig-input{font-family:"Brush Script MT","Segoe Script",cursive;font-size:28px!important;letter-spacing:.5px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.btn{display:inline-block;background:var(--accent);color:#0b0f17;border:0;border-radius:10px;padding:16px 28px;font:inherit;font-weight:700;font-size:16px;cursor:pointer;letter-spacing:.02em;width:100%;margin-top:16px}
+.btn:hover{filter:brightness(1.1)}
+.terms{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.5}
+.success{display:none;padding:20px;background:#052e2b;border:1px solid #064e3b;border-radius:10px;color:#a7f3d0;margin-top:16px}
+.success.show{display:block}
+footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center}
+.tag{display:inline-block;background:#1f2937;color:var(--muted);padding:3px 10px;border-radius:999px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-left:6px;vertical-align:middle}
+hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Project plan · prepared for Midland Floor Care</p>
+  <h1>Fix the foundation. Capture the carpet market. Win the DMV.</h1>
+  <p class="lede">A focused 90-day rebuild of the technical, content, and lead-flow stack — anchored on what your data already says is leaking the most money.</p>
+</header>
+
+<h2>What the data shows</h2>
+<p>Pulled from your Google Search Console, Google Ads, GA, internal crawl, PageSpeed, and GMB.</p>
+
+<div class="grid">
+  <div class="stat"><span class="k">Impressions / 90 days</span><span class="v">19,772</span></div>
+  <div class="stat"><span class="k">Clicks / 90 days</span><span class="v">60</span></div>
+  <div class="stat"><span class="k">Avg position</span><span class="v warn">35.8</span></div>
+  <div class="stat"><span class="k">Mobile PageSpeed</span><span class="v bad">34<small>LCP 11.4s · TBT 1,390ms</small></span></div>
+  <div class="stat"><span class="k">Pages not indexed</span><span class="v bad">857<small>+ 422 robots-blocked, 130 404s</small></span></div>
+  <div class="stat"><span class="k">Real content pages</span><span class="v">38</span></div>
+  <div class="stat"><span class="k">GMB reviews</span><span class="v warn">2</span></div>
+  <div class="stat"><span class="k">Carpet cleaning page clicks</span><span class="v bad">1<small>vs 500K+ monthly searches</small></span></div>
+</div>
+
+<h3>Money queries leaking impressions</h3>
+<table>
+  <thead><tr><th>Query</th><th>Impressions</th><th>Position</th></tr></thead>
+  <tbody>
+    <tr><td>commercial floor maintenance</td><td>1,720</td><td>49</td></tr>
+    <tr><td>commercial floor care germantown</td><td>842</td><td><strong style="color:var(--accent)">7.2</strong></td></tr>
+    <tr><td>commercial floor cleaning services near me</td><td>280</td><td>20</td></tr>
+    <tr><td>hardwood floor cleaning washington dc</td><td>162</td><td>17</td></tr>
+    <tr><td>warehouse floor cleaning company</td><td>101</td><td>11</td></tr>
+  </tbody>
+</table>
+
+<h2>Scope of work</h2>
+<div class="scope">
+  <div class="row"><div class="num">01</div><div><h3>WP-GitHub Backup <span class="tag">Existing</span></h3><p>Version-controlled backup and deployment pipeline. Already proven on Drywall Pros.</p></div></div>
+  <div class="row"><div class="num">02</div><div><h3>Smart Forms Pro</h3><p>Forms, CRM with ActiveCampaign integration, appointment scheduler with Google Calendar sync, Resend email transport.</p></div></div>
+  <div class="row"><div class="num">03</div><div><h3>Real Smart SEO Pro</h3><p>sameAs entity schema, structured data, GSC cleanup (resolves the 857-unindexed crisis), programmatic city × service pages, IndexNow + Rapid URL Indexer for fast Google indexation, daily intel digest.</p></div></div>
+  <div class="row"><div class="num">04</div><div><h3>Smart Reviews Pro</h3><p>Survey-gated GMB review engine. Promoters get the Google review request + reminders. Detractors route to private feedback with owner alert. Triggered by appointment completion.</p></div></div>
+  <div class="row"><div class="num">05</div><div><h3>Intel microservice</h3><p>Python service using pytrends, GSC, GA4, and GMB data to predict demand spikes, surface rising keywords, and email a daily action list.</p></div></div>
+  <div class="row"><div class="num">06</div><div><h3>Site speed + mobile overhaul</h3><p>Elementor audit and rebuild of critical templates. Local CSS bundle, deferred JS, AVIF/WebP images, fixed mobile breakpoints, restructured DOM. Target: PageSpeed mobile 34 → 85+, LCP under 2.5s.</p></div></div>
+  <div class="row"><div class="num">07</div><div><h3>AEO — Answer Engine Optimization</h3><p>Entity reinforcement, llms.txt, structured Q&A schema, citation-friendly rewrites for ChatGPT, Perplexity, Claude, and Google AI Overview visibility.</p></div></div>
+  <div class="row"><div class="num">08</div><div><h3>GEO — Generative Engine Optimization</h3><p>Topical authority clustering, knowledge graph of services × locations × use cases, share-of-voice monitoring across generative answer engines.</p></div></div>
+  <div class="row"><div class="num">09</div><div><h3>Programmatic city × service grid</h3><p>160 pages — 8 services × 20 cities — each with unique geo evidence, full schema, and IndexNow + Rapid URL Indexer submission on publish. Includes the carpet cleaning silo, hardwood refinishing, and vinyl/LVT pages currently missing.</p></div></div>
+</div>
+
+<h2>90-day timeline</h2>
+<div class="timeline">
+  <div class="tl"><span>Week 1</span><span>GSC cleanup, robots.txt fix, 130 404s resolved, sameAs + @id schema deployed, mobile speed first pass.</span></div>
+  <div class="tl"><span>Week 2</span><span>Elementor template rebuilds, full speed pass to PageSpeed 80+, title/meta rewrites on 8 striking-distance pages, IndexNow live.</span></div>
+  <div class="tl"><span>Week 3</span><span>Smart Forms + appointment scheduler + Google Calendar live. Resend wired. ActiveCampaign connected.</span></div>
+  <div class="tl"><span>Week 4</span><span>Smart Reviews deployed. Survey flow live. Owner alerts active.</span></div>
+  <div class="tl"><span>Weeks 5–6</span><span>Programmatic page CPT live. First 40 city × service pages published with unique evidence, Rapid URL Indexer submission.</span></div>
+  <div class="tl"><span>Weeks 7–8</span><span>Carpet cleaning silo built (10 dedicated pages). Hardwood refinishing + vinyl/LVT pages added.</span></div>
+  <div class="tl"><span>Weeks 9–10</span><span>AEO + GEO layer applied to all programmatic pages. llms.txt published. Entity language audit and consolidation.</span></div>
+  <div class="tl"><span>Week 11</span><span>Intel microservice live. Daily owner digest sending.</span></div>
+  <div class="tl"><span>Week 12</span><span>Full programmatic grid (160 pages) published. Final indexation push. Performance review.</span></div>
+</div>
+
+<h2>Predicted results</h2>
+<div class="results">
+  <div class="card">
+    <h3>By day 90</h3>
+    <ul>
+      <li>Pages indexed: 38 → 180+</li>
+      <li>Impressions: ~6,500/mo → 60,000+/mo</li>
+      <li>Clicks: ~20/mo → 400+/mo</li>
+      <li>Striking-distance queries pushed to top 3 (Germantown, warehouse, hardwood DC, vinyl)</li>
+      <li>Mobile PageSpeed: 34 → 85+</li>
+      <li>LCP: 11.4s → under 2.5s</li>
+      <li>GMB reviews: 2 → 25+</li>
+      <li>Local pack inclusion in 5+ city × service combos</li>
+      <li>First AI Overview / Perplexity citations appearing</li>
+      <li>Carpet cleaning vertical activated</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>By month 6</h3>
+    <ul>
+      <li>Impressions: 150,000+/mo</li>
+      <li>Clicks: 1,500+/mo at avg position under 15</li>
+      <li>Local pack inclusion in 15+ combos</li>
+      <li>Carpet cleaning revenue stream producing leads</li>
+      <li>Reactivation drips recovering 8–15% of dormant past customers</li>
+      <li>Daily intel digest driving 3–5 new opportunity actions per week</li>
+    </ul>
+  </div>
+</div>
+
+<div class="price">
+  <p class="eyebrow" style="margin:0">Total investment</p>
+  <div class="amount">$3,950<span>flat</span></div>
+  <p class="note">Everything above included. No retainer. No upsells.</p>
+</div>
+
+<h2>What we need from you</h2>
+<ul>
+  <li>WordPress admin access</li>
+  <li>Google Business Profile manager access</li>
+  <li>Google Search Console + GA4 access</li>
+  <li>Google Cloud OAuth credentials (for calendar sync)</li>
+  <li>Resend API key with verified sending domain</li>
+  <li>ActiveCampaign API key</li>
+  <li>Approval to start this week</li>
+</ul>
+
+<div class="signbox" id="sign">
+  <h2 style="margin-top:0">Approve & sign</h2>
+  <p>Sign below and I'll kick off Week 1 within 48 hours.</p>
+
+  <form id="agreement" novalidate>
+    <div class="row2">
+      <div class="field">
+        <label for="name">Full name</label>
+        <input type="text" id="name" name="name" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="company">Company</label>
+        <input type="text" id="company" name="company" value="Midland Floor Care" required>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+    </div>
+    <div class="field">
+      <label for="signature">Signature (type your full name)</label>
+      <input type="text" id="signature" name="signature" class="sig-input" required autocomplete="off">
+    </div>
+
+    <button type="submit" class="btn">Approve scope & start Week 1</button>
+
+    <p class="terms">By signing, you authorize the scope of work listed above for a flat fee of $3,950 USD, payable on kickoff. Engagement begins within 48 hours of signature. Predicted results are based on current Google Search Console, Google Ads, and PageSpeed data and are forecasts, not guarantees — actual results may vary based on market conditions and external factors.</p>
+
+    <div class="success" id="ok">Signed. I'll send the kickoff email and invoice to the address above within 24 hours.</div>
+  </form>
+</div>
+
+<footer>
+  Prepared <span id="prep"></span> · Midland Floor Care · 90-day plan v1
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var d=new Date();
+  document.getElementById('prep').textContent=d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('date').value=d.toISOString().slice(0,10);
+
+  var form=document.getElementById('agreement');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!form.checkValidity()){form.reportValidity();return;}
+    var data={
+      name:form.name.value.trim(),
+      company:form.company.value.trim(),
+      email:form.email.value.trim(),
+      date:form.date.value,
+      signature:form.signature.value.trim(),
+      signedAt:new Date().toISOString(),
+      userAgent:navigator.userAgent
+    };
+    // Plug your endpoint here (Formspree, Netlify Forms, webhook, etc.)
+    var endpoint=window.SIGN_ENDPOINT||'';
+    var done=function(){
+      document.getElementById('ok').classList.add('show');
+      form.querySelector('button').disabled=true;
+      form.querySelector('button').textContent='Signed';
+      try{localStorage.setItem('midland_signed',JSON.stringify(data));}catch(e){}
+    };
+    if(endpoint){
+      fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+        .then(done).catch(done);
+    } else {
+      done();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
