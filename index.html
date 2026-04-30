@@ -133,6 +133,41 @@
 
         .secure-badge { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: var(--text-body); font-size: 12px; font-weight: bold; }
 
+        /* BEFORE / AFTER */
+        .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin: 30px 0; }
+        @media (max-width: 640px) { .ba-grid { grid-template-columns: 1fr; } }
+        .ba-col { padding: 30px; }
+        .ba-col.before { background: #fef2f2; border-right: 2px solid #e5e7eb; }
+        .ba-col.after { background: #f0fdf4; }
+        @media (max-width: 640px) { .ba-col.before { border-right: none; border-bottom: 2px solid #e5e7eb; } }
+        .ba-label { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        .ba-label.before { color: #dc2626; }
+        .ba-label.after { color: #16a34a; }
+        .ba-col ul { list-style: none; padding: 0; margin: 0; }
+        .ba-col ul li { font-size: 14px; line-height: 1.5; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,0.06); color: var(--text-body); }
+        .ba-col ul li:last-child { border-bottom: none; }
+        .ba-col.before ul li::before { content: "✗  "; color: #dc2626; font-weight: 900; }
+        .ba-col.after ul li::before { content: "✓  "; color: #16a34a; font-weight: 900; }
+
+        /* MILESTONE PHASES */
+        .phases { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 30px 0; }
+        @media (max-width: 640px) { .phases { grid-template-columns: 1fr; } }
+        .phase { border: 2px solid #e5e7eb; border-radius: 8px; padding: 24px; background: white; }
+        .phase-num { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--brand-green); margin-bottom: 6px; }
+        .phase-title { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
+        .phase-weeks { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+        .phase-items { list-style: none; padding: 0; margin: 0 0 16px; }
+        .phase-items li { font-size: 13px; color: var(--text-body); padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+        .phase-items li:last-child { border-bottom: none; }
+        .phase-price { font-size: 22px; font-weight: 900; color: var(--text-dark); }
+        .phase-trigger { font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 2px; }
+
+        /* SIGNATURE CANVAS */
+        .sig-canvas-wrap { border: 2px solid #9ca3af; border-radius: 6px; background: white; position: relative; }
+        #sig-canvas { display: block; width: 100%; height: 120px; cursor: crosshair; touch-action: none; }
+        .sig-actions { display: flex; justify-content: flex-end; padding: 6px 10px; border-top: 1px solid #e5e7eb; }
+        .sig-clear { font-size: 12px; color: #6b7280; cursor: pointer; background: none; border: none; text-decoration: underline; }
+
         /* SUCCESS STATE */
         #success-state { display: none; text-align: center; padding: 50px 20px; background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 8px; margin-top: 40px; }
         #success-state svg { width: 80px; height: 80px; color: var(--cta-color); margin-bottom: 20px; }
@@ -324,22 +359,6 @@
                         <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <div class="offer-text">
                             <h4>Programmatic City × Service Grid (160 Pages)</h4>
-                            <p>8 services × 20 DMV cities. One highly optimized page per real search intent.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Site Speed + Mobile Overhaul</h4>
-                            <p>Elementor rebuild. Target: PageSpeed 34 → 85+. Google scores mobile experience for rank; we fix yours.</p>
-                        </div>
-                    </div>
-
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Programmatic City × Service Grid (160 Pages)</h4>
                             <p>8 services × 20 DMV cities. One highly-optimized page per real search intent.</p>
                         </div>
                     </div>
@@ -389,22 +408,127 @@
                 </div>
             </div>
 
-            <!-- 5. CHECKOUT / FORM SECTION -->
-            <div id="checkout" class="form-section">
-                <div class="form-container" id="form-ui">
-                    <h2>Approve & Start Project</h2>
-                    <p class="sub">Fill out the secure form below to authorize the scope of work. We will begin Week 1 execution within 48 hours.</p>
+            <!-- 4b. BEFORE / AFTER -->
+            <div class="section-padding" style="background:#fff;">
+                <h2 class="section-title">Before This Plan vs. After</h2>
+                <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">The #1 reason small businesses lose jobs isn't lack of demand — it's the broken lead system. Every form submission that goes unresponded is a job your competitor is booking.</p>
+                <div class="ba-grid">
+                    <div class="ba-col before">
+                        <div class="ba-label before">Before This Plan</div>
+                        <ul>
+                            <li>Lead fills out form at 9pm — WP mail fires into spam or doesn't deliver at all</li>
+                            <li>Owner never sees the inquiry — no reply sent — lead books the next guy who picks up</li>
+                            <li>No automated follow-up — cold leads sit in an inbox and go nowhere</li>
+                            <li>Appointments tracked in a notebook — client gets no reminder — no-shows happen</li>
+                            <li>Job finishes — owner is on to the next one — never asks for a review</li>
+                            <li>GMB stays at a handful of reviews while competitors stack 50–500 stars</li>
+                            <li>No visibility into which service or city is driving the most interest</li>
+                            <li>Past customers never heard from again — reactivation is zero</li>
+                        </ul>
+                    </div>
+                    <div class="ba-col after">
+                        <div class="ba-label after">After This Plan</div>
+                        <ul>
+                            <li>Lead submits → Resend delivers instantly — owner notified, branded confirmation sent in seconds</li>
+                            <li>Automated reply fires within minutes with a booking link</li>
+                            <li>If owner hasn't responded in 2 hours → reminder fires to owner's phone + email</li>
+                            <li>Lead self-books via Google Calendar — confirmation sent to both parties automatically</li>
+                            <li>24h reminder + 2h reminder sent to client before appointment</li>
+                            <li>Job complete → 24h later, survey email fires to client</li>
+                            <li>Happy client scores high → branded GMB review link sent + 2 follow-up reminders</li>
+                            <li>Every lead, appointment, and job logged in ActiveCampaign — full pipeline visibility</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px;">
+                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
+                        <div style="font-size:28px;font-weight:900;color:#16a34a;">&lt;2 min</div>
+                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">Lead response time</div>
+                    </div>
+                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
+                        <div style="font-size:28px;font-weight:900;color:#16a34a;">100%</div>
+                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">Email deliverability</div>
+                    </div>
+                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
+                        <div style="font-size:28px;font-weight:900;color:#16a34a;">0</div>
+                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">Leads lost to spam</div>
+                    </div>
+                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
+                        <div style="font-size:28px;font-weight:900;color:#16a34a;">25+</div>
+                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">New GMB reviews / 90 days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. MILESTONE PAYMENT PLAN -->
+            <div class="section-padding gray-section">
+                <h2 class="section-title">3-Phase Milestone Payment Plan</h2>
+                <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">No large upfront lump sum. Each payment unlocks when the previous phase is delivered and confirmed.</p>
+                <div class="phases">
+                    <div class="phase">
+                        <div class="phase-num">Phase 1</div>
+                        <div class="phase-title">Foundation & Speed</div>
+                        <div class="phase-weeks">Weeks 1–4</div>
+                        <ul class="phase-items">
+                            <li>GSC cleanup — kill 857 junk URLs</li>
+                            <li>Resend email transport (zero spam)</li>
+                            <li>sameAs entity schema live</li>
+                            <li>IndexNow + Rapid URL Indexer wired</li>
+                            <li>Site speed overhaul (34 → 85+ target)</li>
+                            <li>GitHub backup deployed</li>
+                        </ul>
+                        <div class="phase-price">$1,500</div>
+                        <div class="phase-trigger">Due on project kickoff</div>
+                    </div>
+                    <div class="phase" style="border-color:var(--brand-green);">
+                        <div class="phase-num">Phase 2</div>
+                        <div class="phase-title">Content Engine</div>
+                        <div class="phase-weeks">Weeks 5–8</div>
+                        <ul class="phase-items">
+                            <li>160 city × service pages live</li>
+                            <li>Google Calendar integration</li>
+                            <li>Smart Forms Pro + ActiveCampaign</li>
+                            <li>Automated lead follow-up sequence</li>
+                            <li>AEO + GEO optimization (llms.txt)</li>
+                        </ul>
+                        <div class="phase-price">$1,500</div>
+                        <div class="phase-trigger">Due on Phase 1 milestone delivery</div>
+                    </div>
+                    <div class="phase">
+                        <div class="phase-num">Phase 3</div>
+                        <div class="phase-title">Market Domination</div>
+                        <div class="phase-weeks">Weeks 9–12</div>
+                        <ul class="phase-items">
+                            <li>Smart Reviews Pro live</li>
+                            <li>Survey-gated GMB review engine</li>
+                            <li>Daily Intel microservice</li>
+                            <li>pytrends + GSC keyword digest</li>
+                            <li>Final QA + handoff documentation</li>
+                        </ul>
+                        <div class="phase-price">$950</div>
+                        <div class="phase-trigger">Due on Phase 2 milestone delivery</div>
+                    </div>
+                </div>
+                <div style="text-align:center;font-size:18px;font-weight:700;color:var(--text-dark);margin-top:10px;">Total: $3,950 — milestone-based, no surprises.</div>
+            </div>
+
+            <!-- 6. CHECKOUT / FORM SECTION -->
+            <div id="checkout" style="background:#f9fafb;padding:50px 20px;border-top:3px solid #e5e7eb;">
+                <div style="max-width:600px;margin:0 auto;background:white;padding:40px;border-radius:8px;border:1px solid #e5e7eb;box-shadow:0 10px 25px -5px rgba(0,0,0,0.08);" id="form-ui">
+                    <h2 style="text-align:center;margin-bottom:10px;font-size:28px;font-weight:900;color:var(--text-dark);">Approve & Start Project</h2>
+                    <p style="text-align:center;margin-bottom:30px;font-size:15px;color:var(--text-body);">Fill out the secure form below to authorize the scope of work. Week 1 begins within 48 hours.</p>
 
                     <div class="price-tag">$3,950</div>
-                    <div class="price-sub">One Time Flat Fee. Everything Above Included.</div>
-                    <p style="text-align: center; margin-top: -15px; margin-bottom: 25px; color: #6b7280; font-size: 13px; font-weight: 500;">*Maintenance fees apply only if you want optional ongoing monthly support after the build.</p>
+                    <div class="price-sub">3-Phase Milestone Plan · Everything Above Included</div>
+                    <p style="text-align:center;margin-top:-15px;margin-bottom:25px;color:#6b7280;font-size:13px;">$1,500 on kickoff · $1,500 on Phase 1 delivery · $950 on Phase 2 delivery</p>
 
                     <form id="approval-form">
                         <div class="form-group">
                             <label>Full Name</label>
                             <input type="text" id="fullName" required placeholder="John Doe">
                         </div>
-                        
+
                         <div class="form-group">
                             <label>Company</label>
                             <input type="text" id="company" value="Midland Floor Care" required>
@@ -420,30 +544,41 @@
                             <input type="text" id="date" required readonly>
                         </div>
 
-                        <div class="signature-box">
-                            <label>Type Your Full Name To Digitally Sign</label>
-                            <input type="text" id="signature" class="sig-input" required placeholder="Sign Here" autocomplete="off">
+                        <div class="form-group">
+                            <label>Draw Your Signature</label>
+                            <div class="sig-canvas-wrap">
+                                <canvas id="sig-canvas" width="560" height="120"></canvas>
+                                <div class="sig-actions">
+                                    <button type="button" class="sig-clear" id="sig-clear">Clear</button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="sig-data" name="signature">
+                            <p style="font-size:12px;color:#9ca3af;margin-top:6px;">Use mouse or finger to sign above</p>
                         </div>
 
-                        <button type="submit" class="cta-button" style="width: 100%; max-width: 100%; margin-top: 30px;">
-                            <span class="cta-main-text" style="font-size: 22px;">I Approve This Scope Start Week 1</span>
+                        <button type="submit" class="cta-button" style="width:100%;max-width:100%;margin-top:20px;display:block;">
+                            <span class="cta-main-text" style="font-size:22px;">I Approve This Scope — Start Week 1</span>
                             <span class="cta-sub-text">Commit to capturing your lost traffic today.</span>
                         </button>
-                        
-                        <p style="text-align: center; font-size: 12px; color: #6b7280; margin-top: 15px;">By signing, you authorize the custom build above for a one time $3,950 USD payable on kickoff. Maintenance is optional. Engagement begins within 48 hours.</p>
-                        
+
+                        <p style="text-align:center;font-size:12px;color:#6b7280;margin-top:15px;">By signing, you authorize the 3-phase build above totalling $3,950 USD, payable per milestone. Engagement begins within 48 hours of kickoff payment.</p>
+
                         <div class="secure-badge">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                            Secure 256 Bit SSL Connection
+                            Secure 256-Bit SSL Connection
                         </div>
                     </form>
                 </div>
 
                 <!-- SUCCESS STATE -->
-                <div id="success-state" class="form-container">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    <h2 style="color: var(--cta-color); margin: 20px 0 10px;">Signed & Approved</h2>
-                    <p style="font-size: 18px; color: var(--text-dark);">Your approval has been securely recorded. You will receive a kickoff email and invoice within 24 hours.</p>
+                <div id="success-state" style="display:none;max-width:600px;margin:40px auto 0;text-align:center;padding:50px 20px;background:#f0fdf4;border:2px solid #bbf7d0;border-radius:8px;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 20px;display:block;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <h2 style="color:var(--cta-color);margin:0 0 10px;font-size:28px;">Signed & Approved</h2>
+                    <p style="font-size:18px;color:var(--text-dark);margin-bottom:24px;">Your approval has been securely recorded. You will receive a kickoff email and invoice within 24 hours.</p>
+                    <a href="https://calendly.com" target="_blank" class="cta-button" style="max-width:400px;margin:0 auto;display:block;">
+                        <span class="cta-main-text" style="font-size:18px;">Book Your Kickoff Call →</span>
+                        <span class="cta-sub-text">Lock in your Week 1 start time</span>
+                    </a>
                 </div>
             </div>
 
@@ -452,36 +587,83 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Set Date
+            // Dynamic date
             const dateField = document.getElementById('date');
-            if(dateField) dateField.value = "April 30, 2026";
+            if (dateField) {
+                const d = new Date();
+                dateField.value = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
 
-            // Form Logic
+            // Canvas signature
+            const canvas = document.getElementById('sig-canvas');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            let hasSig = false;
+
+            function resize() {
+                const ratio = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * ratio;
+                canvas.height = rect.height * ratio;
+                ctx.scale(ratio, ratio);
+                ctx.strokeStyle = '#111827';
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const src = e.touches ? e.touches[0] : e;
+                return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+            }
+
+            canvas.addEventListener('mousedown',  e => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+            canvas.addEventListener('mousemove',  e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; });
+            canvas.addEventListener('mouseup',    () => drawing = false);
+            canvas.addEventListener('mouseleave', () => drawing = false);
+            canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); }, { passive: false });
+            canvas.addEventListener('touchmove',  e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; }, { passive: false });
+            canvas.addEventListener('touchend',   () => drawing = false);
+
+            document.getElementById('sig-clear').addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                hasSig = false;
+                document.getElementById('sig-data').value = '';
+            });
+
+            // Form submit
             const form = document.getElementById('approval-form');
             const formUI = document.getElementById('form-ui');
             const successUI = document.getElementById('success-state');
 
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', e => {
                 e.preventDefault();
 
-                // Capture data
+                if (!hasSig) {
+                    canvas.style.outline = '2px solid #dc2626';
+                    canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                canvas.style.outline = '';
+
+                document.getElementById('sig-data').value = canvas.toDataURL();
+
                 const payload = {
-                    name: document.getElementById('fullName').value,
-                    company: document.getElementById('company').value,
-                    email: document.getElementById('email').value,
-                    date: document.getElementById('date').value,
-                    signature: document.getElementById('signature').value,
+                    name:      document.getElementById('fullName').value,
+                    company:   document.getElementById('company').value,
+                    email:     document.getElementById('email').value,
+                    date:      document.getElementById('date').value,
+                    signature: canvas.toDataURL(),
                     timestamp: new Date().toISOString()
                 };
 
-                // Store in local storage
                 localStorage.setItem('midland_proposal_signature', JSON.stringify(payload));
 
-                // Swap UI
                 formUI.style.display = 'none';
                 successUI.style.display = 'block';
-
-                // Scroll to success
                 successUI.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
         });
