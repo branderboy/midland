@@ -96,13 +96,63 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 .gap h3{margin:0 0 8px;color:var(--warn);font-size:15px}
 .gap p{margin:0;font-size:14px;color:#cdd3dd}
 .gap ul{margin:8px 0 0;padding-left:18px;font-size:13px}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0 32px}
+@media(max-width:600px){.ba{grid-template-columns:1fr}}
+.ba-before{background:#160a0a;border-right:1px solid var(--line);padding:22px 20px}
+.ba-after{background:#0a1610;padding:22px 20px}
+@media(max-width:600px){.ba-before{border-right:0;border-bottom:1px solid var(--line)}}
+.ba-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.ba-label.before{color:#f87171}
+.ba-label.after{color:var(--good)}
+.ba-label::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.ba ul{margin:0;padding:0;list-style:none}
+.ba li{font-size:13px;line-height:1.45;padding:8px 0;border-bottom:1px dashed var(--line);color:#cdd3dd;display:flex;gap:8px;align-items:flex-start}
+.ba li:last-child{border-bottom:0}
+.ba-before li::before{content:'✗';color:#f87171;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ba-after li::before{content:'✓';color:var(--good);font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ba-divider{grid-column:1/-1;background:var(--line);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+@media(max-width:600px){.ba-divider{grid-column:1}}
+.system-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:16px 0 8px}
+.ss{background:var(--panel);border:1px solid #1a2e1a;border-radius:10px;padding:14px 16px;text-align:center}
+.ss .n{font-size:26px;font-weight:800;color:var(--good);letter-spacing:-.02em;line-height:1;margin:0 0 4px}
+.ss .d{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.phases{display:grid;gap:14px;margin:16px 0 24px}
+.phase{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.phase-head{display:grid;grid-template-columns:1fr auto;align-items:start;gap:12px;padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+.phase-head h3{margin:0 0 4px;font-size:16px}
+.phase-head .week{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.phase-pay{text-align:right;flex-shrink:0}
+.phase-pay .amt{display:block;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1}
+.phase-pay .when{display:block;font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.04em;text-transform:uppercase}
+.phase-body{padding:14px 20px}
+.phase-body ul{margin:0;padding-left:18px;font-size:13px;color:#cdd3dd}
+.phase-body li{margin:5px 0}
+.phase-ms{display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:12px;color:var(--good)}
+.phase-ms::before{content:"✓";font-weight:700;flex-shrink:0}
+.ph1{border-color:#1e3a4a}.ph1 .phase-head{background:linear-gradient(135deg,#0f1f2a,#111827)}
+.ph2{border-color:#1a2e1a}.ph2 .phase-head{background:linear-gradient(135deg,#0d1f0d,#111827)}
+.ph3{border-color:#2a2010}.ph3 .phase-head{background:linear-gradient(135deg,#1a1408,#111827)}
+.ph1 .phase-pay .amt{color:var(--accent)}
+.ph2 .phase-pay .amt{color:var(--good)}
+.ph3 .phase-pay .amt{color:var(--warn)}
+.price-total{margin:0 0 8px;padding:24px;background:linear-gradient(135deg,#0b1120 0%,#111827 100%);border:1px solid #2a3447;border-radius:14px;text-align:center}
+.price-total .amount{font-size:clamp(40px,7vw,68px);font-weight:800;letter-spacing:-.04em;line-height:1;color:#fff;margin:6px 0}
+.price-total .amount span{color:var(--muted);font-size:.4em;font-weight:500;vertical-align:super;margin-left:4px}
+.price-total .note{color:var(--muted);font-size:13px;margin:0}
 </style>
 </head>
 <body>
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">Growth plan · prepared for Midland Floor Care</p>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#0b0f17;letter-spacing:-.02em">TF</div>
+      <div style="font-size:13px;color:var(--muted)">TaggleFish <span style="color:var(--line)">·</span> prepared for <strong style="color:#fff">Midland Floor Care</strong></div>
+    </div>
+    <a href="#sign" style="background:var(--accent);color:#0b0f17;text-decoration:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;white-space:nowrap">Review &amp; sign →</a>
+  </div>
+  <p class="eyebrow">Growth plan · April 2026</p>
   <h1>80,000+ DMV searches every month for what you do. Here's how we capture them.</h1>
   <p class="lede">Your Google Ads, GSC, and GA data tell a clear story: there's an active, addressable market in DC, Maryland, and Virginia worth more than $140,000 a year in equivalent paid traffic — and a 90-day plan to capture it.</p>
 </header>
@@ -169,6 +219,49 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
   </ul>
 </div>
 
+<h2>One system. Zero missed leads.</h2>
+<p>Right now, every lead Midland gets goes through WordPress's default mail — which fails silently, lands in spam, or delays for hours. By the time a response goes out, the lead has already called a competitor. Here's exactly what changes.</p>
+
+<div class="ba">
+  <div class="ba-before">
+    <p class="ba-label before">Before this plan</p>
+    <ul>
+      <li>Lead fills out form at 9pm — WP mail fires into spam or doesn't deliver at all</li>
+      <li>Owner never sees the inquiry — no reply sent — lead books the next guy who picks up</li>
+      <li>No automated follow-up — cold leads sit in an inbox and go nowhere</li>
+      <li>Appointments tracked in a notebook — client gets no reminder — no-shows happen</li>
+      <li>Owner has to remember to send a reminder — often doesn't</li>
+      <li>Job finishes — owner is on to the next one — never asks for a review</li>
+      <li>GMB stays at 2 reviews while competitors stack 50–500 stars</li>
+      <li>No visibility into which service or city is driving the most interest</li>
+      <li>Past customers never heard from again — reactivation is zero</li>
+    </ul>
+  </div>
+  <div class="ba-after">
+    <p class="ba-label after">After this plan</p>
+    <ul>
+      <li>Lead submits → Resend delivers instantly — owner notified, branded confirmation sent to lead in seconds</li>
+      <li>Automated reply fires within minutes: "We got your request — here's a link to book your walkthrough"</li>
+      <li>If owner hasn't responded in 2 hours → reminder fires to owner's phone + email</li>
+      <li>Lead self-books via Google Calendar — confirmation sent to both parties automatically</li>
+      <li>24h reminder + 2h reminder sent to client before appointment — no-shows drop</li>
+      <li>Job marked complete → 24h later, survey email fires to client</li>
+      <li>Happy client scores high → branded GMB review link sent + 2 follow-up reminders</li>
+      <li>Every lead, appointment, job logged in ActiveCampaign — full pipeline visibility</li>
+      <li>Dormant clients surface in daily Intel digest — owner knows exactly who to reach out to today</li>
+    </ul>
+  </div>
+</div>
+
+<div class="system-stat">
+  <div class="ss"><p class="n">&lt;2 min</p><p class="d">Lead response time</p></div>
+  <div class="ss"><p class="n">100%</p><p class="d">Email deliverability via Resend</p></div>
+  <div class="ss"><p class="n">0</p><p class="d">Leads lost to spam</p></div>
+  <div class="ss"><p class="n">25+</p><p class="d">GMB reviews by day 90</p></div>
+</div>
+
+<p style="font-size:13px;color:var(--muted);margin-top:8px">Speed to lead is the single biggest lever in service business conversion. Studies show responding within 5 minutes vs 30 minutes increases close rate by up to 21×. Resend + automated reminders make that happen without the owner thinking about it.</p>
+
 <h2>Scope of work</h2>
 <div class="scope">
   <div class="row"><div class="num">01</div><div><h3>WP-GitHub Backup <span class="tag">Existing</span></h3><p>Version-controlled backup and deployment pipeline. Already proven on Drywall Pros.</p></div></div>
@@ -225,11 +318,93 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
   </div>
 </div>
 
-<div class="price">
+<h2>Investment & payment plan</h2>
+<p>Total is $3,950 — broken into three payments tied to delivered milestones, not calendar dates.</p>
+
+<div class="price-total">
   <p class="eyebrow" style="margin:0">Total investment</p>
   <div class="amount">$3,950<span>flat</span></div>
-  <p class="note">Everything above included. No retainer. No upsells.</p>
-  <p class="note" style="margin-top:14px;font-size:13px">Versus $144,000 / year in equivalent paid traffic at month 6 — a one-time investment that replaces a recurring ad budget.</p>
+  <p class="note">No retainer. No upsells. Versus $144,000/yr in equivalent paid traffic at month 6.</p>
+</div>
+
+<div class="phases">
+
+  <div class="phase ph1">
+    <div class="phase-head">
+      <div>
+        <div class="week">Phase 1 · Weeks 1–4</div>
+        <h3>Foundation & Speed</h3>
+      </div>
+      <div class="phase-pay">
+        <span class="amt">$1,500</span>
+        <span class="when">Due on kickoff</span>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>WP GitHub Backup configured and deployment pipeline live</li>
+        <li>GSC cleanup — 857 unindexed pages resolved, 130 404s fixed, robots.txt patched</li>
+        <li>sameAs entity schema + @id business node deployed sitewide</li>
+        <li>Elementor rebuild — PageSpeed mobile 34 → 85+, LCP under 2.5s</li>
+        <li>Title + meta rewrites on 8 striking-distance pages</li>
+        <li>IndexNow live — every publish pings Google instantly</li>
+        <li>Smart Forms + appointment scheduler + Google Calendar + Resend wired</li>
+        <li>ActiveCampaign CRM integration live</li>
+        <li>Smart Reviews deployed — survey → GMB flow active</li>
+      </ul>
+      <div class="phase-ms">Milestone: PageSpeed 80+ confirmed · GSC coverage errors down 80%+ · Lead capture live · First GMB review request sent</div>
+    </div>
+  </div>
+
+  <div class="phase ph2">
+    <div class="phase-head">
+      <div>
+        <div class="week">Phase 2 · Weeks 5–8</div>
+        <h3>Content Engine</h3>
+      </div>
+      <div class="phase-pay">
+        <span class="amt">$1,500</span>
+        <span class="when">Due on Phase 1 milestone</span>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>Programmatic CPT live — city × service architecture built</li>
+        <li>First 40 city × service pages published with unique geo evidence and full schema</li>
+        <li>Rapid URL Indexer submission — 40 pages queued for fast indexing</li>
+        <li>Carpet cleaning silo — 10 dedicated pages (residential, office, area rug, post-construction)</li>
+        <li>Hardwood floor refinishing page — currently 0 coverage, 162 monthly impressions at pos 17</li>
+        <li>Vinyl &amp; LVT floor cleaning page — 176 monthly impressions at pos 16</li>
+        <li>Commercial floor maintenance page — 1,720 impressions, currently no page exists</li>
+      </ul>
+      <div class="phase-ms">Milestone: 40+ new pages indexed · Carpet cleaning vertical producing first clicks · 3 missing service pages live</div>
+    </div>
+  </div>
+
+  <div class="phase ph3">
+    <div class="phase-head">
+      <div>
+        <div class="week">Phase 3 · Weeks 9–12</div>
+        <h3>Market Domination</h3>
+      </div>
+      <div class="phase-pay">
+        <span class="amt">$950</span>
+        <span class="when">Due on Phase 2 milestone</span>
+      </div>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>AEO layer — structured Q&amp;A schema, FAQPage, citation-ready rewrites across all pages</li>
+        <li>GEO layer — topical authority clustering, knowledge graph, llms.txt published</li>
+        <li>Full 160-page programmatic grid published (8 services × 20 cities)</li>
+        <li>Final Rapid URL Indexer push on all remaining pages</li>
+        <li>Intel microservice live — pytrends + GSC + GA4 + GMB daily owner digest</li>
+        <li>90-day performance review — impressions, clicks, indexed pages, GMB reviews, lead volume vs baseline</li>
+      </ul>
+      <div class="phase-ms">Milestone: 160 pages published · 80%+ indexed · Daily intel digest running · Full 90-day report delivered</div>
+    </div>
+  </div>
+
 </div>
 
 <h2>What we need from you</h2>
@@ -275,14 +450,18 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 
     <button type="submit" class="btn">Approve scope & start Week 1</button>
 
-    <p class="terms">By signing, you authorize the scope of work listed above for a flat fee of $3,950 USD, payable on kickoff. Engagement begins within 48 hours of signature. Predicted results are based on current Google Search Console, Google Ads, and PageSpeed data and are forecasts, not guarantees — actual results may vary based on market conditions and external factors.</p>
+    <p class="terms">By signing, you authorize the scope of work above for a total of $3,950 USD, paid in three milestone-based installments: $1,500 on kickoff, $1,500 on Phase 1 milestone delivery, $950 on Phase 2 milestone delivery. Each payment is triggered by confirmed milestone, not by calendar date. Engagement begins within 48 hours of signature. Predicted results are forecasts based on GSC, Google Ads, and PageSpeed data — actual results may vary.</p>
 
-    <div class="success" id="ok">Signed. I'll send the kickoff email and invoice to the address above within 24 hours.</div>
+    <div class="success" id="ok">
+      <strong style="display:block;font-size:18px;color:var(--good);margin-bottom:8px">Signed. You're in.</strong>
+      You'll receive a kickoff email and Phase 1 invoice within 24 hours. Week 1 starts within 48 hours of payment.<br><br>
+      <a href="https://calendar.google.com" target="_blank" style="display:inline-block;background:var(--accent);color:#0b0f17;text-decoration:none;padding:11px 22px;border-radius:8px;font-weight:700;font-size:14px;margin-top:8px">Book your kickoff call →</a>
+    </div>
   </form>
 </div>
 
 <footer>
-  Prepared <span id="prep"></span> · Midland Floor Care · 90-day plan v1
+  Prepared <span id="prep"></span> · Midland Floor Care · 90-day plan v3 · <a href="#sign" style="color:var(--accent);text-decoration:none">Sign &amp; approve →</a>
 </footer>
 
 </div>
