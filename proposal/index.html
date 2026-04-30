@@ -96,6 +96,26 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 .gap h3{margin:0 0 8px;color:var(--warn);font-size:15px}
 .gap p{margin:0;font-size:14px;color:#cdd3dd}
 .gap ul{margin:8px 0 0;padding-left:18px;font-size:13px}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0 32px}
+@media(max-width:600px){.ba{grid-template-columns:1fr}}
+.ba-before{background:#160a0a;border-right:1px solid var(--line);padding:22px 20px}
+.ba-after{background:#0a1610;padding:22px 20px}
+@media(max-width:600px){.ba-before{border-right:0;border-bottom:1px solid var(--line)}}
+.ba-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.ba-label.before{color:#f87171}
+.ba-label.after{color:var(--good)}
+.ba-label::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.ba ul{margin:0;padding:0;list-style:none}
+.ba li{font-size:13px;line-height:1.45;padding:8px 0;border-bottom:1px dashed var(--line);color:#cdd3dd;display:flex;gap:8px;align-items:flex-start}
+.ba li:last-child{border-bottom:0}
+.ba-before li::before{content:'✗';color:#f87171;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ba-after li::before{content:'✓';color:var(--good);font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ba-divider{grid-column:1/-1;background:var(--line);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+@media(max-width:600px){.ba-divider{grid-column:1}}
+.system-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:16px 0 8px}
+.ss{background:var(--panel);border:1px solid #1a2e1a;border-radius:10px;padding:14px 16px;text-align:center}
+.ss .n{font-size:26px;font-weight:800;color:var(--good);letter-spacing:-.02em;line-height:1;margin:0 0 4px}
+.ss .d{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
 .phases{display:grid;gap:14px;margin:16px 0 24px}
 .phase{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .phase-head{display:grid;grid-template-columns:1fr auto;align-items:start;gap:12px;padding:18px 20px 14px;border-bottom:1px solid var(--line)}
@@ -125,7 +145,14 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">Growth plan · prepared for Midland Floor Care</p>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#0b0f17;letter-spacing:-.02em">TF</div>
+      <div style="font-size:13px;color:var(--muted)">TaggleFish <span style="color:var(--line)">·</span> prepared for <strong style="color:#fff">Midland Floor Care</strong></div>
+    </div>
+    <a href="#sign" style="background:var(--accent);color:#0b0f17;text-decoration:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;white-space:nowrap">Review &amp; sign →</a>
+  </div>
+  <p class="eyebrow">Growth plan · April 2026</p>
   <h1>80,000+ DMV searches every month for what you do. Here's how we capture them.</h1>
   <p class="lede">Your Google Ads, GSC, and GA data tell a clear story: there's an active, addressable market in DC, Maryland, and Virginia worth more than $140,000 a year in equivalent paid traffic — and a 90-day plan to capture it.</p>
 </header>
@@ -191,6 +218,49 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
     <li><strong>1 click in 90 days</strong> on the carpet cleaning page against a 500,000+ monthly search vertical</li>
   </ul>
 </div>
+
+<h2>One system. Zero missed leads.</h2>
+<p>Right now, every lead Midland gets goes through WordPress's default mail — which fails silently, lands in spam, or delays for hours. By the time a response goes out, the lead has already called a competitor. Here's exactly what changes.</p>
+
+<div class="ba">
+  <div class="ba-before">
+    <p class="ba-label before">Before this plan</p>
+    <ul>
+      <li>Lead fills out form at 9pm — WP mail fires into spam or doesn't deliver at all</li>
+      <li>Owner never sees the inquiry — no reply sent — lead books the next guy who picks up</li>
+      <li>No automated follow-up — cold leads sit in an inbox and go nowhere</li>
+      <li>Appointments tracked in a notebook — client gets no reminder — no-shows happen</li>
+      <li>Owner has to remember to send a reminder — often doesn't</li>
+      <li>Job finishes — owner is on to the next one — never asks for a review</li>
+      <li>GMB stays at 2 reviews while competitors stack 50–500 stars</li>
+      <li>No visibility into which service or city is driving the most interest</li>
+      <li>Past customers never heard from again — reactivation is zero</li>
+    </ul>
+  </div>
+  <div class="ba-after">
+    <p class="ba-label after">After this plan</p>
+    <ul>
+      <li>Lead submits → Resend delivers instantly — owner notified, branded confirmation sent to lead in seconds</li>
+      <li>Automated reply fires within minutes: "We got your request — here's a link to book your walkthrough"</li>
+      <li>If owner hasn't responded in 2 hours → reminder fires to owner's phone + email</li>
+      <li>Lead self-books via Google Calendar — confirmation sent to both parties automatically</li>
+      <li>24h reminder + 2h reminder sent to client before appointment — no-shows drop</li>
+      <li>Job marked complete → 24h later, survey email fires to client</li>
+      <li>Happy client scores high → branded GMB review link sent + 2 follow-up reminders</li>
+      <li>Every lead, appointment, job logged in ActiveCampaign — full pipeline visibility</li>
+      <li>Dormant clients surface in daily Intel digest — owner knows exactly who to reach out to today</li>
+    </ul>
+  </div>
+</div>
+
+<div class="system-stat">
+  <div class="ss"><p class="n">&lt;2 min</p><p class="d">Lead response time</p></div>
+  <div class="ss"><p class="n">100%</p><p class="d">Email deliverability via Resend</p></div>
+  <div class="ss"><p class="n">0</p><p class="d">Leads lost to spam</p></div>
+  <div class="ss"><p class="n">25+</p><p class="d">GMB reviews by day 90</p></div>
+</div>
+
+<p style="font-size:13px;color:var(--muted);margin-top:8px">Speed to lead is the single biggest lever in service business conversion. Studies show responding within 5 minutes vs 30 minutes increases close rate by up to 21×. Resend + automated reminders make that happen without the owner thinking about it.</p>
 
 <h2>Scope of work</h2>
 <div class="scope">
@@ -382,12 +452,16 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 
     <p class="terms">By signing, you authorize the scope of work above for a total of $3,950 USD, paid in three milestone-based installments: $1,500 on kickoff, $1,500 on Phase 1 milestone delivery, $950 on Phase 2 milestone delivery. Each payment is triggered by confirmed milestone, not by calendar date. Engagement begins within 48 hours of signature. Predicted results are forecasts based on GSC, Google Ads, and PageSpeed data — actual results may vary.</p>
 
-    <div class="success" id="ok">Signed. I'll send the kickoff email and invoice to the address above within 24 hours.</div>
+    <div class="success" id="ok">
+      <strong style="display:block;font-size:18px;color:var(--good);margin-bottom:8px">Signed. You're in.</strong>
+      You'll receive a kickoff email and Phase 1 invoice within 24 hours. Week 1 starts within 48 hours of payment.<br><br>
+      <a href="https://calendar.google.com" target="_blank" style="display:inline-block;background:var(--accent);color:#0b0f17;text-decoration:none;padding:11px 22px;border-radius:8px;font-weight:700;font-size:14px;margin-top:8px">Book your kickoff call →</a>
+    </div>
   </form>
 </div>
 
 <footer>
-  Prepared <span id="prep"></span> · Midland Floor Care · 90-day plan v2
+  Prepared <span id="prep"></span> · Midland Floor Care · 90-day plan v3 · <a href="#sign" style="color:var(--accent);text-decoration:none">Sign &amp; approve →</a>
 </footer>
 
 </div>
