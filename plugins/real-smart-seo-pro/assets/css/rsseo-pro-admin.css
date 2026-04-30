@@ -1,0 +1,41 @@
+/* Real Smart SEO Pro — Admin Styles */
+
+.rsseo-pro-badge { display: inline-block; background: #6b46c1; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; vertical-align: middle; margin-left: 4px; }
+
+.rsseo-pro-divider { text-align: center; border-bottom: 2px solid #6b46c1; margin: 32px 0 24px; }
+.rsseo-pro-divider span { background: #fff; padding: 0 12px; color: #6b46c1; font-weight: 700; font-size: 13px; text-transform: uppercase; position: relative; top: 12px; }
+
+.rsseo-data-source--pro { border-color: #e9d8fd; background: #faf5ff; }
+.rsseo-data-source--pro h3 { color: #553c9a; }
+
+/* Pro panels */
+.rsseo-pro-panel { border: 1px solid #e9d8fd; border-radius: 6px; padding: 20px; margin-bottom: 28px; background: #faf5ff; }
+.rsseo-pro-panel--backlinks { background: #fff; border-color: #c6f6d5; }
+.rsseo-pro-panel__header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.rsseo-pro-panel__header h2 { margin: 0; }
+.rsseo-pro-panel__header p  { margin: 0; color: #718096; }
+
+/* Schema */
+.rsseo-schema-type { display: inline-block; background: #e9d8fd; color: #553c9a; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.rsseo-schema-preview { font-size: 11px; word-break: break-all; }
+
+/* Link types */
+.rsseo-link-type { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.rsseo-link-type--gov       { background: #ebf8ff; color: #2c5282; }
+.rsseo-link-type--org       { background: #f0fff4; color: #276749; }
+.rsseo-link-type--nonprofit { background: #fff5f5; color: #c53030; }
+.rsseo-link-type--chamber   { background: #fffbeb; color: #92400e; }
+.rsseo-link-type--local     { background: #f0f4ff; color: #3c366b; }
+.rsseo-link-type--directory { background: #f7fafc; color: #4a5568; }
+
+.rsseo-col-priority { width: 40px; }
+.rsseo-bl-status    { font-size: 12px; }
+
+/* License page */
+.rsseo-license-active { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.rsseo-license-icon   { font-size: 36px; color: #38a169; line-height: 1; }
+.rsseo-license-active h2 { margin: 0 0 4px; color: #276749; }
+.rsseo-license-form   { display: flex; gap: 10px; align-items: center; margin: 12px 0; }
+.rsseo-pro-features   { list-style: none; padding: 0; margin: 0; }
+.rsseo-pro-features li { padding: 6px 0; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+.rsseo-pro-features li:last-child { border: none; }
