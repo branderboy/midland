@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Carpet Cleaning in Maryland, DC & Virginia | Midland Floor Care</title>
+<meta name="description" content="Expert carpet cleaning for homes and businesses across the DMV. Same-day appointments. Licensed & insured. Free quote — call now.">
+<meta name="robots" content="noindex,nofollow">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#3aa050;
+  --green-dark:#2d7d3e;
+  --green-light:#f0fdf4;
+  --yellow:#fbbf24;
+  --text:#111827;
+  --body:#374151;
+  --gray:#f9fafb;
+  --border:#e5e7eb;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+html{background:#fff;color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%}
+body{line-height:1.5}
+
+/* HEADER BAR */
+.header{background:var(--green);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.header-logo{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.header-phone{font-size:20px;font-weight:900;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
+.header-phone svg{width:20px;height:20px;flex-shrink:0}
+
+/* HERO */
+.hero{background:var(--green-light);border-bottom:3px solid var(--green);padding:50px 20px 40px;text-align:center}
+.hero-badge{display:inline-block;background:var(--yellow);color:#92400e;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:6px 16px;border-radius:20px;margin-bottom:20px}
+.hero h1{font-size:clamp(28px,5vw,50px);line-height:1.1;font-weight:900;letter-spacing:-.02em;margin-bottom:16px;color:var(--text)}
+.hero h1 span{color:var(--green)}
+.hero-sub{font-size:clamp(16px,2.5vw,20px);color:var(--body);margin-bottom:32px;max-width:640px;margin-left:auto;margin-right:auto}
+.trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:36px}
+.trust-item{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--body)}
+.trust-item svg{width:18px;height:18px;color:var(--green);flex-shrink:0}
+
+/* FORM CARD */
+.form-card{background:#fff;border:2px solid var(--green);border-radius:12px;padding:32px;max-width:480px;margin:0 auto;box-shadow:0 20px 40px rgba(0,0,0,0.1)}
+.form-card h2{font-size:22px;font-weight:900;margin-bottom:6px;text-align:center}
+.form-card p{font-size:14px;color:var(--body);text-align:center;margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--body);margin-bottom:6px}
+.form-group input,.form-group select{width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:6px;font-size:15px;font-family:var(--font);color:var(--text);transition:border-color .15s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--green)}
+.form-group select{appearance:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right 14px center;background-color:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-submit{width:100%;background:var(--green);color:#fff;border:none;padding:18px;font-size:20px;font-weight:900;text-transform:uppercase;border-radius:6px;cursor:pointer;box-shadow:0 6px 0 var(--green-dark);transition:all .1s;margin-top:8px;letter-spacing:.5px;font-family:var(--font)}
+.btn-submit:active{transform:translateY(4px);box-shadow:0 2px 0 var(--green-dark)}
+.form-guarantee{text-align:center;font-size:12px;color:#9ca3af;margin-top:12px}
+
+/* SOCIAL PROOF STRIP */
+.proof-strip{background:var(--green);color:#fff;padding:20px;text-align:center}
+.stars{font-size:22px;letter-spacing:2px;margin-bottom:6px}
+.proof-strip p{font-size:15px;font-weight:600}
+
+/* LAYOUT */
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;padding:60px 20px}
+@media(max-width:768px){.two-col{grid-template-columns:1fr;padding:40px 20px}.form-row{grid-template-columns:1fr}}
+
+/* WHY US */
+.section{padding:60px 20px;border-top:1px solid var(--border)}
+.section-title{font-size:clamp(24px,3.5vw,36px);font-weight:900;text-align:center;margin-bottom:8px}
+.section-sub{text-align:center;color:var(--body);margin-bottom:40px;font-size:16px}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+.feature{background:var(--green-light);border:1px solid #bbf7d0;border-radius:8px;padding:24px}
+.feature-icon{font-size:32px;margin-bottom:12px}
+.feature h3{font-size:16px;font-weight:800;margin-bottom:6px;color:var(--text)}
+.feature p{font-size:14px;color:var(--body)}
+
+/* SERVICES */
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:32px}
+.service-item{border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center;background:#fff}
+.service-item svg{width:32px;height:32px;color:var(--green);margin:0 auto 10px;display:block}
+.service-item h4{font-size:14px;font-weight:700;color:var(--text)}
+.service-item p{font-size:12px;color:var(--body);margin-top:4px}
+
+/* REVIEWS */
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:32px}
+.review{background:#fff;border:1px solid var(--border);border-radius:8px;padding:24px}
+.review-stars{color:#fbbf24;font-size:16px;margin-bottom:8px}
+.review-text{font-size:14px;color:var(--body);font-style:italic;margin-bottom:12px;line-height:1.6}
+.review-name{font-size:13px;font-weight:700;color:var(--text)}
+.review-location{font-size:12px;color:#9ca3af}
+
+/* STICKY MOBILE CTA */
+.sticky-cta{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--green);padding:14px 20px;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.15)}
+@media(max-width:640px){.sticky-cta{display:block}}
+.sticky-cta a{display:block;background:#fff;color:var(--green);text-align:center;padding:14px;border-radius:6px;font-size:17px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:.5px}
+
+/* FOOTER */
+.footer{background:var(--text);color:#9ca3af;padding:30px 20px;text-align:center;font-size:13px}
+.footer a{color:#9ca3af}
+
+/* SUCCESS */
+#form-success{display:none;background:var(--green-light);border:2px solid #bbf7d0;border-radius:8px;padding:40px;text-align:center}
+#form-success h2{color:var(--green);font-size:26px;margin-bottom:12px}
+#form-success p{color:var(--body);font-size:16px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">Midland Floor Care</div>
+  <a href="tel:+13015550100" class="header-phone">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.15a16 16 0 0 0 6.13 6.13l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+    (301) 555-0100
+  </a>
+</div>
+
+<!-- HERO + FORM -->
+<div class="two-col wrap">
+  <div class="hero" style="background:none;border:none;text-align:left;padding:20px 0 0">
+    <div class="hero-badge">⭐ Serving DC · Maryland · Virginia</div>
+    <h1>Professional Carpet Cleaning That Actually <span>Gets It Out</span></h1>
+    <p class="hero-sub">Residential & commercial carpet cleaning across the DMV. Same-day available. No hidden fees. Satisfaction guaranteed or we come back free.</p>
+
+    <div class="trust-row" style="justify-content:flex-start">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Licensed & Insured
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Same-Day Appointments
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        100% Satisfaction Guarantee
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Free Quotes, No Obligation
+      </div>
+    </div>
+
+    <!-- Stars on desktop -->
+    <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+      <div style="font-size:22px;color:#fbbf24;letter-spacing:2px;">★★★★★</div>
+      <div style="font-size:14px;color:var(--body);"><strong style="color:var(--text);">4.9/5</strong> from 80+ reviews across Google & Yelp</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div>
+    <div class="form-card" id="form-card">
+      <h2>Get Your Free Quote</h2>
+      <p>Takes 30 seconds. We'll call you back within minutes.</p>
+      <form id="quote-form">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" placeholder="First & Last Name" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" placeholder="(301) 000-0000" required>
+          </div>
+          <div class="form-group">
+            <label>ZIP Code</label>
+            <input type="text" placeholder="20814" maxlength="5" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Service Needed</label>
+          <select required>
+            <option value="" disabled selected>Select a service...</option>
+            <option>Residential Carpet Cleaning</option>
+            <option>Commercial Carpet Cleaning</option>
+            <option>Area Rug Cleaning</option>
+            <option>Carpet + Upholstery Cleaning</option>
+            <option>Pet Odor & Stain Removal</option>
+            <option>Move-In / Move-Out Cleaning</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Property Size</label>
+          <select>
+            <option value="" disabled selected>Approx. sq ft or rooms...</option>
+            <option>1–2 Rooms</option>
+            <option>3–4 Rooms</option>
+            <option>Whole House (5+ Rooms)</option>
+            <option>Small Commercial (&lt;2,000 sq ft)</option>
+            <option>Large Commercial (2,000+ sq ft)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-submit">Get My Free Quote →</button>
+        <p class="form-guarantee">🔒 No spam. No obligation. We'll call within 10 minutes.</p>
+      </form>
+    </div>
+
+    <div id="form-success">
+      <div style="font-size:48px;margin-bottom:16px;">✅</div>
+      <h2>Quote Request Received!</h2>
+      <p>We'll call you back within <strong>10 minutes</strong> during business hours. Check your phone — our number is <strong>(301) 555-0100</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL PROOF STRIP -->
+<div class="proof-strip">
+  <div class="stars">★★★★★</div>
+  <p>"They got out a stain I thought was permanent. Carpet looks brand new." — Sarah M., Bethesda MD</p>
+</div>
+
+<!-- WHY US -->
+<div class="section" style="background:var(--gray)">
+  <div class="wrap">
+    <h2 class="section-title">Why Homeowners & Businesses Choose Midland</h2>
+    <p class="section-sub">We're not a franchise — we're a local DMV team that shows up, does the job right, and backs it up.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>Same-Day Service</h3>
+        <p>We keep availability open daily across MD, DC, and VA. Most customers are booked within hours of calling.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🏆</div>
+        <h3>Professional Equipment</h3>
+        <p>Truck-mounted hot water extraction — the same method carpet manufacturers recommend. Not rental machines.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🐾</div>
+        <h3>Pet Stain Specialists</h3>
+        <p>We remove pet odors at the source — not just mask them. Safe for kids and pets once dry.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">✅</div>
+        <h3>Satisfaction Guarantee</h3>
+        <p>If you're not happy, we come back and re-clean at no charge. We don't leave until the job is done right.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">💰</div>
+        <h3>Upfront Pricing</h3>
+        <p>No bait-and-switch. We quote before we start. The price you're quoted is the price you pay.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🏠</div>
+        <h3>Residential & Commercial</h3>
+        <p>From a single bedroom to a 10,000 sq ft warehouse floor — we have the capacity and crew.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<div class="section">
+  <div class="wrap">
+    <h2 class="section-title">Carpet Cleaning Services We Offer</h2>
+    <p class="section-sub">Every service includes a free walkthrough, pre-treatment of spots, and a final quality check.</p>
+    <div class="services">
+      <div class="service-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <h4>Residential Cleaning</h4>
+        <p>Bedrooms, living rooms, stairs</p>
+      </div>
+      <div class="service-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        <h4>Commercial Cleaning</h4>
+        <p>Offices, retail, multi-unit</p>
+      </div>
+      <div class="service-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        <h4>Area Rug Cleaning</h4>
+        <p>All materials, hand-cleaned</p>
+      </div>
+      <div class="service-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        <h4>Pet Odor Removal</h4>
+        <p>Enzyme treatment at the source</p>
+      </div>
+      <div class="service-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 7 16 12 23 17 23 7"></polyline><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+        <h4>Move-In / Move-Out</h4>
+        <p>Deep clean for landlords & tenants</p>
+      </div>
+      <div class="service-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+        <h4>Upholstery Cleaning</h4>
+        <p>Sofas, chairs, car interiors</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<div class="section" style="background:var(--gray)">
+  <div class="wrap">
+    <h2 class="section-title">What Our Customers Are Saying</h2>
+    <p class="section-sub">Real reviews from real DMV homeowners and business owners.</p>
+    <div class="reviews">
+      <div class="review">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"My carpet had a huge wine stain from a party. I thought I'd have to replace the whole thing. Midland got it completely out. I couldn't believe it."</p>
+        <div class="review-name">Marcus T.</div>
+        <div class="review-location">Silver Spring, MD</div>
+      </div>
+      <div class="review">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"They came out the same day I called and were done in under two hours. Professional, friendly, and the carpets smell amazing. Will definitely use again."</p>
+        <div class="review-name">Jennifer K.</div>
+        <div class="review-location">Bethesda, MD</div>
+      </div>
+      <div class="review">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Used them for our office building — 3 floors of carpet. Priced fairly, minimal disruption to our staff, and the results were outstanding. Highly recommend."</p>
+        <div class="review-name">David R.</div>
+        <div class="review-location">Washington, DC</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM CTA -->
+<div style="background:var(--green);padding:60px 20px;text-align:center;color:#fff;">
+  <h2 style="font-size:clamp(24px,4vw,40px);font-weight:900;margin-bottom:12px;">Ready to Book? Get Your Free Quote Now.</h2>
+  <p style="font-size:18px;opacity:.9;margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto;">Same-day appointments available across Maryland, DC, and Virginia. We'll call back within 10 minutes.</p>
+  <a href="#form-card" style="display:inline-block;background:#fff;color:var(--green);padding:18px 40px;border-radius:6px;font-size:20px;font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:.5px;box-shadow:0 6px 0 var(--green-dark);">Get My Free Quote →</a>
+  <div style="margin-top:24px;font-size:16px;opacity:.85;">Or call us directly: <a href="tel:+13015550100" style="color:#fff;font-weight:900;text-decoration:underline;">(301) 555-0100</a></div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>© <span id="yr"></span> Midland Floor Care · Licensed & Insured · Serving DC, Maryland & Virginia</p>
+  <p style="margin-top:8px;"><a href="/">Back to Main Site</a> · <a href="tel:+13015550100">(301) 555-0100</a></p>
+</div>
+
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-cta">
+  <a href="tel:+13015550100">📞 Call Now — Free Quote in 60 Seconds</a>
+</div>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+document.getElementById('quote-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  document.getElementById('form-card').style.display = 'none';
+  document.getElementById('form-success').style.display = 'block';
+  document.getElementById('form-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+// Smooth scroll for anchor CTA
+document.querySelectorAll('a[href="#form-card"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+</script>
+</body>
+</html>
