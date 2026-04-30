@@ -133,20 +133,28 @@
         .secure-badge { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: var(--text-body); font-size: 12px; font-weight: bold; }
 
         /* BEFORE / AFTER */
-        .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin: 30px 0; }
+        .ba-section { background: #0f172a; padding: 60px 40px; }
+        @media (max-width: 640px) { .ba-section { padding: 40px 20px; } }
+        .ba-section .section-title { color: #fff; }
+        .ba-section .section-sub { color: #94a3b8; margin-bottom: 36px; text-align: center; font-size: 16px; }
+        .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 0 0 36px; }
         @media (max-width: 640px) { .ba-grid { grid-template-columns: 1fr; } }
-        .ba-col { padding: 30px; }
-        .ba-col.before { background: #fef2f2; border-right: 2px solid #e5e7eb; }
-        .ba-col.after { background: #f0fdf4; }
-        @media (max-width: 640px) { .ba-col.before { border-right: none; border-bottom: 2px solid #e5e7eb; } }
-        .ba-label { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-        .ba-label.before { color: #dc2626; }
-        .ba-label.after { color: #16a34a; }
+        .ba-col { border-radius: 10px; overflow: hidden; }
+        .ba-col-header { padding: 16px 24px; display: flex; align-items: center; gap: 10px; }
+        .ba-col.before .ba-col-header { background: #dc2626; }
+        .ba-col.after .ba-col-header { background: #16a34a; }
+        .ba-label { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .ba-col-body { padding: 8px 0; background: #1e293b; }
         .ba-col ul { list-style: none; padding: 0; margin: 0; }
-        .ba-col ul li { font-size: 14px; line-height: 1.5; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,0.06); color: var(--text-body); }
+        .ba-col ul li { font-size: 14px; line-height: 1.5; padding: 12px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cbd5e1; display: flex; align-items: flex-start; gap: 10px; }
         .ba-col ul li:last-child { border-bottom: none; }
-        .ba-col.before ul li::before { content: "✗  "; color: #dc2626; font-weight: 900; }
-        .ba-col.after ul li::before { content: "✓  "; color: #16a34a; font-weight: 900; }
+        .ba-col.before ul li .ba-icon { color: #f87171; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
+        .ba-col.after ul li .ba-icon { color: #4ade80; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
+        .ba-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+        @media (max-width: 640px) { .ba-stats { grid-template-columns: 1fr 1fr; } }
+        .ba-stat { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; }
+        .ba-stat-num { font-size: 30px; font-weight: 900; color: #4ade80; line-height: 1; }
+        .ba-stat-label { font-size: 12px; color: #94a3b8; margin-top: 6px; font-weight: 600; }
 
         /* MILESTONE PHASES */
         .phases { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin: 30px 0; }
@@ -416,54 +424,64 @@
             </div>
 
             <!-- 4b. BEFORE / AFTER -->
-            <div class="section-padding" style="background:#fff;">
+            <div class="ba-section">
                 <h2 class="section-title">Before This Plan vs. After</h2>
-                <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">The #1 reason small businesses lose jobs isn't lack of demand — it's the broken lead system. Every form submission that goes unresponded is a job your competitor is booking.</p>
+                <p class="ba-section section-sub">The #1 reason small businesses lose jobs isn't lack of demand — it's the broken lead system. Every form submission that goes unresponded is a job your competitor is booking.</p>
                 <div class="ba-grid">
                     <div class="ba-col before">
-                        <div class="ba-label before">Before This Plan</div>
-                        <ul>
-                            <li>Lead fills out form at 9pm — WP mail fires into spam or doesn't deliver at all</li>
-                            <li>Owner never sees the inquiry — no reply sent — lead books the next guy who picks up</li>
-                            <li>No automated follow-up — cold leads sit in an inbox and go nowhere</li>
-                            <li>Appointments tracked in a notebook — client gets no reminder — no-shows happen</li>
-                            <li>Job finishes — owner is on to the next one — never asks for a review</li>
-                            <li>GMB stays at a handful of reviews while competitors stack 50–500 stars</li>
-                            <li>No visibility into which service or city is driving the most interest</li>
-                            <li>Past customers never heard from again — reactivation is zero</li>
-                        </ul>
+                        <div class="ba-col-header">
+                            <i class="ba-icon" style="color:#fca5a5;font-style:normal;font-size:20px;">✗</i>
+                            <span class="ba-label">Before This Plan</span>
+                        </div>
+                        <div class="ba-col-body">
+                            <ul>
+                                <li><i class="ba-icon">✗</i>Lead fills out form at 9pm — WP mail fires into spam or doesn't deliver at all</li>
+                                <li><i class="ba-icon">✗</i>Owner never sees the inquiry — no reply — lead books the next guy who picks up</li>
+                                <li><i class="ba-icon">✗</i>No automated follow-up — cold leads sit in an inbox and go nowhere</li>
+                                <li><i class="ba-icon">✗</i>Appointments tracked in a notebook — client gets no reminder — no-shows happen</li>
+                                <li><i class="ba-icon">✗</i>Job finishes — owner moves on — never asks for a review</li>
+                                <li><i class="ba-icon">✗</i>GMB stays at a handful of reviews while competitors stack 50–500 stars</li>
+                                <li><i class="ba-icon">✗</i>No visibility into which service or city drives the most interest</li>
+                                <li><i class="ba-icon">✗</i>Past customers never heard from again — reactivation revenue is zero</li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="ba-col after">
-                        <div class="ba-label after">After This Plan</div>
-                        <ul>
-                            <li>Lead submits → Resend delivers instantly — owner notified, branded confirmation sent in seconds</li>
-                            <li>Automated reply fires within minutes with a booking link</li>
-                            <li>If owner hasn't responded in 2 hours → reminder fires to owner's phone + email</li>
-                            <li>Lead self-books via Google Calendar — confirmation sent to both parties automatically</li>
-                            <li>24h reminder + 2h reminder sent to client before appointment</li>
-                            <li>Job complete → 24h later, survey email fires to client</li>
-                            <li>Happy client scores high → branded GMB review link sent + 2 follow-up reminders</li>
-                            <li>Every lead, appointment, and job logged in ActiveCampaign — full pipeline visibility</li>
-                        </ul>
+                        <div class="ba-col-header">
+                            <i class="ba-icon" style="color:#86efac;font-style:normal;font-size:20px;">✓</i>
+                            <span class="ba-label">After This Plan</span>
+                        </div>
+                        <div class="ba-col-body">
+                            <ul>
+                                <li><i class="ba-icon">✓</i>Lead submits → Resend delivers instantly — owner notified, branded confirmation in seconds</li>
+                                <li><i class="ba-icon">✓</i>Automated reply fires within minutes with a self-booking link</li>
+                                <li><i class="ba-icon">✓</i>No response in 2 hours → escalation reminder fires to owner's phone + email</li>
+                                <li><i class="ba-icon">✓</i>Lead self-books via Google Calendar — confirmation sent to both parties automatically</li>
+                                <li><i class="ba-icon">✓</i>24h + 2h reminders sent to client before every appointment</li>
+                                <li><i class="ba-icon">✓</i>Job complete → 24h later, NPS survey fires — happy client routes to GMB link</li>
+                                <li><i class="ba-icon">✓</i>GMB review request + 2 follow-up reminders until they leave a star rating</li>
+                                <li><i class="ba-icon">✓</i>Every lead, appointment, and job logged in ActiveCampaign — full pipeline visibility</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px;">
-                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
-                        <div style="font-size:28px;font-weight:900;color:#16a34a;">&lt;2 min</div>
-                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">Lead response time</div>
+                <div class="ba-stats">
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">&lt;2 min</div>
+                        <div class="ba-stat-label">Lead Response Time</div>
                     </div>
-                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
-                        <div style="font-size:28px;font-weight:900;color:#16a34a;">100%</div>
-                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">Email deliverability</div>
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">100%</div>
+                        <div class="ba-stat-label">Email Deliverability</div>
                     </div>
-                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
-                        <div style="font-size:28px;font-weight:900;color:#16a34a;">0</div>
-                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">Leads lost to spam</div>
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">0</div>
+                        <div class="ba-stat-label">Leads Lost to Spam</div>
                     </div>
-                    <div style="text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
-                        <div style="font-size:28px;font-weight:900;color:#16a34a;">25+</div>
-                        <div style="font-size:13px;color:#6b7280;margin-top:4px;">New GMB reviews / 90 days</div>
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">25+</div>
+                        <div class="ba-stat-label">New GMB Reviews / 90 Days</div>
                     </div>
                 </div>
             </div>
