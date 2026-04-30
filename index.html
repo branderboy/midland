@@ -149,7 +149,7 @@
         .ba-col.after ul li::before { content: "✓  "; color: #16a34a; font-weight: 900; }
 
         /* MILESTONE PHASES */
-        .phases { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 30px 0; }
+        .phases { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin: 30px 0; }
         @media (max-width: 640px) { .phases { grid-template-columns: 1fr; } }
         .phase { border: 2px solid #e5e7eb; border-radius: 8px; padding: 24px; background: white; }
         .phase-num { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--brand-green); margin-bottom: 6px; }
@@ -470,13 +470,13 @@
 
             <!-- 5. MILESTONE PAYMENT PLAN -->
             <div class="section-padding gray-section">
-                <h2 class="section-title">3-Phase Milestone Payment Plan</h2>
-                <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">No large upfront lump sum. Each payment unlocks when the previous phase is delivered and confirmed.</p>
+                <h2 class="section-title">2-Payment Plan</h2>
+                <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">Split into two payments. Second payment due only after the first milestone is delivered and confirmed.</p>
                 <div class="phases">
-                    <div class="phase">
-                        <div class="phase-num">Phase 1</div>
-                        <div class="phase-title">Foundation & Speed</div>
-                        <div class="phase-weeks">Weeks 1–4</div>
+                    <div class="phase" style="border-color:var(--brand-green);">
+                        <div class="phase-num">Payment 1 — Kickoff</div>
+                        <div class="phase-title">Foundation & Build</div>
+                        <div class="phase-weeks">Weeks 1–6 · Due on start</div>
                         <ul class="phase-items">
                             <li>GSC cleanup — kill 857 junk URLs</li>
                             <li>Resend email transport (zero spam)</li>
@@ -484,40 +484,32 @@
                             <li>IndexNow + Rapid URL Indexer wired</li>
                             <li>Site speed overhaul (34 → 85+ target)</li>
                             <li>GitHub backup deployed</li>
-                        </ul>
-                        <div class="phase-price">$1,000</div>
-                        <div class="phase-trigger">Due on project kickoff</div>
-                    </div>
-                    <div class="phase" style="border-color:var(--brand-green);">
-                        <div class="phase-num">Phase 2</div>
-                        <div class="phase-title">Content Engine</div>
-                        <div class="phase-weeks">Weeks 5–8</div>
-                        <ul class="phase-items">
                             <li>160 city × service pages live</li>
                             <li>Google Calendar integration</li>
                             <li>Smart Forms Pro + ActiveCampaign</li>
-                            <li>Automated lead follow-up sequence</li>
-                            <li>AEO + GEO optimization (llms.txt)</li>
+                            <li>Carpet cleaning ad landing page</li>
                         </ul>
-                        <div class="phase-price">$1,000</div>
-                        <div class="phase-trigger">Due on Phase 1 milestone delivery</div>
+                        <div class="phase-price">$1,500</div>
+                        <div class="phase-trigger">Due on project kickoff</div>
                     </div>
                     <div class="phase">
-                        <div class="phase-num">Phase 3</div>
-                        <div class="phase-title">Market Domination</div>
-                        <div class="phase-weeks">Weeks 9–12</div>
+                        <div class="phase-num">Payment 2 — Completion</div>
+                        <div class="phase-title">Systems & Domination</div>
+                        <div class="phase-weeks">Weeks 7–12 · Due on milestone</div>
                         <ul class="phase-items">
+                            <li>Automated lead follow-up sequence</li>
+                            <li>AEO + GEO optimization (llms.txt)</li>
                             <li>Smart Reviews Pro live</li>
                             <li>Survey-gated GMB review engine</li>
                             <li>Daily Intel microservice</li>
                             <li>pytrends + GSC keyword digest</li>
                             <li>Final QA + handoff documentation</li>
                         </ul>
-                        <div class="phase-price">$965</div>
-                        <div class="phase-trigger">Due on Phase 2 milestone delivery</div>
+                        <div class="phase-price">$1,465</div>
+                        <div class="phase-trigger">Due on Payment 1 milestone delivery</div>
                     </div>
                 </div>
-                <div style="text-align:center;font-size:18px;font-weight:700;color:var(--text-dark);margin-top:10px;">Total: $2,965 — milestone-based, no surprises. <span style="color:var(--cta-color);">+ Carpet Cleaning Ad Page (Bonus)</span></div>
+                <div style="text-align:center;font-size:18px;font-weight:700;color:var(--text-dark);margin-top:10px;">Total: $2,965 — two payments, no surprises. <span style="color:var(--cta-color);">+ Carpet Cleaning Ad Page (Bonus)</span></div>
             </div>
 
             <!-- 6. CHECKOUT / FORM SECTION -->
@@ -527,8 +519,8 @@
                     <p style="text-align:center;margin-bottom:30px;font-size:15px;color:var(--text-body);">Fill out the secure form below to authorize the scope of work. Week 1 begins within 48 hours.</p>
 
                     <div class="price-tag">$2,965</div>
-                    <div class="price-sub">3-Phase Milestone Plan · Everything Above Included</div>
-                    <p style="text-align:center;margin-top:-15px;margin-bottom:25px;color:#6b7280;font-size:13px;">$1,000 on kickoff · $1,000 on Phase 1 delivery · $965 on Phase 2 delivery</p>
+                    <div class="price-sub">2-Payment Plan · Everything Above Included</div>
+                    <p style="text-align:center;margin-top:-15px;margin-bottom:25px;color:#6b7280;font-size:13px;">$1,500 on kickoff · $1,465 on milestone delivery</p>
 
                     <form id="approval-form">
                         <div class="form-group">
@@ -568,7 +560,7 @@
                             <span class="cta-sub-text">Commit to capturing your lost traffic today.</span>
                         </button>
 
-                        <p style="text-align:center;font-size:12px;color:#6b7280;margin-top:15px;">By signing, you authorize the 3-phase build above totalling $2,965 USD, payable per milestone. Engagement begins within 48 hours of kickoff payment.</p>
+                        <p style="text-align:center;font-size:12px;color:#6b7280;margin-top:15px;">By signing, you authorize the full build above totalling $2,965 USD, payable in two installments ($1,500 on kickoff, $1,465 on milestone delivery). Engagement begins within 48 hours.</p>
 
                         <div class="secure-badge">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
