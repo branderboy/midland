@@ -1,0 +1,129 @@
+/* Analytics */
+.sfco-analytics-period {
+    margin: 16px 0;
+    display: flex;
+    gap: 6px;
+}
+
+.sfco-analytics-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.sfco-stat-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+}
+
+.sfco-stat-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.sfco-stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.sfco-stat-green {
+    color: #00a32a;
+}
+
+.sfco-analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.sfco-card-wide {
+    grid-column: 1 / -1;
+}
+
+.sfco-analytics-pct {
+    color: #999;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+/* Bar chart */
+.sfco-bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 180px;
+    padding-top: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.sfco-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+.sfco-bar {
+    width: 100%;
+    max-width: 30px;
+    background: #2271b1;
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+    transition: height 0.3s;
+}
+
+.sfco-bar-col:hover .sfco-bar {
+    background: #135e96;
+}
+
+.sfco-bar-label {
+    font-size: 9px;
+    color: #999;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Team invite form */
+.sfco-invite-fields {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.sfco-invite-fields input,
+.sfco-invite-fields select {
+    padding: 6px 10px;
+}
+
+/* Automation steps */
+.sfco-auto-step {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: #fff;
+}
+
+@media (max-width: 960px) {
+    .sfco-analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    .sfco-analytics-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
