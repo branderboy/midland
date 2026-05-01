@@ -248,6 +248,17 @@
         .segment-box p { font-size: 14px; line-height: 1.55; color: var(--text-body); font-weight: 500; }
 
         /* GEO-GRID HEATMAP MOCKUP */
+        /* OPPORTUNITY CARD */
+        .opportunity-card { background: #fef2f2; border: 2px solid #fca5a5; border-radius: 10px; padding: 22px; margin: 16px 0; }
+        .opp-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 16px; }
+        @media (min-width: 768px) { .opp-grid { grid-template-columns: repeat(3, 1fr); } }
+        .opp-stat { background: #ffffff; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; text-align: center; }
+        .opp-num { font-size: clamp(36px, 5vw, 52px); font-weight: 900; color: #b91c1c; line-height: 1; letter-spacing: -1.5px; }
+        .opp-label { font-size: 13px; font-weight: 800; color: var(--text-dark); margin-top: 8px; line-height: 1.3; }
+        .opp-label span { display: block; font-weight: 500; color: #64748b; font-size: 12px; margin-top: 2px; }
+        .opp-thesis { font-size: 14.5px; line-height: 1.55; color: var(--text-dark); font-weight: 600; padding: 14px 16px; background: #ffffff; border-left: 5px solid #dc2626; border-radius: 6px; }
+        .opp-thesis strong { color: #b91c1c; font-weight: 900; }
+
         /* GMB INSIGHT */
         .gmb-insight { background: #fff8f1; border: 2px solid #fcd9b4; border-radius: 10px; padding: 22px; margin: 16px 0; }
         .gmb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
@@ -839,6 +850,25 @@
                         </div>
                     </div>
                     <p class="gmb-takeaway"><strong>Takeaway:</strong> The GMB is the highest-leverage surface for emergency leads (mobile-search heavy, 58% of discovery is on a phone) and it is currently going dark. Mirror the website services, hours, posts, and photos to GMB. Clean the categories. Push GMB engagement back into the funnel. Pillar 1 ships this as a built-in feature.</p>
+                </div>
+
+                <h3 class="subsection-title">Insight 7 · Emergency Floor Care Is An Open Market <span class="subsection-sub">Nobody owns it</span></h3>
+                <div class="opportunity-card">
+                    <div class="opp-grid">
+                        <div class="opp-stat">
+                            <div class="opp-num">#1</div>
+                            <div class="opp-label">Reason people book Midland<br><span>Spill, flood, damage, last-minute</span></div>
+                        </div>
+                        <div class="opp-stat">
+                            <div class="opp-num">58%</div>
+                            <div class="opp-label">Mobile search discovery<br><span>Phone in hand, ready to call</span></div>
+                        </div>
+                        <div class="opp-stat">
+                            <div class="opp-num">0</div>
+                            <div class="opp-label">DMV competitors positioning on emergency<br><span>Open category, no one claims it</span></div>
+                        </div>
+                    </div>
+                    <p class="opp-thesis"><strong>The play:</strong> Own "emergency floor care DMV" as a category. 24/7 response messaging on the homepage and every city page, same-day SLA badges in the GMB, click-to-call as the primary CTA on mobile, and the Emergency-to-Plan lifecycle (Insight 3) converts those panic calls into recurring Floor Care Plan customers. Highest urgency = highest willingness to pay = fastest path to revenue.</p>
                 </div>
             </div>
 
