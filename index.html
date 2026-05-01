@@ -90,20 +90,19 @@
         .toc-callout { background: #fef9c3; border-bottom: 2px dashed #facc15; text-align: center; padding: 8px 16px; font-size: 14px; font-weight: 800; color: #854d0e; letter-spacing: 1px; text-transform: uppercase; }
         .toc-callout .arrow-down { display: inline-block; font-size: 18px; margin: 0 6px; animation: bounce-down 1.4s ease-in-out infinite; }
         @keyframes bounce-down { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
-        .toc { position: sticky; top: 0; z-index: 50; background: #0f172a; border-bottom: 4px solid var(--brand-green); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
-        .toc-inner { max-width: 1200px; margin: 0 auto; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
-        .toc-label { display: inline-flex; align-items: center; gap: 8px; font-size: clamp(15px, 2vw, 19px); font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; margin-right: 4px; }
-        .toc-label .arrow { display: inline-block; font-size: 22px; color: var(--brand-green); animation: arrow-nudge 1.2s ease-in-out infinite; }
+        .toc { position: sticky; top: 0; z-index: 50; background: #0f172a; border-bottom: 4px solid var(--brand-green); box-shadow: 0 4px 14px rgba(0,0,0,0.18); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .toc::-webkit-scrollbar { height: 0; display: none; }
+        .toc-inner { margin: 0 auto; padding: 12px 16px; display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; justify-content: center; min-width: max-content; }
+        .toc-label { display: inline-flex; align-items: center; gap: 6px; font-size: clamp(13px, 1.4vw, 16px); font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; margin-right: 4px; flex-shrink: 0; }
+        .toc-label .arrow { display: inline-block; font-size: 18px; color: var(--brand-green); animation: arrow-nudge 1.2s ease-in-out infinite; }
         @keyframes arrow-nudge { 0%,100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
-        .toc a { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 8px; font-size: clamp(14px, 1.6vw, 17px); font-weight: 900; color: #ffffff; background: #1e293b; text-decoration: none; border: 2px solid #334155; transition: all 0.15s; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
+        .toc a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border-radius: 7px; font-size: clamp(12px, 1.2vw, 14px); font-weight: 900; color: #ffffff; background: #1e293b; text-decoration: none; border: 2px solid #334155; transition: all 0.15s; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
         .toc a:hover { background: var(--brand-green); color: #ffffff; border-color: var(--brand-green); transform: translateY(-2px); box-shadow: 0 6px 14px rgba(58,160,80,0.4); }
-        .toc a .num { font-size: 13px; font-weight: 900; color: #0f172a; background: var(--brand-green); border-radius: 5px; padding: 3px 8px; line-height: 1; }
+        .toc a .num { font-size: 11px; font-weight: 900; color: #0f172a; background: var(--brand-green); border-radius: 4px; padding: 2px 6px; line-height: 1; }
         .toc a:hover .num { color: var(--brand-green); background: #ffffff; }
         @media (max-width: 640px) {
-            .toc-inner { padding: 10px 12px; gap: 6px; }
-            .toc-label { display: none; }
-            .toc a { padding: 9px 12px; font-size: 13px; }
-            .toc-callout { font-size: 12px; padding: 6px 10px; letter-spacing: 0.5px; }
+            .toc-inner { padding: 10px 12px; gap: 6px; justify-content: flex-start; }
+            .toc a { padding: 8px 10px; font-size: 12px; }
         }
         .subsection-title { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; font-size: clamp(26px, 4vw, 36px); font-weight: 900; color: var(--text-dark); margin: 36px 0 16px; padding-left: 16px; border-left: 6px solid var(--brand-green); line-height: 1.15; letter-spacing: -0.5px; }
         .subsection-title .subsection-sub { font-size: 14px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); }
