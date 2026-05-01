@@ -1,4 +1,4 @@
-# Midland Floor Care — Intake Forms & CRM Tagging Spec
+# Midland Floor Care, Intake Forms & CRM Tagging Spec
 
 This spec defines the lead intake forms and the CRM tagging logic that fires
 when each form is submitted. Every submission is auto-tagged so the right
@@ -12,11 +12,11 @@ out-of-scope) and the right service vertical owns the lead.
 The forms and CRM are built around the four focus services where the demand
 actually is:
 
-1. **Hardwood floor finishing** — sand & refinish, recoat, stain colour change
-2. **Carpet cleaning & installation** — residential carpet (allergy-wave
+1. **Hardwood floor finishing**, sand & refinish, recoat, stain colour change
+2. **Carpet cleaning & installation**, residential carpet (allergy-wave
    seasonality, twice a year) + carpet installs
-3. **Flooring installs** — hardwood, LVP, tile, laminate
-4. **Concrete polishing** — mechanical grind, densify, seal (commercial focus)
+3. **Flooring installs**, hardwood, LVP, tile, laminate
+4. **Concrete polishing**, mechanical grind, densify, seal (commercial focus)
 
 ### Brand / Segment Split
 
@@ -37,9 +37,9 @@ form submit and drives the follow-up sequence.
 
 | #  | Trigger              | Description                                                                                       | Primary CRM Tags                                                |
 |----|----------------------|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| 1  | Emergency            | #1 reason people book — spill, flood, damage, last-minute event. Same-day response required.     | `trigger:emergency`, `priority:high`, `sla:same-day`            |
+| 1  | Emergency            | #1 reason people book, spill, flood, damage, last-minute event. Same-day response required.     | `trigger:emergency`, `priority:high`, `sla:same-day`            |
 | 2  | Future Project       | Prospect is researching, wants to be an informed consumer but is not in-market yet. Long nurture. | `trigger:future-project`, `stage:research`, `nurture:long`      |
-| 3  | Referral / Mgmt Visit| Faster turnaround — often triggered by an upper-management visit or property inspection.          | `trigger:referral`, `priority:expedite`, `source:referral`      |
+| 3  | Referral / Mgmt Visit| Faster turnaround, often triggered by an upper-management visit or property inspection.          | `trigger:referral`, `priority:expedite`, `source:referral`      |
 | 4  | Out Of Scope         | Inquiry for a service we don't provide. Log, decline politely, optionally refer.                 | `trigger:out-of-scope`, `action:decline-or-refer`               |
 
 ### Lifecycle Path
@@ -59,31 +59,31 @@ stage (`stage:floor-care-plan`).
 
 These fields appear on every intake form regardless of service.
 
-- **Name** *(required)* — first, last
+- **Name** *(required)*, first, last
 - **Business Name** *(optional, required if commercial)*
 - **Email** *(required, with confirm)*
 - **Phone** *(required)*
-- **Service Address / ZIP** *(required)* — drives city × service routing
-- **Property Type** *(required)* — Residential / Commercial / Multi-family / Other
-- **Multiple Locations?** *(required, commercial only)* — Yes / No
-- **How did you hear about us?** — Google / Referral / Repeat customer / Other → sets `source:*` tag
-- **Reason for contacting us** *(required)* — the 4 triggers (sets `trigger:*` tag):
-  - Emergency — need service now
-  - Future project — researching options
+- **Service Address / ZIP** *(required)*, drives city × service routing
+- **Property Type** *(required)*, Residential / Commercial / Multi-family / Other
+- **Multiple Locations?** *(required, commercial only)*, Yes / No
+- **How did you hear about us?**, Google / Referral / Repeat customer / Other → sets `source:*` tag
+- **Reason for contacting us** *(required)*, the 4 triggers (sets `trigger:*` tag):
+  - Emergency, need service now
+  - Future project, researching options
   - Referral / management visit / inspection
   - Looking for a service not listed
-- **Notes** *(required)* — free-text, captured as the lead memo on the CRM record
+- **Notes** *(required)*, free-text, captured as the lead memo on the CRM record
 - **Preferred contact window**
 - **Photos / attachments** *(optional)*
 
 ### Auto-tags fired on every submission
 
-- `service:<vertical>` — set by which form was used
+- `service:<vertical>`, set by which form was used
 - `segment:residential` or `segment:commercial`
 - `brand:carpet-care` or `brand:midland-service`
 - `trigger:<one-of-four>`
 - `source:<channel>`
-- `city:<from-zip>` and `zip:<value>` — for geo reporting
+- `city:<from-zip>` and `zip:<value>`, for geo reporting
 - `lead-created:<iso-date>`
 
 ---
@@ -100,14 +100,14 @@ Used for sand & refinish, recoat, stain change, restoration.
   - Stain colour change → `service:hardwood-stain-change`
   - Repair / board replacement → `service:hardwood-repair`
   - Water / pet damage restoration → `service:hardwood-restoration`
-- **Floor type** — Solid hardwood / Engineered / Parquet / Unsure
-- **Approximate square footage** — number input
+- **Floor type**, Solid hardwood / Engineered / Parquet / Unsure
+- **Approximate square footage**, number input
 - **Number of rooms / areas**
-- **Current finish condition** — Like new / Worn but intact / Heavily worn / Damaged
-- **Desired finish** — Oil-based poly / Water-based poly / Hardwax oil / Unsure
-- **Desired sheen** — Matte / Satin / Semi-gloss / Gloss
-- **Furniture in place?** — Yes (need move) / No / Partial
-- **Occupied during work?** — Yes / No / Flexible
+- **Current finish condition**, Like new / Worn but intact / Heavily worn / Damaged
+- **Desired finish**, Oil-based poly / Water-based poly / Hardwax oil / Unsure
+- **Desired sheen**, Matte / Satin / Semi-gloss / Gloss
+- **Furniture in place?**, Yes (need move) / No / Partial
+- **Occupied during work?**, Yes / No / Flexible
 - **Target completion date**
 - **Photos of the floor** *(strongly encouraged)*
 
@@ -120,11 +120,11 @@ Used for sand & refinish, recoat, stain change, restoration.
   - Carpet installation → `service:carpet-install`
   - Carpet repair / re-stretch → `service:carpet-repair`
 - **Approximate square footage / number of rooms**
-- **Carpet type** — Synthetic / Wool / Berber / Commercial loop / Unsure
-- **Stains / problem areas** — checkbox list (pet / wine / coffee / oil / unknown / other)
-- **Pets in the home?** — Yes / No
-- **Allergy concerns?** — Yes / No → if Yes, tag `interest:allergy-program` for seasonal re-engagement
-- **Last professional cleaning** — Within 6 months / 6–12 months / 12+ months / Never
+- **Carpet type**, Synthetic / Wool / Berber / Commercial loop / Unsure
+- **Stains / problem areas**, checkbox list (pet / wine / coffee / oil / unknown / other)
+- **Pets in the home?**, Yes / No
+- **Allergy concerns?**, Yes / No → if Yes, tag `interest:allergy-program` for seasonal re-engagement
+- **Last professional cleaning**, Within 6 months / 6-12 months / 12+ months / Never
 - **Preferred service window**
 - For installs: existing flooring being removed? Yes / No / Unsure
 
@@ -138,11 +138,11 @@ Used for sand & refinish, recoat, stain change, restoration.
   - Other / unsure → `service:install-other`
 - **Approximate square footage**
 - **Rooms / areas**
-- **Existing floor** — and does it need removal / disposal?
-- **Subfloor type** — Concrete slab / Plywood / Unsure
-- **Subfloor condition** — Level / Uneven / Moisture issues / Unsure
-- **Material supplied by** — Midland / Customer / Need recommendation
-- **Need transitions / baseboards / quarter-round?** — Yes / No
+- **Existing floor**, and does it need removal / disposal?
+- **Subfloor type**, Concrete slab / Plywood / Unsure
+- **Subfloor condition**, Level / Uneven / Moisture issues / Unsure
+- **Material supplied by**, Midland / Customer / Need recommendation
+- **Need transitions / baseboards / quarter-round?**, Yes / No
 - **Target completion date**
 - **Photos of the space**
 
@@ -154,16 +154,16 @@ Used for sand & refinish, recoat, stain change, restoration.
   - Garage (residential or commercial) → `service:concrete-garage`
   - Office / institutional → `service:concrete-office`
 - **Approximate square footage**
-- **Current floor condition** — Bare slab / Painted / Coated (epoxy etc.) / Tile-over-slab / Unsure
-- **Desired sheen / level** — Satin / Semi-gloss / High-gloss
-- **Densifier + sealer required?** — Yes / No / Recommend
-- **Joint / crack repair needed?** — Yes / No / Unsure
-- **Operational hours / access constraints** — free text (after-hours, weekends, etc.)
-- **Forklift / heavy equipment traffic?** — Yes / No
+- **Current floor condition**, Bare slab / Painted / Coated (epoxy etc.) / Tile-over-slab / Unsure
+- **Desired sheen / level**, Satin / Semi-gloss / High-gloss
+- **Densifier + sealer required?**, Yes / No / Recommend
+- **Joint / crack repair needed?**, Yes / No / Unsure
+- **Operational hours / access constraints**, free text (after-hours, weekends, etc.)
+- **Forklift / heavy equipment traffic?**, Yes / No
 - **Target completion date**
 - **Photos of the slab**
 
-### 4.5 Floor Care Plan (Recurring — Commercial)
+### 4.5 Floor Care Plan (Recurring, Commercial)
 
 Existing "Schedule An Audit" form, kept and extended.
 
@@ -184,7 +184,7 @@ When a prospect picks "Looking for a service not listed":
 - Free-text **What service are you looking for?**
 - Tag: `trigger:out-of-scope`
 - Auto-reply: polite decline + optional referral list
-- Logged for monthly review — recurring requests inform future service expansion
+- Logged for monthly review, recurring requests inform future service expansion
 
 ---
 
@@ -225,7 +225,7 @@ city:<value> | zip:<value>
 | Emergency        | < 2 min auto-reply + SMS to owner | Quote / dispatch  | Service completed   | Review request     | Day 30 happy-customer → floor care plan offer   |
 | Future Project   | < 2 min auto-reply + resource pack | Education email   | Education email     | Check-in           | Quarterly nurture, seasonal allergy reminder    |
 | Referral         | < 2 min auto-reply + expedited quote | Site visit booked | Quote sent         | Service scheduled  | Floor care plan upsell post-completion          |
-| Out Of Scope     | < 2 min polite decline + referral suggestion | —      | —                   | —                  | Logged for monthly service-expansion review     |
+| Out Of Scope     | < 2 min polite decline + referral suggestion |, |, |, | Logged for monthly service-expansion review     |
 
 The "happy customer → floor care plan" conversion at Day 30 is the single
 highest-leverage automation in the system and must be tracked as its own
