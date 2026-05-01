@@ -166,6 +166,10 @@
         .pillar.conversion .pillar-deliverables ul li { border-left-color: #b45309; }
         .pillar.retention .pillar-deliverables ul li { border-left-color: #15803d; }
         .pillar-deliverables .d-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+        .pillar-deliverables .d-value { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; font-size: 12px; font-weight: 900; color: var(--brand-green); background: #f0fdf4; border: 1px solid var(--brand-green); padding: 4px 9px; border-radius: 5px; line-height: 1; white-space: nowrap; letter-spacing: -0.2px; }
+        .pillar.visibility .pillar-deliverables .d-value { color: #1a73e8; background: #eff6ff; border-color: #1a73e8; }
+        .pillar.conversion .pillar-deliverables .d-value { color: #b45309; background: #fffbeb; border-color: #b45309; }
+        .pillar.retention .pillar-deliverables .d-value { color: #15803d; background: #f0fdf4; border-color: #15803d; }
         .pillar-deliverables .d-num { display: inline-block; font-size: 10px; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; color: #64748b; background: #f3f4f6; padding: 3px 8px; border-radius: 4px; line-height: 1; white-space: nowrap; }
         .pillar-deliverables .d-name { font-size: 16px; font-weight: 900; color: var(--text-dark); line-height: 1.2; letter-spacing: -0.2px; }
         .pillar-deliverables .d-uc, .pillar-deliverables .d-bf { font-size: 13.5px; line-height: 1.5; margin-top: 5px; padding-left: 78px; position: relative; }
@@ -373,6 +377,24 @@
         .ba-stat { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center; }
         .ba-stat-num { font-size: 30px; font-weight: 900; color: #16a34a; line-height: 1; }
         .ba-stat-label { font-size: 12px; color: var(--text-body); margin-top: 6px; font-weight: 600; }
+
+        /* VALUE STACK */
+        .value-stack { background: #ffffff; border: 2px solid var(--brand-green); border-radius: 12px; padding: 22px 24px; margin: 0 auto 24px; max-width: 760px; box-shadow: 0 8px 22px rgba(58,160,80,0.12); }
+        .value-stack-head { font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); text-align: center; margin-bottom: 14px; }
+        .value-stack-rows { display: grid; gap: 6px; margin-bottom: 14px; }
+        .vs-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .vs-row.bonus { background: #fffbeb; border-color: #fcd9b4; color: #b45309; }
+        .vs-row.bonus span:first-child::before { content: "★ "; color: #b45309; }
+        .vs-amt { font-weight: 900; font-variant-numeric: tabular-nums; color: var(--text-dark); }
+        .vs-row.bonus .vs-amt { color: #b45309; }
+        .vs-total { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 16px 12px; background: #0f172a; color: #ffffff; border-radius: 10px; flex-wrap: wrap; }
+        .vs-total > div { text-align: center; }
+        .vs-label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+        .vs-big { display: block; font-size: clamp(28px, 4vw, 38px); font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .vs-price { color: #4ade80; }
+        .vs-arrow { font-size: 28px; color: #4ade80; font-weight: 900; }
+        .vs-note { text-align: center; font-size: 14px; font-weight: 600; color: var(--text-body); margin-top: 14px; }
+        .vs-note strong { color: var(--brand-green); }
 
         /* MILESTONE PHASES */
         .phases { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin: 16px 0; }
@@ -845,7 +867,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 01</span>
                                             <span class="d-name">Midland Smart SEO + GSC Cleanup</span>
-                                        </div>
+                                        <span class="d-value">$800 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Kills the 857 zombie URLs Google refuses to index, deploys sameAs entity schema, wires IndexNow + Rapid URL Indexer for instant indexing.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>Google indexes your real pages within hours, not weeks. Domain authority recovers and starts compounding.</p>
                                     </li>
@@ -853,7 +875,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 02</span>
                                             <span class="d-name">Midland Site Speed Overhaul</span>
-                                        </div>
+                                        <span class="d-value">$600 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Elementor rebuild tuned for Core Web Vitals. PageSpeed 34 → 85+. Mobile-first layout overhaul.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>The 20%+ of mobile visitors who currently bounce stay long enough to convert. Google rewards the speed with rank.</p>
                                     </li>
@@ -862,7 +884,7 @@
                                             <span class="d-num" style="background:#1a73e8;color:#fff;">Feature 03 · Flagship</span>
                                             <span class="d-name">Midland Programmatic City Pages</span>
                                             <span style="display:inline-block;font-size:10px;font-weight:900;letter-spacing:1px;padding:3px 8px;background:#0f172a;color:#fff;border-radius:4px;margin-left:6px;">THE YELP / ANGI PLAY</span>
-                                        </div>
+                                        <span class="d-value">$1,500 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>The same playbook Yelp, Angi, and HomeAdvisor used to dominate local search: <strong>build one optimized landing page for every city × service combination</strong>, programmatically. Phase 1 ships 160 pages (8 focus services × 20 DMV cities). The engine scales to thousands, every neighborhood, every county, every zip, every adjacent service. Each page pulls live data: the GMB pin, geo-grid rank for the keyword, local trust signals, the matching Yelp signals, and a city-tuned CTA.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>You become Yelp for floor care in the DMV instead of a single home page competing with them. Every "carpet cleaning Bethesda", "hardwood refinishing Arlington", "concrete polishing Silver Spring" search hits a dedicated, ranked page built specifically for that exact intent. Phase 1 captures 160 long-tail keywords you currently leak. Phase 2 doubles to 320. Phase 3 takes it to 1,000+. <strong>This is the leverage that turns a small business website into a market-dominating directory.</strong></p>
                                     </li>
@@ -870,7 +892,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 04</span>
                                             <span class="d-name">Midland Geo-Grid Rank Tracker</span>
-                                        </div>
+                                        <span class="d-value">$600 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Local Falcon-style geo-grid scan around the Marlow Heights HQ. Weekly heatmap, AGR / ATGR / Share-of-Local-Voice, drift alerts, competitor overlay.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>Replaces a $25-$300/mo Local Falcon subscription. The data joins with your GSC clicks, form submissions, and CRM tags so you see exactly which neighborhoods rank you and which bury you.</p>
                                     </li>
@@ -878,7 +900,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 05</span>
                                             <span class="d-name">Midland GMB Mirror</span>
-                                        </div>
+                                        <span class="d-value">$400 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Reflects your <strong>GMB categories</strong> (Flooring contractor, Carpet cleaning, Floor refinishing, Wood floor refinishing, Janitorial, Tile cleaning, Upholstery cleaning) and the <strong>exact keywords GMB surfaces</strong> ("commercial floor care", "commercial carpet cleaning", "clean hardwood floors", "floor care services") onto the website navigation, headings, schema, and service pages. Cleans the off-brand category noise (gutter cleaning, general repairs, carpentry) currently diluting your relevance.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>Google sees one consistent Midland Floor Care entity across GMB and the website, not two competing identities. The 35% mobile-search audience that finds you on GMB lands on a site that reinforces every category and keyword they searched for, increasing booking conversion and stopping the May-2026-style traffic collapse.</p>
                                     </li>
@@ -886,7 +908,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 06</span>
                                             <span class="d-name">Midland AI Rank + GEO Module</span>
-                                        </div>
+                                        <span class="d-value">$500 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Generative Engine Optimization (GEO) for the AI search shift. Ships <code>llms.txt</code>, structured Q&amp;A schema, knowledge-graph entities, sameAs cross-linking across GMB / Yelp / Facebook / LinkedIn. Tracks AI-citation surfaces (ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews) to confirm Midland gets cited by name.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>You rank where the next generation of buyers actually search. When a prospect asks ChatGPT "best commercial floor care in DC", Midland Floor Care comes back as the cited answer, not a competitor. Future-proof against the link-to-answer shift instead of getting overrun by it.</p>
                                     </li>
@@ -930,7 +952,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 07</span>
                                             <span class="d-name">Midland Smart Forms Pro <span style="display:inline-block;font-size:10px;font-weight:900;letter-spacing:1px;padding:3px 7px;background:#1a73e8;color:#fff;border-radius:4px;margin-left:6px;vertical-align:2px;">→ ACTIVECAMPAIGN</span></span>
-                                        </div>
+                                        <span class="d-value">$400 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Service-specific intake forms wired to the 4 lead triggers (emergency, future project, referral, out-of-scope), with native two-way sync into your <strong>existing ActiveCampaign CRM</strong>, no second CRM to learn, no double data entry, the tools you already pay for finally talk to each other.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>Every form submission becomes a tagged ActiveCampaign contact in seconds, classified by trigger, segment, brand, and city, ready for follow-up before the owner has even seen the inquiry. Use the CRM you already own, just with leads that actually arrive.</p>
                                     </li>
@@ -938,7 +960,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 08</span>
                                             <span class="d-name">Midland CRM Tagging</span>
-                                        </div>
+                                        <span class="d-value">$300 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Auto-tags every submission with <code>trigger:*</code>, <code>segment:*</code>, <code>brand:*</code>, <code>service:*</code>, <code>source:*</code>, and <code>city:*</code>. Pushes the tagged record straight into ActiveCampaign.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>100% of leads classified consistently. Marketing automation knows exactly what sequence to fire. Zero leads go untracked or untagged.</p>
                                     </li>
@@ -946,7 +968,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 09</span>
                                             <span class="d-name">Midland Lead Routing</span>
-                                        </div>
+                                        <span class="d-value">$300 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>ActiveCampaign sequence per trigger type. Owner SMS + email escalation if no response within 2 hours on emergency leads.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>Same-day SLA on emergencies enforced automatically. No more leads dying at 9pm in an inbox while the next-guy-up books the job.</p>
                                     </li>
@@ -954,7 +976,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 10</span>
                                             <span class="d-name">Midland Self-Booking Calendar</span>
-                                        </div>
+                                        <span class="d-value">$300 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Google Calendar integration. Lead picks a slot from a public-facing calendar. Auto-confirmation to both parties. 24h + 2h appointment reminders.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>40%+ of qualified leads book themselves without owner intervention. No-shows drop because reminders fire automatically.</p>
                                     </li>
@@ -962,7 +984,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 11</span>
                                             <span class="d-name">Midland Branded Mailer</span>
-                                        </div>
+                                        <span class="d-value">$200 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Replaces broken WP mail with the Resend transactional service. Branded confirmations, sender-domain authentication (SPF, DKIM, DMARC).</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>100% inbox deliverability. Zero leads lost to spam folders. Branded "Thank you" email lands in seconds, not minutes.</p>
                                     </li>
@@ -1006,7 +1028,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 12</span>
                                             <span class="d-name">Midland Smart Reviews Pro</span>
-                                        </div>
+                                        <span class="d-value">$500 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Survey-gated GMB review engine. 24h post-job NPS. Promoters get the Google review link + 2 reminders. Detractors route to private feedback with an owner alert.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>25+ new 5-star GMB reviews in 90 days. Stars protected from public 1-star drama because dissatisfied customers vent to you, not Google.</p>
                                     </li>
@@ -1014,7 +1036,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 13</span>
                                             <span class="d-name">Midland Emergency-to-Plan Lifecycle</span>
-                                        </div>
+                                        <span class="d-value">$400 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Automated post-job sequence. Day-1 thank-you, Day-7 NPS, Day-30 Floor Care Plan offer with a personalised quote based on the original service.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>15%+ of one-time emergency customers convert to recurring Floor Care Plan subscribers. The lifetime-value insight finally pays.</p>
                                     </li>
@@ -1022,7 +1044,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 14</span>
                                             <span class="d-name">Midland Daily Intel</span>
-                                        </div>
+                                        <span class="d-value">$400 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>pytrends + GSC + GMB + geo-grid digest emailed to the owner every morning. Rising-keyword alerts, competitor-drift signals, allergy-wave seasonality reminders.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>You see demand shifts before they hit revenue. Act on rising opportunities in days instead of finding out about them in a quarterly review.</p>
                                     </li>
@@ -1030,7 +1052,7 @@
                                         <div class="d-head">
                                             <span class="d-num">Feature 15</span>
                                             <span class="d-name">Midland GitHub Vault &amp; Deploy</span>
-                                        </div>
+                                        <span class="d-value">$400 value</span></div>
                                         <p class="d-uc"><span class="lbl">Use case</span>Every WordPress change, theme file, plugin config, schema template, and programmatic-page template committed to a private GitHub repo. <strong>Doubles as a deployment pipeline:</strong> change a CTA, a schema field, a city-page template, or a tracking tag once in GitHub, and the fix rolls out to all 160+ programmatic pages at scale, instantly. Same workflow Yelp and Angi use to ship updates across thousands of pages without touching them one by one.</p>
                                         <p class="d-bf"><span class="lbl">Benefit</span>Site recovery in minutes if anything breaks, plus the ability to <strong>deploy fixes and improvements across every city page in one push</strong>. No more editing 160 pages by hand. No more 3am restore panics. The site evolves like software, not like a static brochure.</p>
                                     </li>
@@ -1075,14 +1097,11 @@
                         </div>
                         <div class="ba-col-body">
                             <ul>
-                                <li><i class="ba-icon">✗</i>Lead fills out form at 9pm, WP mail fires into spam or doesn't deliver at all</li>
-                                <li><i class="ba-icon">✗</i>Owner never sees the inquiry, no reply, lead books the next guy who picks up</li>
-                                <li><i class="ba-icon">✗</i>No automated follow-up, cold leads sit in an inbox and go nowhere</li>
-                                <li><i class="ba-icon">✗</i>Appointments tracked in a notebook, client gets no reminder, no-shows happen</li>
-                                <li><i class="ba-icon">✗</i>Job finishes, owner moves on, never asks for a review</li>
-                                <li><i class="ba-icon">✗</i>GMB stays at a handful of reviews while competitors stack 50-500 stars</li>
-                                <li><i class="ba-icon">✗</i>No visibility into which service or city drives the most interest</li>
-                                <li><i class="ba-icon">✗</i>Past customers never heard from again, reactivation revenue is zero</li>
+                                <li><i class="ba-icon">✗</i>9pm form lands in spam, owner never sees it</li>
+                                <li><i class="ba-icon">✗</i>Lead books the next competitor who picks up</li>
+                                <li><i class="ba-icon">✗</i>Cold leads die in the inbox, zero follow-up</li>
+                                <li><i class="ba-icon">✗</i>No review ask, GMB stuck while rivals hit 50+</li>
+                                <li><i class="ba-icon">✗</i>Past customers never reactivated, no LTV</li>
                             </ul>
                         </div>
                     </div>
@@ -1093,14 +1112,11 @@
                         </div>
                         <div class="ba-col-body">
                             <ul>
-                                <li><i class="ba-icon">✓</i>Lead submits → Resend delivers instantly, owner notified, branded confirmation in seconds</li>
-                                <li><i class="ba-icon">✓</i>Automated reply fires within minutes with a self-booking link</li>
-                                <li><i class="ba-icon">✓</i>No response in 2 hours → escalation reminder fires to owner's phone + email</li>
-                                <li><i class="ba-icon">✓</i>Lead self-books via Google Calendar, confirmation sent to both parties automatically</li>
-                                <li><i class="ba-icon">✓</i>24h + 2h reminders sent to client before every appointment</li>
-                                <li><i class="ba-icon">✓</i>Job complete → 24h later, NPS survey fires, happy client routes to GMB link</li>
-                                <li><i class="ba-icon">✓</i>GMB review request + 2 follow-up reminders until they leave a star rating</li>
-                                <li><i class="ba-icon">✓</i>Every lead, appointment, and job logged in ActiveCampaign, full pipeline visibility</li>
+                                <li><i class="ba-icon">✓</i>Lead → owner alerted in &lt;2 min, branded confirm</li>
+                                <li><i class="ba-icon">✓</i>Self-booking calendar with auto-reminders</li>
+                                <li><i class="ba-icon">✓</i>Escalation fires if no reply in 2 hours</li>
+                                <li><i class="ba-icon">✓</i>Post-job NPS routes promoters straight to GMB</li>
+                                <li><i class="ba-icon">✓</i>Every lead tagged + tracked in ActiveCampaign</li>
                             </ul>
                         </div>
                     </div>
@@ -1130,7 +1146,25 @@
             <div class="section-padding gray-section" id="investment">
                 <span class="section-eyebrow">05 · Investment</span>
                 <h2 class="section-title">2-Payment Plan</h2>
-                <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">Split into two payments. Second payment due only after the first milestone is delivered and confirmed.</p>
+
+                <div class="value-stack">
+                    <div class="value-stack-head">Total Build Value</div>
+                    <div class="value-stack-rows">
+                        <div class="vs-row"><span>Smart SEO Pro · 6 features</span><span class="vs-amt">$4,400</span></div>
+                        <div class="vs-row"><span>Smart Forms Pro · 5 features</span><span class="vs-amt">$1,500</span></div>
+                        <div class="vs-row"><span>Smart Reviews Pro · 4 features</span><span class="vs-amt">$1,700</span></div>
+                        <div class="vs-row bonus"><span>Bonus · Carpet Cleaning Ad Page</span><span class="vs-amt">$800</span></div>
+                        <div class="vs-row bonus"><span>Bonus · Homepage Redo &amp; SEO Pass</span><span class="vs-amt">$1,200</span></div>
+                    </div>
+                    <div class="vs-total">
+                        <div><span class="vs-label">Total Value</span><span class="vs-big">$9,600</span></div>
+                        <div class="vs-arrow">→</div>
+                        <div><span class="vs-label">Your Price</span><span class="vs-big vs-price">$2,965</span></div>
+                    </div>
+                    <p class="vs-note">You save <strong>$6,635</strong>. Plugins alone clear $7,600 in retail value before either bonus.</p>
+                </div>
+
+                <p style="text-align:center;margin-top:18px;margin-bottom:22px;color:#6b7280;">Split into two payments. Second payment due only after the first milestone is delivered and confirmed.</p>
                 <div class="phases">
                     <div class="phase" style="border-color:var(--brand-green);">
                         <div class="phase-num">Payment 1, Kickoff</div>
