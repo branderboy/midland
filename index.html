@@ -111,6 +111,41 @@
         .benefit-col h3 { font-size: 20px; color: var(--text-dark); margin-bottom: 15px; border-bottom: 2px solid var(--brand-green); padding-bottom: 10px; display: inline-block; }
         .benefit-col p { font-size: 15px; line-height: 1.6; font-weight: 500; color: var(--text-body); }
 
+        /* THE PLAN: 4 PILLARS */
+        .pillars-stack { display: grid; gap: 18px; margin: 6px 0 0; }
+        .pillar { border: 1px solid #e5e7eb; border-radius: 12px; background: #ffffff; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .pillar-header { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; padding: 18px 22px; background: linear-gradient(135deg, #f0f7f2 0%, #ffffff 60%); border-bottom: 1px solid #e5e7eb; }
+        .pillar-num { width: 56px; height: 56px; border-radius: 14px; background: var(--brand-green); color: #ffffff; font-weight: 900; font-size: 26px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .pillar.foundation .pillar-num { background: #dc2626; }
+        .pillar.visibility .pillar-num { background: #1a73e8; }
+        .pillar.conversion .pillar-num { background: #b45309; }
+        .pillar.retention .pillar-num { background: #15803d; }
+        .pillar-titlewrap .pillar-name { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); display: block; margin-bottom: 2px; }
+        .pillar.foundation .pillar-name { color: #b91c1c; }
+        .pillar.visibility .pillar-name { color: #1a73e8; }
+        .pillar.conversion .pillar-name { color: #b45309; }
+        .pillar.retention .pillar-name { color: #15803d; }
+        .pillar-titlewrap .pillar-title { font-size: clamp(20px, 3vw, 24px); font-weight: 900; color: var(--text-dark); line-height: 1.2; margin-bottom: 4px; }
+        .pillar-strategy { font-size: 14px; color: var(--text-body); font-weight: 500; line-height: 1.45; }
+        .pillar-body { display: grid; grid-template-columns: 1fr; }
+        @media (min-width: 768px) { .pillar-body { grid-template-columns: 1.5fr 1fr; } }
+        .pillar-deliverables { padding: 18px 22px; }
+        .pillar-deliverables h4, .pillar-kpi h4 { font-size: 11px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; margin-bottom: 10px; }
+        .pillar-deliverables ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+        .pillar-deliverables ul li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: var(--text-body); font-weight: 500; }
+        .pillar-deliverables ul li::before { content: ""; flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; background: var(--brand-green); margin-top: 2px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>"); background-size: 12px 12px; background-position: center; background-repeat: no-repeat; }
+        .pillar.foundation .pillar-deliverables ul li::before { background-color: #dc2626; }
+        .pillar.visibility .pillar-deliverables ul li::before { background-color: #1a73e8; }
+        .pillar.conversion .pillar-deliverables ul li::before { background-color: #b45309; }
+        .pillar.retention .pillar-deliverables ul li::before { background-color: #15803d; }
+        .pillar-kpi { background: #f9fafb; padding: 18px 22px; border-top: 1px solid #e5e7eb; }
+        @media (min-width: 768px) { .pillar-kpi { border-top: 0; border-left: 1px solid #e5e7eb; } }
+        .kpi-grid { display: grid; gap: 10px; }
+        .kpi-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 10px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; }
+        .kpi-row .label { font-size: 12px; color: var(--text-body); font-weight: 600; }
+        .kpi-row .value { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; }
+        .kpi-row .value .arrow { color: var(--brand-green); font-weight: 900; padding: 0 4px; }
+
         /* PROCESS STEPS (3-stage flow) */
         .process-flow { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 4px 0 0; align-items: stretch; position: relative; }
         @media (min-width: 768px) { .process-flow { grid-template-columns: 1fr 28px 1fr 28px 1fr; gap: 0; } }
@@ -349,10 +384,10 @@
 
             <!-- 2. THE PROBLEM (AGITATION) -->
             <div class="section-padding">
-                <span class="section-eyebrow">The Problem</span>
-                <h2 class="section-title">The Opportunity Sitting Hidden In Your Data</h2>
-                <p style="font-size: 17px; margin-bottom: 18px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
-                    People in DC, Maryland, and Virginia are actively searching for every service you offer. The demand is massive. <strong>But your site isn't showing up, it isn't loading fast enough when it does, and it isn't converting.</strong> Here is what your Google Search Console shows right now:
+                <span class="section-eyebrow">01 · Foundation</span>
+                <h2 class="section-title">What's Broken Today</h2>
+                <p style="font-size: 16px; margin-bottom: 18px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; font-weight: 500;">
+                    The audit. Before we talk strategy, here is what Google sees, what the site delivers, and which queries you are leaking. These are the leaks. Patch them first, then build on top.
                 </p>
 
                 <div class="stat-grid">
@@ -414,51 +449,20 @@
                     </table>
                 </div>
 
-                <div style="background: #ffffff; color: var(--text-dark); border: 2px solid #e5e7eb; padding: 20px; text-align: center; border-radius: 8px; font-size: 18px; font-weight: bold; margin-top: 16px;">
-                    The carpet cleaning market alone has over <span class="highlight" style="padding: 2px 5px;">500,000 searches</span> per month.<br>Your site gets 1 click on that page every 3 months.<br><br><span style="color: var(--cta-color); font-size: 26px;">This is the opportunity. And this is why you need to act now.</span>
+                <div style="background: #ffffff; color: var(--text-dark); border: 1px solid #e5e7eb; padding: 16px 20px; text-align: center; border-radius: 8px; font-size: 15px; font-weight: 500; margin-top: 16px;">
+                    The carpet cleaning market alone gets <span class="highlight" style="padding: 2px 5px;">500,000+ monthly searches</span>. Your site captures 1 click every 3 months on that page. The demand is not the problem.
                 </div>
             </div>
 
-            <!-- 3. THE SOLUTION (WHY THIS PLAN) -->
-            <div class="section-padding gray-section">
-                <span class="section-eyebrow">Our 3-Step Process</span>
-                <h2 class="section-title">Why Generic SEO Won't Work (And What Will)</h2>
-                
-                <div class="process-flow">
-                    <div class="process-step cleanup">
-                        <span class="step-num">1</span>
-                        <span class="step-tag">Step 1 · Cleanup</span>
-                        <h3>Fix What Is Blocking You</h3>
-                        <p>You have 857 pages not indexed and a broken mobile experience. Redirect chains are bleeding your crawl budget. Before we add content, we <strong class="text-dark-bold">remove what is holding the domain down</strong>. Week 1 is entirely cleanup.</p>
-                    </div>
-                    <div class="process-arrow">→</div>
-                    <div class="process-arrow mobile">→</div>
-                    <div class="process-step build">
-                        <span class="step-num">2</span>
-                        <span class="step-tag">Step 2 · Build</span>
-                        <h3>Build Pages For Real Demand</h3>
-                        <p>Your GSC data shows exactly which cities generate impressions with zero clicks. We build <strong>160 city × service pages</strong> (e.g., Bethesda carpet cleaning, DC hardwood), matched to real queries, with instant indexing via IndexNow.</p>
-                    </div>
-                    <div class="process-arrow">→</div>
-                    <div class="process-arrow mobile">→</div>
-                    <div class="process-step">
-                        <span class="step-num">3</span>
-                        <span class="step-tag">Step 3 · Convert</span>
-                        <h3>Turn Rankings Into Revenue</h3>
-                        <p>Traffic without conversion is vanity. We wire your quote flow to ActiveCampaign and Google Calendar. We deploy <strong>Smart Reviews</strong> to turn completed jobs into 5-star GMB ratings. We send you daily Intel digests on rising keywords.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3b. SERVICES IN DEMAND + LEAD TAGGING -->
+            <!-- 02. INSIGHTS -->
             <div class="section-padding">
-                <span class="section-eyebrow">Demand &amp; Lead Tagging</span>
-                <h2 class="section-title">Services In Demand &amp; How We Tag Every Lead</h2>
-                <p style="font-size: 17px; line-height: 1.6; text-align: center; max-width: 820px; margin: 0 auto 30px;">
-                    Not every lead is the same. The CRM and intake forms are built around the <strong>4 real reasons</strong> a prospect contacts Midland, and the <strong>focus services</strong> that actually drive revenue. Every form submission is auto-tagged so the right follow-up fires.
+                <span class="section-eyebrow">02 · Insights</span>
+                <h2 class="section-title">Where The Leverage Is Hiding</h2>
+                <p style="font-size: 16px; line-height: 1.55; text-align: center; max-width: 820px; margin: 0 auto 18px; font-weight: 500;">
+                    Two leverage sources: <strong>your own data</strong> (GSC, GA, GMB, customer behaviour) and <strong>reverse-engineered competitor data</strong> (Yelp city pages, Local Falcon-style geo-grid). Both feed the strategy that follows.
                 </p>
 
-                <h3 class="subsection-title">The Focus Services <span class="subsection-sub">Where The Demand Is</span></h3>
+                <h3 class="subsection-title">Insight 1 · Your Demand Signals <span class="subsection-sub">From your own data</span></h3>
                 <div class="demand-grid">
                     <div class="demand-card focus">
                         <h4>Hardwood Floor Finishing <span class="tag">FOCUS</span></h4>
@@ -496,16 +500,16 @@
 
                 <div class="segment-row">
                     <div class="segment-box">
-                        <h5>Midland Carpet Care &amp; Cleaning, Residential</h5>
-                        <p>Carpet cleaning &amp; installation for homes. <strong>Seasonality:</strong> demand spikes 2x per year on allergy waves (spring + fall), campaign cadence is built around those windows.</p>
+                        <h5>Insight · Two Brands, Two Funnels</h5>
+                        <p><strong>Midland Carpet Care &amp; Cleaning, Residential.</strong> Carpet cleaning &amp; install. Demand spikes 2x/year on allergy waves (spring + fall). Campaign cadence syncs to those windows.</p>
                     </div>
                     <div class="segment-box commercial">
-                        <h5>Midland Service, Commercial</h5>
-                        <p>Tile, hard surface, concrete, hardwood, and everything beyond residential carpet cleaning. Sold as recurring floor care plans, not one-off jobs.</p>
+                        <h5>Insight · Commercial Is Recurring</h5>
+                        <p><strong>Midland Service, Commercial.</strong> Tile, hardwood, concrete polishing, everything beyond residential carpet. Sold as recurring Floor Care Plans, not one-off jobs. Different LTV math.</p>
                     </div>
                 </div>
 
-                <h3 class="subsection-title">The 4 Lead Triggers <span class="subsection-sub">Auto-Tagged In CRM</span></h3>
+                <h3 class="subsection-title">Insight 2 · Why Leads Actually Contact You <span class="subsection-sub">4 triggers, learned from the business</span></h3>
                 <div class="trigger-grid">
                     <div class="trigger-card urgent">
                         <h5>1. Emergency</h5>
@@ -536,10 +540,71 @@
                     </div>
                 </div>
 
-                <div class="geogrid-section">
-                    <h3>Geo-Grid GMB Rank Tracking (Local Falcon-Style)</h3>
+                <h3 class="subsection-title">Insight 3 · The Lifetime-Value Path <span class="subsection-sub">Where the LTV actually lives</span></h3>
+                <div class="funnel-flow">
+                    <div class="funnel-row">
+                        <div class="funnel-step start">Emergency Job</div>
+                        <span class="funnel-arrow">→</span>
+                        <div class="funnel-step">Service Completed</div>
+                        <span class="funnel-arrow">→</span>
+                        <div class="funnel-step">Happy Customer Follow-Up</div>
+                        <span class="funnel-arrow">→</span>
+                        <div class="funnel-step end">Floor Care Plan Customer</div>
+                    </div>
+                    <p style="text-align:center;margin-top:14px;font-size:14px;color:var(--text-body);font-weight:500;">A satisfied emergency customer becomes a recurring <strong style="color:var(--brand-green);">Floor Care Plan</strong> subscriber. The follow-up automation is what makes that conversion happen.</p>
+                </div>
+
+                <h3 class="subsection-title">Insight 4 · Reverse-Engineered Competitor Demand <span class="subsection-sub">Yelp already mapped the DMV</span></h3>
+                <div class="yelp-section">
                     <p class="lede">
-                        Built into Smart SEO Pro. We scan a lat/lng grid around your HQ for every focus keyword and chart the GMB pack rank at every pin. The same intelligence Local Falcon ships, but the data lives inside your stack so it joins with GSC clicks, form submissions, and CRM tags.
+                        Yelp publishes the full demand graph for our market on their city pages, which services prospects search for, which neighborhoods cluster, what FAQs they ask before booking. Smart SEO Pro <strong>scrapes those signals once</strong> and turns them into a city × service page grid. We don't guess what demand looks like, we harvest it.
+                    </p>
+                    <div class="yelp-grid">
+                        <div class="yelp-card">
+                            <h5>Cities &amp; Neighborhoods</h5>
+                            <span class="pill">Alexandria, VA</span>
+                            <span class="pill">Bethesda, MD</span>
+                            <span class="pill">Arlington, VA</span>
+                            <span class="pill">Old Town</span>
+                            <span class="pill">Pentagon City</span>
+                            <span class="pill">Silver Spring</span>
+                            <span class="pill">+ 15 more</span>
+                        </div>
+                        <div class="yelp-card">
+                            <h5>Related Service Searches</h5>
+                            <span class="pill">Hardwood Floor Refinishing</span>
+                            <span class="pill">Carpet Installation</span>
+                            <span class="pill">Tile Installation</span>
+                            <span class="pill">LVP / Vinyl</span>
+                            <span class="pill">Epoxy Garage Floor</span>
+                            <span class="pill">Floor Polishing</span>
+                            <span class="pill">Stain Removal</span>
+                        </div>
+                        <div class="yelp-card">
+                            <h5>FAQ &amp; Intent Signals</h5>
+                            <span class="pill">"best near me"</span>
+                            <span class="pill">popular services</span>
+                            <span class="pill">people also searched</span>
+                            <span class="pill">emergency services</span>
+                            <span class="pill">virtual consultations</span>
+                            <span class="pill">fast-responding</span>
+                        </div>
+                    </div>
+                    <div class="yelp-pipeline">
+                        <span class="step">Scrape Yelp city pages</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Extract cities × services × FAQs</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Map to Midland's focus services</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Generate 160 programmatic pages + FAQ schema</span>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Insight 5 · Reverse-Engineered Map-Pack Position <span class="subsection-sub">Local Falcon-style geo-grid</span></h3>
+                <div class="geogrid-section">
+                    <p class="lede">
+                        A lat/lng grid scan around your HQ for every focus keyword tells you exactly which neighborhoods rank you in the 3-pack and which ones bury you. Same intelligence Local Falcon and BrightLocal sell as a $25-$300/mo subscription, baked into Smart SEO Pro so the data joins with your GSC clicks, form submissions, and CRM tags.
                     </p>
                     <div class="geogrid-wrap">
                         <div>
@@ -590,168 +655,132 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="yelp-section">
-                    <h3>Bonus: Reverse-Engineering Yelp Inside Smart SEO Pro</h3>
-                    <p class="lede">
-                        Yelp already did the keyword research for our market. Their city pages publish exactly which services prospects search for, which neighborhoods cluster the demand, and what FAQs they ask before booking. Smart SEO Pro / the programmatic plugin <strong>scrapes those signals once</strong> and turns them into a city × service page grid, built around real DMV demand, not guesses.
-                    </p>
-                    <div class="yelp-grid">
-                        <div class="yelp-card">
-                            <h5>Cities &amp; Neighborhoods</h5>
-                            <span class="pill">Alexandria, VA</span>
-                            <span class="pill">Bethesda, MD</span>
-                            <span class="pill">Arlington, VA</span>
-                            <span class="pill">Old Town</span>
-                            <span class="pill">Pentagon City</span>
-                            <span class="pill">Silver Spring</span>
-                            <span class="pill">+ 15 more</span>
-                        </div>
-                        <div class="yelp-card">
-                            <h5>Related Service Searches</h5>
-                            <span class="pill">Hardwood Floor Refinishing</span>
-                            <span class="pill">Carpet Installation</span>
-                            <span class="pill">Tile Installation</span>
-                            <span class="pill">LVP / Vinyl</span>
-                            <span class="pill">Epoxy Garage Floor</span>
-                            <span class="pill">Floor Polishing</span>
-                            <span class="pill">Stain Removal</span>
-                        </div>
-                        <div class="yelp-card">
-                            <h5>FAQ &amp; Intent Signals</h5>
-                            <span class="pill">"best near me"</span>
-                            <span class="pill">popular services</span>
-                            <span class="pill">people also searched</span>
-                            <span class="pill">emergency services</span>
-                            <span class="pill">virtual consultations</span>
-                            <span class="pill">fast-responding</span>
-                        </div>
-                    </div>
-                    <div class="yelp-pipeline">
-                        <span class="step">Scrape Yelp city pages</span>
-                        <span class="arrow">→</span>
-                        <span class="step">Extract cities × services × FAQs</span>
-                        <span class="arrow">→</span>
-                        <span class="step">Map to Midland's focus services</span>
-                        <span class="arrow">→</span>
-                        <span class="step">Generate 160 programmatic pages + FAQ schema</span>
-                    </div>
-                    <p style="text-align:center;margin-top:18px;font-size:13px;color:#92400e;">
-                        Reference structure captured in <code>tags.md</code>, the harvested signals for Alexandria, VA become the template for every other DMV city page.
-                    </p>
-                </div>
-
-                <div class="funnel-flow">
-                    <h3>The Customer Lifecycle Path</h3>
-                    <div class="funnel-row">
-                        <div class="funnel-step start">Emergency Job</div>
-                        <span class="funnel-arrow">→</span>
-                        <div class="funnel-step">Service Completed</div>
-                        <span class="funnel-arrow">→</span>
-                        <div class="funnel-step">Happy Customer Follow-Up</div>
-                        <span class="funnel-arrow">→</span>
-                        <div class="funnel-step end">Floor Care Plan Customer</div>
-                    </div>
-                    <p style="text-align:center;margin-top:18px;font-size:14px;color:var(--text-body);">Emergency triggers a service. The follow-up converts a satisfied one-time customer into a recurring <strong style="color:var(--brand-green);">Floor Care Plan</strong>, that's where the lifetime value lives.</p>
-                </div>
             </div>
 
-            <!-- 4. OFFER STACK -->
-            <div class="section-padding">
-                <div class="offer-stack">
-                    <span class="section-eyebrow" style="margin-bottom:0;">The Build</span>
-                    <h2 class="offer-title">Here Is Exactly What We Are Building</h2>
-                    <p style="text-align: center; margin-top: -8px; margin-bottom: 16px; font-weight: bold; font-size: 15px; color: var(--brand-green);">We do not use cookie cutter templates. We are building custom products and digital capacity specifically designed for your exact business use case and needs.</p>
-                    
-                    <!-- Offer Items -->
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Real Smart SEO Pro & GSC Cleanup</h4>
-                            <p>We fix the 857 unindexed crisis, deploy sameAs entity schema, and force instant indexing.</p>
+            <!-- 03. STRATEGY -->
+            <div class="section-padding gray-section">
+                <span class="section-eyebrow">03 · Strategy</span>
+                <h2 class="section-title">The 3-Pillar Plan</h2>
+                <p style="font-size: 16px; line-height: 1.55; text-align: center; max-width: 820px; margin: 0 auto 18px; font-weight: 500;">
+                    Each pillar has a clear strategy, the deliverables that ship under it, and the KPI it moves. Foundation problems and Insights both feed the pillars below.
+                </p>
+
+                <div class="pillars-stack">
+                    <div class="pillar visibility">
+                        <div class="pillar-header">
+                            <div class="pillar-num">1</div>
+                            <div class="pillar-titlewrap">
+                                <span class="pillar-name">Pillar 1 · Visibility</span>
+                                <div class="pillar-title">Show Up Where DMV Demand Already Is</div>
+                                <p class="pillar-strategy"><em>Strategy:</em> Patch what foundation flagged, then own the map pack and organic for every focus service across the DMV. Build pages and citations against demand we already proved exists.</p>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Site Speed + Mobile Overhaul</h4>
-                            <p>Elementor rebuild. Target: PageSpeed 34 → 85+. Google scores mobile experience for rank; we fix yours.</p>
+                        <div class="pillar-body">
+                            <div class="pillar-deliverables">
+                                <h4>Deliverables</h4>
+                                <ul>
+                                    <li>Real Smart SEO Pro + GSC cleanup, 857 unindexed URLs killed, sameAs entity schema deployed, IndexNow + Rapid URL Indexer wired</li>
+                                    <li>Site speed + mobile overhaul, target PageSpeed 34 → 85+</li>
+                                    <li>160 programmatic city × service pages, 8 services × 20 cities, seeded by reverse-engineered Yelp signals</li>
+                                    <li>Geo-Grid GMB rank tracker baked into Smart SEO Pro, weekly heatmap, AGR / ATGR / Share-of-Local-Voice metrics, drift alerts</li>
+                                    <li>AEO + GEO entity work, llms.txt, structured Q&amp;A, AI Overview citations</li>
+                                </ul>
+                            </div>
+                            <div class="pillar-kpi">
+                                <h4>Outcomes by Day 90</h4>
+                                <div class="kpi-grid">
+                                    <div class="kpi-row"><span class="label">Pages indexed</span><span class="value">38 <span class="arrow">→</span> 180+</span></div>
+                                    <div class="kpi-row"><span class="label">Monthly impressions</span><span class="value">6.5K <span class="arrow">→</span> 60K+</span></div>
+                                    <div class="kpi-row"><span class="label">Monthly clicks</span><span class="value">20 <span class="arrow">→</span> 400+</span></div>
+                                    <div class="kpi-row"><span class="label">PageSpeed (mobile)</span><span class="value">34 <span class="arrow">→</span> 85+</span></div>
+                                    <div class="kpi-row"><span class="label">Geo-grid AGR</span><span class="value">target ≤5</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Programmatic City × Service Grid (160 Pages)</h4>
-                            <p>8 services × 20 DMV cities. One highly-optimized page per real search intent, seeded by reverse-engineering Yelp's published city pages (services, neighborhoods, FAQs) so every page targets demand we know exists.</p>
+                    <div class="pillar conversion">
+                        <div class="pillar-header">
+                            <div class="pillar-num">2</div>
+                            <div class="pillar-titlewrap">
+                                <span class="pillar-name">Pillar 2 · Conversion</span>
+                                <div class="pillar-title">Capture, Tag &amp; Route Every Lead In Under 2 Minutes</div>
+                                <p class="pillar-strategy"><em>Strategy:</em> Apply the 4-trigger insight directly to the intake. Every form submission auto-tags by trigger, segment, brand, and city, then routes to the right pipeline with the right SLA. Zero leads lost to spam, the inbox, or human delay.</p>
+                            </div>
+                        </div>
+                        <div class="pillar-body">
+                            <div class="pillar-deliverables">
+                                <h4>Deliverables</h4>
+                                <ul>
+                                    <li>Smart Forms Pro intake covering the 4 trigger types (emergency, future project, referral, out-of-scope) with service-specific fields</li>
+                                    <li>CRM tagging taxonomy: <code>trigger:*</code>, <code>segment:*</code>, <code>brand:*</code>, <code>service:*</code>, <code>source:*</code>, <code>city:*</code></li>
+                                    <li>ActiveCampaign wiring, automated follow-up sequences per trigger, escalation to owner if no response in 2h</li>
+                                    <li>Google Calendar self-booking with 24h + 2h appointment reminders</li>
+                                    <li>Resend transactional email transport, zero spam, 100% deliverability</li>
+                                    <li><strong>Bonus:</strong> Carpet cleaning Google Ads landing page (mobile-first, Quality Score-tuned, call tracking ready)</li>
+                                </ul>
+                            </div>
+                            <div class="pillar-kpi">
+                                <h4>Outcomes by Day 90</h4>
+                                <div class="kpi-grid">
+                                    <div class="kpi-row"><span class="label">Lead response time</span><span class="value">&lt;2 min</span></div>
+                                    <div class="kpi-row"><span class="label">Email deliverability</span><span class="value">100%</span></div>
+                                    <div class="kpi-row"><span class="label">Leads lost to spam</span><span class="value">0</span></div>
+                                    <div class="kpi-row"><span class="label">Auto-tag coverage</span><span class="value">100% of submissions</span></div>
+                                    <div class="kpi-row"><span class="label">Self-booking rate</span><span class="value">target 40%+</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Geo-Grid GMB Rank Tracking (Local Falcon-Style, Built In)</h4>
-                            <p>The same geo-grid intelligence Local Falcon and BrightLocal sell as a separate $25-$300/mo subscription, baked directly into Smart SEO Pro. We scan a lat/lng grid around your Marlow Heights HQ for every focus keyword (carpet cleaning, hardwood refinishing, concrete polishing, etc.) and store the GMB pack rank at every pin. Heatmap view, AGR / ATGR / Share-of-Local-Voice metrics, week-over-week drift alerts, and competitor overlay so you see exactly which neighborhoods rank you in the 3-pack and which ones bury you. Because it is your data, the rank scans join with GSC clicks, form submissions, and CRM tags, an answer the off-the-shelf tools cannot give you.</p>
+                    <div class="pillar retention">
+                        <div class="pillar-header">
+                            <div class="pillar-num">3</div>
+                            <div class="pillar-titlewrap">
+                                <span class="pillar-name">Pillar 3 · Retention &amp; Growth</span>
+                                <div class="pillar-title">Convert One-Time Jobs Into Floor Care Plan Subscribers</div>
+                                <p class="pillar-strategy"><em>Strategy:</em> Run the lifecycle insight: a satisfied emergency customer is the highest-leverage path to recurring revenue. Automate the post-job NPS, the GMB review request, and the Floor Care Plan offer. Watch demand signals daily so you act on rising opportunities, not on hindsight.</p>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Smart Forms Pro + CRM Integration</h4>
-                            <p>ActiveCampaign wiring, Google Calendar scheduling, and Resend email transport. Zero leaked leads.</p>
-                        </div>
-                    </div>
-
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Smart Reviews Pro</h4>
-                            <p>Survey gated GMB engine. Promoters get the Google link. Detractors get private feedback loops. Protect your stars.</p>
-                        </div>
-                    </div>
-
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>AEO & GEO Optimization</h4>
-                            <p>Structured Q&A, llms.txt, and entity knowledge graphs so ChatGPT and AI Overviews cite Midland Floor Care.</p>
-                        </div>
-                    </div>
-
-                    <div class="offer-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4>Daily Intel Microservice & WP Backup</h4>
-                            <p>pytrends + GSC data sent to your inbox daily. Plus, secure GitHub version-controlled backups.</p>
-                        </div>
-                    </div>
-
-                    <div class="offer-item" style="background:#fefce8;border:2px dashed #fbbf24;border-radius:8px;padding:20px;margin-top:10px;">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:#b45309;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <div class="offer-text">
-                            <h4 style="color:#b45309;">🎁 BONUS: Carpet Cleaning Google Ads Landing Page</h4>
-                            <p>A high-converting, mobile-first landing page built specifically to run Google Ads for carpet cleaning in the DMV. Structured for Quality Score, fast load, clear CTA, call tracking ready. Normally $800. Included free.</p>
+                        <div class="pillar-body">
+                            <div class="pillar-deliverables">
+                                <h4>Deliverables</h4>
+                                <ul>
+                                    <li>Smart Reviews Pro, survey-gated GMB engine. Promoters route to Google review request + reminders. Detractors route to private feedback with owner alert.</li>
+                                    <li>Emergency-to-Plan lifecycle automation, 24h NPS, Day-30 Floor Care Plan offer</li>
+                                    <li>Daily Intel microservice, pytrends + GSC + GMB digest emailed to owner with rising-keyword and competitor-drift alerts</li>
+                                    <li>GitHub-versioned WP backups, secure recovery</li>
+                                </ul>
+                            </div>
+                            <div class="pillar-kpi">
+                                <h4>Outcomes by Day 90</h4>
+                                <div class="kpi-grid">
+                                    <div class="kpi-row"><span class="label">New GMB reviews</span><span class="value">25+ in 90 days</span></div>
+                                    <div class="kpi-row"><span class="label">Plan conversion rate</span><span class="value">target 15%+</span></div>
+                                    <div class="kpi-row"><span class="label">Reactivation revenue</span><span class="value">unlocked</span></div>
+                                    <div class="kpi-row"><span class="label">Demand-shift visibility</span><span class="value">daily digest</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 90 Day Expectations -->
-                <div style="text-align: center; margin-bottom: 16px;">
-                    <h3 style="font-size: 22px; font-weight: 900; margin-bottom: 10px;">By Day 90, You Will See:</h3>
-                    <p style="font-size: 18px; line-height: 1.8;">
-                        Pages Indexed: 38 → <strong class="highlight">180+</strong><br>
-                        Monthly Impressions: 6,500 → <strong class="highlight">60,000+</strong><br>
+                <!-- 90 Day Targets summary -->
+                <div style="text-align: center; margin-top: 22px;">
+                    <h3 style="font-size: 18px; font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; color: var(--brand-green);">Headline Targets · Day 90</h3>
+                    <p style="font-size: 16px; line-height: 1.7; font-weight: 500;">
+                        Pages Indexed: 38 → <strong class="highlight">180+</strong> &middot;
+                        Monthly Impressions: 6.5K → <strong class="highlight">60K+</strong> &middot;
                         Monthly Clicks: 20 → <strong class="highlight">400+</strong><br>
                         Carpet Cleaning Vertical: <strong style="color: var(--cta-color)">Producing First Leads</strong>
                     </p>
                 </div>
             </div>
 
+
             <!-- 4b. BEFORE / AFTER -->
             <div class="ba-section">
-                <span class="section-eyebrow">The Transformation</span>
+                <span class="section-eyebrow">04 · Proof</span>
                 <h2 class="section-title">Before This Plan vs. After</h2>
                 <p class="ba-section section-sub">The #1 reason small businesses lose jobs isn't lack of demand, it's the broken lead system. Every form submission that goes unresponded is a job your competitor is booking.</p>
                 <div class="ba-grid">
@@ -815,7 +844,7 @@
 
             <!-- 5. MILESTONE PAYMENT PLAN -->
             <div class="section-padding gray-section">
-                <span class="section-eyebrow">Investment</span>
+                <span class="section-eyebrow">05 · Investment</span>
                 <h2 class="section-title">2-Payment Plan</h2>
                 <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">Split into two payments. Second payment due only after the first milestone is delivered and confirmed.</p>
                 <div class="phases">
