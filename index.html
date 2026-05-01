@@ -158,6 +158,31 @@
         .segment-box h5 { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; color: var(--text-dark); }
         .segment-box p { font-size: 14px; line-height: 1.5; color: var(--text-body); }
 
+        /* GEO-GRID HEATMAP MOCKUP */
+        .geogrid-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 28px; margin: 30px 0; }
+        .geogrid-section h3 { font-size: 20px; font-weight: 900; color: var(--text-dark); text-align: center; margin-bottom: 8px; }
+        .geogrid-section .lede { font-size: 14px; color: var(--text-body); text-align: center; max-width: 700px; margin: 0 auto 22px; line-height: 1.5; }
+        .geogrid-wrap { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: center; }
+        @media (min-width: 768px) { .geogrid-wrap { grid-template-columns: 1fr 1fr; } }
+        .geogrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 320px; margin: 0 auto; }
+        .geogrid .cell { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
+        .geogrid .r1 { background: #16a34a; }
+        .geogrid .r2 { background: #65a30d; }
+        .geogrid .r3 { background: #ca8a04; }
+        .geogrid .r4 { background: #ea580c; }
+        .geogrid .r5 { background: #b91c1c; }
+        .geogrid .center { outline: 3px solid #1a73e8; outline-offset: 1px; }
+        .geogrid-legend { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; font-size: 12px; }
+        .geogrid-legend .lg { display: inline-flex; align-items: center; gap: 5px; color: var(--text-body); }
+        .geogrid-legend .sw { width: 14px; height: 14px; border-radius: 3px; }
+        .geogrid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .geogrid-stat { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; }
+        .geogrid-stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; }
+        .geogrid-stat .num { font-size: 22px; font-weight: 900; color: var(--text-dark); margin-top: 2px; }
+        .geogrid-stat .delta { font-size: 12px; font-weight: 700; margin-top: 2px; }
+        .geogrid-stat .delta.up { color: #16a34a; }
+        .geogrid-stat .delta.down { color: #dc2626; }
+
         /* YELP REVERSE-ENGINEER */
         .yelp-section { background: #fff8f1; border: 2px solid #fcd9b4; border-radius: 10px; padding: 32px; margin: 30px 0; }
         .yelp-section h3 { font-size: 22px; font-weight: 900; color: #b45309; margin-bottom: 12px; text-align: center; }
@@ -509,6 +534,61 @@
                     </div>
                 </div>
 
+                <div class="geogrid-section">
+                    <h3>Geo-Grid GMB Rank Tracking (Local Falcon-Style)</h3>
+                    <p class="lede">
+                        Built into Smart SEO Pro. We scan a lat/lng grid around your HQ for every focus keyword and chart the GMB pack rank at every pin. The same intelligence Local Falcon ships, but the data lives inside your stack so it joins with GSC clicks, form submissions, and CRM tags.
+                    </p>
+                    <div class="geogrid-wrap">
+                        <div>
+                            <div class="geogrid" aria-label="Sample geo-grid heatmap for 'carpet cleaning near me'">
+                                <div class="cell r5">14</div><div class="cell r4">9</div><div class="cell r4">8</div><div class="cell r3">6</div><div class="cell r4">9</div><div class="cell r5">12</div><div class="cell r5">15</div>
+                                <div class="cell r4">10</div><div class="cell r3">5</div><div class="cell r2">3</div><div class="cell r2">3</div><div class="cell r3">4</div><div class="cell r4">7</div><div class="cell r5">11</div>
+                                <div class="cell r3">6</div><div class="cell r2">3</div><div class="cell r1">2</div><div class="cell r1">1</div><div class="cell r2">3</div><div class="cell r3">5</div><div class="cell r4">8</div>
+                                <div class="cell r3">4</div><div class="cell r2">2</div><div class="cell r1">1</div><div class="cell r1 center">1</div><div class="cell r1">2</div><div class="cell r2">3</div><div class="cell r3">6</div>
+                                <div class="cell r4">7</div><div class="cell r3">4</div><div class="cell r2">3</div><div class="cell r1">2</div><div class="cell r2">3</div><div class="cell r3">5</div><div class="cell r4">9</div>
+                                <div class="cell r5">11</div><div class="cell r4">8</div><div class="cell r3">5</div><div class="cell r3">4</div><div class="cell r4">7</div><div class="cell r5">12</div><div class="cell r5">14</div>
+                                <div class="cell r5">17</div><div class="cell r5">13</div><div class="cell r4">9</div><div class="cell r4">8</div><div class="cell r5">11</div><div class="cell r5">16</div><div class="cell r5">19</div>
+                            </div>
+                            <div class="geogrid-legend">
+                                <span class="lg"><span class="sw" style="background:#16a34a;"></span>1-3 (3-pack)</span>
+                                <span class="lg"><span class="sw" style="background:#65a30d;"></span>4-5</span>
+                                <span class="lg"><span class="sw" style="background:#ca8a04;"></span>6-10</span>
+                                <span class="lg"><span class="sw" style="background:#ea580c;"></span>11-14</span>
+                                <span class="lg"><span class="sw" style="background:#b91c1c;"></span>15+</span>
+                            </div>
+                            <p style="text-align:center;font-size:12px;color:#64748b;margin-top:10px;">Sample 7×7 grid: "carpet cleaning near me" centered on Marlow Heights HQ.</p>
+                        </div>
+                        <div class="geogrid-stats">
+                            <div class="geogrid-stat">
+                                <div class="label">Average Group Rank</div>
+                                <div class="num">6.4</div>
+                                <div class="delta up">▲ 1.8 vs last week</div>
+                            </div>
+                            <div class="geogrid-stat">
+                                <div class="label">3-Pack Coverage</div>
+                                <div class="num">22%</div>
+                                <div class="delta up">▲ 6 pts</div>
+                            </div>
+                            <div class="geogrid-stat">
+                                <div class="label">Share of Local Voice</div>
+                                <div class="num">31%</div>
+                                <div class="delta up">▲ 4 pts</div>
+                            </div>
+                            <div class="geogrid-stat">
+                                <div class="label">Pins on Page 2+</div>
+                                <div class="num">14 / 49</div>
+                                <div class="delta down">▼ 3</div>
+                            </div>
+                            <div class="geogrid-stat" style="grid-column: 1 / -1;">
+                                <div class="label">Top Competitor (Same Grid)</div>
+                                <div class="num" style="font-size:16px;">Sears Carpet Cleaning, 27 of 49 pins</div>
+                                <div class="delta" style="color:#64748b;font-weight:600;">Citation gap + 41 GMB reviews lead, action items in weekly digest</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="yelp-section">
                     <h3>Bonus: Reverse-Engineering Yelp Inside Smart SEO Pro</h3>
                     <p class="lede">
@@ -602,6 +682,14 @@
                         <div class="offer-text">
                             <h4>Programmatic City × Service Grid (160 Pages)</h4>
                             <p>8 services × 20 DMV cities. One highly-optimized page per real search intent, seeded by reverse-engineering Yelp's published city pages (services, neighborhoods, FAQs) so every page targets demand we know exists.</p>
+                        </div>
+                    </div>
+
+                    <div class="offer-item">
+                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <div class="offer-text">
+                            <h4>Geo-Grid GMB Rank Tracking (Local Falcon-Style, Built In)</h4>
+                            <p>The same geo-grid intelligence Local Falcon and BrightLocal sell as a separate $25-$300/mo subscription, baked directly into Smart SEO Pro. We scan a lat/lng grid around your Marlow Heights HQ for every focus keyword (carpet cleaning, hardwood refinishing, concrete polishing, etc.) and store the GMB pack rank at every pin. Heatmap view, AGR / ATGR / Share-of-Local-Voice metrics, week-over-week drift alerts, and competitor overlay so you see exactly which neighborhoods rank you in the 3-pack and which ones bury you. Because it is your data, the rank scans join with GSC clicks, form submissions, and CRM tags, an answer the off-the-shelf tools cannot give you.</p>
                         </div>
                     </div>
 
