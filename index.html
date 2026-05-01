@@ -80,13 +80,27 @@
         .cta-sub-text { display: block; font-size: 14px; font-weight: 500; opacity: 0.9; margin-top: 5px; }
 
         /* THE DATA (PROBLEM) SECTION */
-        .section-padding { padding: 32px 40px; }
-        @media (max-width: 600px) { .section-padding { padding: 26px 20px; } }
-        .section-title { font-size: clamp(24px, 4vw, 34px); font-weight: 900; color: var(--text-dark); margin: 0 auto 6px; text-align: center; letter-spacing: -0.5px; line-height: 1.15; max-width: 820px; }
-        .section-title::after { content: ""; display: block; width: 56px; height: 4px; background: var(--brand-green); border-radius: 2px; margin: 10px auto 18px; }
-        .section-eyebrow { display: block; text-align: center; font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); margin-bottom: 6px; }
-        .subsection-title { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: 20px; font-weight: 900; color: var(--text-dark); margin: 22px 0 12px; padding-left: 12px; border-left: 4px solid var(--brand-green); line-height: 1.25; }
-        .subsection-title .subsection-sub { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--brand-green); }
+        .section-padding { padding: 40px 40px; scroll-margin-top: 70px; }
+        @media (max-width: 600px) { .section-padding { padding: 30px 20px; scroll-margin-top: 60px; } }
+        .section-title { font-size: clamp(34px, 6vw, 56px); font-weight: 900; color: var(--text-dark); margin: 0 auto 6px; text-align: center; letter-spacing: -1px; line-height: 1.05; max-width: 900px; }
+        .section-title::after { content: ""; display: block; width: 80px; height: 5px; background: var(--brand-green); border-radius: 3px; margin: 14px auto 22px; }
+        .section-eyebrow { display: block; text-align: center; font-size: 15px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--brand-green); margin-bottom: 10px; }
+
+        /* TABLE OF CONTENTS (sticky nav) */
+        .toc { position: sticky; top: 0; z-index: 50; background: #ffffff; border-bottom: 2px solid var(--brand-green); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .toc-inner { max-width: 1100px; margin: 0 auto; padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; }
+        .toc-label { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dark); margin-right: 8px; }
+        .toc a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 800; color: var(--text-dark); background: #f3f4f6; text-decoration: none; border: 1px solid #e5e7eb; transition: all 0.15s; white-space: nowrap; }
+        .toc a:hover { background: var(--brand-green); color: #ffffff; border-color: var(--brand-green); transform: translateY(-1px); }
+        .toc a .num { font-size: 11px; font-weight: 900; color: var(--brand-green); background: #ffffff; border-radius: 4px; padding: 2px 6px; line-height: 1; }
+        .toc a:hover .num { color: var(--brand-green); }
+        @media (max-width: 640px) {
+            .toc-inner { padding: 8px 12px; gap: 4px; }
+            .toc-label { display: none; }
+            .toc a { padding: 6px 10px; font-size: 12px; }
+        }
+        .subsection-title { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; font-size: clamp(22px, 3vw, 28px); font-weight: 900; color: var(--text-dark); margin: 30px 0 14px; padding-left: 14px; border-left: 5px solid var(--brand-green); line-height: 1.2; letter-spacing: -0.3px; }
+        .subsection-title .subsection-sub { font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--brand-green); }
         
         .stat-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 22px; }
         @media (min-width: 600px) { .stat-grid { grid-template-columns: 1fr 1fr; } }
@@ -120,12 +134,12 @@
         .pillar.visibility .pillar-num { background: #1a73e8; }
         .pillar.conversion .pillar-num { background: #b45309; }
         .pillar.retention .pillar-num { background: #15803d; }
-        .pillar-titlewrap .pillar-name { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); display: block; margin-bottom: 2px; }
+        .pillar-titlewrap .pillar-name { font-size: 13px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; color: var(--brand-green); display: block; margin-bottom: 4px; }
         .pillar.foundation .pillar-name { color: #b91c1c; }
         .pillar.visibility .pillar-name { color: #1a73e8; }
         .pillar.conversion .pillar-name { color: #b45309; }
         .pillar.retention .pillar-name { color: #15803d; }
-        .pillar-titlewrap .pillar-title { font-size: clamp(20px, 3vw, 24px); font-weight: 900; color: var(--text-dark); line-height: 1.2; margin-bottom: 4px; }
+        .pillar-titlewrap .pillar-title { font-size: clamp(22px, 3.5vw, 30px); font-weight: 900; color: var(--text-dark); line-height: 1.15; margin-bottom: 6px; letter-spacing: -0.5px; }
         .pillar-strategy { font-size: 14px; color: var(--text-body); font-weight: 500; line-height: 1.45; }
         .pillar-body { display: grid; grid-template-columns: 1fr; }
         @media (min-width: 768px) { .pillar-body { grid-template-columns: 1.5fr 1fr; } }
@@ -320,6 +334,18 @@
         <div class="marquee-text">ATTENTION MIDLAND FLOOR CARE: Your Google Search Console Data Shows Critical Domain Errors</div>
     </div>
 
+    <nav class="toc" aria-label="Plan sections">
+        <div class="toc-inner">
+            <span class="toc-label">The Plan</span>
+            <a href="#foundation"><span class="num">01</span> Foundation</a>
+            <a href="#insights"><span class="num">02</span> Insights</a>
+            <a href="#strategy"><span class="num">03</span> Strategy</a>
+            <a href="#proof"><span class="num">04</span> Proof</a>
+            <a href="#investment"><span class="num">05</span> Investment</a>
+            <a href="#checkout"><span class="num">→</span> Sign</a>
+        </div>
+    </nav>
+
     <div class="container" style="padding-top: 18px;">
         <div class="content-box">
             
@@ -382,8 +408,8 @@
                 </a>
             </div>
 
-            <!-- 2. THE PROBLEM (AGITATION) -->
-            <div class="section-padding">
+            <!-- 01. FOUNDATION -->
+            <div class="section-padding" id="foundation">
                 <span class="section-eyebrow">01 · Foundation</span>
                 <h2 class="section-title">What's Broken Today</h2>
                 <p style="font-size: 16px; margin-bottom: 18px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; font-weight: 500;">
@@ -455,7 +481,7 @@
             </div>
 
             <!-- 02. INSIGHTS -->
-            <div class="section-padding">
+            <div class="section-padding" id="insights">
                 <span class="section-eyebrow">02 · Insights</span>
                 <h2 class="section-title">Where The Leverage Is Hiding</h2>
                 <p style="font-size: 16px; line-height: 1.55; text-align: center; max-width: 820px; margin: 0 auto 18px; font-weight: 500;">
@@ -658,7 +684,7 @@
             </div>
 
             <!-- 03. STRATEGY -->
-            <div class="section-padding gray-section">
+            <div class="section-padding gray-section" id="strategy">
                 <span class="section-eyebrow">03 · Strategy</span>
                 <h2 class="section-title">The 3-Pillar Plan</h2>
                 <p style="font-size: 16px; line-height: 1.55; text-align: center; max-width: 820px; margin: 0 auto 18px; font-weight: 500;">
@@ -778,8 +804,8 @@
             </div>
 
 
-            <!-- 4b. BEFORE / AFTER -->
-            <div class="ba-section">
+            <!-- 04. PROOF -->
+            <div class="ba-section" id="proof">
                 <span class="section-eyebrow">04 · Proof</span>
                 <h2 class="section-title">Before This Plan vs. After</h2>
                 <p class="ba-section section-sub">The #1 reason small businesses lose jobs isn't lack of demand, it's the broken lead system. Every form submission that goes unresponded is a job your competitor is booking.</p>
@@ -842,8 +868,8 @@
                 </div>
             </div>
 
-            <!-- 5. MILESTONE PAYMENT PLAN -->
-            <div class="section-padding gray-section">
+            <!-- 05. INVESTMENT -->
+            <div class="section-padding gray-section" id="investment">
                 <span class="section-eyebrow">05 · Investment</span>
                 <h2 class="section-title">2-Payment Plan</h2>
                 <p style="text-align:center;margin-top:-20px;margin-bottom:30px;color:#6b7280;">Split into two payments. Second payment due only after the first milestone is delivered and confirmed.</p>
