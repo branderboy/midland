@@ -378,6 +378,20 @@
         .ba-stat-num { font-size: 30px; font-weight: 900; color: #16a34a; line-height: 1; }
         .ba-stat-label { font-size: 12px; color: var(--text-body); margin-top: 6px; font-weight: 600; }
 
+        /* BOTTOM LINE OUTCOMES */
+        .bottom-line { background: var(--brand-green); padding: 40px 20px; }
+        .bottom-line-inner { max-width: 1000px; margin: 0 auto; }
+        .bl-head { text-align: center; color: #ffffff; margin-bottom: 22px; }
+        .bl-eyebrow { display: block; font-size: 13px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #bbf7d0; margin-bottom: 8px; }
+        .bl-title { font-size: clamp(28px, 4.5vw, 44px); font-weight: 900; color: #ffffff; line-height: 1.1; letter-spacing: -1px; margin-bottom: 6px; }
+        .bl-sub { font-size: 15px; font-weight: 500; color: #d1fae5; max-width: 680px; margin: 0 auto; }
+        .bl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (min-width: 768px) { .bl-grid { grid-template-columns: repeat(4, 1fr); } }
+        .bl-card { background: #ffffff; border-radius: 12px; padding: 18px 16px; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        .bl-icon { width: 36px; height: 36px; color: var(--brand-green); margin: 0 auto 10px; display: block; }
+        .bl-num { font-size: clamp(18px, 2.4vw, 22px); font-weight: 900; color: var(--text-dark); line-height: 1.15; letter-spacing: -0.4px; margin-bottom: 4px; }
+        .bl-desc { font-size: 13px; color: var(--text-body); font-weight: 500; line-height: 1.4; }
+
         /* VALUE STACK */
         .value-stack { background: #ffffff; border: 2px solid var(--brand-green); border-radius: 12px; padding: 22px 24px; margin: 0 auto 24px; max-width: 760px; box-shadow: 0 8px 22px rgba(58,160,80,0.12); }
         .value-stack-head { font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); text-align: center; margin-bottom: 14px; }
@@ -1138,6 +1152,39 @@
                     <div class="ba-stat">
                         <div class="ba-stat-num">25+</div>
                         <div class="ba-stat-label">New GMB Reviews / 90 Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM LINE OUTCOMES -->
+            <div class="bottom-line">
+                <div class="bottom-line-inner">
+                    <div class="bl-head">
+                        <span class="bl-eyebrow">Bottom Line</span>
+                        <h2 class="bl-title">Why We're Doing This</h2>
+                        <p class="bl-sub">Every plugin, every feature, every page exists to move these four numbers up.</p>
+                    </div>
+                    <div class="bl-grid">
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <div class="bl-num">More Calls</div>
+                            <div class="bl-desc">Phones ring more often, with the right buyers</div>
+                        </div>
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                            <div class="bl-num">More Form Fills</div>
+                            <div class="bl-desc">Every submission tagged, routed, never lost</div>
+                        </div>
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <div class="bl-num">More Walkthroughs</div>
+                            <div class="bl-desc">Self-booked site visits, fewer no-shows</div>
+                        </div>
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <div class="bl-num">More Revenue</div>
+                            <div class="bl-desc">One-time jobs convert to recurring Floor Care Plans</div>
+                        </div>
                     </div>
                 </div>
             </div>
