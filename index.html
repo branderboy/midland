@@ -105,6 +105,57 @@
         .benefit-col h3 { font-size: 20px; color: var(--text-dark); margin-bottom: 15px; border-bottom: 2px solid var(--brand-green); padding-bottom: 10px; display: inline-block; }
         .benefit-col p { font-size: 15px; line-height: 1.6; }
 
+        /* SERVICES IN DEMAND + TAGGING */
+        .demand-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin: 30px 0; }
+        @media (min-width: 768px) { .demand-grid { grid-template-columns: repeat(2, 1fr); } }
+        .demand-card { border: 2px solid #e5e7eb; background: #ffffff; border-radius: 8px; padding: 22px; }
+        .demand-card.focus { border-color: var(--brand-green); background: #f0f7f2; }
+        .demand-card h4 { font-size: 17px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .demand-card .tag { display: inline-block; background: var(--brand-green); color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px; margin-left: 6px; }
+        .demand-card .tag.alt { background: #6b7280; }
+        .demand-card ul { list-style: none; padding: 0; margin: 8px 0 0; }
+        .demand-card ul li { font-size: 14px; line-height: 1.6; padding: 4px 0; color: var(--text-body); }
+        .demand-card ul li::before { content: "▸ "; color: var(--brand-green); font-weight: 900; }
+
+        .trigger-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 24px 0; }
+        @media (min-width: 768px) { .trigger-grid { grid-template-columns: repeat(2, 1fr); } }
+        .trigger-card { border-left: 5px solid var(--brand-green); background: #ffffff; border-radius: 6px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        .trigger-card.urgent { border-left-color: #dc2626; }
+        .trigger-card.research { border-left-color: #f59e0b; }
+        .trigger-card.referral { border-left-color: #2563eb; }
+        .trigger-card.mismatch { border-left-color: #6b7280; }
+        .trigger-card h5 { font-size: 15px; font-weight: 900; color: var(--text-dark); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .trigger-card p { font-size: 14px; line-height: 1.5; color: var(--text-body); margin-bottom: 8px; }
+        .trigger-card .crm-tag { display: inline-block; background: #111827; color: #d1fae5; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; padding: 3px 8px; border-radius: 4px; margin-right: 4px; margin-top: 4px; }
+
+        .funnel-flow { background: #0f172a; color: #fff; border-radius: 10px; padding: 28px 24px; margin: 30px 0 10px; }
+        .funnel-flow h3 { color: #fff; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; text-align: center; }
+        .funnel-row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .funnel-step { background: #1e293b; border: 1px solid #334155; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 700; color: #e2e8f0; }
+        .funnel-step.start { border-color: #dc2626; color: #fecaca; }
+        .funnel-step.end { border-color: #4ade80; color: #bbf7d0; }
+        .funnel-arrow { color: #4ade80; font-size: 22px; font-weight: 900; }
+
+        .segment-row { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 20px; }
+        @media (min-width: 640px) { .segment-row { grid-template-columns: 1fr 1fr; } }
+        .segment-box { background: #fefce8; border: 2px solid #fbbf24; padding: 18px; border-radius: 8px; }
+        .segment-box.commercial { background: #eff6ff; border-color: #60a5fa; }
+        .segment-box h5 { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; color: var(--text-dark); }
+        .segment-box p { font-size: 14px; line-height: 1.5; color: var(--text-body); }
+
+        /* YELP REVERSE-ENGINEER */
+        .yelp-section { background: #fff8f1; border: 2px solid #fcd9b4; border-radius: 10px; padding: 32px; margin: 30px 0; }
+        .yelp-section h3 { font-size: 22px; font-weight: 900; color: #b45309; margin-bottom: 12px; text-align: center; }
+        .yelp-section .lede { font-size: 16px; line-height: 1.6; text-align: center; max-width: 760px; margin: 0 auto 22px; color: var(--text-body); }
+        .yelp-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 768px) { .yelp-grid { grid-template-columns: repeat(3, 1fr); } }
+        .yelp-card { background: #ffffff; border: 1px solid #fcd9b4; border-radius: 8px; padding: 16px; }
+        .yelp-card h5 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; margin-bottom: 8px; }
+        .yelp-card .pill { display: inline-block; background: #fef3c7; color: #92400e; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin: 2px 3px 2px 0; font-weight: 600; }
+        .yelp-pipeline { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 22px; font-size: 14px; font-weight: 700; }
+        .yelp-pipeline .step { background: #ffffff; border: 1px solid #fcd9b4; padding: 8px 14px; border-radius: 6px; color: var(--text-dark); }
+        .yelp-pipeline .arrow { color: #b45309; font-weight: 900; }
+
         /* OFFER STACK (CLASSIC CF) */
         .offer-stack { border: 4px solid var(--brand-green); padding: 40px; border-radius: 12px; background: white; margin: 40px 0; }
         .offer-title { text-align: center; font-size: 28px; font-weight: 900; margin-bottom: 30px; text-transform: uppercase; }
@@ -339,6 +390,156 @@
                 </div>
             </div>
 
+            <!-- 3b. SERVICES IN DEMAND + LEAD TAGGING -->
+            <div class="section-padding">
+                <h2 class="section-title">Services In Demand &amp; How We Tag Every Lead</h2>
+                <p style="font-size: 17px; line-height: 1.6; text-align: center; max-width: 820px; margin: 0 auto 30px;">
+                    Not every lead is the same. The CRM and intake forms are built around the <strong>4 real reasons</strong> a prospect contacts Midland — and the <strong>focus services</strong> that actually drive revenue. Every form submission is auto-tagged so the right follow-up fires.
+                </p>
+
+                <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 14px; color: var(--text-dark);">The Focus Services (Where The Demand Is)</h3>
+                <div class="demand-grid">
+                    <div class="demand-card focus">
+                        <h4>Hardwood Floor Finishing <span class="tag">FOCUS</span></h4>
+                        <ul>
+                            <li>Sanding &amp; refinishing</li>
+                            <li>Recoat / buff &amp; coat maintenance</li>
+                            <li>Stain colour change &amp; restoration</li>
+                        </ul>
+                    </div>
+                    <div class="demand-card focus">
+                        <h4>Carpet Cleaning &amp; Installation <span class="tag">FOCUS</span></h4>
+                        <ul>
+                            <li>Residential carpet cleaning (allergy-wave seasonality — 2x/year)</li>
+                            <li>Carpet installation (residential + commercial)</li>
+                            <li>Spot &amp; stain emergency response</li>
+                        </ul>
+                    </div>
+                    <div class="demand-card focus">
+                        <h4>Flooring Installs <span class="tag">FOCUS</span></h4>
+                        <ul>
+                            <li>Hardwood, LVP, tile, laminate</li>
+                            <li>Subfloor prep &amp; demo</li>
+                            <li>Transitions, baseboards, finish trim</li>
+                        </ul>
+                    </div>
+                    <div class="demand-card focus">
+                        <h4>Concrete Polishing <span class="tag">FOCUS</span></h4>
+                        <ul>
+                            <li>Mechanical grind &amp; polish</li>
+                            <li>Densifier + sealer systems</li>
+                            <li>Warehouse, retail, garage floors</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="segment-row">
+                    <div class="segment-box">
+                        <h5>Midland Carpet Care &amp; Cleaning — Residential</h5>
+                        <p>Carpet cleaning &amp; installation for homes. <strong>Seasonality:</strong> demand spikes 2x per year on allergy waves (spring + fall) — campaign cadence is built around those windows.</p>
+                    </div>
+                    <div class="segment-box commercial">
+                        <h5>Midland Service — Commercial</h5>
+                        <p>Tile, hard surface, concrete, hardwood, and everything beyond residential carpet cleaning. Sold as recurring floor care plans, not one-off jobs.</p>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 20px; font-weight: 800; margin: 40px 0 14px; color: var(--text-dark);">The 4 Lead Triggers (Auto-Tagged In CRM)</h3>
+                <div class="trigger-grid">
+                    <div class="trigger-card urgent">
+                        <h5>1. Emergency</h5>
+                        <p>The #1 reason people book. Spill, flood, last-minute event, damaged floor before move-in. Needs same-day response.</p>
+                        <span class="crm-tag">trigger:emergency</span>
+                        <span class="crm-tag">priority:high</span>
+                        <span class="crm-tag">sla:same-day</span>
+                    </div>
+                    <div class="trigger-card research">
+                        <h5>2. Future Project</h5>
+                        <p>Prospect is doing homework — wants to be an informed consumer but is not in-market today. Long nurture, education content, seasonal check-ins.</p>
+                        <span class="crm-tag">trigger:future-project</span>
+                        <span class="crm-tag">stage:research</span>
+                        <span class="crm-tag">nurture:long</span>
+                    </div>
+                    <div class="trigger-card referral">
+                        <h5>3. Referral / Upper-Mgmt Visit</h5>
+                        <p>Faster turnaround — often triggered by a property visit from upper management or an inspection. Hot lead, expedited quote.</p>
+                        <span class="crm-tag">trigger:referral</span>
+                        <span class="crm-tag">priority:expedite</span>
+                        <span class="crm-tag">source:referral</span>
+                    </div>
+                    <div class="trigger-card mismatch">
+                        <h5>4. Out Of Scope</h5>
+                        <p>Inquiry for a service Midland doesn't provide. Logged, politely declined, optionally referred — but never lost in the inbox.</p>
+                        <span class="crm-tag">trigger:out-of-scope</span>
+                        <span class="crm-tag">action:decline-or-refer</span>
+                    </div>
+                </div>
+
+                <div class="yelp-section">
+                    <h3>Bonus: Reverse-Engineering Yelp Inside Smart SEO Pro</h3>
+                    <p class="lede">
+                        Yelp already did the keyword research for our market. Their city pages publish exactly which services prospects search for, which neighborhoods cluster the demand, and what FAQs they ask before booking. Smart SEO Pro / the programmatic plugin <strong>scrapes those signals once</strong> and turns them into a city × service page grid — built around real DMV demand, not guesses.
+                    </p>
+                    <div class="yelp-grid">
+                        <div class="yelp-card">
+                            <h5>Cities &amp; Neighborhoods</h5>
+                            <span class="pill">Alexandria, VA</span>
+                            <span class="pill">Bethesda, MD</span>
+                            <span class="pill">Arlington, VA</span>
+                            <span class="pill">Old Town</span>
+                            <span class="pill">Pentagon City</span>
+                            <span class="pill">Silver Spring</span>
+                            <span class="pill">+ 15 more</span>
+                        </div>
+                        <div class="yelp-card">
+                            <h5>Related Service Searches</h5>
+                            <span class="pill">Hardwood Floor Refinishing</span>
+                            <span class="pill">Carpet Installation</span>
+                            <span class="pill">Tile Installation</span>
+                            <span class="pill">LVP / Vinyl</span>
+                            <span class="pill">Epoxy Garage Floor</span>
+                            <span class="pill">Floor Polishing</span>
+                            <span class="pill">Stain Removal</span>
+                        </div>
+                        <div class="yelp-card">
+                            <h5>FAQ &amp; Intent Signals</h5>
+                            <span class="pill">"best near me"</span>
+                            <span class="pill">popular services</span>
+                            <span class="pill">people also searched</span>
+                            <span class="pill">emergency services</span>
+                            <span class="pill">virtual consultations</span>
+                            <span class="pill">fast-responding</span>
+                        </div>
+                    </div>
+                    <div class="yelp-pipeline">
+                        <span class="step">Scrape Yelp city pages</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Extract cities × services × FAQs</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Map to Midland's focus services</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Generate 160 programmatic pages + FAQ schema</span>
+                    </div>
+                    <p style="text-align:center;margin-top:18px;font-size:13px;color:#92400e;">
+                        Reference structure captured in <code>tags.md</code> — the harvested signals for Alexandria, VA become the template for every other DMV city page.
+                    </p>
+                </div>
+
+                <div class="funnel-flow">
+                    <h3>The Customer Lifecycle Path</h3>
+                    <div class="funnel-row">
+                        <div class="funnel-step start">Emergency Job</div>
+                        <span class="funnel-arrow">→</span>
+                        <div class="funnel-step">Service Completed</div>
+                        <span class="funnel-arrow">→</span>
+                        <div class="funnel-step">Happy Customer Follow-Up</div>
+                        <span class="funnel-arrow">→</span>
+                        <div class="funnel-step end">Floor Care Plan Customer</div>
+                    </div>
+                    <p style="text-align:center;margin-top:18px;font-size:14px;color:#94a3b8;">Emergency triggers a service. The follow-up converts a satisfied one-time customer into a recurring <strong style="color:#bbf7d0;">Floor Care Plan</strong> — that's where the lifetime value lives.</p>
+                </div>
+            </div>
+
             <!-- 4. OFFER STACK -->
             <div class="section-padding">
                 <div class="offer-stack">
@@ -366,7 +567,7 @@
                         <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <div class="offer-text">
                             <h4>Programmatic City × Service Grid (160 Pages)</h4>
-                            <p>8 services × 20 DMV cities. One highly-optimized page per real search intent.</p>
+                            <p>8 services × 20 DMV cities. One highly-optimized page per real search intent — seeded by reverse-engineering Yelp's published city pages (services, neighborhoods, FAQs) so every page targets demand we know exists.</p>
                         </div>
                     </div>
 
