@@ -275,6 +275,26 @@
         .opp-thesis { font-size: 14.5px; line-height: 1.55; color: var(--text-dark); font-weight: 600; padding: 14px 16px; background: #ffffff; border-left: 5px solid #dc2626; border-radius: 6px; }
         .opp-thesis strong { color: #b91c1c; font-weight: 900; }
 
+        /* GSC INSIGHT */
+        .gsc-insight { background: #f0f7f2; border: 2px solid #bbf7d0; border-radius: 10px; padding: 26px; margin: 18px 0 24px; }
+        .gsc-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 18px; }
+        @media (min-width: 768px) { .gsc-grid { grid-template-columns: repeat(3, 1fr); } }
+        .gsc-stat { background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; text-align: center; }
+        .gsc-stat.warn { background: #fefce8; border-color: #fcd34d; }
+        .gsc-num { font-size: clamp(26px, 4vw, 40px); font-weight: 900; color: var(--text-dark); line-height: 1.05; letter-spacing: -1px; }
+        .gsc-stat.warn .gsc-num { color: #b45309; }
+        .gsc-label { font-size: 12px; font-weight: 800; color: var(--text-dark); margin-top: 6px; line-height: 1.3; }
+        .gsc-label span { display: block; font-weight: 500; color: #64748b; font-size: 11px; margin-top: 2px; }
+        .gsc-cols { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 768px) { .gsc-cols { grid-template-columns: 1fr 1fr; } }
+        .gsc-col { background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; }
+        .gsc-col h5 { font-size: 13px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #15803d; margin-bottom: 10px; }
+        .gsc-col ul { list-style: none; padding: 0; margin: 0; }
+        .gsc-col ul li { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #bbf7d0; font-size: 13px; color: var(--text-body); font-weight: 500; }
+        .gsc-col ul li:last-child { border-bottom: none; }
+        .gsc-col ul li strong { color: var(--text-dark); font-weight: 800; }
+        .gsc-col ul li .cnt { font-weight: 800; color: #b91c1c; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
         /* GMB INSIGHT */
         .gmb-insight { background: #fff8f1; border: 2px solid #fcd9b4; border-radius: 10px; padding: 26px; margin: 18px 0 24px; }
         .gmb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
@@ -618,51 +638,40 @@
                     Two leverage sources: <strong>your own data</strong> (GSC, GA, GMB, customer behaviour) and <strong>reverse-engineered competitor data</strong> (Yelp city pages, Local Falcon-style geo-grid). Both feed the strategy that follows.
                 </p>
 
-                <h3 class="subsection-title">Insight 1 · Your Demand Signals <span class="subsection-sub">From your own data</span></h3>
-                <div class="demand-grid">
-                    <div class="demand-card focus">
-                        <h4>Hardwood Floor Finishing <span class="tag">FOCUS</span></h4>
-                        <ul>
-                            <li>Sanding &amp; refinishing</li>
-                            <li>Recoat / buff &amp; coat maintenance</li>
-                            <li>Stain colour change &amp; restoration</li>
-                        </ul>
+                <h3 class="subsection-title">Insight 1 · What Your GSC Data Reveals <span class="subsection-sub">Demand you're already showing for, but not capturing</span></h3>
+                <div class="gsc-insight">
+                    <div class="gsc-grid">
+                        <div class="gsc-stat">
+                            <div class="gsc-num">19,772</div>
+                            <div class="gsc-label">Quarterly impressions<br><span>People already see your listings</span></div>
+                        </div>
+                        <div class="gsc-stat warn">
+                            <div class="gsc-num">60</div>
+                            <div class="gsc-label">Quarterly clicks<br><span>0.30% CTR, you barely capture them</span></div>
+                        </div>
+                        <div class="gsc-stat warn">
+                            <div class="gsc-num">35.8</div>
+                            <div class="gsc-label">Average position<br><span>Most listings buried below page 1</span></div>
+                        </div>
                     </div>
-                    <div class="demand-card focus">
-                        <h4>Carpet Cleaning &amp; Installation <span class="tag">FOCUS</span></h4>
-                        <ul>
-                            <li>Residential carpet cleaning (allergy-wave seasonality, 2x/year)</li>
-                            <li>Carpet installation (residential + commercial)</li>
-                            <li>Spot &amp; stain emergency response</li>
-                        </ul>
+                    <div class="gsc-cols">
+                        <div class="gsc-col">
+                            <h5>Queries you rank for but lose by a few spots</h5>
+                            <ul>
+                                <li><strong>commercial floor care germantown</strong> <span class="cnt">#7</span></li>
+                                <li><strong>warehouse floor cleaning company</strong> <span class="cnt">#11</span></li>
+                                <li><strong>commercial floor cleaning near me</strong> <span class="cnt">#20</span></li>
+                                <li><strong>commercial floor maintenance</strong> <span class="cnt">#49</span></li>
+                            </ul>
+                            <p class="gmb-note">Each one is gettable with focused on-page work and the right city pages. The demand is already there, you just aren't winning the click.</p>
+                        </div>
+                        <div class="gsc-col">
+                            <h5>The biggest leak</h5>
+                            <p style="font-size:14px;line-height:1.55;color:var(--text-body);font-weight:500;margin-bottom:10px;">The carpet cleaning vertical has <strong>500,000+ monthly searches</strong> in the DMV. Your site captures <strong>1 click every 3 months</strong> on that page. The market is huge. The page just isn't showing up.</p>
+                            <p class="gmb-note">Insights 2 and 3 below show how to fix it: harvest the demand graph (Yelp) and own the map pack (geo-grid). Pillar 1 ships the plugins that do the work.</p>
+                        </div>
                     </div>
-                    <div class="demand-card focus">
-                        <h4>Flooring Installs <span class="tag">FOCUS</span></h4>
-                        <ul>
-                            <li>Hardwood, LVP, tile, laminate</li>
-                            <li>Subfloor prep &amp; demo</li>
-                            <li>Transitions, baseboards, finish trim</li>
-                        </ul>
-                    </div>
-                    <div class="demand-card focus">
-                        <h4>Concrete Polishing <span class="tag">FOCUS</span></h4>
-                        <ul>
-                            <li>Mechanical grind &amp; polish</li>
-                            <li>Densifier + sealer systems</li>
-                            <li>Warehouse, retail, garage floors</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="segment-row">
-                    <div class="segment-box">
-                        <h5>Insight · Two Brands, Two Funnels</h5>
-                        <p><strong>Midland Carpet Care &amp; Cleaning, Residential.</strong> Carpet cleaning &amp; install. Demand spikes 2x/year on allergy waves (spring + fall). Campaign cadence syncs to those windows.</p>
-                    </div>
-                    <div class="segment-box commercial">
-                        <h5>Insight · Commercial Is Recurring</h5>
-                        <p><strong>Midland Service, Commercial.</strong> Tile, hardwood, concrete polishing, everything beyond residential carpet. Sold as recurring Floor Care Plans, not one-off jobs. Different LTV math.</p>
-                    </div>
+                    <p class="gmb-takeaway"><strong>Takeaway:</strong> You don't have a demand problem. You have a visibility and capture problem. Every plugin in Pillar 1 is built to convert these existing impressions into clicks, calls, and form fills.</p>
                 </div>
 
                 <h3 class="subsection-title">Insight 2 · Why Leads Actually Contact You <span class="subsection-sub">4 triggers, learned from the business</span></h3>
@@ -696,21 +705,7 @@
                     </div>
                 </div>
 
-                <h3 class="subsection-title">Insight 3 · The Lifetime-Value Path <span class="subsection-sub">Where the LTV actually lives</span></h3>
-                <div class="funnel-flow">
-                    <div class="funnel-row">
-                        <div class="funnel-step start">Emergency Job</div>
-                        <span class="funnel-arrow">→</span>
-                        <div class="funnel-step">Service Completed</div>
-                        <span class="funnel-arrow">→</span>
-                        <div class="funnel-step">Happy Customer Follow-Up</div>
-                        <span class="funnel-arrow">→</span>
-                        <div class="funnel-step end">Floor Care Plan Customer</div>
-                    </div>
-                    <p style="text-align:center;margin-top:14px;font-size:14px;color:var(--text-body);font-weight:500;">A satisfied emergency customer becomes a recurring <strong style="color:var(--brand-green);">Floor Care Plan</strong> subscriber. The follow-up automation is what makes that conversion happen.</p>
-                </div>
-
-                <h3 class="subsection-title">Insight 4 · Reverse-Engineered Competitor Demand <span class="subsection-sub">Yelp already mapped the DMV</span></h3>
+                <h3 class="subsection-title">Insight 3 · Reverse-Engineered Competitor Demand <span class="subsection-sub">Yelp already mapped the DMV</span></h3>
                 <div class="yelp-section">
                     <p class="lede">
                         Yelp publishes the full demand graph for our market on their city pages, which services prospects search for, which neighborhoods cluster, what FAQs they ask before booking. Smart SEO Pro <strong>scrapes those signals once</strong> and turns them into a city × service page grid. We don't guess what demand looks like, we harvest it.
@@ -757,7 +752,7 @@
                     </div>
                 </div>
 
-                <h3 class="subsection-title">Insight 5 · Reverse-Engineered Map-Pack Position <span class="subsection-sub">Local Falcon-style geo-grid</span></h3>
+                <h3 class="subsection-title">Insight 4 · Reverse-Engineered Map-Pack Position <span class="subsection-sub">Local Falcon-style geo-grid</span></h3>
                 <div class="geogrid-section">
                     <p class="lede">
                         A lat/lng grid scan around your HQ for every focus keyword tells you exactly which neighborhoods rank you in the 3-pack and which ones bury you. Same intelligence Local Falcon and BrightLocal sell as a $25-$300/mo subscription, baked into Smart SEO Pro so the data joins with your GSC clicks, form submissions, and CRM tags.
@@ -812,7 +807,7 @@
                     </div>
                 </div>
 
-                <h3 class="subsection-title">Insight 6 · Your GMB Is Bleeding <span class="subsection-sub">6 months of profile data</span></h3>
+                <h3 class="subsection-title">Insight 5 · Your GMB Is Bleeding <span class="subsection-sub">6 months of profile data</span></h3>
                 <div class="gmb-insight">
                     <div class="gmb-grid">
                         <div class="gmb-stat critical">
@@ -868,7 +863,7 @@
                     <p class="gmb-takeaway"><strong>Takeaway:</strong> The GMB is the highest-leverage surface for emergency leads (mobile-search heavy, 58% of discovery is on a phone) and it is currently going dark. Mirror the website services, hours, posts, and photos to GMB. Clean the categories. Push GMB engagement back into the funnel. Pillar 1 ships this as a built-in feature.</p>
                 </div>
 
-                <h3 class="subsection-title">Insight 7 · Emergency Is The Fastest Path To Revenue <span class="subsection-sub">Highest urgency, highest willingness to pay</span></h3>
+                <h3 class="subsection-title">Insight 6 · Emergency Is The Fastest Path To Revenue <span class="subsection-sub">Highest urgency, highest willingness to pay</span></h3>
                 <div class="opportunity-card">
                     <div class="opp-grid">
                         <div class="opp-stat">
