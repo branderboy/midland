@@ -244,6 +244,32 @@
         .segment-box p { font-size: 14px; line-height: 1.55; color: var(--text-body); font-weight: 500; }
 
         /* GEO-GRID HEATMAP MOCKUP */
+        /* GMB INSIGHT */
+        .gmb-insight { background: #fff8f1; border: 2px solid #fcd9b4; border-radius: 10px; padding: 22px; margin: 16px 0; }
+        .gmb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+        @media (min-width: 768px) { .gmb-grid { grid-template-columns: repeat(3, 1fr); } }
+        .gmb-stat { background: #ffffff; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; text-align: center; }
+        .gmb-stat.critical { background: #fef2f2; border-color: #fca5a5; }
+        .gmb-stat.warn { background: #fefce8; border-color: #facc15; }
+        .gmb-stat-num { font-size: clamp(24px, 3.5vw, 36px); font-weight: 900; color: var(--text-dark); line-height: 1.05; letter-spacing: -1px; }
+        .gmb-stat.critical .gmb-stat-num { color: #b91c1c; }
+        .gmb-stat.warn .gmb-stat-num { color: #b45309; }
+        .gmb-stat-label { font-size: 12px; font-weight: 800; color: var(--text-dark); margin-top: 6px; line-height: 1.3; }
+        .gmb-stat-label span { display: block; font-weight: 500; color: #64748b; font-size: 11px; margin-top: 2px; }
+        .gmb-cols { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 768px) { .gmb-cols { grid-template-columns: 1fr 1fr; } }
+        .gmb-col { background: #ffffff; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; }
+        .gmb-col h5 { font-size: 13px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #b45309; margin-bottom: 10px; }
+        .gmb-col ul { list-style: none; padding: 0; margin: 0; }
+        .gmb-col ul li { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #fde68a; font-size: 13px; color: var(--text-body); font-weight: 500; }
+        .gmb-col ul li:last-child { border-bottom: none; }
+        .gmb-col ul li strong { color: var(--text-dark); font-weight: 800; }
+        .gmb-col ul li .cnt { font-weight: 800; color: #b45309; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+        .gmb-col ul li .ok { color: #15803d; font-weight: 900; }
+        .gmb-col ul li .bad { color: #b91c1c; font-weight: 800; font-size: 11px; }
+        .gmb-note { font-size: 12.5px; line-height: 1.5; color: #92400e; font-weight: 500; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #fde68a; }
+        .gmb-takeaway { font-size: 14px; line-height: 1.55; color: var(--text-dark); font-weight: 600; margin-top: 16px; padding: 14px 16px; background: #ffffff; border-left: 5px solid #b45309; border-radius: 6px; }
+
         .geogrid-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 16px 0; }
         .geogrid-section h3 { font-size: 20px; font-weight: 900; color: var(--text-dark); text-align: center; margin-bottom: 8px; }
         .geogrid-section .lede { font-size: 14px; color: var(--text-body); text-align: center; max-width: 700px; margin: 0 auto 22px; line-height: 1.5; }
@@ -722,6 +748,62 @@
                         </div>
                     </div>
                 </div>
+
+                <h3 class="subsection-title">Insight 6 · Your GMB Is Bleeding <span class="subsection-sub">6 months of profile data</span></h3>
+                <div class="gmb-insight">
+                    <div class="gmb-grid">
+                        <div class="gmb-stat critical">
+                            <div class="gmb-stat-num">279</div>
+                            <div class="gmb-stat-label">Total Profile Interactions<br><span>Dec 2025 - May 2026</span></div>
+                        </div>
+                        <div class="gmb-stat critical">
+                            <div class="gmb-stat-num">0</div>
+                            <div class="gmb-stat-label">Interactions in May 2026<br><span>Profile went silent</span></div>
+                        </div>
+                        <div class="gmb-stat warn">
+                            <div class="gmb-stat-num">89 → 33</div>
+                            <div class="gmb-stat-label">Monthly Decline<br><span>Dec to Apr, dropping</span></div>
+                        </div>
+                        <div class="gmb-stat">
+                            <div class="gmb-stat-num">751</div>
+                            <div class="gmb-stat-label">Profile Views<br><span>35% mobile search</span></div>
+                        </div>
+                        <div class="gmb-stat">
+                            <div class="gmb-stat-num">35</div>
+                            <div class="gmb-stat-label">Search Impressions<br><span>that surfaced you</span></div>
+                        </div>
+                        <div class="gmb-stat">
+                            <div class="gmb-stat-num">1</div>
+                            <div class="gmb-stat-label">Branded Search Term<br><span>"midland", 17 hits</span></div>
+                        </div>
+                    </div>
+                    <div class="gmb-cols">
+                        <div class="gmb-col">
+                            <h5>Top Search Terms Surfacing You</h5>
+                            <ul>
+                                <li><strong>commercial floor care</strong> <span class="cnt">18</span></li>
+                                <li><strong>midland</strong> <span class="cnt">17</span></li>
+                                <li>"commercial carpet cleaning" + miami fl <span class="cnt">&lt;15</span></li>
+                                <li>clean hardwood floors <span class="cnt">&lt;15</span></li>
+                                <li>floor care <span class="cnt">&lt;15</span></li>
+                                <li>floor care services / floor mantaince / hardwood floor cleaning <span class="cnt">&lt;15</span></li>
+                            </ul>
+                            <p class="gmb-note">A Miami search is surfacing the DMV profile, a category-targeting leak that costs impressions you should be capturing locally.</p>
+                        </div>
+                        <div class="gmb-col">
+                            <h5>Category Mess (Primary + Additional)</h5>
+                            <ul>
+                                <li><strong>Flooring contractor</strong> (primary) <span class="ok">✓</span></li>
+                                <li>Contractor, Carpentry services, Gutter cleaning <span class="bad">⚠ noise</span></li>
+                                <li>Floor refinishing service, Carpet cleaning service, Wood floor refinishing service <span class="ok">✓</span></li>
+                                <li>Janitorial, Tile cleaning, Upholstery cleaning <span class="ok">✓</span></li>
+                                <li>General repairs, Tile work replacement <span class="bad">⚠ off-brand</span></li>
+                            </ul>
+                            <p class="gmb-note">The category mix dilutes your relevance. Off-brand tags (gutter cleaning, general repairs) bleed authority that should compound on your focus services.</p>
+                        </div>
+                    </div>
+                    <p class="gmb-takeaway"><strong>Takeaway:</strong> The GMB is the highest-leverage surface for emergency leads (mobile-search heavy, 58% of discovery is on a phone) and it is currently going dark. Mirror the website services, hours, posts, and photos to GMB. Clean the categories. Push GMB engagement back into the funnel. Pillar 1 ships this as a built-in feature.</p>
+                </div>
             </div>
 
             <!-- 03. STRATEGY -->
@@ -729,10 +811,10 @@
                 <span class="section-eyebrow">03 · Strategy</span>
                 <h2 class="section-title">The 3-Pillar Plan</h2>
                 <p style="font-size: 17px; line-height: 1.55; text-align: center; max-width: 880px; margin: 0 auto 14px; font-weight: 600; color: var(--text-dark);">
-                    <strong style="color:var(--brand-green);">3 custom WordPress plugins, 14 features total</strong>, purpose-built for Midland Floor Care. Not templates. Not generic SEO software. Each feature solves a specific use case Foundation and Insights flagged, and each one earns a specific benefit you can measure.
+                    <strong style="color:var(--brand-green);">3 custom WordPress plugins, 15 features total</strong>, purpose-built for Midland Floor Care. Not templates. Not generic SEO software. Each feature solves a specific use case Foundation and Insights flagged, and each one earns a specific benefit you can measure.
                 </p>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 auto 22px;max-width:820px;">
-                    <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#1a73e8;color:#fff;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">Smart SEO Pro · 5 features</span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#1a73e8;color:#fff;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">Smart SEO Pro · 6 features</span>
                     <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#b45309;color:#fff;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">Smart Forms Pro · 5 features</span>
                     <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#15803d;color:#fff;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">Smart Reviews Pro · 4 features</span>
                 </div>
@@ -755,7 +837,7 @@
                                         <div class="plugin-name">Midland Smart SEO Pro</div>
                                         <div class="plugin-tag">Custom WordPress Plugin · Built For Midland</div>
                                     </div>
-                                    <span class="plugin-count">5 Features</span>
+                                    <span class="plugin-count">6 Features</span>
                                 </div>
                                 <h4>Features Inside This Plugin</h4>
                                 <ul>
@@ -794,10 +876,18 @@
                                     <li>
                                         <div class="d-head">
                                             <span class="d-num">Feature 05</span>
-                                            <span class="d-name">Midland AEO + GEO Module</span>
+                                            <span class="d-name">Midland GMB Mirror</span>
                                         </div>
-                                        <p class="d-uc"><span class="lbl">Use case</span>llms.txt, structured Q&amp;A schema, knowledge-graph entities, sameAs cross-linking with your Yelp / GMB / Facebook profiles.</p>
-                                        <p class="d-bf"><span class="lbl">Benefit</span>ChatGPT, Perplexity, and Google AI Overviews cite Midland Floor Care directly. You stay visible as search shifts from links to AI answers.</p>
+                                        <p class="d-uc"><span class="lbl">Use case</span>Reflects your <strong>GMB categories</strong> (Flooring contractor, Carpet cleaning, Floor refinishing, Wood floor refinishing, Janitorial, Tile cleaning, Upholstery cleaning) and the <strong>exact keywords GMB surfaces</strong> ("commercial floor care", "commercial carpet cleaning", "clean hardwood floors", "floor care services") onto the website navigation, headings, schema, and service pages. Cleans the off-brand category noise (gutter cleaning, general repairs, carpentry) currently diluting your relevance.</p>
+                                        <p class="d-bf"><span class="lbl">Benefit</span>Google sees one consistent Midland Floor Care entity across GMB and the website, not two competing identities. The 35% mobile-search audience that finds you on GMB lands on a site that reinforces every category and keyword they searched for, increasing booking conversion and stopping the May-2026-style traffic collapse.</p>
+                                    </li>
+                                    <li>
+                                        <div class="d-head">
+                                            <span class="d-num">Feature 06</span>
+                                            <span class="d-name">Midland AI Rank + GEO Module</span>
+                                        </div>
+                                        <p class="d-uc"><span class="lbl">Use case</span>Generative Engine Optimization (GEO) for the AI search shift. Ships <code>llms.txt</code>, structured Q&amp;A schema, knowledge-graph entities, sameAs cross-linking across GMB / Yelp / Facebook / LinkedIn. Tracks AI-citation surfaces (ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews) to confirm Midland gets cited by name.</p>
+                                        <p class="d-bf"><span class="lbl">Benefit</span>You rank where the next generation of buyers actually search. When a prospect asks ChatGPT "best commercial floor care in DC", Midland Floor Care comes back as the cited answer, not a competitor. Future-proof against the link-to-answer shift instead of getting overrun by it.</p>
                                     </li>
                                 </ul>
                             </div>
