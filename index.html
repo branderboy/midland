@@ -266,6 +266,22 @@
         .offer-text h4 { font-size: 18px; color: var(--text-dark); margin-bottom: 4px; }
         .offer-text p { font-size: 14px; color: var(--text-body); font-weight: 500; line-height: 1.55; }
 
+        /* BONUS HOMEPAGE REDO CARD */
+        .bonus-card { background: #fffbeb; border: 3px dashed #f59e0b; border-radius: 14px; padding: 28px 28px 22px; position: relative; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.12); }
+        @media (max-width: 600px) { .bonus-card { padding: 22px 18px 18px; } }
+        .bonus-ribbon { display: inline-block; position: absolute; top: -16px; left: 28px; background: #b45309; color: #ffffff; font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; padding: 8px 14px; border-radius: 6px; box-shadow: 0 4px 10px rgba(180, 83, 9, 0.35); }
+        .bonus-title { font-size: clamp(28px, 4.5vw, 40px); font-weight: 900; color: var(--text-dark); line-height: 1.1; letter-spacing: -0.7px; margin-bottom: 10px; }
+        .bonus-lede { font-size: 16px; line-height: 1.55; color: var(--text-body); font-weight: 500; margin-bottom: 22px; max-width: 880px; }
+        .bonus-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 18px; }
+        @media (min-width: 768px) { .bonus-grid { grid-template-columns: 1fr 1fr; } }
+        .bonus-item { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 14px; background: #ffffff; border: 1px solid #fde68a; border-radius: 10px; }
+        .bonus-num { width: 44px; height: 44px; border-radius: 10px; background: #b45309; color: #ffffff; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .bonus-item h4 { font-size: 16px; font-weight: 900; color: var(--text-dark); margin-bottom: 4px; line-height: 1.2; }
+        .bonus-item p { font-size: 13.5px; line-height: 1.5; color: var(--text-body); font-weight: 500; }
+        .bonus-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; padding-top: 14px; border-top: 1px dashed #fbbf24; }
+        .bonus-strike { font-size: 14px; color: #92400e; text-decoration: line-through; font-weight: 700; }
+        .bonus-include { font-size: 16px; color: #15803d; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+
         /* THE FORM / CLOSE */
         .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; color: var(--text-dark); }
         .form-container h2 { text-align: center; margin-bottom: 10px; font-size: 28px; font-weight: 900; }
@@ -343,6 +359,7 @@
             <a href="#strategy"><span class="num">03</span> Strategy</a>
             <a href="#proof"><span class="num">04</span> Proof</a>
             <a href="#investment"><span class="num">05</span> Investment</a>
+            <a href="#bonus" style="background:#fbbf24;color:#0f172a;border-color:#fbbf24;"><span class="num" style="color:#fbbf24;background:#0f172a;">★</span> Bonus</a>
             <a href="#checkout"><span class="num">→</span> Sign</a>
         </div>
     </nav>
@@ -912,6 +929,54 @@
                     </div>
                 </div>
                 <div style="text-align:center;font-size:18px;font-weight:700;color:var(--text-dark);margin-top:10px;">Total: $2,965, two payments, no surprises. <span style="color:var(--cta-color);">+ Carpet Cleaning Ad Page (Bonus)</span></div>
+            </div>
+
+            <!-- BONUS: HOMEPAGE REDO -->
+            <div class="section-padding" id="bonus" style="padding-top: 32px; padding-bottom: 32px;">
+                <div class="bonus-card">
+                    <div class="bonus-ribbon">FREEBIE · ON THE HOUSE</div>
+                    <div class="bonus-body">
+                        <span class="section-eyebrow" style="color:#b45309;text-align:left;margin-bottom:6px;">Bonus Deliverable</span>
+                        <h2 class="bonus-title">A Brand-New, Search-Optimized Homepage. Free.</h2>
+                        <p class="bonus-lede">
+                            On top of everything in the 3-pillar plan above, I will <strong>fully redo your homepage</strong> at no extra cost, structured around every Insight we just walked through: the focus services, the two-brand split, the four lead triggers, the geo-grid demand map, and the Yelp reverse-engineered DMV demand graph. Your current homepage is the #1 page Google sees and the #1 page leaks happen on. We rebuild it so it ranks and converts.
+                        </p>
+                        <div class="bonus-grid">
+                            <div class="bonus-item">
+                                <div class="bonus-num">1</div>
+                                <div>
+                                    <h4>Rebuilt around your focus services</h4>
+                                    <p>Hardwood finishing, carpet cleaning &amp; install, flooring installs, concrete polishing, each with its own conversion path and CRM trigger wired in.</p>
+                                </div>
+                            </div>
+                            <div class="bonus-item">
+                                <div class="bonus-num">2</div>
+                                <div>
+                                    <h4>Two-brand split front and centre</h4>
+                                    <p>Residential (Midland Carpet Care) and Commercial (Midland Service) routed to the right funnel from the hero, no more single funnel for two different buyers.</p>
+                                </div>
+                            </div>
+                            <div class="bonus-item">
+                                <div class="bonus-num">3</div>
+                                <div>
+                                    <h4>SEO-tuned for the queries you are leaking</h4>
+                                    <p>Title, H1, schema, internal links, and entity markup all targeted at the exact GSC queries currently ranking #7 to #49 (commercial floor care, warehouse cleaning, hardwood DMV). Optimised against the Yelp-harvested DMV demand graph.</p>
+                                </div>
+                            </div>
+                            <div class="bonus-item">
+                                <div class="bonus-num">4</div>
+                                <div>
+                                    <h4>Conversion architecture from the plan</h4>
+                                    <p>Smart Forms Pro embedded with the 4-trigger logic, click-to-call, GMB rating proof, and a clear emergency CTA. Every section ties back to a Pillar 1, 2, or 3 deliverable.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bonus-foot">
+                            <span class="bonus-strike">Normally a $1,200 project.</span>
+                            <span class="bonus-include">Included free when you sign below.</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- 6. CHECKOUT / FORM SECTION -->
