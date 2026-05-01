@@ -184,28 +184,28 @@
         .secure-badge { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: var(--text-body); font-size: 12px; font-weight: bold; }
 
         /* BEFORE / AFTER */
-        .ba-section { background: #0f172a; padding: 60px 40px; }
+        .ba-section { background: #ffffff; padding: 60px 40px; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
         @media (max-width: 640px) { .ba-section { padding: 40px 20px; } }
-        .ba-section .section-title { color: #fff; }
-        .ba-section .section-sub { color: #94a3b8; margin-bottom: 36px; text-align: center; font-size: 16px; }
+        .ba-section .section-title { color: var(--text-dark); }
+        .ba-section .section-sub { color: var(--text-body); margin-bottom: 36px; text-align: center; font-size: 16px; }
         .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 0 0 36px; }
         @media (max-width: 640px) { .ba-grid { grid-template-columns: 1fr; } }
-        .ba-col { border-radius: 10px; overflow: hidden; }
+        .ba-col { border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
         .ba-col-header { padding: 16px 24px; display: flex; align-items: center; gap: 10px; }
         .ba-col.before .ba-col-header { background: #dc2626; }
         .ba-col.after .ba-col-header { background: #16a34a; }
         .ba-label { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
-        .ba-col-body { padding: 8px 0; background: #1e293b; }
+        .ba-col-body { padding: 8px 0; background: #ffffff; }
         .ba-col ul { list-style: none; padding: 0; margin: 0; }
-        .ba-col ul li { font-size: 14px; line-height: 1.5; padding: 12px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cbd5e1; display: flex; align-items: flex-start; gap: 10px; }
+        .ba-col ul li { font-size: 14px; line-height: 1.5; padding: 12px 24px; border-bottom: 1px solid #f3f4f6; color: var(--text-body); display: flex; align-items: flex-start; gap: 10px; }
         .ba-col ul li:last-child { border-bottom: none; }
-        .ba-col.before ul li .ba-icon { color: #f87171; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
-        .ba-col.after ul li .ba-icon { color: #4ade80; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
+        .ba-col.before ul li .ba-icon { color: #dc2626; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
+        .ba-col.after ul li .ba-icon { color: #16a34a; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
         .ba-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
         @media (max-width: 640px) { .ba-stats { grid-template-columns: 1fr 1fr; } }
-        .ba-stat { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; }
-        .ba-stat-num { font-size: 30px; font-weight: 900; color: #4ade80; line-height: 1; }
-        .ba-stat-label { font-size: 12px; color: #94a3b8; margin-top: 6px; font-weight: 600; }
+        .ba-stat { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center; }
+        .ba-stat-num { font-size: 30px; font-weight: 900; color: #16a34a; line-height: 1; }
+        .ba-stat-label { font-size: 12px; color: var(--text-body); margin-top: 6px; font-weight: 600; }
 
         /* MILESTONE PHASES */
         .phases { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin: 30px 0; }
@@ -631,7 +631,7 @@
                 <div class="ba-grid">
                     <div class="ba-col before">
                         <div class="ba-col-header">
-                            <i class="ba-icon" style="color:#fca5a5;font-style:normal;font-size:20px;">✗</i>
+                            <i class="ba-icon" style="color:#ffffff;font-style:normal;font-size:20px;">✗</i>
                             <span class="ba-label">Before This Plan</span>
                         </div>
                         <div class="ba-col-body">
@@ -649,7 +649,7 @@
                     </div>
                     <div class="ba-col after">
                         <div class="ba-col-header">
-                            <i class="ba-icon" style="color:#86efac;font-style:normal;font-size:20px;">✓</i>
+                            <i class="ba-icon" style="color:#ffffff;font-style:normal;font-size:20px;">✓</i>
                             <span class="ba-label">After This Plan</span>
                         </div>
                         <div class="ba-col-body">
