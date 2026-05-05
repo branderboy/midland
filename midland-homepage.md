@@ -1,174 +1,188 @@
-# Midland Floor Care — Homepage Copy (SEO Rewrite)
+# Midland — Homepage Copy (SEO Rewrite, Residential + Commercial)
 
 > Geo focus: Washington D.C., Maryland, Virginia (DMV).
-> Primary head terms: commercial floor care services, commercial floor cleaning, carpet cleaning, tile & grout cleaning, hardwood floor refinishing.
-> Local intent: Montgomery County, Prince George's County, Arlington, Alexandria, plus DC neighborhoods (Navy Yard, Chinatown) and MD/VA nearby cities (Bethesda, Silver Spring, Reston, McLean, Tysons).
-> Competitor capture: MilliCare, Stanley Steemer, Aramark, American Floor Care.
+> Two-brand split routed from the hero:
+>   • **Midland Carpet Care** → Residential (homes, condos, apartments)
+>   • **Midland Floor Care** → Commercial (offices, retail, healthcare, gov, hospitality, schools)
+> Primary head terms: carpet cleaning, commercial floor care services, hardwood floor refinishing, tile & grout cleaning, upholstery cleaning, floor cleaning near me.
+> Local intent: Montgomery County, Prince George's County, Arlington, Alexandria, plus DC neighborhoods (Navy Yard, Chinatown) and MD/VA cities (Bethesda, Silver Spring, Reston, McLean, Tysons).
 
 ---
 
 ## Top Nav
-Home · About · Quote · Services · FAQ · Clients · Reach Us
+Home · About · Residential · Commercial · Services · Quote · FAQ · Reach Us
 
 ---
 
-## Hero
+## Hero (Two-Path Routing)
 
-**H1:** Commercial Floor Care & Cleaning Services in Washington D.C., Maryland & Virginia
+**H1:** Carpet, Hardwood & Floor Care for Homes and Businesses Across DC, Maryland & Virginia
 
-**Subhead (H2):** Carpet, tile & grout, hardwood, and hard-surface restoration — for offices, retail, healthcare, schools, and government facilities across the DMV.
+**Subhead (H2):** Family-owned. Locally operated. Trusted by 774+ DMV homeowners and facility managers for carpet cleaning, hardwood refinishing, tile & grout, upholstery, and full commercial floor care.
 
-**CTA bar:** Call Now: (240) 532-9097 · Request a Free Site Evaluation · 24–48 Hour Quote
+**CTA bar:** Call (240) 532-9097 · Get a Free Quote · Same-Week Service
 
-**Hero paragraph (intent-rich, ~60 words):**
-Midland Floor Care is the DMV's local commercial floor cleaning company — a fully insured flooring contractor serving Washington D.C., Montgomery County, Prince George's County, Arlington, Alexandria, and the surrounding Mid-Atlantic region. We deliver professional surface cleaning for commercial facilities, including carpet cleaning, tile & grout restoration, hardwood floor refinishing, concrete polishing, and EPA-approved disinfecting. A faster, more accountable alternative to national vendors like MilliCare, Stanley Steemer, and Aramark.
+### Pick Your Path
 
-**Trust strip (chips under hero):**
-Open Now · Fast-Responding · Free Site Evaluation · Virtual Consultations · 774+ Satisfied Clients · Fully Insured · EPA-Approved Disinfectants
+**🏠 Residential — Midland Carpet Care**
+For homes, condos, townhouses, and apartments. Carpet cleaning, area rug cleaning, hardwood refinishing, tile & grout, upholstery, and pet stain & odor removal.
+**[See Residential Services →]** · **[Get a Home Quote →]**
 
----
+**🏢 Commercial — Midland Floor Care**
+For offices, retail, healthcare, schools, government, hospitality, and warehouses. Recurring programs, after-hours scheduling, COI-ready crews, and EPA-approved disinfecting.
+**[See Commercial Services →]** · **[Request a Site Evaluation →]**
 
-## Service Modes (3 cards)
-
-**Long-Term Programs**
-Recurring commercial floor maintenance contracts — weekly, monthly, or quarterly schedules tailored to your facility, your foot traffic, and your budget.
-
-**Customized Cleaning**
-Built around your space, your surfaces, and your hours. We work nights, weekends, and holidays so your operations never stop.
-
-**Last-Minute & Emergency Services**
-Same-day and next-day response for water events, post-event cleanup, move-outs, inspections, and unexpected stains. Call (240) 532-9097.
+**Trust strip:** Open Now · Fast-Responding · 774+ Satisfied DMV Clients · 5.0 Google Rating · Fully Insured · Eco-Friendly + EPA-Approved
 
 ---
 
-## Founder Video Block
+## About / Founder Block
 
-**Heading:** Watch "What Helps You Drive More Sales" — From Our Founder
-**Caption:** A 2-minute look at why clean floors are a revenue lever, not a line item — and how Midland's Facility Score gives you a defensible plan.
+**H2:** A Local DMV Family Business — Floors Done Right
 
----
+Midland has cleaned, restored, and refinished floors across Washington D.C., Maryland, and Virginia for years. Whether you're a homeowner in Bethesda who wants the carpets ready before family visits, or a property manager in Arlington who needs 40,000 sq ft of office tile cleaned overnight — we run the same playbook: show up on time, do the work right, leave the place better than we found it.
 
-## Industries We Serve in The DC Area
-
-**H2:** Industries We Serve Across DC, Maryland & Virginia
-
-Tailored for DMV businesses — not cookie-cutter contracts. We're the commercial floor cleaning service trusted by:
-
-- **Retail Stores** — storefronts, showrooms, and shopping centers in Bethesda, Tysons, Pentagon City, and Navy Yard
-- **Corporate Offices** — Class A office towers, coworking spaces, and law/finance firms in DC, Arlington, and Silver Spring
-- **Government Facilities** — federal contractors and municipal buildings with security and compliance requirements
-- **Healthcare & Clinics** — medical office floor cleaning with EPA-registered hospital-grade disinfectants
-- **Educational Campuses** — K–12 schools, charter networks, and universities across MD and VA
-- **Hospitality & Restaurants** — hotels, event venues, and restaurants where first impressions are revenue
+**Watch:** "What Helps You Drive More Sales / Love Your Home Again" — From Our Founder
 
 ---
 
-## Clients
+## Residential Services
 
-**H2:** See the Names Behind Our Work
-**Subhead:** Government agencies, regional retailers, healthcare networks, and DMV-area property managers trust Midland Floor Care with their floors. *(client logo grid)*
+**H2:** Residential Carpet, Hardwood & Floor Cleaning — Across the DMV
+
+We bring commercial-grade equipment into your home — without the commercial-grade attitude. Same crews, same quality, family-friendly chemistry.
+
+**Carpet Cleaning**
+Hot-water extraction (steam cleaning) that lifts dirt, allergens, and odors. Safe for kids and pets. Stain protection and dry-in-hours options.
+
+**Pet Stain & Odor Removal**
+Enzyme treatments that neutralize pet accidents at the pad — not just the surface. Works on old stains other cleaners couldn't touch.
+
+**Area Rug Cleaning**
+In-home cleaning for wool, synthetic, and Oriental rugs. Pickup-and-delivery available for fine rugs that need a full submersion wash.
+
+**Hardwood Floor Cleaning & Refinishing**
+Restore the shine on tired hardwood. Light buff-and-recoat or a full sand-stain-seal — we'll tell you which one your floors actually need.
+
+**Tile & Grout Cleaning**
+Bring grout lines back to their original color. Optional sealing keeps kitchens, bathrooms, and entryways looking new for years.
+
+**Upholstery & Leather Cleaning**
+Sofas, sectionals, dining chairs, mattresses, and leather furniture. Fabric-safe cleaning, no over-wetting, no shrinkage.
+
+**Move-In / Move-Out Cleaning**
+Get your deposit back or move into a fresh home. Carpets, hardwood, and tile cleaned to landlord and inspector standards.
+
+**[See All Residential Services →]**
 
 ---
 
-## Services
+## Commercial Services
 
 **H2:** Commercial Floor Care Services — DC, Maryland & Virginia
 
-We provide the commercial floor cleaning services near you for every type of space: office floor cleaning, industrial floor cleaning, retail store floor cleaning, warehouse floor cleaning, medical office floor cleaning, school floor cleaning, government building floor cleaning, hotel floor cleaning, and bank floor cleaning.
+Office floor cleaning, retail store floor cleaning, warehouse floor cleaning, medical office floor cleaning, school floor cleaning, government building floor cleaning, hotel floor cleaning, and bank floor cleaning — across the DMV.
 
-### Carpet Cleaning
-Commercial carpet cleaning, steam cleaning, stain removal, odor removal, and stain protection — eco-friendly solutions that lift dirt and allergens without the long dry times. Ideal for offices, hotels, and high-traffic retail.
-[Learn More →]
+**Commercial Carpet Cleaning**
+Hot-water extraction and low-moisture encapsulation for high-traffic carpet. After-hours service so your operations don't stop.
 
-### Janitorial Services
-Full-service commercial janitorial: routine cleaning, restroom sanitation, waste management, and disinfecting. EPA-registered chemistry, COI-ready crews, recurring or one-time.
-[Learn More →]
+**Janitorial Services**
+Routine cleaning, restroom sanitation, waste management, and disinfecting. EPA-registered chemistry, COI-ready crews, recurring or one-time.
 
-### Tile + Grout Cleaning
-Deep tile and grout cleaning that pulls grime out of porous grout lines and restores the original color. Optional sealing prolongs results and resists future staining in lobbies, restrooms, and kitchens.
-[Learn More →]
+**Tile + Grout Cleaning**
+Deep cleaning and color sealing for lobbies, restrooms, and kitchens.
 
-### Upholstery + Leather Cleaning
-Specialized cleaning for office furniture, hospitality fabrics, and leather seating — restoring appearance without damaging fibers, dyes, or finishes.
-[Learn More →]
+**Upholstery + Leather Cleaning**
+Office furniture, hospitality fabrics, and leather seating restored without damaging fibers or finishes.
 
-### Commercial Hard Surface Floor Restoration
-VCT, LVT, terrazzo, marble, and natural stone — strip, scrub, polish, and protect. We bring tired hard floors back to a high-clarity finish without replacement cost.
-[Learn More →]
+**Hard Surface Floor Restoration**
+VCT, LVT, terrazzo, marble, and natural stone — strip, scrub, polish, and protect.
 
-### Commercial Concrete Polishing
-Durable, high-gloss polished concrete for warehouses, showrooms, and modern offices — light-reflective, low-maintenance, and built for forklift traffic.
-[Learn More →]
+**Commercial Concrete Polishing**
+Durable, high-gloss polished concrete for warehouses, showrooms, and modern offices.
 
-### Hardwood Floor Cleaning & Refinishing
-Wood floor refinishing service for commercial spaces — sand, stain, and seal. Bring office, retail, and hospitality hardwood back to spec.
-[Learn More →]
+**Hardwood Floor Refinishing**
+Commercial wood floor refinishing — sand, stain, and seal for offices, retail, and hospitality.
 
-**[Click Here To View Our Service Area →]**
+**EPA-Approved Disinfecting**
+Hospital-grade disinfectants for healthcare, schools, and food-service environments.
+
+**[See All Commercial Services →]**
+
+---
+
+## Industries We Serve (Commercial)
+
+**H2:** DMV Industries Who Trust Midland Floor Care
+
+- **Retail Stores** — storefronts, showrooms, and shopping centers in Bethesda, Tysons, Pentagon City, Navy Yard
+- **Corporate Offices** — Class A towers, coworking, and law/finance firms in DC, Arlington, Silver Spring
+- **Government Facilities** — federal contractors and municipal buildings with security and compliance requirements
+- **Healthcare & Clinics** — medical office floor cleaning with hospital-grade disinfectants
+- **Educational Campuses** — K–12 schools, charter networks, universities across MD and VA
+- **Hospitality & Restaurants** — hotels, event venues, restaurants where first impressions are revenue
+- **Warehouse & Industrial** — concrete polishing and heavy-traffic floor maintenance
 
 ---
 
 ## Service Area
 
-**H2:** Serving the Mid-Atlantic — DC, Maryland & Virginia
+**H2:** Serving Homes & Businesses Across the DMV
 
-We're on-site across the DMV daily, including:
+We're on-site daily in:
 
 - **Washington D.C.** — Navy Yard, Chinatown, Capitol Hill, Downtown, Georgetown, NoMa
 - **Maryland** — Bethesda, Silver Spring, Rockville, Gaithersburg (20878), Bowie, Waldorf, Laurel (20726), College Park, Hyattsville
 - **Northern Virginia** — Arlington (Ballston, Clarendon, Crystal City, Pentagon City, Shirlington), Alexandria (Old Town, Del Ray), Falls Church, McLean, Vienna, Reston, Tysons, Fairfax, Chantilly, Sterling, Ashburn, Leesburg, Manassas, Springfield, Woodbridge
 
-If you're in the Mid-Atlantic and we're not on the list, call us — we likely already cover your zip.
+If you're in the Mid-Atlantic and your zip's not listed — call us. We probably cover it.
 
 ---
 
-## Social Proof Strip
+## Social Proof
 
-**Over 774 Satisfied DMV Clients · 5.0 Google Rating · Fully Insured · Decades of Combined Floor Care Experience**
+**Over 774 Satisfied DMV Customers · 5.0 Google Rating · Fully Insured · Family-Owned, Locally Operated**
 
 ---
 
 ## Process
 
-**H2:** Let's See Your Floors Shine — The Midland Process
+**H2:** How Midland Works — Same Process for Homes and Businesses
 
-Our process makes it easy to see exactly how we deliver quality results — clear steps, no guesswork, and a smooth experience from first visit to final clean.
+**01 · Walkthrough**
+A real Midland tech (not a salesperson) looks at your floors — in person or virtually. We listen, measure, and identify trouble spots.
 
-**01 · Site Evaluation**
-An experienced Midland tech walks your facility, identifies surfaces, traffic patterns, and trouble spots, and listens to what's not working with your current vendor.
+**02 · Your Score**
+You get a written assessment — your **Home Score** or **Facility Score** — showing current condition, recommended care, and what's at risk. Yours to keep, even if you don't hire us.
 
-**02 · Facility Score**
-You get your **Facility Score** — a written assessment of current condition, recommended care frequency, and the surfaces most at risk. This is yours to keep, even if you don't hire us.
+**03 · Quote in 24–48 Hours**
+Line-item pricing, no hidden fees, no annual lock-ins. Easy to compare to anyone else's bid.
 
-**03 · Get a Quote**
-A complete program quote in 24–48 hours after the site visit. Line-item pricing, no hidden fees, no annual lock-ins.
-
-**04 · Schedule Your Service**
-We schedule around your operations — nights, weekends, holidays, after-hours. Your tenants and customers never see the work; they only see the result.
+**04 · Schedule Around You**
+Homeowners get evening and weekend slots. Businesses get nights, weekends, and holidays so operations never stop.
 
 ---
 
-## Why Choose Midland (vs. National Chains)
+## Why Midland
 
-**H2:** Why DMV Facility Managers Choose Midland Over National Chains
+**H2:** Why DMV Homeowners and Facility Managers Choose Midland
 
-- **Local owners, local crews** — every job is run out of the DMV, not dispatched from a national call center.
-- **One point of contact** — you talk to the same account lead every time, not a ticket queue.
-- **Customized, not cookie-cutter** — programs are built around your floors, not a national playbook.
-- **Affordable floor care for small businesses** — flexible programs that scale from a single suite to a multi-site portfolio.
-- **Faster response** — same-day and next-day availability for emergencies; standard quotes in 24–48 hours.
-- **Insurance & compliance ready** — COIs, W-9s, and security paperwork delivered the same day you ask.
+- **Local family business** — not a national franchise, not a call center
+- **One person you talk to** — same account lead every time
+- **Customized work** — your home, your floors, your hours — not a cookie-cutter package
+- **Affordable for both sides** — small-business pricing, multi-site programs, and one-time residential cleans
+- **Faster response** — same-day and next-day for emergencies; quotes in 24–48 hours
+- **Insurance & compliance ready** — COIs, W-9s, security paperwork delivered same-day
 
-A real local alternative to MilliCare, Stanley Steemer, Aramark, and American Floor Care.
+A real local alternative to Stanley Steemer, MilliCare, Aramark, and American Floor Care.
 
 ---
 
 ## Testimonials
 
-**H2:** Our Happy Clients
-**Subhead:** Our clients' words speak louder than our marketing. Here's what DC, Maryland, and Virginia facility managers say about working with Midland.
+**H2:** What DMV Homeowners and Facility Managers Say
 
-*(testimonial slider — pull 5-star Google and verified client quotes)*
+*(testimonial slider — split between residential 5-star reviews and commercial client quotes)*
 
 ---
 
@@ -176,70 +190,74 @@ A real local alternative to MilliCare, Stanley Steemer, Aramark, and American Fl
 
 **H2:** Frequently Asked Questions
 
-**How quickly can Midland clean our floors?**
-Most DMV clients get a site visit within 48 hours and a written quote 24–48 hours after that. For emergencies, we offer same-day and next-day response — call (240) 532-9097.
+**Do you clean homes or just commercial buildings?**
+Both. Midland Carpet Care handles residential — homes, condos, apartments. Midland Floor Care handles commercial — offices, retail, healthcare, schools, government, hospitality, and warehouses. Same family, same crews, same standards.
+
+**How fast can you get to my home or facility?**
+Most DMV customers get a visit within 48 hours and a written quote 24–48 hours after that. Same-day and next-day are available for emergencies — call (240) 532-9097.
+
+**Are your products safe for kids and pets?**
+Yes. Residential cleans use family-safe, low-residue solutions. We also offer green-certified options for sensitive households.
+
+**Do you offer after-hours and weekend service?**
+Yes. Homeowners get evenings and weekends. Commercial clients get nights, weekends, and holidays so business operations don't stop.
+
+**What floor and surface types do you handle?**
+Carpet, area rugs, hardwood, tile & grout, VCT, LVT, terrazzo, marble, natural stone, polished concrete, upholstery, and leather.
 
 **Do you serve all of DC, Maryland, and Virginia?**
-Yes. We work daily across Washington D.C., Montgomery County, Prince George's County, Arlington, Alexandria, Fairfax, Loudoun, and the rest of the Mid-Atlantic. If you're outside the DMV, ask — we travel for the right program.
+Yes. We work daily across Washington D.C., Montgomery County, Prince George's County, Arlington, Alexandria, Fairfax, Loudoun, and the broader Mid-Atlantic.
 
-**What floor types do you handle?**
-Carpet, tile & grout, VCT, LVT, terrazzo, marble, natural stone, polished concrete, and hardwood. Cleaning, restoration, refinishing, and protection.
+**How is Midland different from Stanley Steemer or MilliCare?**
+We're a local DMV family business — not a national franchise. You get one named contact, custom work, faster response, and direct accountability — not a routed ticket.
 
-**Do you offer after-hours service?**
-Yes. Most commercial work happens nights, weekends, and holidays so your operations are not disrupted.
-
-**Are your products safe for healthcare, schools, and food service?**
-Yes. We use EPA-registered, hospital-grade disinfectants and green-certified chemistry where required. We provide SDS sheets and certifications on request.
-
-**How is Midland different from Stanley Steemer, MilliCare, or Aramark?**
-We're a local DMV flooring contractor, not a national franchise. You get one named account lead, custom programs, faster response, and direct accountability — not a routed ticket.
-
-**Do you provide one-time services or only recurring contracts?**
-Both. One-time deep cleans, post-construction cleanup, move-outs, and event cleanup, plus recurring weekly, monthly, and quarterly programs.
+**Do you do one-time cleanings or only contracts?**
+Both. One-time residential cleans, move-in/move-out, post-construction, and event cleanup, plus recurring weekly/monthly/quarterly programs for businesses.
 
 ---
 
 ## Bottom CTA
 
-**H2:** Ready for Floors That Sell For You?
+**H2:** Ready for Floors That Look Right Again?
 
-Get a free on-site evaluation and your Facility Score in 48 hours.
+Get a free walkthrough and a written quote in 48 hours.
 
-**Call (240) 532-9097 · Request a Quote · Book a Virtual Consultation**
+**Call (240) 532-9097 · Get a Home Quote · Request a Site Evaluation**
 
 ---
 
 ## Footer
 
 **About Midland**
-Midland Floor Care serves the DMV metro with commercial floor care, carpet cleaning, hardwood floor cleaning and refinishing, tile & grout restoration, concrete polishing, janitorial services, and EPA-approved disinfecting. Locally owned. Fully insured. Built for the Mid-Atlantic.
+Midland is a family-owned DMV floor care company serving homes and businesses across Washington D.C., Maryland, and Virginia. Carpet cleaning, hardwood refinishing, tile & grout, upholstery, concrete polishing, janitorial, and EPA-approved disinfecting. Locally owned. Fully insured.
 
-**Follow Us:** Instagram · Facebook · LinkedIn · Google Business Profile
+**Brands:** Midland Carpet Care (Residential) · Midland Floor Care (Commercial)
 
-**Sitemap:** About Midland · Services · Schedule Your Visit & Quote · What We Offer · Reach Us · FAQ · Blog
+**Follow:** Instagram · Facebook · LinkedIn · Google Business Profile
 
-© 2026 Midland Floor Care · Terms and Conditions · Privacy Policy
+**Sitemap:** About · Residential Services · Commercial Services · Quote · Reach Us · FAQ · Blog
+
+© 2026 Midland · Terms and Conditions · Privacy Policy
 
 ---
 
-## Title Tag & Meta (for the page <head>)
+## Title Tag & Meta
 
-**Title (≤60 chars):**
-Commercial Floor Care DC, MD & VA | Midland Floor Care
+**Title (≤60):** Carpet & Floor Care DC, MD, VA — Homes & Businesses | Midland
 
-**Meta Description (≤155 chars):**
-Commercial floor cleaning across DC, Maryland & Virginia — carpet, tile & grout, hardwood, concrete polishing. Free site eval, 24–48 hr quote. Call (240) 532-9097.
+**Meta (≤155):** Family-owned DMV carpet cleaning, hardwood refinishing, tile & grout, and commercial floor care. Homes & businesses across DC, MD, VA. Call (240) 532-9097.
 
-**H1 on page:**
-Commercial Floor Care & Cleaning Services in Washington D.C., Maryland & Virginia
+**H1:** Carpet, Hardwood & Floor Care for Homes and Businesses Across DC, Maryland & Virginia
 
-**Open Graph image:** 1200×630 raster, summary_large_image (per seo-hacks.md guidance — no SVG OG).
+**OG image:** 1200×630 raster, summary_large_image (per seo-hacks.md).
 
-**Schema (JSON-LD) to wire on the homepage:**
-- `LocalBusiness` / `ProfessionalService` with `@id: https://www.midlandfloors.com/#business`
-- `address` (DMV HQ), `areaServed` array of City entities (DC, Bethesda, Silver Spring, Arlington, Alexandria, Fairfax, etc.) each with Wikipedia `sameAs`
-- `sameAs`: Google Business Profile URL, Facebook, Instagram, LinkedIn, Yelp, BBB, Nextdoor
-- `aggregateRating` pulled from GBP
-- `Service` nodes for each service card, each `provider`-linked back to the `@id` of the business
-- `BreadcrumbList` on subpages, all referencing the same business `@id`
-- FAQPage schema for the FAQ block above
+**Schema (JSON-LD):**
+- Two `LocalBusiness` nodes sharing one `parentOrganization`:
+  - `@id: https://www.midlandfloors.com/#carpet-care` (Midland Carpet Care, residential)
+  - `@id: https://www.midlandfloors.com/#floor-care` (Midland Floor Care, commercial)
+- Each with its own `serviceType`, `areaServed`, `priceRange`, `aggregateRating`
+- `sameAs` on each: GBP URL, Facebook, Instagram, LinkedIn, Yelp, BBB, Nextdoor
+- `areaServed` array of City entities (DC, Bethesda, Silver Spring, Arlington, Alexandria, Fairfax, etc.) with Wikipedia `sameAs`
+- `Service` nodes per service card, `provider`-linked to whichever brand `@id` they belong to
+- `FAQPage` schema on the FAQ block
+- `BreadcrumbList` on subpages, all pointing back to the parent business `@id`
