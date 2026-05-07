@@ -1,0 +1,64 @@
+{
+  "manifest_version": "1.0.21",
+  "title": "Midland Floor Care — Sales Page Kit",
+  "page_builder": "elementor",
+  "kit_version": "1.0.0",
+  "templates": [
+    {
+      "name": "Home",
+      "screenshot": "screenshots/home.jpg",
+      "source": "templates/home.json",
+      "preview_url": "",
+      "type": "page",
+      "category": "page",
+      "metadata": {
+        "template_type": "single-page",
+        "include_in_zip": "1"
+      }
+    },
+    {
+      "name": "Header",
+      "screenshot": "screenshots/header.jpg",
+      "source": "templates/header.json",
+      "preview_url": "",
+      "type": "header",
+      "category": "section",
+      "metadata": {
+        "template_type": "section-header",
+        "include_in_zip": "1",
+        "elementor_pro_required": "1",
+        "elementor_library_type": "header",
+        "elementor_pro_conditions": [
+          "include/general"
+        ],
+        "additional_template_information": [
+          "This is a 'Header' template for Elementor Pro.",
+          "This template will display on: Entire Site."
+        ]
+      },
+      "elementor_pro_required": true
+    },
+    {
+      "name": "Footer",
+      "screenshot": "screenshots/footer.jpg",
+      "source": "templates/footer.json",
+      "preview_url": "",
+      "type": "footer",
+      "category": "section",
+      "metadata": {
+        "template_type": "section-footer",
+        "include_in_zip": "1",
+        "elementor_pro_required": "1",
+        "elementor_library_type": "footer",
+        "elementor_pro_conditions": [
+          "include/general"
+        ],
+        "additional_template_information": [
+          "This is a 'Footer' template for Elementor Pro.",
+          "This template will display on: Entire Site."
+        ]
+      },
+      "elementor_pro_required": true
+    }
+  ]
+}
