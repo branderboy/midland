@@ -288,7 +288,7 @@
                       "widgetType": "image",
                       "settings": {
                         "image": {
-                          "url": "",
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/office%20floor.png",
                           "id": "",
                           "size": "",
                           "alt": "Commercial office floor",

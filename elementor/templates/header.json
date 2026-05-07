@@ -179,7 +179,7 @@
                   "widgetType": "image",
                   "settings": {
                     "image": {
-                      "url": "",
+                      "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png",
                       "id": "",
                       "size": "",
                       "alt": "Midland Floor Care",
