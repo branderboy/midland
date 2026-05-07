@@ -1,0 +1,20 @@
+{
+  "manifest_version": "1.0.21",
+  "title": "Midland Floor Care — Sales Page Kit",
+  "page_builder": "elementor",
+  "kit_version": "1.0.0",
+  "templates": [
+    {
+      "name": "Home",
+      "screenshot": "screenshots/home.jpg",
+      "source": "templates/home.json",
+      "preview_url": "",
+      "type": "page",
+      "category": "page",
+      "metadata": {
+        "template_type": "single-page",
+        "include_in_zip": "1"
+      }
+    }
+  ]
+}
