@@ -34,7 +34,7 @@ html{ scroll-behavior:smooth }
 body{
   margin:0;
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
   color: var(--ink);
   background: var(--white);
@@ -43,28 +43,28 @@ body{
 img{ max-width:100%; display:block; height:auto }
 a{ color:inherit; text-decoration:none }
 button{ font-family:inherit; cursor:pointer }
-input, select, textarea{ font-family: inherit; font-size: 15px; }
+input, select, textarea{ font-family: inherit; font-size: 16px; }
 
 h1, h2, h3, h4 { font-family: var(--sans); font-weight: 800; color: var(--ink); margin:0; letter-spacing:-.02em; line-height: 1.1; }
-h1 { font-size: clamp(38px, 5vw, 60px); line-height: 1.05; }
-h2 { font-size: clamp(28px, 3.4vw, 42px); }
-h3 { font-size: 22px; }
-h4 { font-size: 17px; }
+h1 { font-size: clamp(44px, 5.8vw, 72px); line-height: 1.04; }
+h2 { font-size: clamp(32px, 3.8vw, 50px); }
+h3 { font-size: 26px; }
+h4 { font-size: 20px; }
 p { margin: 0; }
-.lede { font-size: 16px; line-height: 1.65; color: var(--ink-2); }
-.eyebrow{ display:inline-block; font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--green-deep); }
+.lede { font-size: 19px; line-height: 1.65; color: var(--ink-2); }
+.eyebrow{ display:inline-block; font-size: 13px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--green-deep); }
 
 .wrap{ max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 .wrap-narrow{ max-width: 920px; margin: 0 auto; padding: 0 24px; }
-section{ padding: 64px 0; background: var(--white); }
+section{ padding: 48px 0; background: var(--white); }
 section.mint{ background: var(--mint); }
 @media (max-width: 720px){ section{ padding: 44px 0; } .wrap, .wrap-narrow{ padding: 0 18px; } }
 
 /* ---------- BTN ---------- */
 .btn{
-  display:inline-flex; align-items:center; justify-content: center; gap: 10px;
-  font-weight: 800; font-size: 15px;
-  padding: 16px 28px; border: 2px solid var(--green);
+  display:inline-flex; align-items:center; justify-content: center; gap: 12px;
+  font-weight: 800; font-size: 17px;
+  padding: 20px 32px; border: 2px solid var(--green);
   background: var(--green); color: #FFF;
   border-radius: 4px;
   text-transform: uppercase; letter-spacing: .04em;
@@ -76,8 +76,8 @@ section.mint{ background: var(--mint); }
 .btn--ghost:hover{ background: #FFF; color: var(--ink); border-color: #FFF; }
 .btn--ink{ background: var(--ink); border-color: var(--ink); color: #FFF; }
 .btn--ink:hover{ background: #000; border-color: #000; }
-.btn--lg{ padding: 18px 32px; font-size: 16px; }
-.btn--xl{ padding: 22px 38px; font-size: 18px; }
+.btn--lg{ padding: 22px 38px; font-size: 18px; }
+.btn--xl{ padding: 26px 46px; font-size: 20px; }
 .btn--block{ width: 100%; }
 
 /* ---------- TOPBAR ---------- */
@@ -155,7 +155,7 @@ nav.primary a:hover{ color: var(--green-deep); }
 .hero .chip-row span:not(:last-child)::after{ content:"·"; position: absolute; right: 0; color: rgba(255,255,255,.4); }
 .hero h1{ color: #FFF; max-width: 14ch; font-weight: 800; }
 .hero p.sub{
-  margin-top: 22px; font-size: 17px; line-height: 1.55;
+  margin-top: 22px; font-size: 20px; line-height: 1.55;
   color: #D5DAD7; max-width: 56ch; font-weight: 500;
 }
 .hero p.sub b{ color: #FFF; font-weight: 800; }
@@ -176,9 +176,9 @@ nav.primary a:hover{ color: var(--green-deep); }
 }
 
 /* ============== SECTION HEADER (centered like live site) ============== */
-.sect-head{ text-align: center; max-width: 720px; margin: 0 auto 40px; }
-.sect-head h2{ margin-top: 14px; }
-.sect-head p{ margin-top: 14px; }
+.sect-head{ text-align: center; max-width: 720px; margin: 0 auto 24px; }
+.sect-head h2{ margin-top: 10px; }
+.sect-head p{ margin-top: 10px; }
 
 /* ============== PROCESS (mint, 4 BIG animated circles) ============== */
 .process-row{
@@ -296,11 +296,12 @@ nav.primary a:hover{ color: var(--green-deep); }
 .about-strip{ text-align:center; max-width: 760px; margin: 0 auto; }
 
 /* ============== SERVICES (residential / commercial — photo + bullets) ============== */
-.svc-block{ display:grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 32px; }
-.svc-block .photo{ border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
-.svc-block .photo img{ aspect-ratio: 4/3; object-fit: cover; width:100%; }
-.svc-block ul{ list-style: none; padding: 0; margin: 18px 0 24px; display:grid; gap: 8px; }
-.svc-block li{ display:flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.svc-block{ display:grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: stretch; margin-top: 20px; }
+.svc-block > div:not(.photo){ display:flex; flex-direction: column; justify-content: center; }
+.svc-block .photo{ border-radius: 4px; overflow: hidden; border: 1px solid var(--line); display:flex; }
+.svc-block .photo img{ width:100%; height: 100%; min-height: 320px; object-fit: cover; }
+.svc-block ul{ list-style: none; padding: 0; margin: 0 0 18px; display:grid; gap: 6px; }
+.svc-block li{ display:flex; gap: 10px; align-items: flex-start; font-size: 16px; }
 .svc-block li::before{
   content:"●"; color: var(--green); font-weight: 800; flex-shrink: 0; font-size: 8px; padding-top: 8px;
 }
@@ -466,7 +467,7 @@ footer{ background: var(--ink); }
       <span class="eyebrow">The Midland Process Explained</span>
       <h2>How our process works.</h2>
       <p class="lede">
-        Our process makes it easy to see exactly how we deliver quality results and complete client satisfaction — clear steps, no guesswork, and a smooth experience from first visit to final clean.
+        Our process makes it easy to see exactly how we deliver quality results and complete client satisfaction. Clear steps, no guesswork, and a smooth experience from first visit to final clean.
       </p>
     </div>
     <div class="process-row reveal">
@@ -478,7 +479,7 @@ footer{ background: var(--ink); }
       <div class="process-step">
         <div class="circle-wrap"><div class="circle">PLAN</div><div class="badge">02</div></div>
         <h4>Facility Score</h4>
-        <p>You get a written assessment of every surface — yours to keep.</p>
+        <p>You get a written assessment of every surface. Yours to keep.</p>
       </div>
       <div class="process-step">
         <div class="circle-wrap"><div class="circle">QUOTE</div><div class="badge">03</div></div>
@@ -488,7 +489,7 @@ footer{ background: var(--ink); }
       <div class="process-step">
         <div class="circle-wrap"><div class="circle">CLEAN</div><div class="badge">04</div></div>
         <h4>Schedule</h4>
-        <p>Nights, weekends, holidays — your tenants only see the result.</p>
+        <p>Nights, weekends, holidays. Your tenants only see the result.</p>
       </div>
     </div>
   </div>
@@ -545,7 +546,7 @@ footer{ background: var(--ink); }
     <span class="eyebrow">About</span>
     <h2 class="mt-12">Midland Floor Care delivers.</h2>
     <p class="lede mt-18">
-      Family-owned, serving DC, Maryland, and Virginia. From Bethesda homeowners pressing for family visits to Arlington property managers needing a 40K sq ft office cleaned overnight and same-play-book show-up on time — we do the work right and leave better than we found it.
+      Family-owned, serving DC, Maryland, and Virginia. From Bethesda homeowners pressing for family visits to Arlington property managers needing a 40K sq ft office cleaned overnight and same-play-book show-up on time, we do the work right and leave better than we found it.
     </p>
     <div class="mt-24" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <a class="btn" href="#schedule">Schedule a Visit</a>
@@ -561,7 +562,7 @@ footer{ background: var(--ink); }
       <h2 style="text-transform: uppercase; letter-spacing: .04em">Residential Services</h2>
       <blockquote class="svc-pull center" style="border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 50ch">
         "Carpet like new after 8 years of kids and pets."
-        <cite>— Sandy, Bethesda</cite>
+        <cite>Sandy, Bethesda</cite>
       </blockquote>
     </div>
     <div class="svc-block reveal">
@@ -604,7 +605,7 @@ footer{ background: var(--ink); }
       <h2 style="text-transform: uppercase; letter-spacing: .04em">Commercial Services</h2>
       <blockquote class="svc-pull center" style="border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 56ch">
         "40K sq ft office cleaned overnight. No downtime."
-        <cite>— Arlington Property Manager</cite>
+        <cite>Arlington Property Manager</cite>
       </blockquote>
     </div>
     <div class="svc-block reveal" style="grid-template-columns: 1fr 1fr">
@@ -621,7 +622,7 @@ footer{ background: var(--ink); }
         <a class="btn" href="#schedule">Get a commercial quote →</a>
       </div>
       <div class="photo">
-        <img src="images/1000151618.jpg" alt="Real Midland commercial hardwood floor refinishing — finished" loading="lazy">
+        <img src="images/office%20floor.png" alt="Real Midland commercial office floor cleaning in DMV" loading="lazy">
       </div>
     </div>
   </div>
@@ -641,11 +642,11 @@ footer{ background: var(--ink); }
       <div class="testi-card">
         <span class="stars">★★★★★</span>
         <blockquote>"Very professional. Knowledgeable and willing to educate. Will refer Midland to anyone that needs carpet cleaning and repair soon to come."</blockquote>
-        <div class="who"><div class="av">PB</div><div><b>Patricia B.</b><span>BUSINESS ADVISOR — BETHESDA</span></div></div>
+        <div class="who"><div class="av">PB</div><div><b>Patricia B.</b><span>BUSINESS ADVISOR | BETHESDA</span></div></div>
       </div>
       <div class="testi-card">
         <span class="stars">★★★★★</span>
-        <blockquote>"40K sq ft office cleaned overnight. No downtime, no excuses. We see the result, not the work — exactly what we wanted from a vendor."</blockquote>
+        <blockquote>"40K sq ft office cleaned overnight. No downtime, no excuses. We see the result, not the work. Exactly what we wanted from a vendor."</blockquote>
         <div class="who"><div class="av">AM</div><div><b>Property Manager</b><span>CLASS A OFFICE, ARLINGTON</span></div></div>
       </div>
       <div class="testi-card">
@@ -667,7 +668,7 @@ footer{ background: var(--ink); }
     <div style="display:grid;gap:10px">
       <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
         <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">How fast can you get on-site? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
-        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after. Same-day emergency dispatch — call (240) 532-9097.</div>
+        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after. Same-day emergency dispatch. Call (240) 532-9097.</div>
       </details>
       <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
         <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">Are you insured and COI-ready? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
@@ -675,7 +676,7 @@ footer{ background: var(--ink); }
       </details>
       <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
         <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">Do you handle nights, weekends, and emergencies? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
-        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">Yes. Most commercial work happens nights, weekends, and holidays. Same-day emergency response is available — call (240) 532-9097.</div>
+        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">Yes. Most commercial work happens nights, weekends, and holidays. Same-day emergency response is available. Call (240) 532-9097.</div>
       </details>
       <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
         <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">What's the difference vs. national chains? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
