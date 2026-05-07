@@ -1,13 +1,19 @@
 <!doctype html>
-<html><body>
+<html><body style="font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;line-height:1.55">
 <h1>Midland Floor Care — Sales Page Kit</h1>
-<p>Single-page Elementor template kit for the Midland Floor Care sales page.</p>
-<h2>Importing</h2>
-<ol>
-  <li>Zip the contents of this folder (manifest.json + templates/ + screenshots/) into <code>midland-elementor-kit.zip</code>.</li>
-  <li>WordPress admin → Elementor → Tools → Import / Export Kit → Import Template Kit.</li>
-  <li>Upload the zip and finish the import wizard.</li>
-</ol>
-<h2>Single page only?</h2>
-<p>If you just want the home page JSON, import <code>templates/home.json</code> directly via Elementor → My Templates → Import.</p>
+
+<h2>1. Import the templates</h2>
+<p><strong>Full kit (Elementor Pro):</strong> WordPress admin → Elementor → Tools → Import / Export Kit → Import Template Kit → upload <code>midland-elementor-kit.zip</code>. Brings home page + Theme Builder header + Theme Builder footer.</p>
+<p><strong>Single page only:</strong> Elementor → Templates → Saved Templates → Import → upload <code>templates/home.json</code>.</p>
+
+<h2>2. Paste the stylesheet</h2>
+<p>This kit's native Elementor widgets handle the structure; <code>midland-styles.css</code> handles the typography, gradient overlays, photo frames, and hover animations that aren't built into native widget controls.</p>
+<p><strong>Elementor Pro:</strong> Elementor → Site Settings → Custom CSS → paste contents of <code>midland-styles.css</code>.</p>
+<p><strong>Free Elementor:</strong> Appearance → Customize → Additional CSS → paste it there instead.</p>
+
+<h2>3. Hook up the form</h2>
+<p>The "Schedule a visit" section uses a shortcode placeholder: <code>[smart-forms-pro id='1']</code>. Replace the form ID with your actual Smart Forms Pro form ID, or swap the shortcode for your form plugin of choice (Contact Form 7, WPForms, Elementor Pro Forms).</p>
+
+<h2>4. Images</h2>
+<p>All template images load from <code>raw.githubusercontent.com/branderboy/midland/main/images/</code>. They render immediately on import. To host them on your own site, upload the files to your media library and replace the URLs.</p>
 </body></html>
