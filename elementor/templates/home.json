@@ -1212,6 +1212,17 @@
                   "isInner": false
                 },
                 {
+                  "id": "8a8ec5ff",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "[gravityform id=\"4\" title=\"false\" description=\"false\" ajax=\"true\"]",
+                    "align": "left"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
                   "id": "7ca7946e",
                   "elType": "widget",
                   "widgetType": "text-editor",
