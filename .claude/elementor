@@ -1,0 +1,442 @@
+ELEMENTOR TEMPLATE CONVERSION PROMPT
+You are an expert Elementor Pro template developer. Convert this HTML/CSS into a proper Elementor JSON template using the hybrid approach (native widgets + HTML widgets only for grids/flex-wrap layouts).
+WORKING REFERENCE STRUCTURE (use this exact format):
+Outer container: flex_direction: column, background_background: classic, padding in em units (5/2/5/2 desktop, 3/1.5/3/1.5 mobile)
+Inner boxed container: content_width: boxed, boxed_width: 1140px, flex_gap: 20px
+All empty image/gallery arrays required
+Widgets need: elType: widget, widgetType, isInner: false
+Inner containers need: isInner: true, elType: container
+NATIVE WIDGETS FOR:
+Eyebrow text (12px uppercase, #a73963, 2px letter-spacing)
+H2 headings (Playfair Display 32px/26px mobile, #1a1a2e)
+Intro paragraphs (17px, #555555, 1.7 line-height)
+Body paragraphs (16px, #555555, 1.8 line-height)
+HTML WIDGETS FOR:
+Flex-wrap tag grids (inline service tags)
+CSS Grid layouts (2-col audience items with gradient checkmarks)
+Any layout requiring display:flex; flex-wrap:wrap or display:grid
+SOURCE HTML/CSS TO CONVERT:
+[<div class="fora-page">
+
+<!-- FAQ Intro Section -->
+
+<section class="fora-intro-section">
+<div class="fora-container">
+<p class="fora-section-eyebrow">Support</p>
+
+<h2>Frequently Asked Questions</h2>
+<p class="fora-intro-text">Answers to common questions about FORA's practice operations services.</p>
+
+</div>
+</section><!-- FAQ Section -->
+
+<section class="fora-faq-section">
+<div class="fora-container">
+<div class="fora-faq-grid">
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">1</span>
+<h3>What does FORA do?</h3>
+</div>
+<div class="fora-faq-answer">
+
+FORA provides practice operations support for healthcare organizations—Revenue Cycle Management, Practice Management, Provider Credentialing, Multi-Location Coordination, and Strategic Consulting.
+
+</div>
+</div>
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">2</span>
+<h3>What size practices do you work with?</h3>
+</div>
+<div class="fora-faq-answer">
+
+We work with practices of all sizes across 40+ specialties. Our focus is on organizations ready to scale—typically those with multiple providers or locations.
+
+</div>
+</div>
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">3</span>
+<h3>How long does onboarding take?</h3>
+</div>
+<div class="fora-faq-answer">
+
+Typically 2-4 weeks depending on practice size. We handle the heavy lifting to make the transition seamless.
+
+</div>
+</div>
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">4</span>
+<h3>Will I have a dedicated contact?</h3>
+</div>
+<div class="fora-faq-answer">
+
+Yes. Every practice is assigned a dedicated Account Manager who knows your operations inside and out.
+
+</div>
+</div>
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">5</span>
+<h3>How does pricing work?</h3>
+</div>
+<div class="fora-faq-answer">
+
+Pricing is customized based on your needs and service scope. Contact us for a personalized quote—no obligation.
+
+</div>
+</div>
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">6</span>
+<h3>How quickly will I see results?</h3>
+</div>
+<div class="fora-faq-answer">
+
+Most practices see improvements within 30-60 days, with more significant gains by 90 days.
+
+</div>
+</div>
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">7</span>
+<h3>Do you work with my EHR system?</h3>
+</div>
+<div class="fora-faq-answer">
+
+Yes. We work with all major EHR and practice management systems including Epic, Athenahealth, eClinicalWorks, NextGen, and others.
+
+</div>
+</div>
+<div class="fora-faq-card">
+<div class="fora-faq-question">
+
+<span class="fora-faq-icon">8</span>
+<h3>Is my patient data secure?</h3>
+</div>
+<div class="fora-faq-answer">
+
+Absolutely. We maintain strict HIPAA compliance and sign a Business Associate Agreement (BAA) as part of every engagement.
+
+</div>
+</div>
+</div>
+</div>
+</section></div>
+<style>
+.fora-page {<br />
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;<br />
+    color: #1a1a2e;<br />
+    line-height: 1.6;<br />
+}</p>
+<p>.fora-intro-section,<br />
+.fora-faq-section {<br />
+    width: 100vw;<br />
+    position: relative;<br />
+    left: 50%;<br />
+    right: 50%;<br />
+    margin-left: -50vw;<br />
+    margin-right: -50vw;<br />
+}</p>
+<p>.fora-container {<br />
+    max-width: 1200px;<br />
+    margin: 0 auto;<br />
+    padding: 0 40px;<br />
+}</p>
+<p>.fora-section-eyebrow {<br />
+    font-size: 12px;<br />
+    text-transform: uppercase;<br />
+    letter-spacing: 2px;<br />
+    color: #a73963;<br />
+    margin-bottom: 15px;<br />
+    font-weight: 500;<br />
+}</p>
+<p>.fora-intro-section {<br />
+    background: #FAF8F5;<br />
+    padding: 60px 0;<br />
+}</p>
+<p>.fora-intro-section h2 {<br />
+    font-family: 'Playfair Display', Georgia, serif;<br />
+    font-size: 36px;<br />
+    font-weight: 500;<br />
+    margin-bottom: 15px;<br />
+}</p>
+<p>.fora-intro-text {<br />
+    font-size: 16px;<br />
+    color: #555;<br />
+    max-width: 600px;<br />
+}</p>
+<p>.fora-faq-section {<br />
+    padding: 60px 0;<br />
+    background: #fff;<br />
+}</p>
+<p>.fora-faq-grid {<br />
+    display: grid;<br />
+    grid-template-columns: repeat(2, 1fr);<br />
+    gap: 25px;<br />
+}</p>
+<p>@media (max-width: 768px) {<br />
+    .fora-faq-grid { grid-template-columns: 1fr; }<br />
+}</p>
+<p>.fora-faq-card {<br />
+    padding: 28px 32px;<br />
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);<br />
+    border: 1px solid rgba(167, 57, 99, 0.1);<br />
+    border-radius: 16px;<br />
+    box-shadow: 0 4px 20px rgba(167, 57, 99, 0.08);<br />
+    transition: all 0.3s ease;<br />
+}</p>
+<p>.fora-faq-card:hover {<br />
+    transform: translateY(-6px);<br />
+    box-shadow: 0 12px 35px rgba(167, 57, 99, 0.12);<br />
+    border-color: rgba(167, 57, 99, 0.15);<br />
+}</p>
+<p>.fora-faq-question {<br />
+    display: flex;<br />
+    gap: 12px;<br />
+    align-items: flex-start;<br />
+    margin-bottom: 12px;<br />
+}</p>
+<p>.fora-faq-icon {<br />
+    width: 28px;<br />
+    height: 28px;<br />
+    min-width: 28px;<br />
+    background: linear-gradient(135deg, #a73963 0%, #c44b77 100%);<br />
+    color: #fff;<br />
+    border-radius: 6px;<br />
+    display: flex;<br />
+    align-items: center;<br />
+    justify-content: center;<br />
+    font-weight: 600;<br />
+    font-size: 13px;<br />
+}</p>
+<p>.fora-faq-question h3 {<br />
+    font-size: 17px;<br />
+    font-weight: 600;<br />
+    color: #1a1a2e;<br />
+    margin: 0;<br />
+    line-height: 1.4;<br />
+}</p>
+<p>.fora-faq-answer p {<br />
+    font-size: 15px;<br />
+    color: #555;<br />
+    line-height: 1.6;<br />
+    margin: 0;<br />
+    padding-left: 40px;<br />
+}</p>
+<p>@media (max-width: 768px) {<br />
+    .fora-container {<br />
+        padding: 0 25px;<br />
+    }</p>
+<p>    .fora-intro-section {<br />
+        padding: 60px 0;<br />
+    }</p>
+<p>    .fora-intro-section h2 {<br />
+        font-size: 28px;<br />
+    }</p>
+<p>    .fora-faq-section {<br />
+        padding: 60px 0;<br />
+    }</p>
+<p>    .fora-faq-answer p {<br />
+        padding-left: 0;<br />
+    }<br />
+}<br />
+</style>
+]
+OUTPUT: Complete valid Elementor JSON with version: 0.4, type: page
+
+Elementor Kit Anatomy
+elementor-kit.zip
+├── manifest.json
+├── help.html
+├── templates/
+│   ├── global.json
+│   ├── home.json
+│   ├── about-us.json
+│   ├── services.json
+│   ├── contact-us.json
+│   ├── header.json
+│   ├── footer.json
+│   ├── archive.json
+│   ├── single-post.json
+│   ├── 404.json
+│   └── other-page.json
+└── screenshots/
+    ├── home.jpg
+    ├── about-us.jpg
+    ├── services.jpg
+    └── etc.
+What matters most
+The kit is basically:
+manifest.json
+Controls the kit name, template list, screenshots, template types, required plugins.
+templates/global.json
+Stores global colors, fonts, button styles, body styles, container widths.
+Each page JSON
+Example: home.json, services.json, about-us.json.
+Every page uses:
+{
+  "version": "0.4",
+  "title": "Home",
+  "type": "page",
+  "metadata": {},
+  "content": []
+}
+
+The content array
+This is the whole page layout.
+Elementor builds pages from nested:
+container → container → widget
+
+Widgets used
+This kit mainly uses:
+heading
+text-editor
+image
+button
+icon-list
+image-box
+call-to-action
+testimonial
+counter
+posts
+image-carousel
+rating
+So Claude does not need to invent crazy Elementor logic. It needs to generate clean Elementor JSON using containers and common widgets.
+The build model for Claude
+Use this prompt:
+You are building a ThemeForest-style Elementor Template Kit.
+
+Create a complete Elementor Template Kit structure with:
+
+1. manifest.json
+2. templates/global.json
+3. templates/home.json
+4. templates/about-us.json
+5. templates/services.json
+6. templates/contact-us.json
+7. templates/header.json
+8. templates/footer.json
+9. templates/404.json
+10. screenshots folder placeholders
+
+Use Elementor JSON format:
+- version: "0.4"
+- title
+- type
+- metadata
+- content array
+
+Use nested Elementor containers, not sections.
+Use only common Elementor widgets:
+- heading
+- text-editor
+- image
+- button
+- icon-list
+- image-box
+- counter
+- testimonial
+- call-to-action
+- posts
+- image-carousel
+
+Global style rules:
+- Create system colors
+- Create custom color palette
+- Create typography system
+- Define body, H1-H6, button, link, and container styles
+- Use CSS variables or Elementor global references where possible
+
+Each page must have:
+- Hero section
+- Trust/value section
+- Service/content section
+- CTA section
+- Responsive tablet/mobile settings
+- Clean container hierarchy
+- Placeholder image URLs
+- No broken widgets
+- No missing required Elementor keys
+
+The niche is: [INSERT NICHE]
+Brand name: [INSERT BRAND]
+Style direction: [INSERT STYLE]
+Pages needed: [INSERT PAGES]
+
+Important:
+Do not create regular HTML.
+Do not create React.
+Do not create WordPress theme files.
+Only create Elementor Template Kit JSON files that can be zipped and imported through Elementor Template Kit import.
+The smart way to build your kits
+Do not start from scratch.
+Use this ClayHive kit as your base skeleton:
+Keep:
+- manifest structure
+- global.json structure
+- container nesting style
+- widget types
+- metadata format
+- screenshot naming pattern
+
+Replace:
+- kit title
+- page names
+- colors
+- fonts
+- headings
+- text
+- images
+- service sections
+- testimonials
+- CTAs
+Claude workflow
+Step 1: Give Claude the extracted kit folder.
+Step 2: Tell it to clone the structure.
+Step 3: Tell it to create a new kit for one niche.
+Step 4: Tell it to only edit JSON content, labels, styles, images, and manifest.
+Step 5: Zip the final folder.
+Step 6: Import into Elementor Template Kit importer.
+Step 7: Fix any broken widget settings.
+Best niches for fast Elementor kits
+contractor website kit
+cleaning company kit
+med spa kit
+barber shop kit
+cannabis dispensary kit
+restaurant kit
+event promoter kit
+DJ / music artist kit
+real estate investor kit
+law firm kit
+home remodeling kit
+roofing company kit
+fitness trainer kit
+church / ministry kit
+local nonprofit kit
+The real product play
+Make each kit include:
+Home
+About
+Services
+Single Service
+Contact
+Blog Archive
+Single Post
+404
+Header
+Footer
+Landing Page
+Thank You Page
+That gives you a real sellable kit, not just a homepage.
+
