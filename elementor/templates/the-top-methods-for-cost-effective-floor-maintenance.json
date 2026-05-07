@@ -1,0 +1,481 @@
+{
+  "version": "0.4",
+  "title": "Midland \u2014 The Top Methods for Cost-Effective Floor Maintenance",
+  "type": "page",
+  "metadata": {},
+  "content": [
+    {
+      "id": "5e71780d",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero - The Top Methods for Cost-Effective Floor"
+      },
+      "elements": [
+        {
+          "id": "28ce2916",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "ad8b23c7",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Article",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "59145a87",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "The Top Methods for Cost-Effective Floor Maintenance",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "dcdd29ee",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Maintaining the floors of your establishment doesn't have to drain your budget. With the right strategies, you can keep your floors looking their best wit\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.6,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "c4343ad7",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content"
+      },
+      "elements": [
+        {
+          "id": "2d4d9e84",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "e6bf8d2d",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "Maintaining the floors of your establishment doesn't have to drain your budget. With the right strategies, you can keep your floors looking their best without overspending. This blog post explores the top methods for cost-effective floor maintenance, ensuring cleanliness and durability while keeping costs low.\n<h4>Regular Cleaning: The Foundation of Floor Care</h4>\nThe most cost-effective floor maintenance method starts with regular cleaning. Dirt and grit can act like sandpaper, wearing down the finish on your floors. By sweeping, vacuuming, and mopping regularly, you can prevent this wear and tear, extending the life of your flooring. Invest in high-quality, durable cleaning tools that will last longer and do a better job than cheaper alternatives.\n<h4>Preventative Measures: Reduce Long-Term Costs</h4>\nPreventative measures can significantly reduce maintenance costs over time. Placing high-quality mats at every entrance can minimize the amount of dirt and moisture tracked onto your floors. Encourage a shoes-off policy in residential spaces to further protect flooring. Additionally, applying felt pads to the bottoms of furniture legs can prevent scratches and gouges on hard surfaces.\n<h4>Choose the Right Cleaning Products</h4>\nUsing the wrong cleaning products can damage your floors and lead to costly repairs or replacements. Research the best products for your specific flooring type and stick to those recommendations. Often, a mild detergent and water are all that's needed for effective cleaning, which can be more cost-effective than specialized or harsh chemical cleaners. Buying cleaning supplies in bulk can also save money in the long run.\n<h4>DIY Deep Cleaning and Maintenance</h4>\nProfessional deep cleaning services can be expensive. For a more cost-effective approach, consider doing it yourself. Rent or invest in a professional-grade carpet cleaner for annual deep cleaning of carpeted areas. For hard surfaces, a steam mop can remove dirt and grime without harsh chemicals. Learn how to properly seal tile and stone floors to extend their lifespan and beauty.\n<h4>Repair Instead of Replace</h4>\nWhen floors show signs of damage, look into repair options before considering replacement. Small chips or cracks in tile can often be filled in, and hardwood floors can be sanded and refinished several times before needing to be replaced. Carpet tiles are an excellent option for commercial spaces since individual tiles can be replaced if stained or damaged, rather than replacing the entire carpet.\n<h4>Educate Your Team or Family</h4>\nWhether in a commercial setting or at home, educating your team or family about proper floor care can prevent damage and reduce maintenance costs. Simple practices, such as wiping up spills immediately, can prevent stains and damage that might require professional intervention later.\n<h4>Conclusion</h4>\nCost-effective floor maintenance is about being proactive, choosing the right products, and taking a DIY approach when possible. By implementing these top methods, you can maintain beautiful floors that stand the test of time without breaking the bank. Remember, investing a little time and effort into regular maintenance can save you a significant amount of money in the long run.\n\n<a href=\"https://midlandfloors.com/ultimate-guide-to-floor-care-for-retail/\"><span style=\"font-weight: 400;\">Ultimate Guide to Floor Care for Retail</span></a>\n\n<a href=\"https://midlandfloors.com/the-secret-to-floor-care-for-various-materials/\"><span style=\"font-weight: 400;\">The Secret to Floor Care for Various Materials</span></a>\n\n<a href=\"https://midlandfloors.com/floor-care-services/\"><span style=\"font-weight: 400;\">Services</span></a>\n\n<a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\"><span style=\"font-weight: 400;\">7 Essential Tips for Impeccable Commercial Floor Care Services</span></a>\n\n<a href=\"https://midlandfloors.com/\"><span style=\"font-weight: 400;\">Home</span></a>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "335cd89d",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA"
+      },
+      "elements": [
+        {
+          "id": "7152a438",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "f0f591c1",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 36,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "532d9c16",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and Facility Score in 48 hours.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "67193a9c",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center"
+              },
+              "elements": [
+                {
+                  "id": "6bd06575",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "c4d04062",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#FFFFFF",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}
