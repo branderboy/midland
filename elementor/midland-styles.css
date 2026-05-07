@@ -434,3 +434,5 @@ html{ scroll-behavior:smooth }
 .reveal{ opacity: 1 !important; transform: none !important; }
 /* PREVENT double scrollbar on imported HTML widgets */
 .midland-page{ overflow: visible; }
+
+.midland-page .footer-logo-white img{ filter: brightness(0) invert(1) !important; }
