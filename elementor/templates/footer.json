@@ -123,7 +123,19 @@
                           "size": "",
                           "alt": "Midland Floor Care",
                           "source": "library"
-                        }
+                        },
+                        "_css_filters_css_filter": "custom",
+                        "_css_filters_invert": {
+                          "unit": "%",
+                          "size": 100,
+                          "sizes": []
+                        },
+                        "_css_filters_brightness": {
+                          "unit": "%",
+                          "size": 1000,
+                          "sizes": []
+                        },
+                        "_css_classes": "footer-logo-white"
                       },
                       "elements": [],
                       "isInner": false
