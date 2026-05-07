@@ -1,6 +1,6 @@
 {
   "version": "0.4",
-  "title": "Home",
+  "title": "Midland \u2014 Home",
   "type": "page",
   "metadata": {},
   "content": [
@@ -828,7 +828,8 @@
         },
         "background_background": "classic",
         "background_color": "#FFFFFF",
-        "_title": "Side Job + CTA"
+        "_title": "Side Job + CTA",
+        "_element_id": "schedule"
       },
       "elements": [
         {
