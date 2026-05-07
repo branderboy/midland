@@ -27,7 +27,8 @@
         },
         "background_background": "classic",
         "background_color": "#0F1411",
-        "_title": "Top Bar"
+        "_title": "Top Bar",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -186,7 +187,8 @@
           "left": "0",
           "isLinked": false
         },
-        "border_color": "#E5EAE6"
+        "border_color": "#E5EAE6",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {

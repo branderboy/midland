@@ -27,7 +27,8 @@
         },
         "background_background": "classic",
         "background_color": "#0F1411",
-        "_title": "Footer"
+        "_title": "Footer",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {

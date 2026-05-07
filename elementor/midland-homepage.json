@@ -53,7 +53,8 @@
           "size": 90,
           "sizes": []
         },
-        "_title": "Hero"
+        "_title": "Hero",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -324,7 +325,8 @@
         },
         "background_background": "classic",
         "background_color": "#F3FCF4",
-        "_title": "Process"
+        "_title": "Process",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -792,7 +794,8 @@
         },
         "background_background": "classic",
         "background_color": "#FFFFFF",
-        "_title": "Side Job + Form"
+        "_title": "Side Job + Form",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -996,7 +999,8 @@
         },
         "background_background": "classic",
         "background_color": "#F3FCF4",
-        "_title": "About"
+        "_title": "About",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -1232,7 +1236,8 @@
         },
         "background_background": "classic",
         "background_color": "#FFFFFF",
-        "_title": "Residential Services"
+        "_title": "Residential Services",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -1618,7 +1623,8 @@
         },
         "background_background": "classic",
         "background_color": "#0E2F14",
-        "_title": "Stats Band"
+        "_title": "Stats Band",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -1810,7 +1816,8 @@
         },
         "background_background": "classic",
         "background_color": "#FFFFFF",
-        "_title": "Commercial Services"
+        "_title": "Commercial Services",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -2196,7 +2203,8 @@
         },
         "background_background": "classic",
         "background_color": "#0E2F14",
-        "_title": "Testimonials"
+        "_title": "Testimonials",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
@@ -2644,7 +2652,8 @@
         },
         "background_background": "classic",
         "background_color": "#F3FCF4",
-        "_title": "FAQ"
+        "_title": "FAQ",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
