@@ -1,0 +1,530 @@
+{
+  "version": "0.4",
+  "title": "About Midland",
+  "type": "page",
+  "metadata": {
+    "_seo_title": "About Midland | Midland Floor Care DC, MD & VA",
+    "_seo_description": "About Midland Floor Care Our Mission To help our clients create safe, clean, and lasting environments by providing exceptional floor care services, and to\u2026",
+    "_canonical_url": "https://midlandfloors.com/about/"
+  },
+  "content": [
+    {
+      "id": "c6173acd",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "_title": "SEO Schema",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "524fa2bd",
+          "elType": "widget",
+          "widgetType": "html",
+          "settings": {
+            "html": "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": \"ProfessionalService\",\n      \"@id\": \"https://midlandfloors.com/#business\",\n      \"name\": \"Midland Floor Care\",\n      \"url\": \"https://midlandfloors.com\",\n      \"telephone\": \"+1-240-532-9097\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ],\n      \"address\": {\n        \"@type\": \"PostalAddress\",\n        \"addressRegion\": \"VA\",\n        \"addressCountry\": \"US\"\n      },\n      \"sameAs\": [\n        \"https://www.facebook.com/midlandfloorcare\",\n        \"https://www.instagram.com/midlandfloorcare\",\n        \"https://www.linkedin.com/company/midland-floor-care\"\n      ]\n    },\n    {\n      \"@type\": \"WebPage\",\n      \"name\": \"About Midland\",\n      \"description\": \"About Midland Floor Care Our Mission To help our clients create safe, clean, and lasting environments by providing exceptional floor care services, and to\\u2026\",\n      \"url\": \"https://midlandfloors.com/about\",\n      \"isPartOf\": {\n        \"@id\": \"https://midlandfloors.com/#business\"\n      }\n    },\n    {\n      \"@type\": \"BreadcrumbList\",\n      \"itemListElement\": [\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 1,\n          \"name\": \"Home\",\n          \"item\": \"https://midlandfloors.com\"\n        },\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 2,\n          \"name\": \"About Midland\",\n          \"item\": \"https://midlandfloors.com/about\"\n        }\n      ]\n    }\n  ]\n}\n</script>"
+          },
+          "elements": [],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "302bac81",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero \u2014 About Midland",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "6a19416b",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "5d884da4",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Page",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "eee164b0",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "About Midland",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 56,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "c1be2240",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>About Midland Floor Care Our Mission To help our clients create safe, clean, and lasting environments by providing exceptional floor care services, and to\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.65,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "06de1f65",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "ae05d5b9",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "46cbf30c",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<h1 style=\"text-align: center;\">About Midland Floor Care</h1>\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<img width=\"2560\" height=\"2560\" src=\"https://midlandfloors.com/wp-content/uploads/2024/01/IMG_6257-scaled.jpeg\" alt=\"Commercial Floor Care Service\" srcset=\"https://midlandfloors.com/wp-content/uploads/2024/01/IMG_6257-scaled.jpeg 2560w, https://midlandfloors.com/wp-content/uploads/2024/01/IMG_6257-300x300.jpeg 300w, https://midlandfloors.com/wp-content/uploads/2024/01/IMG_6257-100x100.jpeg 100w, https://midlandfloors.com/wp-content/uploads/2024/01/IMG_6257-600x600.jpeg 600w\" sizes=\"(max-width: 2560px) 100vw, 2560px\" />\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t<h4><strong>Our Mission</strong></h4><p>To help our clients create safe, clean, and lasting environments by providing exceptional floor care services, and to build a great company that attracts, develops, excites, and retains exceptional people.</p><h4>Our Values:</h4><p>Deliver Excellence</p><ul><li>Always provide the highest quality floor care and restoration</li><li>Maintain professionalism and attention to detail in every project</li><li>Manage time and resources responsibly</li></ul><h4>Build Trust</h4><ul><li>Operate with honesty, transparency, and respect</li><li>Protect client confidentiality</li><li>Foster long-term relationships based on reliability and integrity</li></ul><h4>Drive Innovation</h4><ul><li>Use modern techniques and eco-friendly solutions</li><li>Seek continuous improvement in our services and processes</li><li>Stay ahead of industry trends to deliver the best outcomes</li></ul><h4>Empower People</h4><ul><li>Invest in training and development of our team</li><li>Support a culture of collaboration and accountability</li><li>Encourage leadership, growth, and career advancement</li></ul>\t\t\n\t\t<h2>Midland Floors Today</h2><p>Today, Midland Floor Care stands as a testament to the power of a dream, the strength of dedication, and the impact of genuine care. As a proud<a href=\"https://pgcocmd.chambermaster.com/list/member/midland-floor-care-llc-2875\"> local member of the Maryland Chamber of Commerce</a>, we\u2019re deeply committed to supporting our community and local businesses. While we don't offer 24/7 support, our commitment to green cleaning and our reputation as an industry leader in practical interim maintenance solutions remain steadfast. We continue to serve the Mid-Atlantic region with pride and excellence, ensuring that each service we provide is a guarantee to great service.</p><p>As we look to the future, our mission remains the same \u2013 to provide reliable, efficient, and affordable Retail &amp; Office Floor Cleaning that don't just clean spaces but transform them. We invite you to join us on this journey, to experience the Midland Floor Care difference, and to see for yourself how we turn every floor into a story of cleanliness and care.</p><p><a href=\"https://midlandfloors.com/\">Home</a></p><p><a href=\"https://midlandfloors.com/floor-care-services/\">Services</a></p><p><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule a Visit</a></p><p><a href=\"https://midlandfloors.com/clients-we-serve/\">Clients We Serve</a></p><a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\" target=\"_blank\" rel=\"noopener\">7 Essential Tips for Impeccable Commercial Floor Care Services</a><div style=\"background:#F3FCF4;border-left:4px solid #43A94B;padding:18px 22px;margin-top:24px;border-radius:6px\"><p style=\"margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#0F1411\">Related Services</p><ul style=\"margin:0;padding-left:18px;line-height:1.9\"><li><a href=\"/long-term-recurring-commercial-floor-care-programs/\" style=\"color:#2F8137;font-weight:700\">Long-Term & Recurring Commercial Floor Care Services</a></li><li><a href=\"/customized-commercial-floor-care-solutions/\" style=\"color:#2F8137;font-weight:700\">Customized Commercial Floor Care Solutions</a></li><li><a href=\"/janitorial-housekeeping-facility-services/\" style=\"color:#2F8137;font-weight:700\">Janitorial & Housekeeping Facility Services</a></li><li><a href=\"/commercial-upholstery/\" style=\"color:#2F8137;font-weight:700\">Commercial Upholstery</a></li><li><a href=\"/commercial-tile-grout-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Tile & Grout Cleaning</a></li><li><a href=\"/commercial-carpet-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Carpet Cleaning Services</a></li></ul></div>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "21f092a3",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "0964260e",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "00d54b4b",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "f740f73b",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and written Facility Score in 48 hours. Yours to keep, even if you don't hire us.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "7e3ffab4",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center",
+                "_css_classes": "midland-page"
+              },
+              "elements": [
+                {
+                  "id": "6d78bc9b",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "\ud83d\udcde (240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#0E2F14",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#FFFFFF",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "6f86882c",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#43A94B",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}

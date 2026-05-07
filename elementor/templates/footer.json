@@ -5,18 +5,11 @@
   "metadata": {},
   "content": [
     {
-      "id": "cdd83700",
+      "id": "87a83eb3",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
-        "flex_gap": {
-          "column": "20",
-          "row": "20",
-          "isLinked": true,
-          "unit": "px",
-          "size": 20
-        },
         "padding": {
           "unit": "px",
           "top": "0",
@@ -25,599 +18,64 @@
           "left": "0",
           "isLinked": true
         },
-        "background_background": "classic",
-        "background_color": "#0F1411",
+        "flex_gap": {
+          "column": "0",
+          "row": "0",
+          "isLinked": true,
+          "unit": "px",
+          "size": 0
+        },
+        "_title": "Global CSS",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "692e972f",
+          "elType": "widget",
+          "widgetType": "html",
+          "settings": {
+            "html": "<style>\n\n/* ================================================================\n   MIDLAND FLOOR CARE \u2014 Homepage v=20260507-7\n   Match live site block order. Polish + tighten sales.\n   ================================================================ */\n\n:root{\n  --white: #FFFFFF;\n  --mint:  #F3FCF4;\n  --mint-2:#E6F7E8;\n  --ink:   #0F1411;\n  --ink-2: #4B5563;\n  --line:  #E5EAE6;\n  --green: #43A94B;\n  --green-deep: #2F8137;\n  --green-dark: #0E2F14;\n  --gold:  #FACC15;\n  --red:   #DC2525;\n  --sans: \"Manrope\", system-ui, -apple-system, \"Segoe UI\", sans-serif;\n}\n\n*,*::before,*::after{ box-sizing:border-box }\nhtml{ scroll-behavior:smooth }\nbody{\n  margin:0;\n  font-family: var(--sans);\n  font-size: 19px;\n  font-weight: 500;\n  line-height: 1.65;\n  color: var(--ink);\n  background: var(--white);\n  -webkit-font-smoothing: antialiased;\n}\nimg{ max-width:100%; display:block; height:auto }\na{ color:inherit; text-decoration:none }\nbutton{ font-family:inherit; cursor:pointer }\ninput, select, textarea{ font-family: inherit; font-size: 16px; }\n\nh1, h2, h3, h4 { font-family: var(--sans); font-weight: 800; color: var(--ink); margin:0; letter-spacing:-.02em; line-height: 1.1; text-transform: capitalize; }\nh1 { font-size: clamp(48px, 6.4vw, 84px); line-height: 1.04; }\nh2 { font-size: clamp(36px, 4.2vw, 56px); }\nh3 { font-size: 28px; }\nh4 { font-size: 22px; }\np { margin: 0; }\n.lede { font-size: 21px; line-height: 1.65; color: var(--ink-2); font-weight: 500; }\np { font-weight: 500; }\nli { font-weight: 500; }\n.eyebrow{ display:inline-block; font-size: 13px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--green-deep); }\n\n.wrap{ max-width: 1200px; margin: 0 auto; padding: 0 24px; }\n.wrap-narrow{ max-width: 920px; margin: 0 auto; padding: 0 24px; }\nsection{ padding: 48px 0; background: var(--white); }\nsection.mint{ background: var(--mint); }\n@media (max-width: 720px){ section{ padding: 44px 0; } .wrap, .wrap-narrow{ padding: 0 18px; } }\n\n/* ---------- BTN ---------- */\n.btn{\n  display:inline-flex; align-items:center; justify-content: center; gap: 12px;\n  font-weight: 800; font-size: 17px;\n  padding: 20px 32px; border: 2px solid var(--green);\n  background: var(--green); color: #FFF;\n  border-radius: 4px;\n  text-transform: uppercase; letter-spacing: .04em;\n  transition: transform .12s ease, background .15s ease, box-shadow .15s ease;\n  line-height: 1; text-align: center;\n}\n.btn:hover{ background: var(--green-deep); border-color: var(--green-deep); transform: translateY(-1px); }\n.btn--ghost{ background: transparent; color: #FFF; border-color: #FFF; }\n.btn--ghost:hover{ background: #FFF; color: var(--ink); border-color: #FFF; }\n.btn--ink{ background: var(--ink); border-color: var(--ink); color: #FFF; }\n.btn--ink:hover{ background: #000; border-color: #000; }\n.btn--lg{ padding: 22px 38px; font-size: 18px; }\n.btn--xl{ padding: 26px 46px; font-size: 20px; }\n.btn--block{ width: 100%; }\n\n/* ---------- TOPBAR ---------- */\n.topbar{\n  background: var(--ink); color: #E5EAE6;\n  font-size: 12px; font-weight: 500;\n}\n.topbar .inner{\n  display:flex; justify-content:space-between; align-items:center;\n  padding: 8px 24px; gap: 16px; flex-wrap: wrap;\n  max-width: 1200px; margin: 0 auto;\n}\n.topbar .pill{\n  display:inline-flex; align-items:center; gap:8px;\n  padding: 3px 10px; background: rgba(67,169,75,.18); color: #B7E5BD;\n  border-radius: 999px; font-weight: 700; font-size: 11px;\n  text-transform: uppercase; letter-spacing: .06em;\n}\n.topbar .pill::before{ content:\"\"; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.6s infinite; }\n@keyframes pulse{ 0%{ box-shadow: 0 0 0 0 rgba(67,169,75,.6) } 70%{ box-shadow: 0 0 0 8px rgba(67,169,75,0) } 100%{ box-shadow: 0 0 0 0 rgba(67,169,75,0) } }\n.topbar a{ color:#FFF; font-weight: 700; }\n\n/* ---------- NAV ---------- */\nheader.nav{\n  position: sticky; top: 0; z-index: 50;\n  background: rgba(255,255,255,.97); backdrop-filter: saturate(140%) blur(8px);\n  border-bottom: 1px solid var(--line);\n}\nheader.nav .inner{\n  display:flex; align-items:center; justify-content: space-between;\n  max-width: 1200px; margin: 0 auto; padding: 12px 24px;\n}\n.logo img{ height: 60px; width: auto; display:block; }\nnav.primary ul{ list-style: none; padding:0; margin:0; display:flex; gap: 24px; }\nnav.primary a{\n  font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;\n  color: var(--ink);\n}\nnav.primary a:hover{ color: var(--green-deep); }\n.nav-cta{ display:flex; gap: 12px; align-items:center; }\n.nav-cta .phone{ font-weight: 800; font-size: 15px; color: var(--ink); }\n@media (max-width: 900px){ nav.primary{ display:none } }\n@media (max-width: 540px){ .nav-cta .phone{ display:none } }\n\n/* ============== HERO \u2014 full-bleed photo with dark overlay ============== */\n.hero{\n  position: relative;\n  background: var(--ink);\n  color: #FFF;\n  overflow: hidden;\n  min-height: 580px;\n  display: flex; align-items: center;\n  padding: 80px 0;\n}\n.hero .bg{\n  position: absolute; inset: 0; z-index: 0;\n  background-image:\n    linear-gradient(90deg, rgba(15,20,17,.94) 0%, rgba(15,20,17,.82) 40%, rgba(15,20,17,.45) 70%, rgba(15,20,17,.25) 100%),\n    url('https://raw.githubusercontent.com/branderboy/midland/main/images/Midland%20Floors%20Hero%20image.jpg');\n  background-size: cover; background-position: center right;\n}\n.hero .wrap{\n  position: relative; z-index: 1;\n  max-width: none; margin: 0;\n  padding: 0 32px 0 64px;\n}\n.hero .wrap > * { max-width: 680px; }\n@media (max-width: 720px){ .hero .wrap{ padding: 0 20px; } }\n.hero .chip-row{\n  display:flex; gap: 0; flex-wrap: wrap;\n  font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;\n  color: var(--green); margin-bottom: 24px;\n}\n.hero .chip-row span{ position: relative; padding-right: 14px; margin-right: 14px; }\n.hero .chip-row span:not(:last-child)::after{ content:\"\u00b7\"; position: absolute; right: 0; color: rgba(255,255,255,.4); }\n.hero h1{ color: #FFF; max-width: 14ch; font-weight: 800; }\n.hero p.sub{\n  margin-top: 22px; font-size: 22px; line-height: 1.55;\n  color: #D5DAD7; max-width: 56ch; font-weight: 500;\n}\n.hero p.sub b{ color: #FFF; font-weight: 800; }\n.hero p.sub .urgent{ color: var(--green); font-weight: 800; }\n.hero .ctas{ margin-top: 28px; display:flex; gap: 12px; flex-wrap: wrap; align-items: center; }\n.hero .ctas .secondary{ font-size: 14px; font-weight: 600; color: #B7BCB8; }\n.hero .ctas .secondary u{ color: #FFF; }\n.hero .reviews{\n  margin-top: 28px; display:flex; gap: 18px; align-items: center; flex-wrap: wrap;\n  font-size: 13px; color: #B7BCB8;\n}\n.hero .reviews .stars{ color: var(--gold); letter-spacing: .12em; font-size: 16px; }\n.hero .reviews b{ color: #FFF; font-weight: 800; }\n\n@media (max-width: 720px){\n  .hero{ min-height: 0; padding: 56px 0 48px; }\n  .hero .bg{ background-position: center; }\n}\n\n/* ============== SECTION HEADER (centered like live site) ============== */\n.sect-head{ text-align: center; max-width: 720px; margin: 0 auto 24px; }\n.sect-head h2{ margin-top: 10px; }\n.sect-head p{ margin-top: 10px; }\n\n/* ============== PROCESS (mint, 4 BIG animated circles) ============== */\n.process-row{\n  display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;\n  position: relative; margin-top: 32px;\n}\n.process-step{\n  text-align: center; position: relative;\n  padding: 0 8px;\n  background: transparent;\n  border: 0;\n  cursor: pointer;\n  transition: transform .35s cubic-bezier(.2,.8,.2,1);\n}\n.process-step:hover{\n  transform: translateY(-10px);\n}\n.process-step .circle-wrap{\n  position: relative; width: 140px; height: 140px; margin: 0 auto 22px;\n  z-index: 1;\n}\n.process-step .circle{\n  width: 100%; height: 100%; border-radius: 50%;\n  background: var(--white); border: 2px solid var(--green);\n  display: grid; place-items: center;\n  font-weight: 800; font-size: 14px; letter-spacing: .16em;\n  color: var(--green-deep); text-transform: uppercase;\n  box-shadow: 0 8px 20px -8px rgba(67,169,75,.25);\n  transition: transform .4s cubic-bezier(.2,.8,.2,1), background .25s ease, color .25s ease, box-shadow .35s ease;\n}\n.process-step:hover .circle{\n  background: var(--green); color: #FFF;\n  transform: scale(1.08) rotate(-4deg);\n  box-shadow: 0 16px 32px -8px rgba(67,169,75,.55);\n}\n.process-step .badge{\n  position: absolute; top: -4px; right: -4px;\n  width: 40px; height: 40px; background: var(--green); color: #FFF;\n  border-radius: 50%; display:grid; place-items:center;\n  font-size: 15px; font-weight: 800;\n  box-shadow: 0 6px 12px -2px rgba(67,169,75,.5);\n  border: 3px solid var(--white);\n  transition: transform .35s cubic-bezier(.2,.8,.2,1), background .25s ease;\n}\n.process-step:hover .badge{\n  transform: scale(1.15) rotate(8deg);\n  background: var(--ink);\n}\n.process-step h4{ font-size: 21px; margin-bottom: 8px; font-weight: 800; }\n.process-step p{ color: var(--ink-2); font-size: 16px; line-height: 1.55; max-width: 28ch; margin: 0 auto; }\n/* connecting dotted line between cards */\n.process-row::before{\n  content:\"\"; position: absolute; top: 130px; left: 14%; right: 14%; height: 2px;\n  background-image: linear-gradient(to right, var(--green) 50%, transparent 50%);\n  background-size: 12px 2px; background-repeat: repeat-x;\n  z-index: 0; opacity: .35;\n}\n@media (max-width: 800px){\n  .process-row{ grid-template-columns: repeat(2, 1fr); gap: 18px; }\n  .process-row::before{ display: none; }\n  .process-step{ padding: 24px 14px; }\n  .process-step .circle-wrap{ width: 120px; height: 120px; }\n}\n\n/* ============== FLOORS AREN'T A SIDE JOB + FORM ============== */\n.side-job{\n  display:grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start;\n}\n.side-job .left h2{ font-size: clamp(28px, 3.6vw, 42px); }\n.side-job .team-photo{\n  margin-top: 20px; border-radius: 4px; overflow: hidden;\n  border: 1px solid var(--line);\n}\n.side-job .team-photo img{ aspect-ratio: 5/4; object-fit: cover; width: 100%; }\n.side-job .badges{\n  display:flex; gap: 14px; flex-wrap: wrap; margin-top: 14px;\n  font-size: 12px; color: var(--ink-2); font-weight: 700;\n}\n.side-job .badges span{ display:inline-flex; align-items:center; gap: 6px; }\n.side-job .badges span::before{\n  content:\"\u2713\"; width: 18px; height: 18px; background: var(--mint);\n  color: var(--green-deep); display:grid; place-items:center; border-radius: 50%; font-weight: 800; font-size: 10px;\n}\n\n/* form \u2014 match live site exactly: simple, single column */\n.form-card{\n  background: var(--white); border: 1px solid var(--line); border-radius: 4px;\n  padding: 28px;\n}\n.form-card h3{ font-size: 26px; margin-bottom: 4px; font-weight: 800; }\n.form-card .sub{ font-size: 13px; color: var(--ink-2); margin-bottom: 18px; }\n.form-card label{ display:block; font-size: 12px; font-weight: 800; color: var(--ink); margin-bottom: 6px; letter-spacing: .04em; text-transform: uppercase; }\n.form-card .row{ margin-bottom: 14px; }\n.form-card input, .form-card select{\n  width: 100%; padding: 11px 14px;\n  border: 1.5px solid var(--line); border-radius: 4px;\n  background: var(--white); color: var(--ink);\n  transition: border-color .15s ease, box-shadow .15s ease;\n}\n.form-card input:focus, .form-card select:focus{\n  outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(67,169,75,.15);\n}\n.form-card .radios{ display:flex; flex-direction:column; gap: 8px; margin-top: 4px; }\n.form-card .radios label{ display:flex; align-items:center; gap: 10px; font-size: 14px; font-weight: 500; text-transform: none; letter-spacing: 0; cursor: pointer; }\n.form-card .radios input{ width: auto; margin: 0; accent-color: var(--green); }\n.form-card .help{ margin-top: 10px; font-size: 12px; color: var(--ink-2); line-height: 1.5; }\n.form-card .alt{\n  margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line);\n  text-align:center; font-size: 13px; color: var(--ink-2);\n}\n.form-card .alt a{ font-weight: 800; color: var(--ink); display:block; margin-top: 4px; font-size: 22px; }\n@media (max-width: 800px){ .side-job{ grid-template-columns: 1fr; gap: 32px; } }\n\n/* ============== ABOUT STRIP ============== */\n.about-strip{ text-align:center; max-width: 760px; margin: 0 auto; }\n\n/* ============== SERVICES (residential / commercial \u2014 photo + bullets) ============== */\n.svc-block{ display:grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: stretch; margin-top: 20px; }\n.svc-block > div:not(.photo){ display:flex; flex-direction: column; justify-content: center; }\n.svc-block p.lede{ font-size: 17px; line-height: 1.6; color: var(--ink-2); }\n.svc-block .btn{\n  padding: 12px 20px; font-size: 13px;\n  background: #FFFFFF; color: var(--green-deep);\n  border-color: var(--green);\n  align-self: flex-start;\n}\n.svc-block .btn:hover{\n  background: var(--green); color: #FFFFFF; border-color: var(--green);\n}\n.svc-block .photo{\n  position: relative;\n  border-radius: 16px;\n  overflow: hidden;\n  background: var(--white);\n  box-shadow:\n    0 24px 48px -16px rgba(15,20,17,.18),\n    0 8px 16px -8px rgba(67,169,75,.22),\n    0 0 0 1px var(--line);\n  display:flex;\n  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;\n}\n.svc-block .photo:hover{\n  transform: translateY(-4px);\n  box-shadow:\n    0 32px 56px -16px rgba(15,20,17,.22),\n    0 12px 24px -8px rgba(67,169,75,.32),\n    0 0 0 1px var(--green);\n}\n.svc-block .photo img{\n  width:100%; height: 100%; min-height: 320px; object-fit: cover;\n  display: block;\n}\n/* Brand corner mark \u2014 small green clover-leaf accent in top-left */\n.svc-block .photo::before{\n  content: \"\";\n  position: absolute; top: 14px; left: 14px;\n  width: 14px; height: 14px;\n  background: var(--green);\n  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);\n  z-index: 2;\n  box-shadow: 0 2px 6px rgba(67,169,75,.4);\n}\n.svc-block ul{ list-style: none; padding: 0; margin: 0 0 18px; display:grid; gap: 8px; }\n.svc-block li{\n  display:flex; gap: 10px; align-items: flex-start;\n  font-size: 16px; font-weight: 700; color: var(--ink);\n}\n.svc-block li::before{\n  content:\"\u2192\"; color: var(--green); font-weight: 800;\n  flex-shrink: 0; font-size: 18px; line-height: 1.4;\n}\n.svc-pull{\n  font-style: italic; font-size: 15px; color: var(--ink-2);\n  border-left: 3px solid var(--green); padding-left: 14px;\n  margin-top: 12px; max-width: 50ch;\n}\n.svc-pull cite{ display:block; font-style: normal; font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 6px; }\n@media (max-width: 800px){ .svc-block{ grid-template-columns: 1fr; gap: 24px; } }\n\n/* ============== STATS BAND (green) ============== */\n.stats-band{\n  position: relative;\n  background: var(--green-dark);\n  color: #FFF;\n  padding: 36px 0;\n}\n.stats-band .inner{\n  display:flex; justify-content: space-between; align-items: center;\n  gap: 32px; flex-wrap: wrap;\n}\n.stats-band h3{ color: #FFF; font-size: clamp(22px, 2.8vw, 32px); margin: 0; max-width: 28ch; line-height: 1.2; }\n.stats-band h3 .accent{ color: var(--green); }\n.stats-band a.btn{ flex-shrink: 0; }\n.stats-band .meta{ font-size: 11px; color: var(--green); font-weight: 800; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 8px; }\n\n/* ============== TESTIMONIALS (dark photo overlay) ============== */\n.testi{\n  background: var(--green-dark);\n  color: #FFF;\n}\n.testi h2{ color: #FFF; }\n.testi .sect-head p{ color: #B7BCB8; }\n.testi-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }\n.testi-card{\n  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12);\n  border-radius: 4px; padding: 22px;\n  display:flex; flex-direction:column; gap: 14px;\n  backdrop-filter: blur(4px);\n}\n.testi-card .stars{ color: var(--gold); letter-spacing: .12em; font-size: 16px; }\n.testi-card blockquote{ margin: 0; font-size: 15px; line-height: 1.6; color: #FFF; font-weight: 500; }\n.testi-card .who{ display:flex; gap: 12px; align-items: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.14); }\n.testi-card .who .av{ width: 36px; height: 36px; border-radius: 50%; background: var(--green); color: #FFF; display: grid; place-items: center; font-weight: 800; flex-shrink: 0; font-size: 13px; }\n.testi-card .who b{ display:block; font-size: 14px; color: #FFF; }\n.testi-card .who span{ font-size: 11px; color: #B7BCB8; letter-spacing: .04em; }\n@media (max-width: 800px){ .testi-grid{ grid-template-columns: 1fr; } }\n\n/* ============== FOOTER \u2014 single dark band, 4 columns ============== */\nfooter{ padding: 56px 0 24px; background: var(--ink); color: #B7BCB8; }\nfooter .grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }\nfooter h5{ font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--green); margin: 0 0 14px; }\nfooter .footer-logo{ display:inline-block; margin: 0 0 16px; }\nfooter .footer-logo img{ height: 64px; width: auto; display: block; filter: brightness(0) invert(1); }\nfooter p.brand-line{ color: #B7BCB8; font-size: 15px; line-height: 1.6; max-width: 36ch; margin: 0; }\nfooter ul{ list-style: none; padding: 0; margin: 0; }\nfooter li{ padding: 4px 0; font-size: 15px; }\nfooter a:hover{ color: var(--green); }\nfooter .socials{ display:flex; gap: 8px; margin-top: 14px; }\nfooter .socials a{\n  width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.08);\n  display:grid; place-items:center; color: #FFF; font-weight: 800; font-size: 13px;\n  transition: background .15s ease;\n}\nfooter .socials a:hover{ background: var(--green); }\nfooter .meta{\n  font-size: 12px; color: #6B7280;\n  padding-top: 24px; margin-top: 28px;\n  border-top: 1px solid #1F2A22;\n  display:flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;\n}\n@media (max-width: 800px){ footer .grid{ grid-template-columns: 1fr 1fr; } }\n@media (max-width: 500px){ footer .grid{ grid-template-columns: 1fr; } }\n\n/* helpers */\n.center{ text-align:center }\n.mt-12{ margin-top:12px } .mt-18{ margin-top:18px } .mt-24{ margin-top:24px } .mt-32{ margin-top:32px }\n\n.reveal{ opacity: 0; transform: translateY(8px); transition: opacity .45s ease, transform .45s ease; }\n.reveal.in{ opacity: 1; transform: none; }\n@media (prefers-reduced-motion: reduce){ .reveal{ opacity:1; transform:none; transition:none; } }\n\n</style>"
+          },
+          "elements": [],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "b68b49c9",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "flex_gap": {
+          "column": "0",
+          "row": "0",
+          "isLinked": true,
+          "unit": "px",
+          "size": 0
+        },
         "_title": "Footer",
         "_css_classes": "midland-page"
       },
       "elements": [
         {
-          "id": "83fa5b50",
-          "elType": "container",
+          "id": "ede3d6fe",
+          "elType": "widget",
+          "widgetType": "html",
           "settings": {
-            "flex_direction": "column",
-            "content_width": "boxed",
-            "flex_gap": {
-              "column": "24",
-              "row": "24",
-              "isLinked": true,
-              "unit": "px",
-              "size": 24
-            },
-            "boxed_width": {
-              "unit": "px",
-              "size": 1140,
-              "sizes": []
-            },
-            "padding": {
-              "unit": "em",
-              "top": "3",
-              "right": "1.5",
-              "bottom": "3",
-              "left": "1.5",
-              "isLinked": false
-            }
+            "html": "<footer id=\"footer\">\n  <div class=\"wrap\">\n    <div class=\"grid\">\n      <div>\n        <a href=\"/\" class=\"footer-logo\" aria-label=\"Midland Floor Care home\">\n          <img src=\"https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png\" alt=\"Midland Floor Care\">\n        </a>\n        <p class=\"brand-line\">\n          We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.\n        </p>\n        <div class=\"socials\">\n          <a href=\"#\" aria-label=\"Instagram\">IG</a>\n          <a href=\"#\" aria-label=\"Facebook\">FB</a>\n          <a href=\"#\" aria-label=\"LinkedIn\">LI</a>\n          <a href=\"#\" aria-label=\"Google Business Profile\">G</a>\n        </div>\n      </div>\n      <div>\n        <h5>About</h5>\n        <ul>\n          <li><a href=\"#about\">About Midland</a></li>\n          <li><a href=\"#services\">Services</a></li>\n          <li><a href=\"#schedule\">Schedule a Visit</a></li>\n          <li><a href=\"#\">Blog</a></li>\n        </ul>\n      </div>\n      <div>\n        <h5>Services</h5>\n        <ul>\n          <li><a href=\"#\">Carpet Cleaning</a></li>\n          <li><a href=\"#\">Tile &amp; Grout</a></li>\n          <li><a href=\"#\">Hardwood Refinishing</a></li>\n          <li><a href=\"#\">Concrete Polishing</a></li>\n          <li><a href=\"#\">Janitorial</a></li>\n        </ul>\n      </div>\n      <div>\n        <h5>Reach Us</h5>\n        <ul>\n          <li><a href=\"tel:2405329097\">(240) 532-9097</a></li>\n          <li><a href=\"#schedule\">Free Quote</a></li>\n          <li><a href=\"#faq\">FAQ</a></li>\n          <li><a href=\"#testimonials\">Clients</a></li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"meta\">\n      <span>\u00a9 2026 Midland Floor Care | Serving DC, MD, VA</span>\n      <span>Terms and Conditions | Privacy Policy</span>\n    </div>\n  </div>\n</footer>"
           },
-          "elements": [
-            {
-              "id": "2fe7e6c7",
-              "elType": "container",
-              "settings": {
-                "flex_direction": "row",
-                "content_width": "full",
-                "flex_gap": {
-                  "column": "32",
-                  "row": "32",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 32
-                },
-                "padding": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "0",
-                  "left": "0",
-                  "isLinked": true
-                },
-                "flex_align_items": "flex-start"
-              },
-              "elements": [
-                {
-                  "id": "570a9c13",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "14",
-                      "row": "14",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 14
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "0",
-                      "left": "0",
-                      "isLinked": true
-                    },
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 33,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [
-                    {
-                      "id": "765db0ca",
-                      "elType": "widget",
-                      "widgetType": "image",
-                      "settings": {
-                        "image": {
-                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png",
-                          "id": "",
-                          "size": "",
-                          "alt": "Midland Floor Care",
-                          "source": "library"
-                        },
-                        "width": {
-                          "unit": "px",
-                          "size": 140,
-                          "sizes": []
-                        },
-                        "_element_width": "initial",
-                        "_css_classes": "footer-logo-invert"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "ae32965a",
-                      "elType": "widget",
-                      "widgetType": "text-editor",
-                      "settings": {
-                        "editor": "<p style=\"color:#B7BCB8;font-size:15px;line-height:1.6;max-width:36ch;margin:0\">We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.</p>",
-                        "align": "left"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "3cd33e9c",
-                      "elType": "widget",
-                      "widgetType": "icon-list",
-                      "settings": {
-                        "icon_list": [
-                          {
-                            "text": "Instagram",
-                            "selected_icon": {
-                              "value": "fas fa-circle",
-                              "library": "fa-solid"
-                            },
-                            "_id": "42ab4c7a",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Facebook",
-                            "selected_icon": {
-                              "value": "fas fa-circle",
-                              "library": "fa-solid"
-                            },
-                            "_id": "fab704cc",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "LinkedIn",
-                            "selected_icon": {
-                              "value": "fas fa-circle",
-                              "library": "fa-solid"
-                            },
-                            "_id": "3cca44c0",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Google",
-                            "selected_icon": {
-                              "value": "fas fa-circle",
-                              "library": "fa-solid"
-                            },
-                            "_id": "32b425aa",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          }
-                        ],
-                        "icon_color": "#43A94B",
-                        "icon_size": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        },
-                        "space_between": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        },
-                        "view": "inline",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "700",
-                        "text_color": "#B7BCB8",
-                        "space_inline": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        }
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                },
-                {
-                  "id": "e6afabf9",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "10",
-                      "row": "10",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 10
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "0",
-                      "left": "0",
-                      "isLinked": true
-                    },
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 22,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [
-                    null,
-                    {
-                      "id": "2f389d64",
-                      "elType": "widget",
-                      "widgetType": "icon-list",
-                      "settings": {
-                        "icon_list": [
-                          {
-                            "text": "About Midland",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "3abe78e7",
-                            "link": {
-                              "url": "#about",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Services",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "b7417878",
-                            "link": {
-                              "url": "#services",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Schedule a Visit",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "d4ecc33b",
-                            "link": {
-                              "url": "#schedule",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Blog",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "ff981086",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          }
-                        ],
-                        "icon_color": "#43A94B",
-                        "icon_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "space_between": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        },
-                        "view": "traditional",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 15,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "400",
-                        "text_color": "#B7BCB8"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                },
-                {
-                  "id": "2783b68e",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "10",
-                      "row": "10",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 10
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "0",
-                      "left": "0",
-                      "isLinked": true
-                    },
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 22,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [
-                    null,
-                    {
-                      "id": "a6d13463",
-                      "elType": "widget",
-                      "widgetType": "icon-list",
-                      "settings": {
-                        "icon_list": [
-                          {
-                            "text": "Carpet Cleaning",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "33f9fd0b",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Tile & Grout",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "5c67fcd0",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Hardwood Refinishing",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "b83994b2",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Concrete Polishing",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "f724a592",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Janitorial",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "c2287e0a",
-                            "link": {
-                              "url": "#",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          }
-                        ],
-                        "icon_color": "#43A94B",
-                        "icon_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "space_between": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        },
-                        "view": "traditional",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 15,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "400",
-                        "text_color": "#B7BCB8"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                },
-                {
-                  "id": "02f31681",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "10",
-                      "row": "10",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 10
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "0",
-                      "left": "0",
-                      "isLinked": true
-                    },
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 22,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [
-                    null,
-                    {
-                      "id": "dab1f736",
-                      "elType": "widget",
-                      "widgetType": "icon-list",
-                      "settings": {
-                        "icon_list": [
-                          {
-                            "text": "(240) 532-9097",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "8d625d58",
-                            "link": {
-                              "url": "tel:2405329097",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Free Quote",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "83bc9e3c",
-                            "link": {
-                              "url": "#schedule",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "FAQ",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "2a93e54b",
-                            "link": {
-                              "url": "#faq",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          },
-                          {
-                            "text": "Clients",
-                            "selected_icon": {
-                              "value": "fas fa-chevron-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "f7eb2707",
-                            "link": {
-                              "url": "#testimonials",
-                              "is_external": "",
-                              "nofollow": ""
-                            }
-                          }
-                        ],
-                        "icon_color": "#43A94B",
-                        "icon_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "space_between": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        },
-                        "view": "traditional",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 15,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "400",
-                        "text_color": "#B7BCB8"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                }
-              ],
-              "isInner": true
-            },
-            {
-              "id": "d3ce1eac",
-              "elType": "widget",
-              "widgetType": "text-editor",
-              "settings": {
-                "editor": "<p style=\"font-size:12px;color:#6B7280;padding-top:24px;margin-top:28px;border-top:1px solid #1F2A22;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px\"><span>\u00a9 2026 Midland Floor Care | Serving DC, MD, VA</span><span>Terms and Conditions | Privacy Policy</span></p>",
-                "align": "left"
-              },
-              "elements": [],
-              "isInner": false
-            }
-          ],
-          "isInner": true
+          "elements": [],
+          "isInner": false
         }
       ],
       "isInner": false

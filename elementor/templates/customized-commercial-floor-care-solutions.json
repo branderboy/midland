@@ -1,0 +1,530 @@
+{
+  "version": "0.4",
+  "title": "Customized Commercial Floor Care Solutions",
+  "type": "page",
+  "metadata": {
+    "_seo_title": "Customized Commercial Floor Care Solutions | Midland Floor Care DC, MD & VA",
+    "_seo_description": "No two facilities are the same, and neither are their flooring needs. At Midland Floor Care, we understand that different industries, traffic patterns, an\u2026",
+    "_canonical_url": "https://midlandfloors.com/customized-commercial-floor-care-solutions/"
+  },
+  "content": [
+    {
+      "id": "6be3566b",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "_title": "SEO Schema",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "c1704b6a",
+          "elType": "widget",
+          "widgetType": "html",
+          "settings": {
+            "html": "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": \"ProfessionalService\",\n      \"@id\": \"https://midlandfloors.com/#business\",\n      \"name\": \"Midland Floor Care\",\n      \"url\": \"https://midlandfloors.com\",\n      \"telephone\": \"+1-240-532-9097\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ],\n      \"address\": {\n        \"@type\": \"PostalAddress\",\n        \"addressRegion\": \"VA\",\n        \"addressCountry\": \"US\"\n      },\n      \"sameAs\": [\n        \"https://www.facebook.com/midlandfloorcare\",\n        \"https://www.instagram.com/midlandfloorcare\",\n        \"https://www.linkedin.com/company/midland-floor-care\"\n      ]\n    },\n    {\n      \"@type\": \"Service\",\n      \"name\": \"Customized Commercial Floor Care Solutions\",\n      \"description\": \"No two facilities are the same, and neither are their flooring needs. At Midland Floor Care, we understand that different industries, traffic patterns, an\\u2026\",\n      \"provider\": {\n        \"@id\": \"https://midlandfloors.com/#business\"\n      },\n      \"url\": \"https://midlandfloors.com/customized-commercial-floor-care-solutions\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ]\n    },\n    {\n      \"@type\": \"BreadcrumbList\",\n      \"itemListElement\": [\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 1,\n          \"name\": \"Home\",\n          \"item\": \"https://midlandfloors.com\"\n        },\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 2,\n          \"name\": \"Customized Commercial Floor Care Solutions\",\n          \"item\": \"https://midlandfloors.com/customized-commercial-floor-care-solutions\"\n        }\n      ]\n    }\n  ]\n}\n</script>"
+          },
+          "elements": [],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "101598cd",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero \u2014 Customized Commercial Floor Care Solutio",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "3f23e6a5",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "eca46c7e",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Service",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "56e31f37",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Customized Commercial Floor Care Solutions",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 56,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "06fa3d1e",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>No two facilities are the same, and neither are their flooring needs. At Midland Floor Care, we understand that different industries, traffic patterns, an\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.65,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "7d082e2f",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "c68f0506",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "04882141",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p data-start=\"0\" data-end=\"220\">No two facilities are the same, and neither are their flooring needs. At Midland Floor Care, we understand that different industries, traffic patterns, and brand standards require tailored cleaning and maintenance plans.</p><p data-start=\"222\" data-end=\"394\">Our Customized Commercial Floor Care Solutions are built for your facility, ensuring every square foot gets the care it needs without unnecessary services or wasted budget.</p><p data-start=\"396\" data-end=\"442\"><strong data-start=\"396\" data-end=\"442\">Why businesses choose customized solutions</strong></p><ul data-start=\"443\" data-end=\"907\"><li data-start=\"443\" data-end=\"579\"><p data-start=\"445\" data-end=\"579\">Industry-specific needs: from high-shine hotel lobbies to industrial-grade warehouse floors, we match our approach to your environment</p></li><li data-start=\"580\" data-end=\"661\"><p data-start=\"582\" data-end=\"661\">Flexible scheduling: services timed to avoid peak hours and minimize disruption</p></li><li data-start=\"662\" data-end=\"741\"><p data-start=\"664\" data-end=\"741\">Targeted care: focus first on high-visibility, high-traffic, or problem areas</p></li><li data-start=\"742\" data-end=\"834\"><p data-start=\"744\" data-end=\"834\">Brand alignment: floor finishes and cleaning methods that fit your company\u2019s look and feel</p></li><li data-start=\"835\" data-end=\"907\"><p data-start=\"837\" data-end=\"907\">Cost efficiency: you pay for the services you need, when you need them</p></li></ul><p data-start=\"909\" data-end=\"945\"><strong data-start=\"909\" data-end=\"945\">Examples of customized solutions</strong></p><ul data-start=\"946\" data-end=\"1332\"><li data-start=\"946\" data-end=\"1040\"><p data-start=\"948\" data-end=\"1040\">Multi-surface facilities: combine carpet, tile, concrete, and specialty flooring in one plan</p></li><li data-start=\"1041\" data-end=\"1125\"><p data-start=\"1043\" data-end=\"1125\">Seasonal adjustments: increase cleaning during high-traffic or bad-weather seasons</p></li><li data-start=\"1126\" data-end=\"1232\"><p data-start=\"1128\" data-end=\"1232\">Event-based service: pre and post event cleaning for conferences, grand openings, or corporate functions</p></li><li data-start=\"1233\" data-end=\"1332\"><p data-start=\"1235\" data-end=\"1332\">Special treatment programs: anti-slip coatings, stain guard applications, or eco-friendly options</p></li></ul><p data-start=\"1334\" data-end=\"1379\"><strong data-start=\"1334\" data-end=\"1379\">Our process for building your custom plan</strong></p><ol data-start=\"1380\" data-end=\"1719\"><li data-start=\"1380\" data-end=\"1488\"><p data-start=\"1383\" data-end=\"1488\">Consultation and site assessment: we walk your facility and discuss goals, challenges, and requirements</p></li><li data-start=\"1489\" data-end=\"1566\"><p data-start=\"1492\" data-end=\"1566\">Custom proposal: services, frequency, and methods tailored to your needs</p></li><li data-start=\"1567\" data-end=\"1638\"><p data-start=\"1570\" data-end=\"1638\">Implementation: trained technicians deliver on the agreed schedule</p></li><li data-start=\"1639\" data-end=\"1719\"><p data-start=\"1642\" data-end=\"1719\">Ongoing optimization: adjust based on seasons, feedback, and traffic patterns</p></li></ol><p data-start=\"1721\" data-end=\"1753\"><strong data-start=\"1721\" data-end=\"1753\">Industries that benefit most</strong></p><ul data-start=\"1754\" data-end=\"1966\"><li data-start=\"1754\" data-end=\"1792\"><p data-start=\"1756\" data-end=\"1792\">Corporate offices and headquarters</p></li><li data-start=\"1793\" data-end=\"1831\"><p data-start=\"1795\" data-end=\"1831\">Retail stores and shopping centers</p></li><li data-start=\"1832\" data-end=\"1865\"><p data-start=\"1834\" data-end=\"1865\">Hotels and hospitality venues</p></li><li data-start=\"1866\" data-end=\"1903\"><p data-start=\"1868\" data-end=\"1903\">Healthcare and medical facilities</p></li><li data-start=\"1904\" data-end=\"1932\"><p data-start=\"1906\" data-end=\"1932\">Educational institutions</p></li><li data-start=\"1933\" data-end=\"1966\"><p data-start=\"1935\" data-end=\"1966\">Government and public buildings</p></li></ul><p data-start=\"1968\" data-end=\"1994\"><strong data-start=\"1968\" data-end=\"1994\">Why Midland Floor Care</strong></p><ul data-start=\"1995\" data-end=\"2269\"><li data-start=\"1995\" data-end=\"2070\"><p data-start=\"1997\" data-end=\"2070\">Versatile expertise: skilled across all major commercial flooring types</p></li><li data-start=\"2071\" data-end=\"2146\"><p data-start=\"2073\" data-end=\"2146\">Advanced equipment and techniques: built for performance and efficiency</p></li><li data-start=\"2147\" data-end=\"2200\"><p data-start=\"2149\" data-end=\"2200\">One point of contact: a dedicated account manager</p></li><li data-start=\"2201\" data-end=\"2269\"><p data-start=\"2203\" data-end=\"2269\">Guaranteed quality: every service meets our Midland Shine Standard</p></li></ul><p data-start=\"2271\" data-end=\"2439\">One size doesn\u2019t fit all, and neither should your floor care.<br data-start=\"2332\" data-end=\"2335\" />Partner with Midland Floor Care for a customized cleaning plan that works as hard as your business does.</p><p data-start=\"2441\" data-end=\"2469\" data-is-last-node=\"\" data-is-only-node=\"\">Thank you,<br data-start=\"2451\" data-end=\"2454\" />Justin Campbell</p><p data-start=\"2441\" data-end=\"2469\" data-is-last-node=\"\" data-is-only-node=\"\"><a href=\"https://midlandfloors.com/schedule-a-visit/\">Click to Schedule a On-Site Visit</a></p><ul>\n  <li><a href=\"https://midlandfloors.com/floor-care-services/\">Services</a></li>\n  <li><a href=\"https://midlandfloors.com/staff-training/\">Staff Training</a></li>\n  <li><a href=\"https://midlandfloors.com/our-work-in-action/\">Our Work</a></li>\n  <li><a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\">7 Essential Tips for Impeccable Commercial Floor Care Services</a></li>\n  <li><a href=\"https://midlandfloors.com/\">Home</a></li>\n</ul><div style=\"background:#F3FCF4;border-left:4px solid #43A94B;padding:18px 22px;margin-top:24px;border-radius:6px\"><p style=\"margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#0F1411\">Related Services</p><ul style=\"margin:0;padding-left:18px;line-height:1.9\"><li><a href=\"/long-term-recurring-commercial-floor-care-programs/\" style=\"color:#2F8137;font-weight:700\">Long-Term & Recurring Commercial Floor Care Services</a></li><li><a href=\"/janitorial-housekeeping-facility-services/\" style=\"color:#2F8137;font-weight:700\">Janitorial & Housekeeping Facility Services</a></li><li><a href=\"/commercial-upholstery/\" style=\"color:#2F8137;font-weight:700\">Commercial Upholstery</a></li><li><a href=\"/commercial-tile-grout-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Tile & Grout Cleaning</a></li><li><a href=\"/commercial-carpet-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Carpet Cleaning Services</a></li><li><a href=\"/commercial-hard-surface-floor-restoration/\" style=\"color:#2F8137;font-weight:700\">Commercial Hard Surface Floor Restoration</a></li></ul></div>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "a6d135e9",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "acf008f8",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "b5862b77",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "0533a2eb",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and written Facility Score in 48 hours. Yours to keep, even if you don't hire us.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "c3a0da27",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center",
+                "_css_classes": "midland-page"
+              },
+              "elements": [
+                {
+                  "id": "fd9078e0",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "\ud83d\udcde (240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#0E2F14",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#FFFFFF",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "6d54221d",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#43A94B",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}

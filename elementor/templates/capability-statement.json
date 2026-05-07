@@ -1,0 +1,530 @@
+{
+  "version": "0.4",
+  "title": "Capability Statement",
+  "type": "page",
+  "metadata": {
+    "_seo_title": "Capability Statement | Midland Floor Care DC, MD & VA",
+    "_seo_description": "/*! elementor - v3.20.0 - 26-03-2024 */ .elementor-heading-title{padding:0;margin:0;line-height:1}.elementor-widget-heading .elementor-heading-title[class\u2026",
+    "_canonical_url": "https://midlandfloors.com/capability-statement/"
+  },
+  "content": [
+    {
+      "id": "8b31918b",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "_title": "SEO Schema",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "02464a67",
+          "elType": "widget",
+          "widgetType": "html",
+          "settings": {
+            "html": "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": \"ProfessionalService\",\n      \"@id\": \"https://midlandfloors.com/#business\",\n      \"name\": \"Midland Floor Care\",\n      \"url\": \"https://midlandfloors.com\",\n      \"telephone\": \"+1-240-532-9097\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ],\n      \"address\": {\n        \"@type\": \"PostalAddress\",\n        \"addressRegion\": \"VA\",\n        \"addressCountry\": \"US\"\n      },\n      \"sameAs\": [\n        \"https://www.facebook.com/midlandfloorcare\",\n        \"https://www.instagram.com/midlandfloorcare\",\n        \"https://www.linkedin.com/company/midland-floor-care\"\n      ]\n    },\n    {\n      \"@type\": \"WebPage\",\n      \"name\": \"Capability Statement\",\n      \"description\": \"/*! elementor - v3.20.0 - 26-03-2024 */ .elementor-heading-title{padding:0;margin:0;line-height:1}.elementor-widget-heading .elementor-heading-title[class\\u2026\",\n      \"url\": \"https://midlandfloors.com/capability-statement\",\n      \"isPartOf\": {\n        \"@id\": \"https://midlandfloors.com/#business\"\n      }\n    },\n    {\n      \"@type\": \"BreadcrumbList\",\n      \"itemListElement\": [\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 1,\n          \"name\": \"Home\",\n          \"item\": \"https://midlandfloors.com\"\n        },\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 2,\n          \"name\": \"Capability Statement\",\n          \"item\": \"https://midlandfloors.com/capability-statement\"\n        }\n      ]\n    }\n  ]\n}\n</script>"
+          },
+          "elements": [],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "759e6b7a",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero \u2014 Capability Statement",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "bb829c86",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "5cf20271",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Page",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "706a2808",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Capability Statement",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 56,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "cda1ce5a",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>/*! elementor - v3.20.0 - 26-03-2024 */ .elementor-heading-title{padding:0;margin:0;line-height:1}.elementor-widget-heading .elementor-heading-title[class\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.65,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "a8af9763",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "3a53bda6",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "a67258c2",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<style>/*! elementor - v3.20.0 - 26-03-2024 */<br />\n.elementor-heading-title{padding:0;margin:0;line-height:1}.elementor-widget-heading .elementor-heading-title>a{color:inherit;font-size:inherit;line-height:inherit}.elementor-widget-heading .elementor-heading-title.elementor-size-small{font-size:15px}.elementor-widget-heading .elementor-heading-title.elementor-size-medium{font-size:19px}.elementor-widget-heading .elementor-heading-title.elementor-size-large{font-size:29px}.elementor-widget-heading .elementor-heading-title.elementor-size-xl{font-size:39px}.elementor-widget-heading .elementor-heading-title.elementor-size-xxl{font-size:59px}</style>\n<h2>Midland Floor Care Overview:</h2>\n<img title=\"Commercial Floor Care Service\" src=\"http://midlandfloors.com/wp-content/uploads/elementor/thumbs/IMG_6257-qip24rl62vxstm7vj5ur5we44aldeaqhv4s5nzdmho.jpeg\" alt=\"Commercial Floor Care Service\" />\n\nMidland Floor Care is a premier provider of comprehensive floor care solutions, specializing in servicing large-scale government facilities with professionalism and efficiency. With decades of industry experience and a commitment to excellence, we offer a wide range of services tailored to meet the unique needs of government agencies.\n<h4><strong>Core Competencies:</strong></h4>\nExpertise in Large-Scale Projects: Midland Floor Care excels in managing and executing projects encompassing vast areas, exceeding 300,000 square feet of cleanable space. Our experienced team is adept at coordinating complex logistics and delivering exceptional results within strict timelines.\n<h4><strong>Comprehensive Floor Care Solutions: </strong></h4>\nFrom routine maintenance to specialized treatments, we offer a comprehensive suite of floor care services including cleaning, stripping, waxing, polishing, and restoration. Our advanced techniques and environmentally friendly products ensure superior outcomes while minimizing environmental impact.\n<h4><strong>State-of-the-Art Equipment:</strong></h4>\nMidland Floor Care utilizes cutting-edge equipment and technology to optimize efficiency and achieve optimal cleanliness. Our investment in innovative tools allows us to tackle even the most challenging cleaning tasks with precision and effectiveness.\n<h4><strong>Trained and Certified Professionals: </strong></h4>\nOur team comprises highly skilled technicians who undergo rigorous training and certification to uphold the highest standards of quality and safety. With a focus on continuous improvement, we stay abreast of industry best practices and emerging trends.\n<h4><strong>Compliance and Security:</strong></h4>\nMidland Floor Care is committed to compliance with all regulatory requirements and security protocols governing government contracts. We prioritize confidentiality, integrity, and adherence to strict guidelines to ensure seamless collaboration with government agencies.\n<h4><strong>Past Performance: </strong></h4>\nMidland Floor Care has a proven track record of successfully completing large government contracts across various sectors, including military installations, federal office buildings, and public institutions. Our dedication to excellence and customer satisfaction has earned us a reputation as a trusted partner in government facility maintenance.\n<h4><strong>Client Testimonials:</strong></h4>\nMidland Floor Care consistently delivers exceptional results on our government contracts. Their professionalism, attention to detail, and commitment to quality set them apart from other vendors.\" - Government Facilities\n<h4><strong>Manager Contact Information:</strong></h4>\nFor inquiries or to request a consultation, please visit our website at <a href=\"http://midlandfloors.com/\">midlandfloors.com</a> or contact us directly at contact@midlandfloors.com. We look forward to the opportunity to serve your floor care needs and exceed your expectations.\n\n<strong>NACIS:</strong> 561720\n\n<strong>NACIS:</strong> 238330<div style=\"background:#F3FCF4;border-left:4px solid #43A94B;padding:18px 22px;margin-top:24px;border-radius:6px\"><p style=\"margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#0F1411\">Related Services</p><ul style=\"margin:0;padding-left:18px;line-height:1.9\"><li><a href=\"/long-term-recurring-commercial-floor-care-programs/\" style=\"color:#2F8137;font-weight:700\">Long-Term & Recurring Commercial Floor Care Services</a></li><li><a href=\"/customized-commercial-floor-care-solutions/\" style=\"color:#2F8137;font-weight:700\">Customized Commercial Floor Care Solutions</a></li><li><a href=\"/janitorial-housekeeping-facility-services/\" style=\"color:#2F8137;font-weight:700\">Janitorial & Housekeeping Facility Services</a></li><li><a href=\"/commercial-upholstery/\" style=\"color:#2F8137;font-weight:700\">Commercial Upholstery</a></li><li><a href=\"/commercial-tile-grout-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Tile & Grout Cleaning</a></li><li><a href=\"/commercial-carpet-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Carpet Cleaning Services</a></li></ul></div>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "d70f2162",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "e3e0078f",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "a8554410",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "ba3a2a16",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and written Facility Score in 48 hours. Yours to keep, even if you don't hire us.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "45a74703",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center",
+                "_css_classes": "midland-page"
+              },
+              "elements": [
+                {
+                  "id": "ad0e6cfd",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "\ud83d\udcde (240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#0E2F14",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#FFFFFF",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "ecabc402",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#43A94B",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}
