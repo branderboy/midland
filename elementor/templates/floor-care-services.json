@@ -1,0 +1,481 @@
+{
+  "version": "0.4",
+  "title": "Services",
+  "type": "page",
+  "metadata": {},
+  "content": [
+    {
+      "id": "7b36a22f",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero - Services"
+      },
+      "elements": [
+        {
+          "id": "9ab6841a",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "218f5a9a",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Service",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "1749c8f2",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Services",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "655d9fca",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>At Midland Floors, we're not just about cleaning floors; we're about building lasting relationships with our clients and ensuring their spaces always refl\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.6,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "b224c601",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content"
+      },
+      "elements": [
+        {
+          "id": "76d79420",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "d95e94b2",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>At Midland Floors, we're not just about cleaning floors; we're about building lasting relationships with our clients and ensuring their spaces always reflect the highest standards of cleanliness and care. Let us be your trusted partner in floor care excellence.</p><p><strong>We Provide Long-term Service Commitment</strong>: At Midland Floors, we understand the importance of maintaining the quality and appearance of your floors over time. Our long-term service commitment is designed to provide you with consistent, high-quality floor care. We work closely with you to develop a maintenance plan that suits the specific needs of your space, ensuring that your floors remain in top condition year after year.</p><p><strong>We Provide Customized Cleaning Solutions</strong>: Every space is unique, and so are its cleaning requirements. That's why we offer customized cleaning solutions tailored to the specific needs of your environment. Whether it's a retail store, a government building, or a commercial office, we assess your space and develop a cleaning plan that addresses its unique challenges. Our team is equipped with the latest tools and techniques to deliver effective and efficient cleaning services, ensuring your floors always make the right impression.</p><p><strong>We Provide Last-Minute Services</strong>: We understand that unexpected needs can arise, and you might require immediate floor care services. Midland Floors is here to help, even at the last minute. Our flexible scheduling and responsive team ensure that we can accommodate your urgent requests and provide the necessary services promptly.</p><p>Whether it's a sudden spill, an unplanned event, or any other emergency, you can count on us to be there when you need us most. \u00a0To schedule a site visit and experience the Midland Floors difference, <a href=\"/schedule-a-visit/\" target=\"_new\" rel=\"noopener\">click here</a>.</p><h4><strong>Midland Floors Service Area:</strong></h4><p>Midland Floor Care offers premier floor maintenance and restoration services within a 45-mile radius of the DMV area, focusing on commercial clients in key regions like <a href=\"https://en.wikipedia.org/wiki/Fairfax_County,_Virginia\" target=\"_new\" rel=\"noopener\">Fairfax County</a>, <a href=\"https://en.wikipedia.org/wiki/Montgomery_County,_Maryland\" target=\"_new\" rel=\"noopener\">Montgomery County</a>, <a href=\"https://en.wikipedia.org/wiki/Prince_George%27s_County,_Maryland\" target=\"_new\" rel=\"noopener\">Prince George's County</a>, and the cities of <a href=\"https://en.wikipedia.org/wiki/Alexandria,_Virginia\" target=\"_new\" rel=\"noopener\">Alexandria</a>, <a href=\"https://en.wikipedia.org/wiki/Arlington_County,_Virginia\" target=\"_new\" rel=\"noopener\">Arlington</a>, and <a href=\"https://en.wikipedia.org/wiki/Bethesda,_Maryland\" target=\"_new\" rel=\"noopener\">Bethesda</a>. We specialize in eco-friendly solutions, serving sectors from retail and healthcare to educational institutions, ensuring every floor we touch reflects excellence and environmental responsibility.</p><strong>\u00a0</strong>\t\t\n\t\t\t<h2>Our Midland Solutions</h2>\t\t\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/10/ser-h1.png\" alt=\"image\"/>\n                                    <h4> Carpet Cleaning</h4>\n                Our state-of-the-art carpet cleaning techniques delve deep into fibers, removing dirt, stains, and allergens, leaving your carpets fresh, clean, and vibrant.\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/10/ser-icon2.png\" alt=\"image\"/>\n                                    <h4> Upholstery and Leather Cleaning: </h4>\n                We treat your use the utmost care, using gentle yet effective methods to revive and protect your cherished furnishings.\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/10/ser-icon3.png\" alt=\"image\"/>\n                                    <h4> Tile and Grout Cleaning</h4>\n                Say goodbye to stubborn grime and discoloration. Our tile and grout cleaning services restore the original shine and cleanliness of your tiled surfaces.\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/10/ser-icon4.png\" alt=\"image\"/>\n                                    <h4> Hard Surface Cleaning &amp; Maintenance: </h4>\n                From hardwood floors to concrete, our team is equipped to handle all types of hard surfaces, ensuring they are impeccably clean and well-maintained.\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/10/ser-icon5.png\" alt=\"image\"/>\n                                    <h4> COVID-19 Disinfecting &amp; Fogging</h4>\n                In these challenging times, your safety is our priority. Our comprehensive disinfecting services are designed to eliminate viruses and bacteria.            \n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/10/ser-icon6.png\" alt=\"image\"/>\n                                    <h4> Janitorial Services</h4>\n                Our janitorial services are tailored to meet the specific needs of your space, whether it\u2019s a daily, weekly, or monthly cleaning schedule, ensuring your premises are always at their best.\n\t            What to Expect During Your Onsite Visit<h2>Our Process</h2>\t\t\t\t\n            \t\t            \t\t<p>When you schedule an onsite visit with Midland Floor Care, here\u2019s what you can expect:</p>  \n            01\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/11/process-icon1.png\" alt=\"image\"/>\n                                            <h2> Site Evaluation</h2>\n                Our experienced team will conduct a comprehensive site visit to evaluate your specific cleaning needs.\n                                                <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/11/proce-shape3.png\" alt=\"image\"/>\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/11/process-icon2.png\" alt=\"image\"/>\n            02\n                                    <h2> Facility Score </h2>\n                We will provide you with yourFacility Score \u2013 a detailed assessment of your space&#039;s current condition &amp; cleaning requirements.            \n                                                <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/11/proce-shape1.png\" alt=\"image\"/>\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/11/process-icon3.png\" alt=\"image\"/>\n            03\n                                    <h2> Get a Quote</h2>\n                We guarantee a quick turnaround, providing you with a comprehensive program quote within 24 to 48 hours following our site visit.\n                                                <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/11/proce-shape2.png\" alt=\"image\"/>\n                        <img src=\"https://tv.fixherotheme.com/wp-content/uploads/2023/11/process-icon4.png\" alt=\"image\"/>\n            04\n                                    <h2> Schedule Your Service</h2>\n                We will work with you to schedule the cleaning at a time that is most convenient for you and your facility.             \n\t\t\t<a href=\"https://midlandfloors.com/schedule-a-visit/\">\n\t\t\t\t\t\tSCHEDULE A SITE VISIT HERE!\n\t\t\t\t\t</a>\n\t\t<p><a href=\"https://midlandfloors.com/\">Home</a></p><p><a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\">7 Essential Tips for Impeccable Commercial Floor Care Services</a></p><p><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your Visit &amp; Quote</a></p><p><a href=\"https://midlandfloors.com/about/\">About Midland</a></p><p><a href=\"https://midlandfloors.com/faq/\">Frequently Asked Questions</a></p>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "6cdeba9d",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA"
+      },
+      "elements": [
+        {
+          "id": "2f2beae0",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "998bf672",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 36,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "b898853c",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and Facility Score in 48 hours.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "a444cc1d",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center"
+              },
+              "elements": [
+                {
+                  "id": "6709c4b4",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "8ec615cf",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#FFFFFF",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}

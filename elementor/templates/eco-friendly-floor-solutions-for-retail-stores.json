@@ -1,0 +1,481 @@
+{
+  "version": "0.4",
+  "title": "Eco-Friendly Floor Solutions for Retail Stores",
+  "type": "page",
+  "metadata": {},
+  "content": [
+    {
+      "id": "f50e085e",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero - Eco-Friendly Floor Solutions for Retail "
+      },
+      "elements": [
+        {
+          "id": "48d6177f",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "0a74722f",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Article",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "2eb35476",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Eco-Friendly Floor Solutions for Retail Stores",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "1ab39889",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>In today's environmentally conscious market, retail stores are increasingly seeking ways to reduce their carbon footprint and appeal to eco-aware customer\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.6,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "a1684caf",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content"
+      },
+      "elements": [
+        {
+          "id": "13e2af99",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "472219d9",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "In today's environmentally conscious market, retail stores are increasingly seeking ways to reduce their carbon footprint and appeal to eco-aware customers. One significant area of focus is the adoption of eco-friendly floor solutions. These sustainable practices not only contribute to the health of the planet but also ensure a safer, healthier shopping environment for customers. Here's a comprehensive guide to implementing eco-friendly floor solutions in your retail space.\n<h4>Understanding the Importance of Eco-Friendly Flooring</h4>\nEco-friendly flooring options are designed with sustainable materials, manufacturing processes, and maintenance practices that minimize environmental impact. These solutions offer several benefits, including:\n<ul>\n \t<li><strong>Reduced Environmental Footprint:</strong> They are made from renewable resources, recycled materials, or sustainably sourced products.</li>\n \t<li><strong>Improved Indoor Air Quality:</strong> Low in volatile organic compounds (VOCs), eco-friendly floors contribute to a healthier indoor environment.</li>\n \t<li><strong>Durability and Longevity:</strong> Many green flooring options are as durable as traditional materials, reducing the need for frequent replacements and waste.</li>\n</ul>\n<h4>Top Eco-Friendly Flooring Options for Retail</h4>\n<ol>\n \t<li><strong>Bamboo:</strong> Fast-growing and highly renewable, bamboo flooring is a popular choice for its durability and stylish appearance.</li>\n \t<li><strong>Cork:</strong> Harvested from the bark of cork oak trees without harming the tree, cork flooring is resilient, sound-absorbing, and naturally antimicrobial.</li>\n \t<li><strong>Recycled Rubber:</strong> Rubber flooring made from recycled tires is durable, easy to clean, and perfect for high-traffic areas.</li>\n \t<li><strong>Linoleum:</strong> Often confused with vinyl, true linoleum is made from natural materials like linseed oil and wood flour, making it biodegradable and compostable.</li>\n \t<li><strong>Reclaimed Wood:</strong> Utilizing wood salvaged from old buildings or rivers not only adds unique character but also prevents deforestation.</li>\n</ol>\n<h4>Sustainable Floor Maintenance Practices</h4>\nChoosing eco-friendly flooring is just the first step; maintaining these floors with green practices is equally important:\n<ul>\n \t<li><strong>Eco-Friendly Cleaning Products:</strong> Use cleaning solutions that are biodegradable, non-toxic, and free from harmful chemicals.</li>\n \t<li><strong>Microfiber Mops and Cloths:</strong> These require less water and cleaning product than traditional mops and are more effective at trapping dirt and dust.</li>\n \t<li><strong>Proper Waste Management:</strong> Implement recycling and composting practices for any waste generated during floor maintenance.</li>\n</ul>\n<h4>The Role of Floor Mats in Eco-Friendly Retail Spaces</h4>\nIncorporating eco-friendly floor mats made from recycled materials or sustainable fibers can further enhance your green initiatives. These mats help reduce cleaning needs by trapping dirt at the entrance, reducing wear and tear on your floors.\n<h4>Educating Staff and Customers</h4>\nAn essential part of adopting eco-friendly floor solutions is educating your staff and customers about the benefits. Highlighting your store's commitment to sustainability can strengthen your brand's reputation and appeal to environmentally conscious consumers.\n<h4>Conclusion</h4>\nImplementing eco-friendly floor solutions in retail stores is a meaningful step towards sustainability. By choosing sustainable materials, adopting green maintenance practices, and educating your community, you can create a healthier environment for your customers and the planet. As consumer awareness and demand for eco-friendly products continue to grow, making the switch to green flooring can set your retail store apart in the competitive market.\n\n&nbsp;\n\n<a href=\"https://midlandfloors.com/faq/\"><span style=\"font-weight: 400;\">Frequently Asked Questions</span></a>\n\n<a href=\"https://midlandfloors.com/the-top-methods-for-cost-effective-floor-maintenance/\"><span style=\"font-weight: 400;\">The Top Methods for Cost-Effective Floor Maintenance</span></a>\n\n<a href=\"https://midlandfloors.com/ultimate-guide-to-floor-care-for-retail/\"><span style=\"font-weight: 400;\">Ultimate Guide to Floor Care for Retail</span></a>\n\n<a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\"><span style=\"font-weight: 400;\">7 Essential Tips for Impeccable Commercial Floor Care Services</span></a>\n\n<a href=\"https://midlandfloors.com/the-latest-in-commercial-floor-tech-innovations-for-2024/\"><span style=\"font-weight: 400;\">The Latest in Commercial Floor Tech: Innovations for 2024</span></a>\n\n<a href=\"https://midlandfloors.com/floor-care-services/\"><span style=\"font-weight: 400;\">Services</span></a>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "335c5207",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA"
+      },
+      "elements": [
+        {
+          "id": "86ad3163",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "86ca0c84",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 36,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "37a856b1",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and Facility Score in 48 hours.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "96359224",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center"
+              },
+              "elements": [
+                {
+                  "id": "863ec4e3",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "cf4c1988",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#FFFFFF",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}
