@@ -1,0 +1,530 @@
+{
+  "version": "0.4",
+  "title": "Commercial Tile & Grout Cleaning",
+  "type": "page",
+  "metadata": {
+    "_seo_title": "Commercial Tile & Grout Cleaning | Midland Floor Care DC, MD & VA",
+    "_seo_description": "Commercial Tile &amp; Grout Cleaning That Revives Your Floors Over time, dirt, grease, and contaminants seep into porous grout lines and textured tile sur\u2026",
+    "_canonical_url": "https://midlandfloors.com/commercial-tile-grout-cleaning-services/"
+  },
+  "content": [
+    {
+      "id": "03e444c6",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "_title": "SEO Schema",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "7e42122e",
+          "elType": "widget",
+          "widgetType": "html",
+          "settings": {
+            "html": "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": \"ProfessionalService\",\n      \"@id\": \"https://midlandfloors.com/#business\",\n      \"name\": \"Midland Floor Care\",\n      \"url\": \"https://midlandfloors.com\",\n      \"telephone\": \"+1-240-532-9097\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ],\n      \"address\": {\n        \"@type\": \"PostalAddress\",\n        \"addressRegion\": \"VA\",\n        \"addressCountry\": \"US\"\n      },\n      \"sameAs\": [\n        \"https://www.facebook.com/midlandfloorcare\",\n        \"https://www.instagram.com/midlandfloorcare\",\n        \"https://www.linkedin.com/company/midland-floor-care\"\n      ]\n    },\n    {\n      \"@type\": \"Service\",\n      \"name\": \"Commercial Tile & Grout Cleaning\",\n      \"description\": \"Commercial Tile &amp; Grout Cleaning That Revives Your Floors Over time, dirt, grease, and contaminants seep into porous grout lines and textured tile sur\\u2026\",\n      \"provider\": {\n        \"@id\": \"https://midlandfloors.com/#business\"\n      },\n      \"url\": \"https://midlandfloors.com/commercial-tile-grout-cleaning-services\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ]\n    },\n    {\n      \"@type\": \"BreadcrumbList\",\n      \"itemListElement\": [\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 1,\n          \"name\": \"Home\",\n          \"item\": \"https://midlandfloors.com\"\n        },\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 2,\n          \"name\": \"Commercial Tile & Grout Cleaning\",\n          \"item\": \"https://midlandfloors.com/commercial-tile-grout-cleaning-services\"\n        }\n      ]\n    }\n  ]\n}\n</script>"
+          },
+          "elements": [],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "c8ae9db7",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero \u2014 Commercial Tile & Grout Cleaning",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "86642159",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "a096c4b3",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Service",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "83a675f2",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Commercial Tile & Grout Cleaning",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 56,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "b4b2cf20",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Commercial Tile &amp; Grout Cleaning That Revives Your Floors Over time, dirt, grease, and contaminants seep into porous grout lines and textured tile sur\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.65,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "94952c51",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "3ff996f2",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "6514b6ea",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<h2>Commercial Tile\u00a0&amp;\u00a0Grout Cleaning\u00a0That Revives Your Floors</h2><p data-start=\"63\" data-end=\"224\">Over time, dirt, grease, and contaminants seep into porous grout lines and textured tile surfaces, dulling your floor\u2019s appearance and creating hygiene concerns.</p><p data-start=\"226\" data-end=\"388\">At Midland Floor Care, we specialize in commercial tile and grout cleaning that brings back a like-new look and helps extend the life of your flooring investment.</p><p data-start=\"390\" data-end=\"448\"><strong data-start=\"390\" data-end=\"448\">Why businesses need professional tile &amp; grout cleaning</strong></p><ul data-start=\"449\" data-end=\"761\"><li data-start=\"449\" data-end=\"528\"><p data-start=\"451\" data-end=\"528\">Restores original appearance: eliminates discoloration and uneven grout tones</p></li><li data-start=\"529\" data-end=\"604\"><p data-start=\"531\" data-end=\"604\">Improves hygiene: removes bacteria, mold, and allergens from porous grout</p></li><li data-start=\"605\" data-end=\"684\"><p data-start=\"607\" data-end=\"684\">Protects your investment: helps prevent grout erosion and costly replacements</p></li><li data-start=\"685\" data-end=\"761\"><p data-start=\"687\" data-end=\"761\">Maintains brand standards: keeps your space looking sharp and professional</p></li></ul><p data-start=\"763\" data-end=\"811\"><strong data-start=\"763\" data-end=\"811\">Our commercial tile &amp; grout cleaning process</strong></p><ol data-start=\"812\" data-end=\"1204\"><li data-start=\"812\" data-end=\"897\"><p data-start=\"815\" data-end=\"897\">Inspection and assessment: identify stains, discoloration, and high-traffic wear</p></li><li data-start=\"898\" data-end=\"971\"><p data-start=\"901\" data-end=\"971\">Pre-treatment: professional solutions loosen soil and embedded grime</p></li><li data-start=\"972\" data-end=\"1048\"><p data-start=\"975\" data-end=\"1048\">Agitation: specialized brushes scrub grout lines for deeper penetration</p></li><li data-start=\"1049\" data-end=\"1121\"><p data-start=\"1052\" data-end=\"1121\">Hot water extraction: high pressure and suction remove contaminants</p></li><li data-start=\"1122\" data-end=\"1204\"><p data-start=\"1125\" data-end=\"1204\">Grout sealing (recommended): protects against future staining and discoloration</p></li></ol><p data-start=\"1206\" data-end=\"1229\"><strong data-start=\"1206\" data-end=\"1229\">Industries we serve</strong></p><ul data-start=\"1230\" data-end=\"1420\"><li data-start=\"1230\" data-end=\"1262\"><p data-start=\"1232\" data-end=\"1262\">Restaurants and food service</p></li><li data-start=\"1263\" data-end=\"1301\"><p data-start=\"1265\" data-end=\"1301\">Retail stores and shopping centers</p></li><li data-start=\"1302\" data-end=\"1344\"><p data-start=\"1304\" data-end=\"1344\">Office buildings and corporate lobbies</p></li><li data-start=\"1345\" data-end=\"1367\"><p data-start=\"1347\" data-end=\"1367\">Hotels and resorts</p></li><li data-start=\"1368\" data-end=\"1393\"><p data-start=\"1370\" data-end=\"1393\">Healthcare facilities</p></li><li data-start=\"1394\" data-end=\"1420\"><p data-start=\"1396\" data-end=\"1420\">Educational institutions</p></li></ul><p data-start=\"1422\" data-end=\"1466\"><strong data-start=\"1422\" data-end=\"1466\">Why businesses choose Midland Floor Care</strong></p><ul data-start=\"1467\" data-end=\"1692\"><li data-start=\"1467\" data-end=\"1522\"><p data-start=\"1469\" data-end=\"1522\">Commercial expertise: solutions for high-use spaces</p></li><li data-start=\"1523\" data-end=\"1575\"><p data-start=\"1525\" data-end=\"1575\">Advanced equipment: deeper, longer-lasting clean</p></li><li data-start=\"1576\" data-end=\"1633\"><p data-start=\"1578\" data-end=\"1633\">Flexible service hours: nights and weekends available</p></li><li data-start=\"1634\" data-end=\"1692\"><p data-start=\"1636\" data-end=\"1692\">Guaranteed results: backed by our Midland Shine Standard</p></li></ul><p data-start=\"1694\" data-end=\"1722\" data-is-last-node=\"\" data-is-only-node=\"\">Thank you,<br data-start=\"1704\" data-end=\"1707\" />Justin Campbell</p><p data-start=\"1694\" data-end=\"1722\" data-is-last-node=\"\" data-is-only-node=\"\"><strong><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your On-Site Visit</a></strong></p><ul><li><a href=\"https://midlandfloors.com/floor-care-services/\">Services</a></li><li><a href=\"https://midlandfloors.com/\">Home</a></li><li><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your Visit &amp; Quote</a></li><li><a href=\"https://midlandfloors.com/ultimate-guide-to-floor-care-for-retail/\">Ultimate Guide to Floor Care for Retail</a></li><li><a href=\"https://midlandfloors.com/jobs/\">Jobs</a></li></ul><div style=\"background:#F3FCF4;border-left:4px solid #43A94B;padding:18px 22px;margin-top:24px;border-radius:6px\"><p style=\"margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#0F1411\">Related Services</p><ul style=\"margin:0;padding-left:18px;line-height:1.9\"><li><a href=\"/long-term-recurring-commercial-floor-care-programs/\" style=\"color:#2F8137;font-weight:700\">Long-Term & Recurring Commercial Floor Care Services</a></li><li><a href=\"/customized-commercial-floor-care-solutions/\" style=\"color:#2F8137;font-weight:700\">Customized Commercial Floor Care Solutions</a></li><li><a href=\"/janitorial-housekeeping-facility-services/\" style=\"color:#2F8137;font-weight:700\">Janitorial & Housekeeping Facility Services</a></li><li><a href=\"/commercial-upholstery/\" style=\"color:#2F8137;font-weight:700\">Commercial Upholstery</a></li><li><a href=\"/commercial-carpet-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Carpet Cleaning Services</a></li><li><a href=\"/commercial-hard-surface-floor-restoration/\" style=\"color:#2F8137;font-weight:700\">Commercial Hard Surface Floor Restoration</a></li></ul></div>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "5deab1ad",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "8b780e83",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "32d48546",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "53b3914b",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and written Facility Score in 48 hours. Yours to keep, even if you don't hire us.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "161a22da",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center",
+                "_css_classes": "midland-page"
+              },
+              "elements": [
+                {
+                  "id": "14e27c9b",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "\ud83d\udcde (240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#0E2F14",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#FFFFFF",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "d007a367",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#43A94B",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}

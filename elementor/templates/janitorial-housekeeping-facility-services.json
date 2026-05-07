@@ -1,0 +1,530 @@
+{
+  "version": "0.4",
+  "title": "Janitorial & Housekeeping Facility Services",
+  "type": "page",
+  "metadata": {
+    "_seo_title": "Janitorial & Housekeeping Facility Services | Midland Floor Care DC, MD & VA",
+    "_seo_description": "Janitorial &amp; Housekeeping Facility Services (for select commercial clients) Some facilities need more than exceptional floor care. They need a compreh\u2026",
+    "_canonical_url": "https://midlandfloors.com/janitorial-housekeeping-facility-services/"
+  },
+  "content": [
+    {
+      "id": "8d04de2d",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "_title": "SEO Schema",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "637e4633",
+          "elType": "widget",
+          "widgetType": "html",
+          "settings": {
+            "html": "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": \"ProfessionalService\",\n      \"@id\": \"https://midlandfloors.com/#business\",\n      \"name\": \"Midland Floor Care\",\n      \"url\": \"https://midlandfloors.com\",\n      \"telephone\": \"+1-240-532-9097\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ],\n      \"address\": {\n        \"@type\": \"PostalAddress\",\n        \"addressRegion\": \"VA\",\n        \"addressCountry\": \"US\"\n      },\n      \"sameAs\": [\n        \"https://www.facebook.com/midlandfloorcare\",\n        \"https://www.instagram.com/midlandfloorcare\",\n        \"https://www.linkedin.com/company/midland-floor-care\"\n      ]\n    },\n    {\n      \"@type\": \"Service\",\n      \"name\": \"Janitorial & Housekeeping Facility Services\",\n      \"description\": \"Janitorial &amp; Housekeeping Facility Services (for select commercial clients) Some facilities need more than exceptional floor care. They need a compreh\\u2026\",\n      \"provider\": {\n        \"@id\": \"https://midlandfloors.com/#business\"\n      },\n      \"url\": \"https://midlandfloors.com/janitorial-housekeeping-facility-services\",\n      \"areaServed\": [\n        \"Washington, DC\",\n        \"Maryland\",\n        \"Virginia\"\n      ]\n    },\n    {\n      \"@type\": \"BreadcrumbList\",\n      \"itemListElement\": [\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 1,\n          \"name\": \"Home\",\n          \"item\": \"https://midlandfloors.com\"\n        },\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 2,\n          \"name\": \"Janitorial & Housekeeping Facility Services\",\n          \"item\": \"https://midlandfloors.com/janitorial-housekeeping-facility-services\"\n        }\n      ]\n    }\n  ]\n}\n</script>"
+          },
+          "elements": [],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "c5bfcbf6",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero \u2014 Janitorial & Housekeeping Facility Servi",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "72d3da19",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "bc48ed3f",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Service",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "d4a27168",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Janitorial & Housekeeping Facility Services",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 56,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "c4698189",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Janitorial &amp; Housekeeping Facility Services (for select commercial clients) Some facilities need more than exceptional floor care. They need a compreh\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.65,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "dd9dcfa2",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "bdb9547e",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "9e73076a",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<h2 data-start=\"0\" data-end=\"79\"><strong data-start=\"0\" data-end=\"79\">Janitorial &amp; Housekeeping Facility Services (for select commercial clients)</strong></h2><p data-start=\"81\" data-end=\"267\">Some facilities need more than exceptional floor care. They need a comprehensive, discreet, dependable partner who understands the demands of a premium property or high profile business.</p><p data-start=\"269\" data-end=\"458\">At Midland Floor Care, we provide exclusive janitorial and housekeeping facility services to select commercial clients who value consistency, confidentiality, and a higher standard of care.</p><p data-start=\"460\" data-end=\"496\"><strong data-start=\"460\" data-end=\"496\">What makes our service different</strong></p><ul data-start=\"497\" data-end=\"838\"><li data-start=\"497\" data-end=\"597\"><p data-start=\"499\" data-end=\"597\">Selective partnerships: we work with a limited number of clients for maximum attention and quality</p></li><li data-start=\"598\" data-end=\"668\"><p data-start=\"600\" data-end=\"668\">White glove standards: detail oriented service beyond industry norms</p></li><li data-start=\"669\" data-end=\"745\"><p data-start=\"671\" data-end=\"745\">Discreet, professional staff: fully trained, uniformed, background checked</p></li><li data-start=\"746\" data-end=\"838\"><p data-start=\"748\" data-end=\"838\">Flexible scope: from daily upkeep to specialized event preparation, tailored to your needs</p></li></ul><p data-start=\"840\" data-end=\"883\"><strong data-start=\"840\" data-end=\"883\">Services offered for our select clients</strong></p><ul data-start=\"884\" data-end=\"1302\"><li data-start=\"884\" data-end=\"971\"><p data-start=\"886\" data-end=\"971\">Full janitorial care: sweeping, mopping, dusting, trash removal, restroom maintenance</p></li><li data-start=\"972\" data-end=\"1050\"><p data-start=\"974\" data-end=\"1050\">Housekeeping services: common area upkeep, furniture dusting, glass cleaning</p></li><li data-start=\"1051\" data-end=\"1146\"><p data-start=\"1053\" data-end=\"1146\">Floor maintenance: integrated with our specialty programs for carpet, tile, and hard surfaces</p></li><li data-start=\"1147\" data-end=\"1229\"><p data-start=\"1149\" data-end=\"1229\">Special event prep and cleanup: guest ready before and after important occasions</p></li><li data-start=\"1230\" data-end=\"1302\"><p data-start=\"1232\" data-end=\"1302\">High touch disinfection: enhanced sanitation for high contact surfaces</p></li></ul><p data-start=\"1304\" data-end=\"1354\"><strong data-start=\"1304\" data-end=\"1354\">Industries and facilities we serve exclusively</strong></p><ul data-start=\"1355\" data-end=\"1569\"><li data-start=\"1355\" data-end=\"1381\"><p data-start=\"1357\" data-end=\"1381\">Corporate headquarters</p></li><li data-start=\"1382\" data-end=\"1422\"><p data-start=\"1384\" data-end=\"1422\">Luxury hotels and hospitality venues</p></li><li data-start=\"1423\" data-end=\"1450\"><p data-start=\"1425\" data-end=\"1450\">Executive office suites</p></li><li data-start=\"1451\" data-end=\"1490\"><p data-start=\"1453\" data-end=\"1490\">Upscale retail stores and showrooms</p></li><li data-start=\"1491\" data-end=\"1535\"><p data-start=\"1493\" data-end=\"1535\">Private healthcare and medical practices</p></li><li data-start=\"1536\" data-end=\"1569\"><p data-start=\"1538\" data-end=\"1569\">High security government spaces</p></li></ul><p data-start=\"1571\" data-end=\"1610\"><strong data-start=\"1571\" data-end=\"1610\">Why partner with Midland Floor Care</strong></p><ul data-start=\"1611\" data-end=\"1919\"><li data-start=\"1611\" data-end=\"1687\"><p data-start=\"1613\" data-end=\"1687\">Limited client list: your facility gets the focus and priority it deserves</p></li><li data-start=\"1688\" data-end=\"1774\"><p data-start=\"1690\" data-end=\"1774\">Comprehensive solutions: floor care, janitorial, and housekeeping under one provider</p></li><li data-start=\"1775\" data-end=\"1841\"><p data-start=\"1777\" data-end=\"1841\">Confidentiality assured: discretion in every client relationship</p></li><li data-start=\"1842\" data-end=\"1919\"><p data-start=\"1844\" data-end=\"1919\">Consistency guaranteed: same trusted team, same high standards, every visit</p></li></ul><p data-start=\"1921\" data-end=\"2119\"><strong data-start=\"1921\" data-end=\"1950\">Schedule an on-site visit</strong><br />Ready to discuss your facility. <a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule an on-site visit today.</a> Call us or request a visit online and we\u2019ll walk the space, build the plan, and align on your timeline.</p><p data-start=\"2121\" data-end=\"2215\">For facilities where presentation is everything, maintenance is not a task. It\u2019s a commitment.</p><p data-start=\"2217\" data-end=\"2245\" data-is-last-node=\"\" data-is-only-node=\"\">Thank you,<br data-start=\"2227\" data-end=\"2230\" />Justin Campbell</p><ul>\n  <li><a href=\"https://midlandfloors.com/floor-care-services/\">Services</a></li>\n  <li><a href=\"https://midlandfloors.com/\">Home</a></li>\n  <li><a href=\"https://midlandfloors.com/about/\">About Midland</a></li>\n  <li><a href=\"https://midlandfloors.com/our-work-in-action/\">Our Work</a></li>\n  <li><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your Visit & Quote</a></li>\n</ul>\n<ul>\n  <li><a href=\"https://midlandfloors.com/\">Home</a></li>\n  <li><a href=\"https://midlandfloors.com/about/\">About Midland</a></li>\n  <li><a href=\"https://midlandfloors.com/floor-care-services/\">Services</a></li>\n  <li><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your Visit &amp; Quote</a></li>\n  <li><a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\">7 Essential Tips for Impeccable Commercial Floor Care Services</a></li>\n</ul><div style=\"background:#F3FCF4;border-left:4px solid #43A94B;padding:18px 22px;margin-top:24px;border-radius:6px\"><p style=\"margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#0F1411\">Related Services</p><ul style=\"margin:0;padding-left:18px;line-height:1.9\"><li><a href=\"/long-term-recurring-commercial-floor-care-programs/\" style=\"color:#2F8137;font-weight:700\">Long-Term & Recurring Commercial Floor Care Services</a></li><li><a href=\"/customized-commercial-floor-care-solutions/\" style=\"color:#2F8137;font-weight:700\">Customized Commercial Floor Care Solutions</a></li><li><a href=\"/commercial-upholstery/\" style=\"color:#2F8137;font-weight:700\">Commercial Upholstery</a></li><li><a href=\"/commercial-tile-grout-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Tile & Grout Cleaning</a></li><li><a href=\"/commercial-carpet-cleaning-services/\" style=\"color:#2F8137;font-weight:700\">Commercial Carpet Cleaning Services</a></li><li><a href=\"/commercial-hard-surface-floor-restoration/\" style=\"color:#2F8137;font-weight:700\">Commercial Hard Surface Floor Restoration</a></li></ul></div>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "cff5c986",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA",
+        "_css_classes": "midland-page"
+      },
+      "elements": [
+        {
+          "id": "6b94a178",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center",
+            "_css_classes": "midland-page"
+          },
+          "elements": [
+            {
+              "id": "0592f9af",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "9bce81d8",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and written Facility Score in 48 hours. Yours to keep, even if you don't hire us.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "5240c1dd",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center",
+                "_css_classes": "midland-page"
+              },
+              "elements": [
+                {
+                  "id": "8f1700a6",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "\ud83d\udcde (240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#0E2F14",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#FFFFFF",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "9d1d14e4",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#43A94B",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}
