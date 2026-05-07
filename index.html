@@ -3,16 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Commercial Floor &amp; Carpet Care in DC, MD &amp; VA | Midland Floor Care</title>
-<meta name="description" content="Commercial carpet cleaning, tile &amp; grout, hardwood refinishing, and concrete polishing for offices, retail, healthcare, and government across DC, Maryland, Virginia. Call (240) 532-9097." />
+<title>Professional Floor &amp; Carpet Care in DC, MD &amp; VA | Midland Floor Care</title>
+<meta name="description" content="Professional commercial floor and carpet care for DC, Maryland, and Virginia. Carpet cleaning, hardwood refinishing, tile &amp; grout, concrete polishing. Call (240) 532-9097 for immediate availability." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
 /* ================================================================
-   MIDLAND FLOOR CARE — Commercial Sales Page  v=20260507-6
-   Local brand. Photo-bg hero. Phone-first CTAs.
-   White / mint / brand green. Real logo + photos.
+   MIDLAND FLOOR CARE — Homepage v=20260507-7
+   Match live site block order. Polish + tighten sales.
    ================================================================ */
 
 :root{
@@ -35,8 +34,8 @@ html{ scroll-behavior:smooth }
 body{
   margin:0;
   font-family: var(--sans);
-  font-size: 17px;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.6;
   color: var(--ink);
   background: var(--white);
   -webkit-font-smoothing: antialiased;
@@ -44,32 +43,31 @@ body{
 img{ max-width:100%; display:block; height:auto }
 a{ color:inherit; text-decoration:none }
 button{ font-family:inherit; cursor:pointer }
-input, select, textarea{ font-family: inherit; font-size: 16px; }
+input, select, textarea{ font-family: inherit; font-size: 15px; }
 
 h1, h2, h3, h4 { font-family: var(--sans); font-weight: 800; color: var(--ink); margin:0; letter-spacing:-.02em; line-height: 1.1; }
-h1 { font-size: clamp(40px, 5.4vw, 72px); line-height: 1.04; }
-h2 { font-size: clamp(28px, 3.4vw, 44px); }
+h1 { font-size: clamp(38px, 5vw, 60px); line-height: 1.05; }
+h2 { font-size: clamp(28px, 3.4vw, 42px); }
 h3 { font-size: 22px; }
-h4 { font-size: 18px; }
+h4 { font-size: 17px; }
 p { margin: 0; }
-.lede { font-size: 18px; line-height: 1.55; color: var(--ink-2); }
-.eyebrow{ display:inline-block; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--green-deep); }
+.lede { font-size: 16px; line-height: 1.65; color: var(--ink-2); }
+.eyebrow{ display:inline-block; font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--green-deep); }
 
 .wrap{ max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 .wrap-narrow{ max-width: 920px; margin: 0 auto; padding: 0 24px; }
 section{ padding: 64px 0; background: var(--white); }
 section.mint{ background: var(--mint); }
-section.dark{ background: var(--ink); color: #DDE2DE; }
-section.dark h2, section.dark h3 { color: #FFF; }
 @media (max-width: 720px){ section{ padding: 44px 0; } .wrap, .wrap-narrow{ padding: 0 18px; } }
 
 /* ---------- BTN ---------- */
 .btn{
   display:inline-flex; align-items:center; justify-content: center; gap: 10px;
-  font-weight: 700; font-size: 16px;
-  padding: 16px 26px; border: 2px solid var(--green);
+  font-weight: 800; font-size: 15px;
+  padding: 16px 28px; border: 2px solid var(--green);
   background: var(--green); color: #FFF;
-  border-radius: 6px;
+  border-radius: 4px;
+  text-transform: uppercase; letter-spacing: .04em;
   transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
   line-height: 1; text-align: center;
 }
@@ -78,14 +76,14 @@ section.dark h2, section.dark h3 { color: #FFF; }
 .btn--ghost:hover{ background: #FFF; color: var(--ink); border-color: #FFF; }
 .btn--ink{ background: var(--ink); border-color: var(--ink); color: #FFF; }
 .btn--ink:hover{ background: #000; border-color: #000; }
-.btn--lg{ padding: 18px 30px; font-size: 17px; }
-.btn--xl{ padding: 22px 36px; font-size: 19px; }
+.btn--lg{ padding: 18px 32px; font-size: 16px; }
+.btn--xl{ padding: 22px 38px; font-size: 18px; }
 .btn--block{ width: 100%; }
 
 /* ---------- TOPBAR ---------- */
 .topbar{
   background: var(--ink); color: #E5EAE6;
-  font-size: 13px; font-weight: 500;
+  font-size: 12px; font-weight: 500;
 }
 .topbar .inner{
   display:flex; justify-content:space-between; align-items:center;
@@ -95,7 +93,8 @@ section.dark h2, section.dark h3 { color: #FFF; }
 .topbar .pill{
   display:inline-flex; align-items:center; gap:8px;
   padding: 3px 10px; background: rgba(67,169,75,.18); color: #B7E5BD;
-  border-radius: 999px; font-weight: 600; font-size: 12px;
+  border-radius: 999px; font-weight: 700; font-size: 11px;
+  text-transform: uppercase; letter-spacing: .06em;
 }
 .topbar .pill::before{ content:""; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.6s infinite; }
 @keyframes pulse{ 0%{ box-shadow: 0 0 0 0 rgba(67,169,75,.6) } 70%{ box-shadow: 0 0 0 8px rgba(67,169,75,0) } 100%{ box-shadow: 0 0 0 0 rgba(67,169,75,0) } }
@@ -112,11 +111,14 @@ header.nav .inner{
   max-width: 1200px; margin: 0 auto; padding: 12px 24px;
 }
 .logo img{ height: 38px; width: auto; display:block; }
-nav.primary ul{ list-style: none; padding:0; margin:0; display:flex; gap: 26px; }
-nav.primary a{ font-size: 15px; font-weight: 600; color: var(--ink-2); }
+nav.primary ul{ list-style: none; padding:0; margin:0; display:flex; gap: 24px; }
+nav.primary a{
+  font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink);
+}
 nav.primary a:hover{ color: var(--green-deep); }
 .nav-cta{ display:flex; gap: 12px; align-items:center; }
-.nav-cta .phone{ font-weight: 700; font-size: 15px; color: var(--ink); }
+.nav-cta .phone{ font-weight: 800; font-size: 15px; color: var(--ink); }
 @media (max-width: 900px){ nav.primary{ display:none } }
 @media (max-width: 540px){ .nav-cta .phone{ display:none } }
 
@@ -126,161 +128,207 @@ nav.primary a:hover{ color: var(--green-deep); }
   background: var(--ink);
   color: #FFF;
   overflow: hidden;
-  min-height: 640px;
+  min-height: 580px;
   display: flex; align-items: center;
-  padding: 100px 0 96px;
+  padding: 80px 0;
 }
 .hero .bg{
   position: absolute; inset: 0; z-index: 0;
   background-image:
-    linear-gradient(90deg, rgba(15,20,17,.92) 0%, rgba(15,20,17,.7) 45%, rgba(15,20,17,.35) 100%),
+    linear-gradient(90deg, rgba(15,20,17,.94) 0%, rgba(15,20,17,.82) 40%, rgba(15,20,17,.45) 70%, rgba(15,20,17,.25) 100%),
     url('https://midlandfloors.com/wp-content/uploads/2025/08/Midland-Floor-Care-Photo-1.png');
   background-size: cover; background-position: center right;
 }
-.hero .wrap{ position: relative; z-index: 1; }
+.hero .wrap{ position: relative; z-index: 1; max-width: 1200px; }
 .hero .chip-row{
-  display:flex; gap: 8px; flex-wrap: wrap;
-  font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--green); margin-bottom: 22px;
+  display:flex; gap: 0; flex-wrap: wrap;
+  font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--green); margin-bottom: 24px;
 }
-.hero .chip-row span{ position: relative; padding-right: 10px; }
+.hero .chip-row span{ position: relative; padding-right: 14px; margin-right: 14px; }
 .hero .chip-row span:not(:last-child)::after{ content:"·"; position: absolute; right: 0; color: rgba(255,255,255,.4); }
-.hero h1{ color: #FFF; max-width: 16ch; }
-.hero h1 .accent{ color: var(--green); }
+.hero h1{ color: #FFF; max-width: 14ch; font-weight: 800; }
 .hero p.sub{
-  margin-top: 22px; font-size: 19px; line-height: 1.5;
+  margin-top: 22px; font-size: 17px; line-height: 1.55;
   color: #D5DAD7; max-width: 56ch; font-weight: 500;
 }
-.hero p.sub b{ color: #FFF; font-weight: 700; }
-.hero .ctas{ margin-top: 32px; display:flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.hero p.sub b{ color: #FFF; font-weight: 800; }
+.hero p.sub .urgent{ color: var(--green); font-weight: 800; }
+.hero .ctas{ margin-top: 28px; display:flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.hero .ctas .secondary{ font-size: 14px; font-weight: 600; color: #B7BCB8; }
+.hero .ctas .secondary u{ color: #FFF; }
 .hero .reviews{
   margin-top: 28px; display:flex; gap: 18px; align-items: center; flex-wrap: wrap;
-  font-size: 14px; color: #B7BCB8;
+  font-size: 13px; color: #B7BCB8;
 }
-.hero .reviews .stars{ color: var(--gold); letter-spacing: .12em; font-size: 18px; }
-.hero .reviews b{ color: #FFF; font-weight: 700; }
+.hero .reviews .stars{ color: var(--gold); letter-spacing: .12em; font-size: 16px; }
+.hero .reviews b{ color: #FFF; font-weight: 800; }
 
 @media (max-width: 720px){
-  .hero{ min-height: 0; padding: 64px 0 56px; }
+  .hero{ min-height: 0; padding: 56px 0 48px; }
   .hero .bg{ background-position: center; }
 }
 
-/* ============== TRUST STRIP ============== */
-.trust-strip{
-  background: var(--ink);
-  border-top: 1px solid #1F2A22;
-  color: #DDE2DE;
-  padding: 18px 0;
-  font-size: 13px; font-weight: 600;
-}
-.trust-strip .inner{
-  display:grid; grid-template-columns: repeat(5, 1fr); gap: 16px; align-items: center;
-  text-align: center;
-}
-.trust-strip b{ color: #FFF; }
-@media (max-width: 900px){ .trust-strip .inner{ grid-template-columns: repeat(2, 1fr); text-align:left; gap: 10px; } }
+/* ============== SECTION HEADER (centered like live site) ============== */
+.sect-head{ text-align: center; max-width: 720px; margin: 0 auto 40px; }
+.sect-head h2{ margin-top: 14px; }
+.sect-head p{ margin-top: 14px; }
 
-/* ============== PROCESS (mint, like their site) ============== */
-.process-row{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 32px; }
-.process-step{ text-align: center; position: relative; }
-.process-step .num-circle{
-  width: 84px; height: 84px; border-radius: 50%;
+/* ============== PROCESS (mint, 4 BIG animated circles) ============== */
+.process-row{
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+  position: relative; margin-top: 32px;
+}
+.process-step{
+  text-align: center; position: relative;
+  padding: 28px 16px;
+  background: var(--white);
+  border: 1px solid var(--mint-2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .25s ease;
+}
+.process-step:hover{
+  transform: translateY(-10px);
+  box-shadow: 0 24px 40px -16px rgba(67,169,75,.35), 0 8px 16px -8px rgba(15,20,17,.12);
+  border-color: var(--green);
+}
+.process-step .circle-wrap{
+  position: relative; width: 140px; height: 140px; margin: 0 auto 22px;
+  z-index: 1;
+}
+.process-step .circle{
+  width: 100%; height: 100%; border-radius: 50%;
   background: var(--white); border: 2px solid var(--green);
-  display:grid; place-items:center;
-  margin: 0 auto 16px;
-  font-weight: 800; font-size: 14px; letter-spacing: .1em;
-  color: var(--green-deep);
-  position: relative;
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 14px; letter-spacing: .16em;
+  color: var(--green-deep); text-transform: uppercase;
+  box-shadow: 0 8px 20px -8px rgba(67,169,75,.25);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1), background .25s ease, color .25s ease, box-shadow .35s ease;
 }
-.process-step .num-circle::before{
-  content: attr(data-n);
-  position: absolute; top: -8px; right: -8px;
-  width: 28px; height: 28px; background: var(--green); color: #FFF;
-  border-radius: 50%; display:grid; place-items:center; font-size: 12px; font-weight: 800;
+.process-step:hover .circle{
+  background: var(--green); color: #FFF;
+  transform: scale(1.08) rotate(-4deg);
+  box-shadow: 0 16px 32px -8px rgba(67,169,75,.55);
 }
-.process-step h4{ font-size: 18px; margin-bottom: 6px; }
-.process-step p{ color: var(--ink-2); font-size: 14px; line-height: 1.5; max-width: 28ch; margin: 0 auto; }
-@media (max-width: 800px){ .process-row{ grid-template-columns: repeat(2, 1fr); } }
+.process-step .badge{
+  position: absolute; top: -4px; right: -4px;
+  width: 40px; height: 40px; background: var(--green); color: #FFF;
+  border-radius: 50%; display:grid; place-items:center;
+  font-size: 15px; font-weight: 800;
+  box-shadow: 0 6px 12px -2px rgba(67,169,75,.5);
+  border: 3px solid var(--white);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), background .25s ease;
+}
+.process-step:hover .badge{
+  transform: scale(1.15) rotate(8deg);
+  background: var(--ink);
+}
+.process-step h4{ font-size: 19px; margin-bottom: 8px; font-weight: 800; }
+.process-step p{ color: var(--ink-2); font-size: 14px; line-height: 1.55; max-width: 26ch; margin: 0 auto; }
+/* connecting dotted line between cards */
+.process-row::before{
+  content:""; position: absolute; top: 130px; left: 14%; right: 14%; height: 2px;
+  background-image: linear-gradient(to right, var(--green) 50%, transparent 50%);
+  background-size: 12px 2px; background-repeat: repeat-x;
+  z-index: 0; opacity: .35;
+}
+@media (max-width: 800px){
+  .process-row{ grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .process-row::before{ display: none; }
+  .process-step{ padding: 24px 14px; }
+  .process-step .circle-wrap{ width: 120px; height: 120px; }
+}
 
-/* ============== TEAM + FORM (white) ============== */
-.team-form{
+/* ============== FLOORS AREN'T A SIDE JOB + FORM ============== */
+.side-job{
   display:grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start;
 }
-.team-form .left h2{ font-size: clamp(30px, 4vw, 48px); }
-.team-form .team-photo{
-  margin-top: 24px; border-radius: 4px; overflow: hidden;
+.side-job .left h2{ font-size: clamp(28px, 3.6vw, 42px); }
+.side-job .team-photo{
+  margin-top: 20px; border-radius: 4px; overflow: hidden;
   border: 1px solid var(--line);
 }
-.team-form .team-photo img{ aspect-ratio: 5/4; object-fit: cover; width: 100%; }
-.team-form .badges{
-  display:flex; gap: 18px; flex-wrap: wrap; margin-top: 18px;
-  font-size: 13px; color: var(--ink-2); font-weight: 600;
+.side-job .team-photo img{ aspect-ratio: 5/4; object-fit: cover; width: 100%; }
+.side-job .badges{
+  display:flex; gap: 14px; flex-wrap: wrap; margin-top: 14px;
+  font-size: 12px; color: var(--ink-2); font-weight: 700;
 }
-.team-form .badges span{ display:inline-flex; align-items:center; gap: 8px; }
-.team-form .badges span::before{
-  content:"✓"; width: 22px; height: 22px; background: var(--mint);
-  color: var(--green-deep); display:grid; place-items:center; border-radius: 50%; font-weight: 800; font-size: 12px;
+.side-job .badges span{ display:inline-flex; align-items:center; gap: 6px; }
+.side-job .badges span::before{
+  content:"✓"; width: 18px; height: 18px; background: var(--mint);
+  color: var(--green-deep); display:grid; place-items:center; border-radius: 50%; font-weight: 800; font-size: 10px;
 }
 
-/* form */
+/* form — match live site exactly: simple, single column */
 .form-card{
-  background: var(--white); border: 1px solid var(--line); border-radius: 8px;
+  background: var(--white); border: 1px solid var(--line); border-radius: 4px;
   padding: 28px;
 }
-.form-card h3{ font-size: 24px; margin-bottom: 6px; }
-.form-card .sub{ font-size: 14px; color: var(--ink-2); margin-bottom: 20px; }
-.form-card label{ display:block; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.form-card h3{ font-size: 26px; margin-bottom: 4px; font-weight: 800; }
+.form-card .sub{ font-size: 13px; color: var(--ink-2); margin-bottom: 18px; }
+.form-card label{ display:block; font-size: 12px; font-weight: 800; color: var(--ink); margin-bottom: 6px; letter-spacing: .04em; text-transform: uppercase; }
 .form-card .row{ margin-bottom: 14px; }
-.form-card .row.two{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .form-card input, .form-card select{
-  width: 100%; padding: 12px 14px;
-  border: 1.5px solid var(--line); border-radius: 6px;
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--line); border-radius: 4px;
   background: var(--white); color: var(--ink);
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 .form-card input:focus, .form-card select:focus{
   outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(67,169,75,.15);
 }
-.form-card .legal{ margin-top: 10px; font-size: 12px; color: var(--ink-2); text-align:center; line-height: 1.45; }
+.form-card .radios{ display:flex; flex-direction:column; gap: 8px; margin-top: 4px; }
+.form-card .radios label{ display:flex; align-items:center; gap: 10px; font-size: 14px; font-weight: 500; text-transform: none; letter-spacing: 0; cursor: pointer; }
+.form-card .radios input{ width: auto; margin: 0; accent-color: var(--green); }
+.form-card .help{ margin-top: 10px; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
 .form-card .alt{
   margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line);
-  text-align:center; font-size: 14px; color: var(--ink-2);
+  text-align:center; font-size: 13px; color: var(--ink-2);
 }
-.form-card .alt a{ font-weight: 800; color: var(--ink); display:block; margin-top: 6px; font-size: 22px; }
-@media (max-width: 800px){ .team-form{ grid-template-columns: 1fr; gap: 32px; } }
+.form-card .alt a{ font-weight: 800; color: var(--ink); display:block; margin-top: 4px; font-size: 22px; }
+@media (max-width: 800px){ .side-job{ grid-template-columns: 1fr; gap: 32px; } }
 
-/* ============== ABOUT (mint, intro) ============== */
+/* ============== ABOUT STRIP ============== */
 .about-strip{ text-align:center; max-width: 760px; margin: 0 auto; }
 
-/* ============== SERVICES (commercial) ============== */
-.svc-flex{ display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 32px; }
-.svc-flex.reverse{ direction: rtl; }
-.svc-flex.reverse > *{ direction: ltr; }
-.svc-flex .photo{ border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
-.svc-flex .photo img{ aspect-ratio: 4/3; object-fit: cover; width:100%; }
-.svc-flex h2{ font-size: clamp(28px, 3.4vw, 40px); }
-.svc-flex .quote{ font-size: 15px; color: var(--ink-2); margin-top: 10px; font-style: italic; max-width: 50ch; }
-.svc-flex ul{ list-style: none; padding: 0; margin: 18px 0 24px; display:grid; gap: 8px; }
-.svc-flex li{ display:flex; gap: 10px; align-items: flex-start; font-size: 16px; }
-.svc-flex li::before{ content:"•"; color: var(--green); font-weight: 800; flex-shrink: 0; }
-@media (max-width: 800px){ .svc-flex{ grid-template-columns: 1fr; gap: 24px; } .svc-flex.reverse{ direction: ltr; } }
+/* ============== SERVICES (residential / commercial — photo + bullets) ============== */
+.svc-block{ display:grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 32px; }
+.svc-block .photo{ border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+.svc-block .photo img{ aspect-ratio: 4/3; object-fit: cover; width:100%; }
+.svc-block ul{ list-style: none; padding: 0; margin: 18px 0 24px; display:grid; gap: 8px; }
+.svc-block li{ display:flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.svc-block li::before{
+  content:"●"; color: var(--green); font-weight: 800; flex-shrink: 0; font-size: 8px; padding-top: 8px;
+}
+.svc-pull{
+  font-style: italic; font-size: 15px; color: var(--ink-2);
+  border-left: 3px solid var(--green); padding-left: 14px;
+  margin-top: 12px; max-width: 50ch;
+}
+.svc-pull cite{ display:block; font-style: normal; font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 6px; }
+@media (max-width: 800px){ .svc-block{ grid-template-columns: 1fr; gap: 24px; } }
 
-/* ============== STATS GREEN BAR ============== */
+/* ============== STATS BAND (green) ============== */
 .stats-band{
-  background: var(--green-dark);
+  position: relative;
+  background:
+    linear-gradient(90deg, rgba(14,47,20,.92) 0%, rgba(14,47,20,.85) 100%),
+    url('https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-Work-3.jpeg');
+  background-size: cover; background-position: center;
   color: #FFF;
-  padding: 28px 0;
+  padding: 36px 0;
 }
 .stats-band .inner{
   display:flex; justify-content: space-between; align-items: center;
-  gap: 24px; flex-wrap: wrap;
+  gap: 32px; flex-wrap: wrap;
 }
-.stats-band h3{ color: #FFF; font-size: clamp(20px, 2.4vw, 30px); margin: 0; max-width: 30ch }
+.stats-band h3{ color: #FFF; font-size: clamp(22px, 2.8vw, 32px); margin: 0; max-width: 28ch; line-height: 1.2; }
 .stats-band h3 .accent{ color: var(--green); }
 .stats-band a.btn{ flex-shrink: 0; }
-.stats-band .meta{ font-size: 13px; color: #B7E5BD; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.stats-band .meta{ font-size: 11px; color: var(--green); font-weight: 800; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 8px; }
 
-/* ============== TESTIMONIALS (dark with overlay) ============== */
+/* ============== TESTIMONIALS (dark photo overlay) ============== */
 .testi{
   background:
     linear-gradient(180deg, rgba(15,20,17,.86), rgba(15,20,17,.96)),
@@ -289,65 +337,69 @@ nav.primary a:hover{ color: var(--green-deep); }
   color: #FFF;
 }
 .testi h2{ color: #FFF; }
+.testi .sect-head p{ color: #B7BCB8; }
 .testi-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
 .testi-card{
   background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12);
-  border-radius: 8px; padding: 22px;
+  border-radius: 4px; padding: 22px;
   display:flex; flex-direction:column; gap: 14px;
   backdrop-filter: blur(4px);
 }
-.testi-card .stars{ color: var(--gold); letter-spacing: .1em; font-size: 17px; }
-.testi-card blockquote{ margin: 0; font-size: 16px; line-height: 1.55; color: #FFF; font-weight: 500; }
+.testi-card .stars{ color: var(--gold); letter-spacing: .12em; font-size: 16px; }
+.testi-card blockquote{ margin: 0; font-size: 15px; line-height: 1.6; color: #FFF; font-weight: 500; }
 .testi-card .who{ display:flex; gap: 12px; align-items: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.14); }
-.testi-card .who .av{ width: 38px; height: 38px; border-radius: 50%; background: var(--green); color: #FFF; display: grid; place-items: center; font-weight: 800; flex-shrink: 0; }
+.testi-card .who .av{ width: 36px; height: 36px; border-radius: 50%; background: var(--green); color: #FFF; display: grid; place-items: center; font-weight: 800; flex-shrink: 0; font-size: 13px; }
 .testi-card .who b{ display:block; font-size: 14px; color: #FFF; }
-.testi-card .who span{ font-size: 12px; color: #B7BCB8; }
+.testi-card .who span{ font-size: 11px; color: #B7BCB8; letter-spacing: .04em; }
 @media (max-width: 800px){ .testi-grid{ grid-template-columns: 1fr; } }
 
-/* ============== AREA ============== */
-.area{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; margin-top: 28px; }
-.area .col h4{ font-size: 18px; padding-bottom: 10px; border-bottom: 2px solid var(--green); margin-bottom: 12px; color: var(--ink); }
-.area .col ul{ list-style: none; padding: 0; margin: 0; }
-.area .col li{ padding: 4px 0; font-size: 15px; color: var(--ink-2); }
-@media (max-width: 800px){ .area{ grid-template-columns: 1fr; } }
-
-/* ============== FAQ ============== */
-.faq details{ background: var(--white); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px; margin-bottom: 10px; cursor: pointer; }
-.faq summary{ list-style: none; display: flex; justify-content: space-between; gap: 18px; align-items: center; font-size: 16px; font-weight: 700; }
-.faq summary::-webkit-details-marker{ display: none; }
-.faq summary .ic{ width: 24px; height: 24px; display:grid; place-items:center; flex-shrink: 0; background: var(--mint); color: var(--green-deep); border-radius: 50%; font-weight: 800; transition: transform .2s ease, background .2s ease, color .2s ease; }
-.faq details[open] summary .ic{ transform: rotate(45deg); background: var(--green); color: #fff; }
-.faq .a{ margin-top: 12px; color: var(--ink-2); font-size: 15px; line-height: 1.6; }
-
-/* ============== BOTTOM CTA (green) ============== */
-.bigcta{
-  background: var(--green-dark); color: #FFF;
-  padding: 64px 0;
-  text-align: center;
+/* ============== FOOTER (green block + black block, like live site) ============== */
+footer{ background: var(--ink); }
+.footer-grid{
+  display:grid; grid-template-columns: 1fr 2fr; gap: 0;
 }
-.bigcta h2{ color: #FFF; font-size: clamp(32px, 4.4vw, 56px); max-width: 18ch; margin: 0 auto; }
-.bigcta p{ color: #B7E5BD; margin: 18px auto 0; font-size: 18px; max-width: 60ch; }
-.bigcta .ctas{ margin-top: 28px; display:flex; gap: 12px; justify-content: center; flex-wrap:wrap; }
-.bigcta .micro{
-  margin-top: 20px; font-size: 13px; color: #9FB6A4; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+.footer-green{
+  background: var(--green); color: #FFF;
+  padding: 48px 32px;
+  display: flex; flex-direction: column; gap: 16px;
 }
-
-/* ============== FOOTER ============== */
-footer{ padding: 56px 0 24px; background: var(--ink); color: #B7BCB8; }
-footer .grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
-footer .logo img{ height: 44px; filter: brightness(0) invert(1); }
-footer h5{ font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
-footer ul{ list-style: none; padding: 0; margin: 0; }
-footer li{ padding: 4px 0; font-size: 15px; }
-footer a:hover{ color: var(--green); }
-footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28px; border-top: 1px solid #1F2A22; display:flex; justify-content:space-between; flex-wrap:wrap; gap: 12px; }
-@media (max-width: 800px){ footer .grid{ grid-template-columns: 1fr 1fr; } }
-@media (max-width: 500px){ footer .grid{ grid-template-columns: 1fr; } }
+.footer-green img{ height: 56px; width: auto; }
+.footer-green p{ color: rgba(255,255,255,.95); font-size: 14px; line-height: 1.6; max-width: 36ch; }
+.footer-black{
+  background: var(--ink); color: #B7BCB8;
+  padding: 48px 32px;
+}
+.footer-black .top{
+  display: flex; align-items: center; gap: 18px; padding-bottom: 24px;
+  border-bottom: 1px solid #1F2A22; margin-bottom: 24px;
+}
+.footer-black .top h5{ color: #FFF; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin: 0; }
+.footer-black .socials{ display:flex; gap: 8px; }
+.footer-black .socials a{
+  width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.08);
+  display:grid; place-items:center; color: #FFF; font-weight: 800; font-size: 13px;
+  transition: background .15s ease;
+}
+.footer-black .socials a:hover{ background: var(--green); }
+.footer-black .cols{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.footer-black h6{ color: #FFF; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 12px; }
+.footer-black ul{ list-style: none; padding: 0; margin: 0; }
+.footer-black li{ padding: 4px 0; font-size: 14px; }
+.footer-black a:hover{ color: var(--green); }
+.footer-meta{
+  background: var(--ink); border-top: 1px solid #1F2A22;
+  color: #6B7280; font-size: 12px;
+  padding: 16px 32px;
+  display:flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+@media (max-width: 800px){
+  .footer-grid{ grid-template-columns: 1fr; }
+  .footer-black .cols{ grid-template-columns: 1fr 1fr; gap: 18px; }
+}
 
 /* helpers */
 .center{ text-align:center }
 .mt-12{ margin-top:12px } .mt-18{ margin-top:18px } .mt-24{ margin-top:24px } .mt-32{ margin-top:32px }
-.mb-12{ margin-bottom:12px } .mb-18{ margin-bottom:18px } .mb-32{ margin-bottom:32px }
 
 .reveal{ opacity: 0; transform: translateY(8px); transition: opacity .45s ease, transform .45s ease; }
 .reveal.in{ opacity: 1; transform: none; }
@@ -373,15 +425,16 @@ footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28
     <nav class="primary">
       <ul>
         <li><a href="#about">About</a></li>
+        <li><a href="#schedule">Quote</a></li>
         <li><a href="#services">Services</a></li>
-        <li><a href="#process">How It Works</a></li>
-        <li><a href="#area">Service Area</a></li>
         <li><a href="#faq">FAQ</a></li>
+        <li><a href="#testimonials">Clients</a></li>
+        <li><a href="#footer">Reach Us</a></li>
       </ul>
     </nav>
     <div class="nav-cta">
       <a class="phone" href="tel:2405329097">(240) 532-9097</a>
-      <a class="btn" href="#schedule" style="padding:10px 18px;font-size:14px">Schedule a Visit</a>
+      <a class="btn" href="#schedule" style="padding:10px 18px;font-size:12px">Schedule Visit</a>
     </div>
   </div>
 </header>
@@ -391,67 +444,52 @@ footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28
   <div class="bg" aria-hidden="true"></div>
   <div class="wrap">
     <div class="chip-row">
-      <span>Carpet</span><span>Hardwood</span><span>Tile &amp; Grout</span><span>Concrete</span><span>Commercial</span>
+      <span>Carpet</span><span>Hardwood</span><span>Tile</span><span>Concrete</span><span>Commercial</span>
     </div>
-    <h1>
-      Commercial floor &amp; carpet care for <span class="accent">DC, MD &amp; VA.</span>
-    </h1>
+    <h1>Professional Floor &amp; Carpet Care in DC, MD &amp; VA.</h1>
     <p class="sub">
-      Family-owned, locally operated. Trusted by DMV facility teams and property managers for <b>commercial carpet cleaning, hardwood refinishing, tile &amp; grout, upholstery, and full commercial floor care.</b> Call for immediate availability.
+      Family-owned, locally operated. Trusted by DMV homeowners and facility managers for <b>carpet cleaning, hardwood refinishing, tile &amp; grout, upholstery, and full commercial floor care.</b> <span class="urgent">Call for immediate availability.</span>
     </p>
     <div class="ctas">
       <a class="btn btn--xl" href="tel:2405329097">📞 Call now (240) 532-9097</a>
-      <a class="btn btn--ghost btn--xl" href="#schedule">Schedule a free visit</a>
+      <span class="secondary">or <a href="#schedule"><u>schedule a free site visit →</u></a></span>
     </div>
     <div class="reviews">
       <span class="stars">★★★★★</span>
       <span><b>5.0 Google Rating</b> · 774+ DMV Clients</span>
-      <span><b>Fully Insured</b> · COI-Ready</span>
+      <span><b>Fully Insured</b> · COI on Demand</span>
     </div>
   </div>
 </section>
 
-<!-- ============== TRUST STRIP ============== -->
-<div class="trust-strip">
-  <div class="wrap">
-    <div class="inner">
-      <div>✓ <b>Fully Insured</b> (COI on Demand)</div>
-      <div>✓ <b>EPA-Approved</b> Disinfectants</div>
-      <div>✓ <b>Same-Day</b> Emergency Response</div>
-      <div>✓ <b>24-48 Hour</b> Quote Turnaround</div>
-      <div>✓ <b>No Annual</b> Lock-Ins</div>
-    </div>
-  </div>
-</div>
-
 <!-- ============== PROCESS ============== -->
 <section class="mint" id="process">
   <div class="wrap">
-    <div class="center">
+    <div class="sect-head">
       <span class="eyebrow">The Midland Process Explained</span>
-      <h2 class="mt-12">How our process works.</h2>
-      <p class="lede mt-12" style="margin-left:auto;margin-right:auto;max-width:60ch">
-        Clear steps. No guesswork. A smooth experience from first visit to final clean.
+      <h2>How our process works.</h2>
+      <p class="lede">
+        Our process makes it easy to see exactly how we deliver quality results and complete client satisfaction — clear steps, no guesswork, and a smooth experience from first visit to final clean.
       </p>
     </div>
     <div class="process-row reveal">
       <div class="process-step">
-        <div class="num-circle" data-n="01">SITE</div>
+        <div class="circle-wrap"><div class="circle">SITE</div><div class="badge">01</div></div>
         <h4>Walkthrough</h4>
         <p>We inspect the space in person, identify surfaces and trouble spots.</p>
       </div>
       <div class="process-step">
-        <div class="num-circle" data-n="02">PLAN</div>
+        <div class="circle-wrap"><div class="circle">PLAN</div><div class="badge">02</div></div>
         <h4>Facility Score</h4>
         <p>You get a written assessment of every surface — yours to keep.</p>
       </div>
       <div class="process-step">
-        <div class="num-circle" data-n="03">QUOTE</div>
+        <div class="circle-wrap"><div class="circle">QUOTE</div><div class="badge">03</div></div>
         <h4>24-48 Hour Quote</h4>
         <p>Line-item pricing, no hidden fees, no annual lock-ins.</p>
       </div>
       <div class="process-step">
-        <div class="num-circle" data-n="04">CLEAN</div>
+        <div class="circle-wrap"><div class="circle">CLEAN</div><div class="badge">04</div></div>
         <h4>Schedule</h4>
         <p>Nights, weekends, holidays — your tenants only see the result.</p>
       </div>
@@ -459,24 +497,14 @@ footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28
   </div>
 </section>
 
-<!-- ============== TEAM + FORM ============== -->
+<!-- ============== FLOORS AREN'T A SIDE JOB + SCHEDULE FORM ============== -->
 <section id="schedule">
   <div class="wrap">
-    <div class="team-form">
+    <div class="side-job">
       <div class="left">
-        <span class="eyebrow">Side job? Not here.</span>
-        <h2 class="mt-12">Floors and carpet aren't a side job. They're the whole job.</h2>
-        <p class="lede mt-18">
-          Family-owned and locally operated in the DMV. Every program is run out of our shop, not dispatched from a national call center. One named account lead, every visit.
-        </p>
-        <div class="badges">
-          <span>DMV-based crews</span>
-          <span>One named lead</span>
-          <span>EPA-approved chemistry</span>
-          <span>COI on demand</span>
-        </div>
-        <div class="team-photo">
-          <img src="https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-Work.jpeg" alt="Midland Floor Care crew on site in DMV commercial space" loading="lazy">
+        <h2>Floors and Carpet Aren't a Side Job. They're the Whole Job.</h2>
+        <div class="team-photo" style="margin-top:24px">
+          <img src="https://midlandfloors.com/wp-content/uploads/2024/01/IMG_6257-scaled.jpeg" alt="The Midland Floor Care team" loading="lazy">
         </div>
       </div>
 
@@ -484,29 +512,26 @@ footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28
         <h3>Schedule a visit here.</h3>
         <p class="sub">Free site evaluation. No pressure, no obligation.</p>
         <form onsubmit="event.preventDefault(); alert('Thanks! A Midland tech will reach out within 1 business hour.');">
-          <div class="row two">
-            <div><label for="fname">First name</label><input id="fname" type="text" required placeholder="Jane"></div>
-            <div><label for="lname">Last name</label><input id="lname" type="text" required placeholder="Doe"></div>
-          </div>
+          <div class="row"><label for="fname">Name</label><input id="fname" type="text" required placeholder="Jane Doe"></div>
           <div class="row"><label for="phone">Phone</label><input id="phone" type="tel" required placeholder="(240) 555-0100"></div>
-          <div class="row"><label for="email">Email</label><input id="email" type="email" required placeholder="you@company.com"></div>
-          <div class="row two">
-            <div>
-              <label for="service">Service needed</label>
-              <select id="service" required>
-                <option value="">Pick one</option>
-                <option>Commercial Carpet Cleaning</option>
-                <option>Tile &amp; Grout</option>
-                <option>Hardwood Refinishing</option>
-                <option>Concrete Polishing</option>
-                <option>Janitorial / Disinfecting</option>
-                <option>Other / Multiple</option>
-              </select>
+          <div class="row">
+            <label>Choose a service</label>
+            <div class="radios">
+              <label><input type="radio" name="svc" value="floor"> Floor Cleaning</label>
+              <label><input type="radio" name="svc" value="carpet"> Carpet Cleaning</label>
+              <label><input type="radio" name="svc" value="commercial"> Commercial Care</label>
             </div>
-            <div><label for="zip">Building Zip</label><input id="zip" type="text" required placeholder="20878"></div>
           </div>
-          <button class="btn btn--block btn--lg" type="submit">Get my free site visit →</button>
-          <p class="legal">By submitting, you agree to be contacted by Midland Floor Care. We never share your info.</p>
+          <div class="row">
+            <label>Do you require emergency service?</label>
+            <div class="radios">
+              <label><input type="radio" name="emerg" value="yes"> Yes</label>
+              <label><input type="radio" name="emerg" value="no"> No</label>
+            </div>
+          </div>
+          <div class="row"><label for="zip">Zip Code</label><input id="zip" type="text" required placeholder="20878"></div>
+          <p class="help">You'll be redirected to our pricing page along with an option to schedule a site visit.</p>
+          <button class="btn btn--block btn--lg" type="submit">Submit</button>
         </form>
         <div class="alt">
           Or call us right now:
@@ -517,13 +542,13 @@ footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28
   </div>
 </section>
 
-<!-- ============== ABOUT (intro strip) ============== -->
+<!-- ============== ABOUT (mint, intro) ============== -->
 <section class="mint" id="about">
   <div class="wrap-narrow about-strip">
-    <span class="eyebrow">About Midland Floor Care</span>
+    <span class="eyebrow">About</span>
     <h2 class="mt-12">Midland Floor Care delivers.</h2>
     <p class="lede mt-18">
-      Family-owned, serving DC, Maryland, and Virginia. From Bethesda homeowners pressing for family visits to Arlington property managers needing a 40K sq ft office cleaned overnight and same-play-book show-up on time — we do the work right and leave better than we found it. Trusted by federal contractors, Class A property managers, healthcare networks, and DMV school districts.
+      Family-owned, serving DC, Maryland, and Virginia. From Bethesda homeowners pressing for family visits to Arlington property managers needing a 40K sq ft office cleaned overnight and same-play-book show-up on time — we do the work right and leave better than we found it.
     </p>
     <div class="mt-24" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <a class="btn" href="#schedule">Schedule a Visit</a>
@@ -532,34 +557,31 @@ footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28
   </div>
 </section>
 
-<!-- ============== COMMERCIAL SERVICES (photo + bullets) ============== -->
+<!-- ============== RESIDENTIAL SERVICES ============== -->
 <section id="services">
   <div class="wrap">
-    <div class="center">
-      <span class="eyebrow">Commercial Services</span>
-      <h2 class="mt-12">Built for commercial buildings across the DMV.</h2>
-      <p class="lede mt-12" style="margin-left:auto;margin-right:auto;max-width:64ch">
-        Office, retail, healthcare, government, education, and hospitality. Every surface, every shift.
-      </p>
+    <div class="sect-head">
+      <h2 style="text-transform: uppercase; letter-spacing: .04em">Residential Services</h2>
+      <blockquote class="svc-pull center" style="border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 50ch">
+        "Carpet like new after 8 years of kids and pets."
+        <cite>— Sandy, Bethesda</cite>
+      </blockquote>
     </div>
-
-    <div class="svc-flex reveal">
+    <div class="svc-block reveal">
       <div class="photo">
-        <img src="https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-Work-2.jpeg" alt="Commercial carpet cleaning work in DMV office" loading="lazy">
+        <img src="https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-Work-2.jpeg" alt="Midland residential carpet cleaning in DMV home" loading="lazy">
       </div>
       <div>
-        <h2>Commercial Carpet Cleaning</h2>
-        <p class="quote">"40K sq ft office cleaned overnight. No downtime." — Arlington property manager</p>
         <ul>
-          <li>Carpet cleaning (steam extraction)</li>
-          <li>Pet stain &amp; odor removal</li>
-          <li>Area rug cleaning (pickup available)</li>
-          <li>Hardwood cleaning &amp; refinishing</li>
-          <li>Tile &amp; grout cleaning + sealing</li>
-          <li>Upholstery + leather cleaning</li>
-          <li>Move-in / move-out cleaning</li>
+          <li>Carpet Cleaning (steam extraction)</li>
+          <li>Pet Stain &amp; Odor Removal</li>
+          <li>Area Rug Cleaning (pickup available)</li>
+          <li>Hardwood Cleaning &amp; Refinishing</li>
+          <li>Tile &amp; Grout Cleaning + Sealing</li>
+          <li>Upholstery Cleaning</li>
+          <li>Move-In / Move-Out Cleaning</li>
         </ul>
-        <a class="btn" href="#schedule">Get a quote →</a>
+        <a class="btn" href="#schedule">Get a residential quote →</a>
       </div>
     </div>
   </div>
@@ -578,148 +600,145 @@ footer .meta{ font-size: 12px; color: #6B7280; padding-top: 24px; margin-top: 28
   </div>
 </div>
 
-<!-- ============== COMMERCIAL SERVICES (second flex, reversed) ============== -->
+<!-- ============== COMMERCIAL SERVICES ============== -->
 <section>
   <div class="wrap">
-    <div class="svc-flex reverse reveal">
-      <div class="photo">
-        <img src="https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-Work-3.jpeg" alt="Commercial hard surface floor restoration in DMV" loading="lazy">
-      </div>
+    <div class="sect-head">
+      <h2 style="text-transform: uppercase; letter-spacing: .04em">Commercial Services</h2>
+      <blockquote class="svc-pull center" style="border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 56ch">
+        "40K sq ft office cleaned overnight. No downtime."
+        <cite>— Arlington Property Manager</cite>
+      </blockquote>
+    </div>
+    <div class="svc-block reveal" style="grid-template-columns: 1fr 1fr">
       <div>
-        <h2>Commercial Floor Restoration</h2>
-        <p class="quote">"40K sq ft of office tile cleaned overnight. No downtime." — Arlington property manager</p>
         <ul>
-          <li>Carpet cleaning (after-hours)</li>
-          <li>Tile &amp; grout deep clean</li>
-          <li>Hard surface floor restoration (VCT, stone)</li>
-          <li>Concrete polishing</li>
-          <li>Janitorial services</li>
-          <li>Upholstery + leather cleaning</li>
-          <li>EPA-approved disinfecting</li>
+          <li>Carpet Cleaning (after-hours)</li>
+          <li>Tile &amp; Grout Deep Clean</li>
+          <li>Hard Surface Floor Restoration (VCT, stone)</li>
+          <li>Concrete Polishing</li>
+          <li>Janitorial Services</li>
+          <li>Upholstery + Leather Cleaning</li>
+          <li>EPA-Approved Disinfecting</li>
         </ul>
-        <a class="btn" href="#schedule">Get a quote →</a>
+        <a class="btn" href="#schedule">Get a commercial quote →</a>
+      </div>
+      <div class="photo">
+        <img src="https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-Work-3.jpeg" alt="Midland commercial floor restoration in DMV office" loading="lazy">
       </div>
     </div>
   </div>
 </section>
 
 <!-- ============== TESTIMONIALS ============== -->
-<section class="testi">
+<section class="testi" id="testimonials">
   <div class="wrap">
-    <div class="center mb-32">
+    <div class="sect-head">
       <span class="eyebrow" style="color:var(--green)">Testimonials</span>
-      <h2 class="mt-12">Our happy clients.</h2>
-      <p class="lede mt-12" style="color:#B7BCB8;margin-left:auto;margin-right:auto;max-width:60ch">
-        We believe our clients' testimonials speak louder than our marketing. Here's what DMV facility managers are saying.
+      <h2>Our Happy Clients.</h2>
+      <p class="lede">
+        We believe our clients' testimonials speak louder than our marketing. Here's what DMV homeowners and facility managers say about working with us.
       </p>
     </div>
     <div class="testi-grid">
       <div class="testi-card">
         <span class="stars">★★★★★</span>
         <blockquote>"Very professional. Knowledgeable and willing to educate. Will refer Midland to anyone that needs carpet cleaning and repair soon to come."</blockquote>
-        <div class="who"><div class="av">PB</div><div><b>Patricia B.</b><span>Business Advisor — Bethesda</span></div></div>
+        <div class="who"><div class="av">PB</div><div><b>Patricia B.</b><span>BUSINESS ADVISOR — BETHESDA</span></div></div>
       </div>
       <div class="testi-card">
         <span class="stars">★★★★★</span>
         <blockquote>"40K sq ft office cleaned overnight. No downtime, no excuses. We see the result, not the work — exactly what we wanted from a vendor."</blockquote>
-        <div class="who"><div class="av">AM</div><div><b>Property Manager</b><span>Class A Office, Arlington</span></div></div>
+        <div class="who"><div class="av">AM</div><div><b>Property Manager</b><span>CLASS A OFFICE, ARLINGTON</span></div></div>
       </div>
       <div class="testi-card">
         <span class="stars">★★★★★</span>
         <blockquote>"Carpet like new after 8 years of kids and pets. The team showed up on time and treated the place like their own."</blockquote>
-        <div class="who"><div class="av">SK</div><div><b>Sandy K.</b><span>Bethesda</span></div></div>
+        <div class="who"><div class="av">SK</div><div><b>Sandy K.</b><span>BETHESDA</span></div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============== AREA ============== -->
-<section id="area">
-  <div class="wrap">
-    <div class="center">
-      <span class="eyebrow">Service Area</span>
-      <h2 class="mt-12">On-site across the DMV. Daily.</h2>
-      <p class="lede mt-12" style="margin-left:auto;margin-right:auto;max-width:60ch">
-        If you're in the Mid-Atlantic and we're not on the list, call us — we likely already cover your zip.
-      </p>
-    </div>
-    <div class="area">
-      <div class="col">
-        <h4>Washington D.C.</h4>
-        <ul><li>Navy Yard</li><li>Chinatown</li><li>Capitol Hill</li><li>Downtown</li><li>Georgetown</li><li>NoMa</li></ul>
-      </div>
-      <div class="col">
-        <h4>Maryland</h4>
-        <ul><li>Bethesda</li><li>Silver Spring</li><li>Rockville</li><li>Gaithersburg</li><li>Bowie</li><li>Laurel</li><li>College Park</li><li>Hyattsville</li></ul>
-      </div>
-      <div class="col">
-        <h4>N. Virginia</h4>
-        <ul><li>Arlington (Ballston, Clarendon)</li><li>Alexandria (Old Town, Del Ray)</li><li>McLean | Vienna | Reston | Tysons</li><li>Fairfax | Chantilly | Sterling</li><li>Ashburn | Leesburg | Manassas</li></ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============== FAQ ============== -->
-<section class="mint" id="faq">
+<!-- ============== FAQ (lightweight) ============== -->
+<section id="faq" class="mint">
   <div class="wrap-narrow">
-    <div class="center mb-32">
+    <div class="sect-head">
       <span class="eyebrow">FAQ</span>
-      <h2 class="mt-12">Questions DMV facility managers ask first.</h2>
+      <h2>Questions DMV homeowners and facility managers ask first.</h2>
     </div>
-    <div class="faq reveal">
-      <details><summary>How fast can you get on-site? <span class="ic">+</span></summary><div class="a">Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after that. Same-day emergency dispatch available — call (240) 532-9097.</div></details>
-      <details><summary>Are you insured and COI-ready? <span class="ic">+</span></summary><div class="a">Yes. Fully insured. COI, W-9, and SDS sheets are emailed the same business day you ask. We work daily with federal contractors and Class A property managers.</div></details>
-      <details><summary>Do you do nights and weekends? <span class="ic">+</span></summary><div class="a">Most commercial work happens nights, weekends, and holidays so your operations are never disrupted. Tenants and customers never see the work, only the result.</div></details>
-      <details><summary>What's the difference vs. Stanley Steemer / MilliCare / Aramark? <span class="ic">+</span></summary><div class="a">We're a local DMV flooring contractor, not a national franchise. One named account lead, custom programs, faster response, no annual lock-ins, and direct accountability — not a routed ticket.</div></details>
-      <details><summary>One-time job or recurring contract? <span class="ic">+</span></summary><div class="a">Both. One-time deep cleans, post-construction cleanup, move-outs, event cleanup, plus recurring weekly, monthly, or quarterly programs. No minimums.</div></details>
-      <details><summary>Are your products safe for healthcare, schools, food service? <span class="ic">+</span></summary><div class="a">Yes. We use EPA-registered, hospital-grade disinfectants and green-certified chemistry where required. SDS sheets on request.</div></details>
+    <div style="display:grid;gap:10px">
+      <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
+        <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">How fast can you get on-site? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
+        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after. Same-day emergency dispatch — call (240) 532-9097.</div>
+      </details>
+      <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
+        <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">Are you insured and COI-ready? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
+        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">Yes. Fully insured. COI, W-9, and SDS sheets are emailed the same business day you ask.</div>
+      </details>
+      <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
+        <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">Do you handle nights, weekends, and emergencies? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
+        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">Yes. Most commercial work happens nights, weekends, and holidays. Same-day emergency response is available — call (240) 532-9097.</div>
+      </details>
+      <details style="background:#FFF; border:1px solid var(--line); border-radius: 4px; padding: 16px 20px;">
+        <summary style="list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; font-size:16px; font-weight:800; cursor:pointer">What's the difference vs. national chains? <span style="width:24px;height:24px;background:var(--mint);color:var(--green-deep);border-radius:50%;display:grid;place-items:center;font-weight:800">+</span></summary>
+        <div style="margin-top:12px;color:var(--ink-2);font-size:15px;line-height:1.6">We're a local DMV flooring contractor, not a national franchise. One named account lead, custom programs, faster response, no annual lock-ins.</div>
+      </details>
     </div>
   </div>
 </section>
 
-<!-- ============== BOTTOM CTA ============== -->
-<section class="bigcta">
-  <div class="wrap">
-    <h2>Let's see your floors shine.</h2>
-    <p>Schedule a free on-site evaluation. We'll walk your facility, score every surface, and give you a written report — yours to keep, even if you don't hire us.</p>
-    <div class="ctas">
-      <a class="btn btn--xl" href="tel:2405329097" style="background:#FFF;color:var(--green-dark);border-color:#FFF">📞 Call (240) 532-9097</a>
-      <a class="btn btn--ghost btn--xl" href="#schedule">Schedule a Visit</a>
+<!-- ============== FOOTER (green block + black block, like live site) ============== -->
+<footer id="footer">
+  <div class="footer-grid">
+    <div class="footer-green">
+      <h4 style="color:#FFF; font-size: 22px; font-weight: 800; line-height: 1.2; margin: 0">Serving the DMV with commercial floor care since day one.</h4>
+      <p>
+        We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.
+      </p>
+      <a class="btn" href="tel:2405329097" style="background:#FFF; color: var(--green-deep); border-color: #FFF; align-self: flex-start; margin-top: 8px">📞 (240) 532-9097</a>
     </div>
-    <div class="micro">Serving DC | MD | VA · Fully Insured · 5.0 ★ on Google</div>
+    <div class="footer-black">
+      <div class="top">
+        <h5>Follow Us:</h5>
+        <div class="socials">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="Facebook">FB</a>
+          <a href="#" aria-label="LinkedIn">LI</a>
+          <a href="#" aria-label="Google Business Profile">G</a>
+        </div>
+      </div>
+      <div class="cols">
+        <div>
+          <h6>About Midland</h6>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#schedule">Schedule Your Visit &amp; Quote</a></li>
+          </ul>
+        </div>
+        <div>
+          <h6>What We Offer</h6>
+          <ul>
+            <li><a href="#">Reach Us</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="tel:2405329097">(240) 532-9097</a></li>
+          </ul>
+        </div>
+        <div>
+          <h6>Additional Links</h6>
+          <ul>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Service Area</a></li>
+            <li><a href="#testimonials">Clients</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
-</section>
-
-<!-- ============== FOOTER ============== -->
-<footer>
-  <div class="wrap">
-    <div class="grid">
-      <div>
-        <a href="/" class="logo" aria-label="Midland Floor Care home">
-          <img src="https://midlandfloors.com/wp-content/uploads/2023/12/MFC_LOGO_website.png" alt="Midland Floor Care">
-        </a>
-        <p style="margin-top:14px; font-size:14px; max-width:36ch">
-          Commercial floor care, carpet cleaning, hardwood refinishing, tile and grout restoration, concrete polishing, and EPA-approved disinfecting across the DMV. Locally owned. Fully insured.
-        </p>
-      </div>
-      <div>
-        <h5>About Midland</h5>
-        <ul><li><a href="#about">About</a></li><li><a href="#services">Services</a></li><li><a href="#area">Service Area</a></li><li><a href="#">Blog</a></li></ul>
-      </div>
-      <div>
-        <h5>What We Offer</h5>
-        <ul><li><a href="#">Carpet Cleaning</a></li><li><a href="#">Tile &amp; Grout</a></li><li><a href="#">Hardwood Refinishing</a></li><li><a href="#">Concrete Polishing</a></li><li><a href="#">Janitorial</a></li></ul>
-      </div>
-      <div>
-        <h5>Reach Us</h5>
-        <ul><li><a href="tel:2405329097">(240) 532-9097</a></li><li><a href="#schedule">Schedule a Visit</a></li><li><a href="#">Instagram</a></li><li><a href="#">LinkedIn</a></li></ul>
-      </div>
-    </div>
-    <div class="meta">
-      <span>© 2026 Midland Floor Care · Serving DC, MD, VA</span>
-      <span>Terms · Privacy Policy</span>
-    </div>
+  <div class="footer-meta">
+    <span>© 2026 Midland Floor Care</span>
+    <span>Terms and Conditions · Privacy Policy</span>
   </div>
 </footer>
 
