@@ -1,6 +1,6 @@
 {
     "manifest_version": "1.0.21",
-    "title": "Midland Floor Care",
+    "title": "Midland Floor Care - Sales Page Kit",
     "page_builder": "elementor",
     "kit_version": "1.0.0",
     "templates": [
@@ -13,10 +13,440 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1",
-                "elementor_pro_required": "1"
-            },
-            "elementor_pro_required": true
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Header",
+            "screenshot": "screenshots/header.jpg",
+            "source": "templates/header.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Footer",
+            "screenshot": "screenshots/footer.jpg",
+            "source": "templates/footer.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Process",
+            "screenshot": "screenshots/process.jpg",
+            "source": "templates/process.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Residential Services",
+            "screenshot": "screenshots/residential.jpg",
+            "source": "templates/residential.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Commercial Services",
+            "screenshot": "screenshots/commercial.jpg",
+            "source": "templates/commercial.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Reviews",
+            "screenshot": "screenshots/reviews.jpg",
+            "source": "templates/reviews.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Long-Term & Recurring Commercial Floor Care Services",
+            "screenshot": "screenshots/long-term-recurring-commercial-floor-care-programs.jpg",
+            "source": "templates/long-term-recurring-commercial-floor-care-programs.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Customized Commercial Floor Care Solutions",
+            "screenshot": "screenshots/customized-commercial-floor-care-solutions.jpg",
+            "source": "templates/customized-commercial-floor-care-solutions.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Janitorial & Housekeeping Facility Services",
+            "screenshot": "screenshots/janitorial-housekeeping-facility-services.jpg",
+            "source": "templates/janitorial-housekeeping-facility-services.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Commercial Upholstery",
+            "screenshot": "screenshots/commercial-upholstery.jpg",
+            "source": "templates/commercial-upholstery.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Commercial Tile & Grout Cleaning",
+            "screenshot": "screenshots/commercial-tile-grout-cleaning-services.jpg",
+            "source": "templates/commercial-tile-grout-cleaning-services.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Commercial Carpet Cleaning Services",
+            "screenshot": "screenshots/commercial-carpet-cleaning-services.jpg",
+            "source": "templates/commercial-carpet-cleaning-services.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Commercial Hard Surface Floor Restoration",
+            "screenshot": "screenshots/commercial-hard-surface-floor-restoration.jpg",
+            "source": "templates/commercial-hard-surface-floor-restoration.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 About Midland",
+            "screenshot": "screenshots/about.jpg",
+            "source": "templates/about.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Reach Us",
+            "screenshot": "screenshots/reach.jpg",
+            "source": "templates/reach.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Frequently Asked Questions",
+            "screenshot": "screenshots/faq.jpg",
+            "source": "templates/faq.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Services",
+            "screenshot": "screenshots/floor-care-services.jpg",
+            "source": "templates/floor-care-services.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Our Work",
+            "screenshot": "screenshots/our-work-in-action.jpg",
+            "source": "templates/our-work-in-action.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Schedule Your Visit & Quote",
+            "screenshot": "screenshots/schedule-a-visit.jpg",
+            "source": "templates/schedule-a-visit.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Jobs",
+            "screenshot": "screenshots/jobs.jpg",
+            "source": "templates/jobs.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Instant Quote",
+            "screenshot": "screenshots/instant-quote.jpg",
+            "source": "templates/instant-quote.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 COVID19 Protected",
+            "screenshot": "screenshots/covid19-protected-services.jpg",
+            "source": "templates/covid19-protected-services.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Staff Training",
+            "screenshot": "screenshots/staff-training.jpg",
+            "source": "templates/staff-training.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Ultimate Guide to Floor Care for Retail",
+            "screenshot": "screenshots/ultimate-guide-to-floor-care-for-retail.jpg",
+            "source": "templates/ultimate-guide-to-floor-care-for-retail.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Capability Statement",
+            "screenshot": "screenshots/capability-statement.jpg",
+            "source": "templates/capability-statement.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Last-Minute Commercial Floor Care Services",
+            "screenshot": "screenshots/last-minute-commercial-floor-care-services.jpg",
+            "source": "templates/last-minute-commercial-floor-care-services.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Commercial Polished Concrete",
+            "screenshot": "screenshots/commercial-polished-concrete.jpg",
+            "source": "templates/commercial-polished-concrete.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Service Area: Washington DC, Maryland, and Virginia (DMV)",
+            "screenshot": "screenshots/our-service-area.jpg",
+            "source": "templates/our-service-area.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Industries",
+            "screenshot": "screenshots/industries-we-serve.jpg",
+            "source": "templates/industries-we-serve.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Clients",
+            "screenshot": "screenshots/clients.jpg",
+            "source": "templates/clients.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 7 Essential Tips for Impeccable Commercial Floor Care Services",
+            "screenshot": "screenshots/7-essential-tips-for-impeccable-commercial-floor-care-services.jpg",
+            "source": "templates/7-essential-tips-for-impeccable-commercial-floor-care-services.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 Eco-Friendly Floor Solutions for Retail Stores",
+            "screenshot": "screenshots/eco-friendly-floor-solutions-for-retail-stores.jpg",
+            "source": "templates/eco-friendly-floor-solutions-for-retail-stores.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 The Secret to Floor Care for Various Materials",
+            "screenshot": "screenshots/the-secret-to-floor-care-for-various-materials.jpg",
+            "source": "templates/the-secret-to-floor-care-for-various-materials.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 The Top Methods for Cost-Effective Floor Maintenance",
+            "screenshot": "screenshots/the-top-methods-for-cost-effective-floor-maintenance.jpg",
+            "source": "templates/the-top-methods-for-cost-effective-floor-maintenance.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland \u2014 The Latest in Commercial Floor Tech: Innovations for 2024",
+            "screenshot": "screenshots/the-latest-in-commercial-floor-tech-innovations-for-2024.jpg",
+            "source": "templates/the-latest-in-commercial-floor-tech-innovations-for-2024.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Midland Scenarios: Revolutionizing Floor Care for Tech Companies in Herndon, VA",
+            "screenshot": "screenshots/midland-scenarios-revolutionizing-floor-care-for-tech-companies-in-herndon-va.jpg",
+            "source": "templates/midland-scenarios-revolutionizing-floor-care-for-tech-companies-in-herndon-va.json",
+            "preview_url": "",
+            "type": "page",
+            "category": "page",
+            "metadata": {
+                "template_type": "single-page",
+                "include_in_zip": "1"
+            }
         }
     ]
 }
