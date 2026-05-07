@@ -5,56 +5,49 @@
   "metadata": {},
   "content": [
     {
-      "id": "8118993a",
+      "id": "ff311f89",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
         "padding": {
-          "unit": "em",
+          "unit": "px",
           "top": "0",
           "right": "0",
           "bottom": "0",
           "left": "0",
-          "isLinked": false
-        },
-        "padding_mobile": {
-          "unit": "em",
-          "top": "2",
-          "right": "0",
-          "bottom": "2",
-          "left": "0",
-          "isLinked": false
-        },
-        "flex_gap": {
-          "column": "0",
-          "row": "0",
-          "isLinked": true,
-          "unit": "px",
-          "size": 0
+          "isLinked": true
         },
         "background_background": "classic",
         "background_color": "#0F1411",
-        "_title": "Top Bar"
+        "_title": "Top Bar",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
-          "id": "9515b53f",
+          "id": "93d08941",
           "elType": "container",
           "settings": {
             "flex_direction": "row",
             "content_width": "boxed",
-            "boxed_width": {
-              "unit": "px",
-              "size": 1200,
-              "sizes": []
-            },
             "flex_gap": {
-              "column": "20",
-              "row": "20",
+              "column": "16",
+              "row": "16",
               "isLinked": true,
               "unit": "px",
-              "size": 20
+              "size": 16
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
             },
             "padding": {
               "unit": "px",
@@ -64,16 +57,22 @@
               "left": "24",
               "isLinked": false
             },
-            "flex_align_items": "center",
-            "flex_wrap": "wrap"
+            "flex_align_items": "center"
           },
           "elements": [
             {
-              "id": "c6a6936f",
+              "id": "85f757f8",
               "elType": "container",
               "settings": {
                 "flex_direction": "column",
                 "content_width": "full",
+                "flex_gap": {
+                  "column": "20",
+                  "row": "20",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 20
+                },
                 "padding": {
                   "unit": "px",
                   "top": "0",
@@ -81,13 +80,6 @@
                   "bottom": "0",
                   "left": "0",
                   "isLinked": true
-                },
-                "flex_gap": {
-                  "column": "12",
-                  "row": "12",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 12
                 },
                 "_flex_size": "none",
                 "_element_width": "initial",
@@ -99,11 +91,12 @@
               },
               "elements": [
                 {
-                  "id": "1df214de",
+                  "id": "8b400009",
                   "elType": "widget",
-                  "widgetType": "html",
+                  "widgetType": "text-editor",
                   "settings": {
-                    "html": "<div style=\"display:flex;align-items:center;gap:12px;font-family:Manrope,sans-serif;font-size:13px;color:#E5EAE6\"><span style=\"display:inline-flex;align-items:center;gap:8px;padding:3px 10px;background:rgba(67,169,75,.18);color:#B7E5BD;border-radius:999px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em\"><span style=\"width:6px;height:6px;background:#43A94B;border-radius:50%\"></span>Open Now</span><span>Free On-Site Eval | Same-Day Emergency Response</span></div>"
+                    "editor": "<p style=\"display:flex;align-items:center;gap:12px;color:#E5EAE6;font-size:13px;font-weight:500;margin:0\"><span style=\"display:inline-flex;align-items:center;gap:8px;padding:3px 10px;background:rgba(67,169,75,.18);color:#B7E5BD;border-radius:999px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em\"><span style=\"width:6px;height:6px;background:#43A94B;border-radius:50%\"></span>Open Now</span>Free On-Site Eval | Same-Day Emergency Response</p>",
+                    "align": "left"
                   },
                   "elements": [],
                   "isInner": false
@@ -112,11 +105,18 @@
               "isInner": true
             },
             {
-              "id": "ae4b996d",
+              "id": "822b14ab",
               "elType": "container",
               "settings": {
                 "flex_direction": "column",
                 "content_width": "full",
+                "flex_gap": {
+                  "column": "20",
+                  "row": "20",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 20
+                },
                 "padding": {
                   "unit": "px",
                   "top": "0",
@@ -124,13 +124,6 @@
                   "bottom": "0",
                   "left": "0",
                   "isLinked": true
-                },
-                "flex_gap": {
-                  "column": "12",
-                  "row": "12",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 12
                 },
                 "_flex_size": "none",
                 "_element_width": "initial",
@@ -142,11 +135,12 @@
               },
               "elements": [
                 {
-                  "id": "cb7958fc",
+                  "id": "d7c0865c",
                   "elType": "widget",
-                  "widgetType": "html",
+                  "widgetType": "text-editor",
                   "settings": {
-                    "html": "<div style=\"display:flex;align-items:center;justify-content:flex-end;gap:14px;font-family:Manrope,sans-serif;font-size:13px;color:#E5EAE6\"><span>Fully Insured | COI-Ready</span><a href=\"tel:2405329097\" style=\"color:#FFF;font-weight:700;text-decoration:none\">(240) 532-9097 \u2192</a></div>"
+                    "editor": "<p style=\"text-align:right;color:#E5EAE6;font-size:13px;margin:0\">Fully Insured | COI-Ready &nbsp; <a href=\"tel:2405329097\" style=\"color:#FFF;font-weight:800;text-decoration:none\">(240) 532-9097 \u2192</a></p>",
+                    "align": "right"
                   },
                   "elements": [],
                   "isInner": false
@@ -161,36 +155,29 @@
       "isInner": false
     },
     {
-      "id": "45d1e99b",
+      "id": "64241f42",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
         "padding": {
-          "unit": "em",
+          "unit": "px",
           "top": "0",
           "right": "0",
           "bottom": "0",
           "left": "0",
-          "isLinked": false
-        },
-        "padding_mobile": {
-          "unit": "em",
-          "top": "2",
-          "right": "0",
-          "bottom": "2",
-          "left": "0",
-          "isLinked": false
-        },
-        "flex_gap": {
-          "column": "0",
-          "row": "0",
-          "isLinked": true,
-          "unit": "px",
-          "size": 0
+          "isLinked": true
         },
         "background_background": "classic",
         "background_color": "#FFFFFF",
+        "_title": "Header / Nav",
         "border_border": "solid",
         "border_width": {
           "unit": "px",
@@ -201,26 +188,26 @@
           "isLinked": false
         },
         "border_color": "#E5EAE6",
-        "_title": "Header / Nav"
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
-          "id": "b8496686",
+          "id": "56c094c5",
           "elType": "container",
           "settings": {
             "flex_direction": "row",
             "content_width": "boxed",
-            "boxed_width": {
-              "unit": "px",
-              "size": 1200,
-              "sizes": []
-            },
             "flex_gap": {
               "column": "20",
               "row": "20",
               "isLinked": true,
               "unit": "px",
               "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
             },
             "padding": {
               "unit": "px",
@@ -230,16 +217,22 @@
               "left": "24",
               "isLinked": false
             },
-            "flex_align_items": "center",
-            "flex_wrap": "wrap"
+            "flex_align_items": "center"
           },
           "elements": [
             {
-              "id": "2832ba6e",
+              "id": "2d3a2bbf",
               "elType": "container",
               "settings": {
                 "flex_direction": "column",
                 "content_width": "full",
+                "flex_gap": {
+                  "column": "20",
+                  "row": "20",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 20
+                },
                 "padding": {
                   "unit": "px",
                   "top": "0",
@@ -248,31 +241,23 @@
                   "left": "0",
                   "isLinked": true
                 },
-                "flex_gap": {
-                  "column": "12",
-                  "row": "12",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 12
-                },
+                "flex_align_items": "flex-start",
                 "_flex_size": "none",
                 "_element_width": "initial",
                 "width": {
                   "unit": "%",
                   "size": 20,
                   "sizes": []
-                },
-                "flex_justify_content": "center",
-                "flex_align_items": "center"
+                }
               },
               "elements": [
                 {
-                  "id": "70578d91",
+                  "id": "98a85487",
                   "elType": "widget",
                   "widgetType": "image",
                   "settings": {
                     "image": {
-                      "url": "images/midland-small-logo.png",
+                      "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png",
                       "id": "",
                       "size": "",
                       "alt": "Midland Floor Care",
@@ -292,11 +277,18 @@
               "isInner": true
             },
             {
-              "id": "247a7efb",
+              "id": "b27e73c9",
               "elType": "container",
               "settings": {
                 "flex_direction": "column",
                 "content_width": "full",
+                "flex_gap": {
+                  "column": "20",
+                  "row": "20",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 20
+                },
                 "padding": {
                   "unit": "px",
                   "top": "0",
@@ -305,13 +297,8 @@
                   "left": "0",
                   "isLinked": true
                 },
-                "flex_gap": {
-                  "column": "12",
-                  "row": "12",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 12
-                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center",
                 "_flex_size": "none",
                 "_element_width": "initial",
                 "width": {
@@ -322,11 +309,116 @@
               },
               "elements": [
                 {
-                  "id": "e5340ffd",
+                  "id": "2ab77715",
                   "elType": "widget",
-                  "widgetType": "html",
+                  "widgetType": "icon-list",
                   "settings": {
-                    "html": "<nav style=\"display:flex;gap:24px;justify-content:center;align-items:center;font-family:Manrope,sans-serif\"><a href=\"#about\" style=\"font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0F1411;text-decoration:none\">About</a><a href=\"#schedule\" style=\"font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0F1411;text-decoration:none\">Quote</a><a href=\"#services\" style=\"font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0F1411;text-decoration:none\">Services</a><a href=\"#faq\" style=\"font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0F1411;text-decoration:none\">FAQ</a><a href=\"#testimonials\" style=\"font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0F1411;text-decoration:none\">Clients</a><a href=\"#footer\" style=\"font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0F1411;text-decoration:none\">Reach Us</a></nav>"
+                    "icon_list": [
+                      {
+                        "text": "About",
+                        "selected_icon": {
+                          "value": null,
+                          "library": "fa-solid"
+                        },
+                        "_id": "aef4364f",
+                        "link": {
+                          "url": "#about",
+                          "is_external": "",
+                          "nofollow": ""
+                        }
+                      },
+                      {
+                        "text": "Quote",
+                        "selected_icon": {
+                          "value": null,
+                          "library": "fa-solid"
+                        },
+                        "_id": "63c14e1e",
+                        "link": {
+                          "url": "#schedule",
+                          "is_external": "",
+                          "nofollow": ""
+                        }
+                      },
+                      {
+                        "text": "Services",
+                        "selected_icon": {
+                          "value": null,
+                          "library": "fa-solid"
+                        },
+                        "_id": "1269534b",
+                        "link": {
+                          "url": "#services",
+                          "is_external": "",
+                          "nofollow": ""
+                        }
+                      },
+                      {
+                        "text": "FAQ",
+                        "selected_icon": {
+                          "value": null,
+                          "library": "fa-solid"
+                        },
+                        "_id": "0ce78d03",
+                        "link": {
+                          "url": "#faq",
+                          "is_external": "",
+                          "nofollow": ""
+                        }
+                      },
+                      {
+                        "text": "Clients",
+                        "selected_icon": {
+                          "value": null,
+                          "library": "fa-solid"
+                        },
+                        "_id": "d98701de",
+                        "link": {
+                          "url": "#testimonials",
+                          "is_external": "",
+                          "nofollow": ""
+                        }
+                      },
+                      {
+                        "text": "Reach Us",
+                        "selected_icon": {
+                          "value": null,
+                          "library": "fa-solid"
+                        },
+                        "_id": "1a795289",
+                        "link": {
+                          "url": "#footer",
+                          "is_external": "",
+                          "nofollow": ""
+                        }
+                      }
+                    ],
+                    "icon_color": "#0F1411",
+                    "icon_size": {
+                      "unit": "px",
+                      "size": 14,
+                      "sizes": []
+                    },
+                    "space_between": {
+                      "unit": "px",
+                      "size": 24,
+                      "sizes": []
+                    },
+                    "view": "inline",
+                    "typography_typography": "custom",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 13,
+                      "sizes": []
+                    },
+                    "typography_font_weight": "800",
+                    "text_color": "#0F1411",
+                    "space_inline": {
+                      "unit": "px",
+                      "size": 24,
+                      "sizes": []
+                    },
+                    "_css_classes": "nav-links"
                   },
                   "elements": [],
                   "isInner": false
@@ -335,11 +427,18 @@
               "isInner": true
             },
             {
-              "id": "6215ce05",
+              "id": "e67e8d68",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
                 "content_width": "full",
+                "flex_gap": {
+                  "column": "10",
+                  "row": "10",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 10
+                },
                 "padding": {
                   "unit": "px",
                   "top": "0",
@@ -348,36 +447,30 @@
                   "left": "0",
                   "isLinked": true
                 },
-                "flex_gap": {
-                  "column": "10",
-                  "row": "10",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 10
-                },
+                "flex_align_items": "center",
+                "flex_justify_content": "flex-end",
                 "_flex_size": "none",
                 "_element_width": "initial",
                 "width": {
                   "unit": "%",
                   "size": 22,
                   "sizes": []
-                },
-                "flex_align_items": "center",
-                "flex_justify_content": "flex-end"
+                }
               },
               "elements": [
                 {
-                  "id": "d7792582",
+                  "id": "1f997416",
                   "elType": "widget",
-                  "widgetType": "html",
+                  "widgetType": "text-editor",
                   "settings": {
-                    "html": "<div style=\"display:flex;align-items:center;justify-content:flex-end;gap:12px\"><a href=\"tel:2405329097\" style=\"font-family:Manrope,sans-serif;font-weight:800;font-size:15px;color:#0F1411;text-decoration:none\">(240) 532-9097</a></div>"
+                    "editor": "<p style=\"font-weight:800;font-size:15px;color:#0F1411;margin:0\"><a href=\"tel:2405329097\" style=\"color:inherit;text-decoration:none\">(240) 532-9097</a></p>",
+                    "align": "right"
                   },
                   "elements": [],
                   "isInner": false
                 },
                 {
-                  "id": "aaad81ae",
+                  "id": "aa9725d7",
                   "elType": "widget",
                   "widgetType": "button",
                   "settings": {
@@ -388,7 +481,7 @@
                       "nofollow": ""
                     },
                     "size": "lg",
-                    "align": "right",
+                    "align": "left",
                     "background_color": "#43A94B",
                     "button_text_color": "#FFFFFF",
                     "border_border": "solid",

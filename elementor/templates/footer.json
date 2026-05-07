@@ -5,73 +5,73 @@
   "metadata": {},
   "content": [
     {
-      "id": "da76d120",
+      "id": "cdd83700",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
-        "padding": {
-          "unit": "em",
-          "top": "3",
-          "right": "0",
-          "bottom": "3",
-          "left": "0",
-          "isLinked": false
-        },
-        "padding_mobile": {
-          "unit": "em",
-          "top": "2",
-          "right": "0",
-          "bottom": "2",
-          "left": "0",
-          "isLinked": false
-        },
         "flex_gap": {
-          "column": "0",
-          "row": "0",
+          "column": "20",
+          "row": "20",
           "isLinked": true,
           "unit": "px",
-          "size": 0
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
         },
         "background_background": "classic",
         "background_color": "#0F1411",
-        "_title": "Footer"
+        "_title": "Footer",
+        "_css_classes": "midland-page"
       },
       "elements": [
         {
-          "id": "47981d7b",
+          "id": "83fa5b50",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
             "content_width": "boxed",
-            "boxed_width": {
-              "unit": "px",
-              "size": 1200,
-              "sizes": []
-            },
             "flex_gap": {
-              "column": "20",
-              "row": "20",
+              "column": "24",
+              "row": "24",
               "isLinked": true,
               "unit": "px",
-              "size": 20
+              "size": 24
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
             },
             "padding": {
               "unit": "em",
-              "top": "0",
+              "top": "3",
               "right": "1.5",
-              "bottom": "0",
+              "bottom": "3",
               "left": "1.5",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "1ebe91a5",
+              "id": "2fe7e6c7",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
                 "content_width": "full",
+                "flex_gap": {
+                  "column": "32",
+                  "row": "32",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 32
+                },
                 "padding": {
                   "unit": "px",
                   "top": "0",
@@ -80,22 +80,22 @@
                   "left": "0",
                   "isLinked": true
                 },
-                "flex_gap": {
-                  "column": "32",
-                  "row": "32",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 32
-                },
                 "flex_align_items": "flex-start"
               },
               "elements": [
                 {
-                  "id": "bd61d3f5",
+                  "id": "570a9c13",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
+                    "flex_gap": {
+                      "column": "14",
+                      "row": "14",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 14
+                    },
                     "padding": {
                       "unit": "px",
                       "top": "0",
@@ -103,13 +103,6 @@
                       "bottom": "0",
                       "left": "0",
                       "isLinked": true
-                    },
-                    "flex_gap": {
-                      "column": "14",
-                      "row": "14",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 14
                     },
                     "_flex_size": "none",
                     "_element_width": "initial",
@@ -121,12 +114,12 @@
                   },
                   "elements": [
                     {
-                      "id": "41db13ed",
+                      "id": "765db0ca",
                       "elType": "widget",
                       "widgetType": "image",
                       "settings": {
                         "image": {
-                          "url": "images/midland-small-logo.png",
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png",
                           "id": "",
                           "size": "",
                           "alt": "Midland Floor Care",
@@ -134,37 +127,110 @@
                         },
                         "width": {
                           "unit": "px",
-                          "size": 120,
+                          "size": 140,
                           "sizes": []
                         },
                         "_element_width": "initial",
-                        "_css_filters_css_filter": "custom",
-                        "css_filters_css_filter_invert": {
-                          "unit": "%",
-                          "size": 100,
-                          "sizes": []
-                        }
+                        "_css_classes": "footer-logo-invert"
                       },
                       "elements": [],
                       "isInner": false
                     },
                     {
-                      "id": "18d03fde",
+                      "id": "ae32965a",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
-                        "editor": "<p style=\"color:#B7BCB8;font-size:15px;line-height:1.6;max-width:36ch\">We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.</p>",
+                        "editor": "<p style=\"color:#B7BCB8;font-size:15px;line-height:1.6;max-width:36ch;margin:0\">We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.</p>",
                         "align": "left"
                       },
                       "elements": [],
                       "isInner": false
                     },
                     {
-                      "id": "784affab",
+                      "id": "3cd33e9c",
                       "elType": "widget",
-                      "widgetType": "html",
+                      "widgetType": "icon-list",
                       "settings": {
-                        "html": "<div style=\"display:flex;gap:8px;margin-top:8px\"><a href=\"#\" aria-label=\"Instagram\" style=\"width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#FFF;font-weight:800;font-size:13px;text-decoration:none\">IG</a><a href=\"#\" aria-label=\"Facebook\" style=\"width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#FFF;font-weight:800;font-size:13px;text-decoration:none\">FB</a><a href=\"#\" aria-label=\"LinkedIn\" style=\"width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#FFF;font-weight:800;font-size:13px;text-decoration:none\">LI</a><a href=\"#\" aria-label=\"Google\" style=\"width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#FFF;font-weight:800;font-size:13px;text-decoration:none\">G</a></div>"
+                        "icon_list": [
+                          {
+                            "text": "Instagram",
+                            "selected_icon": {
+                              "value": "fas fa-circle",
+                              "library": "fa-solid"
+                            },
+                            "_id": "42ab4c7a",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
+                          },
+                          {
+                            "text": "Facebook",
+                            "selected_icon": {
+                              "value": "fas fa-circle",
+                              "library": "fa-solid"
+                            },
+                            "_id": "fab704cc",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
+                          },
+                          {
+                            "text": "LinkedIn",
+                            "selected_icon": {
+                              "value": "fas fa-circle",
+                              "library": "fa-solid"
+                            },
+                            "_id": "3cca44c0",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
+                          },
+                          {
+                            "text": "Google",
+                            "selected_icon": {
+                              "value": "fas fa-circle",
+                              "library": "fa-solid"
+                            },
+                            "_id": "32b425aa",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
+                          }
+                        ],
+                        "icon_color": "#43A94B",
+                        "icon_size": {
+                          "unit": "px",
+                          "size": 10,
+                          "sizes": []
+                        },
+                        "space_between": {
+                          "unit": "px",
+                          "size": 10,
+                          "sizes": []
+                        },
+                        "view": "inline",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 14,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "700",
+                        "text_color": "#B7BCB8",
+                        "space_inline": {
+                          "unit": "px",
+                          "size": 10,
+                          "sizes": []
+                        }
                       },
                       "elements": [],
                       "isInner": false
@@ -173,11 +239,18 @@
                   "isInner": true
                 },
                 {
-                  "id": "acc6053a",
+                  "id": "e6afabf9",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
                     "padding": {
                       "unit": "px",
                       "top": "0",
@@ -185,13 +258,6 @@
                       "bottom": "0",
                       "left": "0",
                       "isLinked": true
-                    },
-                    "flex_gap": {
-                      "column": "12",
-                      "row": "12",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 12
                     },
                     "_flex_size": "none",
                     "_element_width": "initial",
@@ -202,35 +268,9 @@
                     }
                   },
                   "elements": [
+                    null,
                     {
-                      "id": "17c42949",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "About",
-                        "header_size": "h5",
-                        "align": "left",
-                        "size": "default",
-                        "title_color": "#43A94B",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 13,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "800",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 2,
-                          "sizes": []
-                        },
-                        "typography_text_transform": "uppercase"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "ca35ad31",
+                      "id": "2f389d64",
                       "elType": "widget",
                       "widgetType": "icon-list",
                       "settings": {
@@ -241,7 +281,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "1c238d5a"
+                            "_id": "3abe78e7",
+                            "link": {
+                              "url": "#about",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Services",
@@ -249,7 +294,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "0e81556e"
+                            "_id": "b7417878",
+                            "link": {
+                              "url": "#services",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Schedule a Visit",
@@ -257,7 +307,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "f268ba15"
+                            "_id": "d4ecc33b",
+                            "link": {
+                              "url": "#schedule",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Blog",
@@ -265,7 +320,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "8a87e579"
+                            "_id": "ff981086",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           }
                         ],
                         "icon_color": "#43A94B",
@@ -279,6 +339,7 @@
                           "size": 10,
                           "sizes": []
                         },
+                        "view": "traditional",
                         "typography_typography": "custom",
                         "typography_font_size": {
                           "unit": "px",
@@ -295,11 +356,18 @@
                   "isInner": true
                 },
                 {
-                  "id": "4376abea",
+                  "id": "2783b68e",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
                     "padding": {
                       "unit": "px",
                       "top": "0",
@@ -307,13 +375,6 @@
                       "bottom": "0",
                       "left": "0",
                       "isLinked": true
-                    },
-                    "flex_gap": {
-                      "column": "12",
-                      "row": "12",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 12
                     },
                     "_flex_size": "none",
                     "_element_width": "initial",
@@ -324,35 +385,9 @@
                     }
                   },
                   "elements": [
+                    null,
                     {
-                      "id": "1e82fc5c",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "Services",
-                        "header_size": "h5",
-                        "align": "left",
-                        "size": "default",
-                        "title_color": "#43A94B",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 13,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "800",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 2,
-                          "sizes": []
-                        },
-                        "typography_text_transform": "uppercase"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "4d074570",
+                      "id": "a6d13463",
                       "elType": "widget",
                       "widgetType": "icon-list",
                       "settings": {
@@ -363,7 +398,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "ca7cc0a9"
+                            "_id": "33f9fd0b",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Tile & Grout",
@@ -371,7 +411,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "9b71a5f0"
+                            "_id": "5c67fcd0",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Hardwood Refinishing",
@@ -379,7 +424,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "dec082e3"
+                            "_id": "b83994b2",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Concrete Polishing",
@@ -387,7 +437,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "9c32338a"
+                            "_id": "f724a592",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Janitorial",
@@ -395,7 +450,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "59ceb7fd"
+                            "_id": "c2287e0a",
+                            "link": {
+                              "url": "#",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           }
                         ],
                         "icon_color": "#43A94B",
@@ -409,6 +469,7 @@
                           "size": 10,
                           "sizes": []
                         },
+                        "view": "traditional",
                         "typography_typography": "custom",
                         "typography_font_size": {
                           "unit": "px",
@@ -425,11 +486,18 @@
                   "isInner": true
                 },
                 {
-                  "id": "7e1914b0",
+                  "id": "02f31681",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
                     "padding": {
                       "unit": "px",
                       "top": "0",
@@ -437,13 +505,6 @@
                       "bottom": "0",
                       "left": "0",
                       "isLinked": true
-                    },
-                    "flex_gap": {
-                      "column": "12",
-                      "row": "12",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 12
                     },
                     "_flex_size": "none",
                     "_element_width": "initial",
@@ -454,35 +515,9 @@
                     }
                   },
                   "elements": [
+                    null,
                     {
-                      "id": "178a292f",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "Reach Us",
-                        "header_size": "h5",
-                        "align": "left",
-                        "size": "default",
-                        "title_color": "#43A94B",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 13,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "800",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 2,
-                          "sizes": []
-                        },
-                        "typography_text_transform": "uppercase"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "ab7e3498",
+                      "id": "dab1f736",
                       "elType": "widget",
                       "widgetType": "icon-list",
                       "settings": {
@@ -493,7 +528,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "6f3a8b7e"
+                            "_id": "8d625d58",
+                            "link": {
+                              "url": "tel:2405329097",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Free Quote",
@@ -501,7 +541,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "7c6e9588"
+                            "_id": "83bc9e3c",
+                            "link": {
+                              "url": "#schedule",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "FAQ",
@@ -509,7 +554,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "9d5df79d"
+                            "_id": "2a93e54b",
+                            "link": {
+                              "url": "#faq",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           },
                           {
                             "text": "Clients",
@@ -517,7 +567,12 @@
                               "value": "fas fa-chevron-right",
                               "library": "fa-solid"
                             },
-                            "_id": "cde455d0"
+                            "_id": "f7eb2707",
+                            "link": {
+                              "url": "#testimonials",
+                              "is_external": "",
+                              "nofollow": ""
+                            }
                           }
                         ],
                         "icon_color": "#43A94B",
@@ -531,6 +586,7 @@
                           "size": 10,
                           "sizes": []
                         },
+                        "view": "traditional",
                         "typography_typography": "custom",
                         "typography_font_size": {
                           "unit": "px",
@@ -550,11 +606,12 @@
               "isInner": true
             },
             {
-              "id": "5a0e4152",
+              "id": "d3ce1eac",
               "elType": "widget",
-              "widgetType": "html",
+              "widgetType": "text-editor",
               "settings": {
-                "html": "<div style=\"font-size:12px;color:#6B7280;padding-top:24px;margin-top:28px;border-top:1px solid #1F2A22;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px\"><span>\u00a9 2026 Midland Floor Care | Serving DC, MD, VA</span><span>Terms and Conditions | Privacy Policy</span></div>"
+                "editor": "<p style=\"font-size:12px;color:#6B7280;padding-top:24px;margin-top:28px;border-top:1px solid #1F2A22;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px\"><span>\u00a9 2026 Midland Floor Care | Serving DC, MD, VA</span><span>Terms and Conditions | Privacy Policy</span></p>",
+                "align": "left"
               },
               "elements": [],
               "isInner": false
