@@ -139,7 +139,13 @@ nav.primary a:hover{ color: var(--green-deep); }
     url('images/Midland%20Floors%20Hero%20image.jpg');
   background-size: cover; background-position: center right;
 }
-.hero .wrap{ position: relative; z-index: 1; max-width: 1200px; }
+.hero .wrap{
+  position: relative; z-index: 1;
+  max-width: none; margin: 0;
+  padding: 0 32px 0 64px;
+}
+.hero .wrap > * { max-width: 680px; }
+@media (max-width: 720px){ .hero .wrap{ padding: 0 20px; } }
 .hero .chip-row{
   display:flex; gap: 0; flex-wrap: wrap;
   font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
@@ -181,17 +187,14 @@ nav.primary a:hover{ color: var(--green-deep); }
 }
 .process-step{
   text-align: center; position: relative;
-  padding: 28px 16px;
-  background: var(--white);
-  border: 1px solid var(--mint-2);
-  border-radius: 12px;
+  padding: 0 8px;
+  background: transparent;
+  border: 0;
   cursor: pointer;
-  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .25s ease;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1);
 }
 .process-step:hover{
   transform: translateY(-10px);
-  box-shadow: 0 24px 40px -16px rgba(67,169,75,.35), 0 8px 16px -8px rgba(15,20,17,.12);
-  border-color: var(--green);
 }
 .process-step .circle-wrap{
   position: relative; width: 140px; height: 140px; margin: 0 auto 22px;
