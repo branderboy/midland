@@ -1,0 +1,481 @@
+{
+  "version": "0.4",
+  "title": "Commercial Polished Concrete",
+  "type": "page",
+  "metadata": {},
+  "content": [
+    {
+      "id": "98e45eeb",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero - Commercial Polished Concrete"
+      },
+      "elements": [
+        {
+          "id": "0cc6139d",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "3ccd711f",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Service",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "402f2e57",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Commercial Polished Concrete",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "f6d47ba4",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Commercial Polished Concrete: Durable, Sleek, and Built to Last Polished concrete is more than a flooring option. It\u2019s modern, durable, and low maintenanc\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.6,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "aa39493b",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content"
+      },
+      "elements": [
+        {
+          "id": "a613ac80",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "d2b13fae",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<h2 data-start=\"0\" data-end=\"67\"><strong data-start=\"0\" data-end=\"67\">Commercial Polished Concrete: Durable, Sleek, and Built to Last</strong></h2><p data-start=\"69\" data-end=\"312\">Polished concrete is more than a flooring option. It\u2019s modern, durable, and low maintenance. Whether you\u2019re building new or refreshing existing floors, Midland Floor Care delivers polished concrete that looks sharp and performs under pressure.</p><p data-start=\"314\" data-end=\"357\"><strong data-start=\"314\" data-end=\"357\">Why businesses choose polished concrete</strong></p><ul data-start=\"358\" data-end=\"716\"><li data-start=\"358\" data-end=\"437\"><p data-start=\"360\" data-end=\"437\">Professional appearance: high-gloss or satin finishes that reflect your brand</p></li><li data-start=\"438\" data-end=\"513\"><p data-start=\"440\" data-end=\"513\">Extreme durability: stands up to heavy foot traffic and rolling equipment</p></li><li data-start=\"514\" data-end=\"583\"><p data-start=\"516\" data-end=\"583\">Low maintenance: easy to clean and more stain resistant when sealed</p></li><li data-start=\"584\" data-end=\"655\"><p data-start=\"586\" data-end=\"655\">Cost-effective lifecycle: outlasts many materials with minimal upkeep</p></li><li data-start=\"656\" data-end=\"716\"><p data-start=\"658\" data-end=\"716\">Sustainable option: uses the existing slab to reduce waste</p></li></ul><p data-start=\"718\" data-end=\"763\"><strong data-start=\"718\" data-end=\"763\">Our commercial polished concrete services</strong></p><ul data-start=\"764\" data-end=\"1129\"><li data-start=\"764\" data-end=\"839\"><p data-start=\"766\" data-end=\"839\">Surface preparation: grinding, patching, and cleaning for a flawless base</p></li><li data-start=\"840\" data-end=\"912\"><p data-start=\"842\" data-end=\"912\">Polishing and finishing: multiple grit levels from matte to high gloss</p></li><li data-start=\"913\" data-end=\"978\"><p data-start=\"915\" data-end=\"978\">Staining and color enhancement: rich tones and branding accents</p></li><li data-start=\"979\" data-end=\"1051\"><p data-start=\"981\" data-end=\"1051\">Protective sealing: added resistance to stains, moisture, and abrasion</p></li><li data-start=\"1052\" data-end=\"1129\"><p data-start=\"1054\" data-end=\"1129\">Ongoing maintenance programs: scheduled polishing to keep the finish strong</p></li></ul><p data-start=\"1131\" data-end=\"1154\"><strong data-start=\"1131\" data-end=\"1154\">Industries we serve</strong></p><ul data-start=\"1155\" data-end=\"1357\"><li data-start=\"1155\" data-end=\"1193\"><p data-start=\"1157\" data-end=\"1193\">Corporate offices and headquarters</p></li><li data-start=\"1194\" data-end=\"1225\"><p data-start=\"1196\" data-end=\"1225\">Retail stores and showrooms</p></li><li data-start=\"1226\" data-end=\"1259\"><p data-start=\"1228\" data-end=\"1259\">Hotels and hospitality venues</p></li><li data-start=\"1260\" data-end=\"1289\"><p data-start=\"1262\" data-end=\"1289\">Restaurants and breweries</p></li><li data-start=\"1290\" data-end=\"1318\"><p data-start=\"1292\" data-end=\"1318\">Educational institutions</p></li><li data-start=\"1319\" data-end=\"1357\"><p data-start=\"1321\" data-end=\"1357\">Warehouses and industrial facilities</p></li></ul><p data-start=\"1359\" data-end=\"1385\"><strong data-start=\"1359\" data-end=\"1385\">Why Midland Floor Care</strong></p><ul data-start=\"1386\" data-end=\"1649\"><li data-start=\"1386\" data-end=\"1459\"><p data-start=\"1388\" data-end=\"1459\">Specialized equipment: commercial grinders, polishers, and dust control</p></li><li data-start=\"1460\" data-end=\"1526\"><p data-start=\"1462\" data-end=\"1526\">Expert technicians: trained for the demands of commercial spaces</p></li><li data-start=\"1527\" data-end=\"1591\"><p data-start=\"1529\" data-end=\"1591\">Minimal downtime: flexible scheduling to keep business running</p></li><li data-start=\"1592\" data-end=\"1649\"><p data-start=\"1594\" data-end=\"1649\">Full-service partner: installation through ongoing care</p></li></ul><p data-start=\"1651\" data-end=\"1720\">Transform your space with the strength and look of polished concrete.</p><p data-start=\"1722\" data-end=\"1902\"><a href=\"https://midlandfloors.com/schedule-a-visit/\"><strong data-start=\"1722\" data-end=\"1751\">Schedule an on-site visit</strong></a><br data-start=\"1751\" data-end=\"1754\" />Ready to plan your project. Call us or request an on-site visit. We\u2019ll walk the space, confirm scope, and deliver a clear plan, price, and timeline.</p><p data-start=\"1904\" data-end=\"1932\" data-is-last-node=\"\" data-is-only-node=\"\">Thank you,<br data-start=\"1914\" data-end=\"1917\" />Justin Campbell</p><ul><li><a href=\"https://midlandfloors.com/staff-training/\">Staff Training</a></li><li><a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\">7 Essential Tips for Impeccable Commercial Floor Care Services</a></li><li><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your Visit &amp; Quote</a></li><li><a href=\"https://midlandfloors.com/faq/\">Frequently Asked Questions</a></li><li><a href=\"https://midlandfloors.com/\">Home</a></li></ul>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "240ec2f2",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA"
+      },
+      "elements": [
+        {
+          "id": "d045b2da",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "41399c4a",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 36,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "747b547c",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and Facility Score in 48 hours.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "e27d29af",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center"
+              },
+              "elements": [
+                {
+                  "id": "2edc53fd",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "4e5f6aff",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#FFFFFF",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}

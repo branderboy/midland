@@ -1,0 +1,481 @@
+{
+  "version": "0.4",
+  "title": "Industries",
+  "type": "page",
+  "metadata": {},
+  "content": [
+    {
+      "id": "84a1e7bb",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero - Industries"
+      },
+      "elements": [
+        {
+          "id": "a61dc772",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "44b2998a",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Page",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "18f15fd5",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Industries",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "450bc7ba",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Industries We Proudly Serve At Midland Floors, we deliver commercial floor care tailored to the unique demands of every industry. From retail stores and h\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.6,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "92060dfa",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content"
+      },
+      "elements": [
+        {
+          "id": "1c37bda2",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "44bf7139",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<h1>Industries We Proudly Serve</h1>\t\t\t\t\n\t\t<p data-start=\"127\" data-end=\"716\">At Midland Floors, we deliver commercial floor care tailored to the unique demands of every industry. From retail stores and healthcare facilities to government buildings and corporate offices, our team has the experience to handle it all.</p><p data-start=\"127\" data-end=\"716\">Whether it\u2019s maintaining high-traffic shopping centers, ensuring hygienic conditions in medical environments, or creating professional spaces for offices and agencies, we adapt our services to fit your world. Our goal is simple: keep your floors looking exceptional, safe, and built to last\u2014no matter where your business operates</p><p data-start=\"139\" data-end=\"429\"><strong> Here\u2019s an overview of the sectors we proudly serve:</strong></p><h4 data-start=\"431\" data-end=\"462\">Retail &amp; Shopping Centers</h4><p data-start=\"463\" data-end=\"688\">From national fashion outlets like <strong data-start=\"498\" data-end=\"505\">H&amp;M</strong> and <strong data-start=\"510\" data-end=\"521\">Lacoste</strong> to specialty stores such as <strong data-start=\"550\" data-end=\"568\">Barnes &amp; Noble</strong> and <strong data-start=\"573\" data-end=\"585\">Hallmark</strong>, we provide floor care solutions that keep stores looking polished, safe, and inviting for shoppers.</p><h4 data-start=\"690\" data-end=\"711\">Health &amp; Beauty</h4><p data-start=\"712\" data-end=\"900\">Trusted by clients including <strong data-start=\"741\" data-end=\"749\">Ulta</strong>, <strong data-start=\"751\" data-end=\"767\">Massage Envy</strong>, and <strong data-start=\"773\" data-end=\"796\">European Wax Center</strong>, we ensure spotless and hygienic flooring that reflects the premium experience your customers expect.</p><h4 data-start=\"902\" data-end=\"929\">Healthcare Facilities</h4><p data-start=\"930\" data-end=\"1098\">Serving medical environments like <strong data-start=\"964\" data-end=\"981\">US Renal Care</strong>, our protocols prioritize <strong data-start=\"1008\" data-end=\"1046\">safety, sanitation, and compliance</strong>, reducing risk and supporting patient well-being.</p><h4 data-start=\"1100\" data-end=\"1132\">Government &amp; Public Sector</h4><p data-start=\"1133\" data-end=\"1347\">We support agencies including the <strong data-start=\"1167\" data-end=\"1202\">Department of Homeland Security</strong>, <strong data-start=\"1204\" data-end=\"1245\">Environmental Protection Agency (EPA)</strong>, and <strong data-start=\"1251\" data-end=\"1274\">Department of Labor</strong>, ensuring facilities meet strict cleanliness and compliance standards.</p><h4 data-start=\"1349\" data-end=\"1378\">Transportation &amp; Travel</h4><p data-start=\"1379\" data-end=\"1525\">From <strong data-start=\"1384\" data-end=\"1403\">Amtrak stations</strong> to transportation hubs, we help maintain clean, welcoming, and durable flooring that supports heavy daily foot traffic.</p><h4 data-start=\"1527\" data-end=\"1548\">Food &amp; Beverage</h4><p data-start=\"1549\" data-end=\"1743\">Restaurants and cafes demand resilient, hygienic floors. Whether it\u2019s <strong data-start=\"1619\" data-end=\"1637\">Raising Cane\u2019s</strong> or <strong data-start=\"1641\" data-end=\"1665\">Lazy Dog Restaurants</strong>, we deliver care that withstands spills, grease, and nonstop customer flow.</p><h4 data-start=\"1745\" data-end=\"1769\">Fitness &amp; Wellness</h4><p data-start=\"1770\" data-end=\"1904\">Serving gyms like <strong data-start=\"1788\" data-end=\"1802\">LA Fitness</strong>, we ensure floors are safe, slip-resistant, and durable enough to support high-energy environments.</p><h4 data-start=\"1906\" data-end=\"1935\">Entertainment &amp; Leisure</h4><p data-start=\"1936\" data-end=\"2111\">From cultural venues like <strong data-start=\"1962\" data-end=\"1975\">Wolf Trap</strong> to recreational sites under the <strong data-start=\"2008\" data-end=\"2033\">National Park Service</strong>, we help create positive visitor experiences with well-maintained flooring.</p><h4 data-start=\"2113\" data-end=\"2135\">Home &amp; Lifestyle</h4><p data-start=\"2136\" data-end=\"2287\">For retailers such as <strong data-start=\"2158\" data-end=\"2176\">At Home Stores</strong> and <strong data-start=\"2181\" data-end=\"2188\">REI</strong>, our services ensure polished, resilient floors that enhance product displays and customer flow.</p><h4 data-start=\"2289\" data-end=\"2320\">Corporate &amp; Office Spaces</h4><p data-start=\"2321\" data-end=\"2466\">We tailor cleaning programs to professional environments, supporting productivity and presenting a clean, polished image for corporate clients.</p><h4 data-start=\"2468\" data-end=\"2509\">Educational &amp; Research Institutions</h4><p data-start=\"2510\" data-end=\"2689\">From schools to major research organizations like the <strong data-start=\"2564\" data-end=\"2603\">National Institutes of Health (NIH)</strong>, we provide consistent, compliant floor care that supports learning and innovation.</p><h4 data-start=\"2691\" data-end=\"2732\">Why Businesses Choose Midland Floors</h4><ul data-start=\"2733\" data-end=\"2933\"><li data-start=\"2733\" data-end=\"2774\"><p data-start=\"2735\" data-end=\"2774\">Experience across multiple industries</p></li><li data-start=\"2775\" data-end=\"2825\"><p data-start=\"2777\" data-end=\"2825\">Scalable services tailored to your environment</p></li><li data-start=\"2826\" data-end=\"2875\"><p data-start=\"2828\" data-end=\"2875\">Commitment to hygiene, safety, and appearance</p></li><li data-start=\"2876\" data-end=\"2933\"><p data-start=\"2878\" data-end=\"2933\">Proven track record with national brands and agencies</p></li></ul><p data-start=\"2935\" data-end=\"3055\">At <strong data-start=\"2938\" data-end=\"2956\">Midland Floors</strong>, our expertise ensures your floors are not just clean\u2014but a long-lasting asset to your business.</p>\t\t\n\t\t\t\t\t<h2>Diverse Clientele at Midland Floors</h2>\t\t\t\t\n\t\t<p>REI<br />Amtrak<br />Guitar Center<br />Ulta<br />US Renal Care<br />Lego<br />Le Labo<br />Massage Envy<br />European Wax Cente</p><p>Harbor Freight<br />Dept Homeland Security<br />US AID<br />Environmental Protection Agency (EPA)<br />Dept of Labor<br />Lazy Dog Restaurants<br />Raising Cane\u2019s<br />Puma</p><p>Land\u2019s End<br />Famous Footwear<br />Hanes Brand<br />Lacoste<br />Pandora<br />LA Fitness<br />Cava<br />National Park Service<br />National Institute of Health (NIH)</p><p>Wolf Trap<br />At Home Stores<br />CVS<br />Save A Lot<br />Eileen Fisher<br />H&amp;M<br />Barnes &amp; Noble<br />Hallmark</p>\t\t\n\t\t<ul>\n  <li><a href=\"https://midlandfloors.com/our-work-in-action/\">Our Work</a></li>\n  <li><a href=\"https://midlandfloors.com/about/\">About Midland</a></li>\n  <li><a href=\"https://midlandfloors.com/faq/\">Frequently Asked Questions</a></li>\n  <li><a href=\"https://midlandfloors.com/eco-friendly-floor-solutions-for-retail-stores/\">Eco-Friendly Floor Solutions for Retail Stores</a></li>\n  <li><a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\">7 Essential Tips for Impeccable Commercial Floor Care Services</a></li>\n</ul>\n<p style=\"text-align: center;\">REI<br />Amtrak<br />Guitar Center<br />Ulta<br />US Renal Care<br />Lego<br />Le Labo<br />Massage Envy<br />European Wax Cente</p><p style=\"text-align: center;\">Harbor Freight<br />Dept Homeland Security<br />US AID<br />Environmental Protection Agency (EPA)<br />Dept of Labor<br />Lazy Dog Restaurants<br />Raising Cane\u2019s<br />Puma</p><p style=\"text-align: center;\">Land\u2019s End<br />Famous Footwear<br />Hanes Brand<br />Lacoste<br />Pandora<br />LA Fitness<br />Cava<br />National Park Service<br />National Institute of Health (NIH)</p>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "49b47249",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA"
+      },
+      "elements": [
+        {
+          "id": "e87f571f",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "6ad285fe",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 36,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "506e3e2f",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and Facility Score in 48 hours.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "0da0fa68",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center"
+              },
+              "elements": [
+                {
+                  "id": "a70e0894",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "05a5cbf0",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#FFFFFF",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}

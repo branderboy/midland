@@ -1,0 +1,368 @@
+{
+  "version": "0.4",
+  "title": "Reviews",
+  "type": "section",
+  "metadata": {},
+  "content": [
+    {
+      "id": "68742f0c",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "Testimonials"
+      },
+      "elements": [
+        {
+          "id": "cd1f4a33",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "232aeef0",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Our Happy Clients",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 40,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "18",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "8bece488",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "18",
+                  "row": "18",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 18
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "stretch"
+              },
+              "elements": [
+                {
+                  "id": "e22897de",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "22",
+                      "right": "22",
+                      "bottom": "22",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "rgba(255,255,255,0.04)",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 33,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "8aa2f2f3",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FACC15;font-size:14px;letter-spacing:.1em\">\u2605\u2605\u2605\u2605\u2605</p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "aa5576b8",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>\"Very professional. Knowledgeable and willing to educate. Will refer Midland to anyone.\"</p>",
+                        "align": "left",
+                        "text_color": "#FFFFFF",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.6,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "500"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "ac8e16a7",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FFF;font-weight:800;margin-top:8px;font-size:14px\">Patricia B.<br><span style=\"color:#B7BCB8;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700\">Business Advisor, Bethesda</span></p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                },
+                {
+                  "id": "7cd29d29",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "22",
+                      "right": "22",
+                      "bottom": "22",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "rgba(255,255,255,0.04)",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 33,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "e33192fa",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FACC15;font-size:14px;letter-spacing:.1em\">\u2605\u2605\u2605\u2605\u2605</p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "b1dceceb",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>\"40K sq ft office cleaned overnight. No downtime. We see the result, not the work.\"</p>",
+                        "align": "left",
+                        "text_color": "#FFFFFF",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.6,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "500"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "b00cb899",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FFF;font-weight:800;margin-top:8px;font-size:14px\">Property Manager<br><span style=\"color:#B7BCB8;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700\">Class A Office, Arlington</span></p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                },
+                {
+                  "id": "7a8f3478",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "22",
+                      "right": "22",
+                      "bottom": "22",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "rgba(255,255,255,0.04)",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 33,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "aa40112b",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FACC15;font-size:14px;letter-spacing:.1em\">\u2605\u2605\u2605\u2605\u2605</p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "85c9e405",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>\"Carpet like new after 8 years of kids and pets. Treated the place like their own.\"</p>",
+                        "align": "left",
+                        "text_color": "#FFFFFF",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.6,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "500"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "b27eec74",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FFF;font-weight:800;margin-top:8px;font-size:14px\">Sandy K.<br><span style=\"color:#B7BCB8;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700\">Bethesda</span></p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}

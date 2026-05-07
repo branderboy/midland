@@ -1,0 +1,481 @@
+{
+  "version": "0.4",
+  "title": "Janitorial & Housekeeping Facility Services",
+  "type": "page",
+  "metadata": {},
+  "content": [
+    {
+      "id": "8fe3100a",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "Hero - Janitorial & Housekeeping Facility Servi"
+      },
+      "elements": [
+        {
+          "id": "b58d90c7",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "2",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "432f1d88",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Service",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "10",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "699810af",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Janitorial & Housekeeping Facility Services",
+                "header_size": "h1",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 44,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.05,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "fd35c957",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Janitorial &amp; Housekeeping Facility Services (for select commercial clients) Some facilities need more than exceptional floor care. They need a compreh\u2026</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.6,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "59da43a5",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Content"
+      },
+      "elements": [
+        {
+          "id": "88f264bd",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 820,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "2",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "968c6b87",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<h2 data-start=\"0\" data-end=\"79\"><strong data-start=\"0\" data-end=\"79\">Janitorial &amp; Housekeeping Facility Services (for select commercial clients)</strong></h2><p data-start=\"81\" data-end=\"267\">Some facilities need more than exceptional floor care. They need a comprehensive, discreet, dependable partner who understands the demands of a premium property or high profile business.</p><p data-start=\"269\" data-end=\"458\">At Midland Floor Care, we provide exclusive janitorial and housekeeping facility services to select commercial clients who value consistency, confidentiality, and a higher standard of care.</p><p data-start=\"460\" data-end=\"496\"><strong data-start=\"460\" data-end=\"496\">What makes our service different</strong></p><ul data-start=\"497\" data-end=\"838\"><li data-start=\"497\" data-end=\"597\"><p data-start=\"499\" data-end=\"597\">Selective partnerships: we work with a limited number of clients for maximum attention and quality</p></li><li data-start=\"598\" data-end=\"668\"><p data-start=\"600\" data-end=\"668\">White glove standards: detail oriented service beyond industry norms</p></li><li data-start=\"669\" data-end=\"745\"><p data-start=\"671\" data-end=\"745\">Discreet, professional staff: fully trained, uniformed, background checked</p></li><li data-start=\"746\" data-end=\"838\"><p data-start=\"748\" data-end=\"838\">Flexible scope: from daily upkeep to specialized event preparation, tailored to your needs</p></li></ul><p data-start=\"840\" data-end=\"883\"><strong data-start=\"840\" data-end=\"883\">Services offered for our select clients</strong></p><ul data-start=\"884\" data-end=\"1302\"><li data-start=\"884\" data-end=\"971\"><p data-start=\"886\" data-end=\"971\">Full janitorial care: sweeping, mopping, dusting, trash removal, restroom maintenance</p></li><li data-start=\"972\" data-end=\"1050\"><p data-start=\"974\" data-end=\"1050\">Housekeeping services: common area upkeep, furniture dusting, glass cleaning</p></li><li data-start=\"1051\" data-end=\"1146\"><p data-start=\"1053\" data-end=\"1146\">Floor maintenance: integrated with our specialty programs for carpet, tile, and hard surfaces</p></li><li data-start=\"1147\" data-end=\"1229\"><p data-start=\"1149\" data-end=\"1229\">Special event prep and cleanup: guest ready before and after important occasions</p></li><li data-start=\"1230\" data-end=\"1302\"><p data-start=\"1232\" data-end=\"1302\">High touch disinfection: enhanced sanitation for high contact surfaces</p></li></ul><p data-start=\"1304\" data-end=\"1354\"><strong data-start=\"1304\" data-end=\"1354\">Industries and facilities we serve exclusively</strong></p><ul data-start=\"1355\" data-end=\"1569\"><li data-start=\"1355\" data-end=\"1381\"><p data-start=\"1357\" data-end=\"1381\">Corporate headquarters</p></li><li data-start=\"1382\" data-end=\"1422\"><p data-start=\"1384\" data-end=\"1422\">Luxury hotels and hospitality venues</p></li><li data-start=\"1423\" data-end=\"1450\"><p data-start=\"1425\" data-end=\"1450\">Executive office suites</p></li><li data-start=\"1451\" data-end=\"1490\"><p data-start=\"1453\" data-end=\"1490\">Upscale retail stores and showrooms</p></li><li data-start=\"1491\" data-end=\"1535\"><p data-start=\"1493\" data-end=\"1535\">Private healthcare and medical practices</p></li><li data-start=\"1536\" data-end=\"1569\"><p data-start=\"1538\" data-end=\"1569\">High security government spaces</p></li></ul><p data-start=\"1571\" data-end=\"1610\"><strong data-start=\"1571\" data-end=\"1610\">Why partner with Midland Floor Care</strong></p><ul data-start=\"1611\" data-end=\"1919\"><li data-start=\"1611\" data-end=\"1687\"><p data-start=\"1613\" data-end=\"1687\">Limited client list: your facility gets the focus and priority it deserves</p></li><li data-start=\"1688\" data-end=\"1774\"><p data-start=\"1690\" data-end=\"1774\">Comprehensive solutions: floor care, janitorial, and housekeeping under one provider</p></li><li data-start=\"1775\" data-end=\"1841\"><p data-start=\"1777\" data-end=\"1841\">Confidentiality assured: discretion in every client relationship</p></li><li data-start=\"1842\" data-end=\"1919\"><p data-start=\"1844\" data-end=\"1919\">Consistency guaranteed: same trusted team, same high standards, every visit</p></li></ul><p data-start=\"1921\" data-end=\"2119\"><strong data-start=\"1921\" data-end=\"1950\">Schedule an on-site visit</strong><br />Ready to discuss your facility. <a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule an on-site visit today.</a> Call us or request a visit online and we\u2019ll walk the space, build the plan, and align on your timeline.</p><p data-start=\"2121\" data-end=\"2215\">For facilities where presentation is everything, maintenance is not a task. It\u2019s a commitment.</p><p data-start=\"2217\" data-end=\"2245\" data-is-last-node=\"\" data-is-only-node=\"\">Thank you,<br data-start=\"2227\" data-end=\"2230\" />Justin Campbell</p><ul>\n  <li><a href=\"https://midlandfloors.com/floor-care-services/\">Services</a></li>\n  <li><a href=\"https://midlandfloors.com/\">Home</a></li>\n  <li><a href=\"https://midlandfloors.com/about/\">About Midland</a></li>\n  <li><a href=\"https://midlandfloors.com/our-work-in-action/\">Our Work</a></li>\n  <li><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your Visit & Quote</a></li>\n</ul>\n<ul>\n  <li><a href=\"https://midlandfloors.com/\">Home</a></li>\n  <li><a href=\"https://midlandfloors.com/about/\">About Midland</a></li>\n  <li><a href=\"https://midlandfloors.com/floor-care-services/\">Services</a></li>\n  <li><a href=\"https://midlandfloors.com/schedule-a-visit/\">Schedule Your Visit &amp; Quote</a></li>\n  <li><a href=\"https://midlandfloors.com/7-essential-tips-for-impeccable-commercial-floor-care-services/\">7 Essential Tips for Impeccable Commercial Floor Care Services</a></li>\n</ul>",
+                "align": "left",
+                "text_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.7,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "7c0e8447",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "CTA"
+      },
+      "elements": [
+        {
+          "id": "018d3dfb",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "6b61530a",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for floors that sell for you?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 36,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "ffa07a72",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Free on-site evaluation and Facility Score in 48 hours.</p>",
+                "align": "center",
+                "text_color": "#B7E5BD",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "a7a1c5c3",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "center",
+                "flex_justify_content": "center"
+              },
+              "elements": [
+                {
+                  "id": "34b8503c",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "e8707059",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "/schedule-a-visit/",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "center",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#FFFFFF",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 17,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    }
+  ],
+  "page_settings": []
+}
