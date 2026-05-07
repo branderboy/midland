@@ -5,7 +5,7 @@
   "metadata": {},
   "content": [
     {
-      "id": "8df57348",
+      "id": "c319e751",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -26,49 +26,22 @@
           "isLinked": true
         },
         "background_background": "classic",
-        "background_image": {
-          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/Midland%20Floors%20Hero%20image.jpg",
-          "id": "",
-          "size": "",
-          "alt": "",
-          "source": "library"
-        },
-        "background_position": "center right",
-        "background_size": "cover",
-        "background_overlay_background": "gradient",
-        "background_overlay_color": "rgba(15,20,17,0.94)",
-        "background_overlay_color_b": "rgba(15,20,17,0.25)",
-        "background_overlay_color_b_stop": {
-          "unit": "%",
-          "size": 100,
-          "sizes": []
-        },
-        "background_overlay_color_stop": {
-          "unit": "%",
-          "size": 0,
-          "sizes": []
-        },
-        "background_overlay_gradient_angle": {
-          "unit": "deg",
-          "size": 90,
-          "sizes": []
-        },
-        "_title": "Hero",
-        "_css_classes": "midland-page"
+        "background_color": "#F3FCF4",
+        "_title": "Hero"
       },
       "elements": [
         {
-          "id": "0c135a59",
+          "id": "853eee2d",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
             "content_width": "boxed",
             "flex_gap": {
-              "column": "20",
-              "row": "20",
+              "column": "18",
+              "row": "18",
               "isLinked": true,
               "unit": "px",
-              "size": 20
+              "size": 18
             },
             "boxed_width": {
               "unit": "px",
@@ -77,158 +50,77 @@
             },
             "padding": {
               "unit": "em",
-              "top": "5",
-              "right": "2",
-              "bottom": "5",
-              "left": "4",
+              "top": "4",
+              "right": "1.5",
+              "bottom": "4",
+              "left": "1.5",
               "isLinked": false
             },
-            "flex_align_items": "flex-start",
-            "_css_classes": "midland-page"
+            "flex_align_items": "center"
           },
           "elements": [
             {
-              "id": "f6f11007",
-              "elType": "widget",
-              "widgetType": "icon-list",
-              "settings": {
-                "icon_list": [
-                  {
-                    "text": "Carpet",
-                    "selected_icon": {
-                      "value": "fas fa-circle",
-                      "library": "fa-solid"
-                    },
-                    "_id": "95c3e909"
-                  },
-                  {
-                    "text": "Hardwood",
-                    "selected_icon": {
-                      "value": "fas fa-circle",
-                      "library": "fa-solid"
-                    },
-                    "_id": "74af9b03"
-                  },
-                  {
-                    "text": "Tile",
-                    "selected_icon": {
-                      "value": "fas fa-circle",
-                      "library": "fa-solid"
-                    },
-                    "_id": "676aa4b9"
-                  },
-                  {
-                    "text": "Concrete",
-                    "selected_icon": {
-                      "value": "fas fa-circle",
-                      "library": "fa-solid"
-                    },
-                    "_id": "a2a0df2d"
-                  },
-                  {
-                    "text": "Commercial",
-                    "selected_icon": {
-                      "value": "fas fa-circle",
-                      "library": "fa-solid"
-                    },
-                    "_id": "922b380f"
-                  }
-                ],
-                "icon_color": "#43A94B",
-                "icon_size": {
-                  "unit": "px",
-                  "size": 4,
-                  "sizes": []
-                },
-                "space_between": {
-                  "unit": "px",
-                  "size": 20,
-                  "sizes": []
-                },
-                "view": "inline",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 11,
-                  "sizes": []
-                },
-                "typography_font_weight": "800",
-                "text_color": "#43A94B"
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "a27d03fe",
+              "id": "61b87536",
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
-                "title": "Professional Floor & Carpet Care in DC, MD & VA.",
+                "title": "Professional Floor & Carpet Care in DC, MD & VA",
                 "header_size": "h1",
-                "align": "left",
+                "align": "center",
                 "size": "default",
-                "title_color": "#FFFFFF",
+                "title_color": "#0F1411",
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 64,
+                  "size": 48,
                   "sizes": []
                 },
                 "typography_font_weight": "800",
                 "typography_line_height": {
                   "unit": "em",
-                  "size": 1.04,
+                  "size": 1.05,
                   "sizes": []
-                },
-                "_margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "20",
-                  "left": "0",
-                  "isLinked": false
                 }
               },
               "elements": [],
               "isInner": false
             },
             {
-              "id": "5aeebc05",
+              "id": "f093ecd7",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Family-owned, locally operated. Trusted by DMV homeowners and facility managers for <strong>carpet cleaning, hardwood refinishing, tile &amp; grout, upholstery, and full commercial floor care.</strong> <span style=\"color:#43A94B;font-weight:800\">Call for immediate availability.</span></p>",
-                "align": "left",
-                "text_color": "#D5DAD7",
+                "editor": "<p>Family-owned, locally operated. Trusted by DMV homeowners and facility managers for carpet cleaning, hardwood refinishing, tile and grout, upholstery, and full commercial floor care.</p>",
+                "align": "center",
+                "text_color": "#4B5563",
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 20,
+                  "size": 18,
                   "sizes": []
                 },
                 "typography_line_height": {
                   "unit": "em",
-                  "size": 1.55,
+                  "size": 1.6,
                   "sizes": []
-                },
-                "typography_font_weight": "500"
+                }
               },
               "elements": [],
               "isInner": false
             },
             {
-              "id": "234e6507",
+              "id": "8c8dd24d",
               "elType": "widget",
               "widgetType": "button",
               "settings": {
-                "text": "\ud83d\udcde Call now (240) 532-9097",
+                "text": "Call now (240) 532-9097",
                 "link": {
                   "url": "tel:2405329097",
                   "is_external": "",
                   "nofollow": ""
                 },
                 "size": "lg",
-                "align": "left",
+                "align": "center",
                 "background_color": "#43A94B",
                 "button_text_color": "#FFFFFF",
                 "border_border": "solid",
@@ -259,15 +151,15 @@
                 },
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 20,
+                  "size": 17,
                   "sizes": []
                 },
                 "text_padding": {
                   "unit": "px",
-                  "top": "26",
-                  "right": "46",
-                  "bottom": "26",
-                  "left": "46",
+                  "top": "20",
+                  "right": "32",
+                  "bottom": "20",
+                  "left": "32",
                   "isLinked": false
                 },
                 "hover_color": "#FFFFFF",
@@ -284,7 +176,7 @@
       "isInner": false
     },
     {
-      "id": "c3a8a19e",
+      "id": "485854e4",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -305,13 +197,12 @@
           "isLinked": true
         },
         "background_background": "classic",
-        "background_color": "#F3FCF4",
-        "_title": "Process",
-        "_css_classes": "midland-page"
+        "background_color": "#FFFFFF",
+        "_title": "Process"
       },
       "elements": [
         {
-          "id": "ed9d65ee",
+          "id": "0c90688c",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
@@ -335,24 +226,23 @@
               "bottom": "3",
               "left": "1.5",
               "isLinked": false
-            },
-            "_css_classes": "midland-page"
+            }
           },
           "elements": [
             {
-              "id": "e72f0b3b",
+              "id": "a359dafe",
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
-                "title": "The Midland Process Explained",
-                "header_size": "h6",
+                "title": "How Our Process Works",
+                "header_size": "h2",
                 "align": "center",
                 "size": "default",
-                "title_color": "#2F8137",
+                "title_color": "#0F1411",
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 13,
+                  "size": 40,
                   "sizes": []
                 },
                 "typography_font_weight": "800",
@@ -369,46 +259,17 @@
               "isInner": false
             },
             {
-              "id": "04093903",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "How our process works.",
-                "header_size": "h2",
-                "align": "center",
-                "size": "default",
-                "title_color": "#0F1411",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 48,
-                  "sizes": []
-                },
-                "typography_font_weight": "800",
-                "_margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "12",
-                  "left": "0",
-                  "isLinked": false
-                }
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "ef944c0e",
+              "id": "fb5c1fd5",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Our process makes it easy to see exactly how we deliver quality results and complete client satisfaction. Clear steps, no guesswork, and a smooth experience from first visit to final clean.</p>",
+                "editor": "<p>Clear steps, no guesswork, and a smooth experience from first visit to final clean.</p>",
                 "align": "center",
                 "text_color": "#4B5563",
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 18,
+                  "size": 17,
                   "sizes": []
                 },
                 "typography_line_height": {
@@ -421,7 +282,7 @@
               "isInner": false
             },
             {
-              "id": "a703c78b",
+              "id": "84af470c",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
@@ -435,28 +296,27 @@
                 },
                 "padding": {
                   "unit": "px",
-                  "top": "32",
+                  "top": "24",
                   "right": "0",
                   "bottom": "0",
                   "left": "0",
                   "isLinked": false
                 },
-                "flex_align_items": "flex-start",
-                "_css_classes": "midland-page"
+                "flex_align_items": "flex-start"
               },
               "elements": [
                 {
-                  "id": "9d413a3d",
+                  "id": "f74eaead",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
                     "flex_gap": {
-                      "column": "20",
-                      "row": "20",
+                      "column": "6",
+                      "row": "6",
                       "isLinked": true,
                       "unit": "px",
-                      "size": 20
+                      "size": 6
                     },
                     "padding": {
                       "unit": "px",
@@ -467,7 +327,6 @@
                       "isLinked": true
                     },
                     "flex_align_items": "center",
-                    "_css_classes": "midland-page",
                     "_flex_size": "none",
                     "_element_width": "initial",
                     "width": {
@@ -478,54 +337,80 @@
                   },
                   "elements": [
                     {
-                      "id": "8cac6c5c",
+                      "id": "073798a2",
                       "elType": "widget",
-                      "widgetType": "icon-box",
+                      "widgetType": "heading",
                       "settings": {
-                        "selected_icon": {
-                          "value": "fas fa-circle",
-                          "library": "fa-solid"
-                        },
-                        "title_text": "Walkthrough",
-                        "description_text": "We inspect the space in person, identify surfaces and trouble spots.",
-                        "view": "default",
-                        "shape": "circle",
-                        "primary_color": "#43A94B",
-                        "icon_secondary_color": "#FFFFFF",
-                        "title_typography_typography": "custom",
-                        "title_typography_font_size": {
-                          "unit": "px",
-                          "size": 21,
-                          "sizes": []
-                        },
-                        "title_typography_font_weight": "800",
-                        "description_typography_typography": "custom",
-                        "description_typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "description_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.55,
-                          "sizes": []
-                        },
-                        "description_color": "#4B5563",
-                        "title_color": "#0F1411",
-                        "icon_size": {
+                        "title": "01",
+                        "header_size": "h3",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#43A94B",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
                           "unit": "px",
                           "size": 42,
                           "sizes": []
                         },
-                        "icon_padding": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 36,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "46a1ade2",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "Walkthrough",
+                        "header_size": "h4",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 20,
                           "sizes": []
                         },
-                        "position": "top",
-                        "title_bottom_space": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 8,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "868a2c45",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>We inspect the space in person and identify trouble spots.</p>",
+                        "align": "center",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.55,
                           "sizes": []
                         }
                       },
@@ -536,17 +421,17 @@
                   "isInner": true
                 },
                 {
-                  "id": "17b60830",
+                  "id": "6f2842ca",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
                     "flex_gap": {
-                      "column": "20",
-                      "row": "20",
+                      "column": "6",
+                      "row": "6",
                       "isLinked": true,
                       "unit": "px",
-                      "size": 20
+                      "size": 6
                     },
                     "padding": {
                       "unit": "px",
@@ -557,7 +442,6 @@
                       "isLinked": true
                     },
                     "flex_align_items": "center",
-                    "_css_classes": "midland-page",
                     "_flex_size": "none",
                     "_element_width": "initial",
                     "width": {
@@ -568,54 +452,80 @@
                   },
                   "elements": [
                     {
-                      "id": "f1999490",
+                      "id": "4f18c2d2",
                       "elType": "widget",
-                      "widgetType": "icon-box",
+                      "widgetType": "heading",
                       "settings": {
-                        "selected_icon": {
-                          "value": "fas fa-circle",
-                          "library": "fa-solid"
-                        },
-                        "title_text": "Facility Score",
-                        "description_text": "You get a written assessment of every surface. Yours to keep.",
-                        "view": "default",
-                        "shape": "circle",
-                        "primary_color": "#43A94B",
-                        "icon_secondary_color": "#FFFFFF",
-                        "title_typography_typography": "custom",
-                        "title_typography_font_size": {
-                          "unit": "px",
-                          "size": 21,
-                          "sizes": []
-                        },
-                        "title_typography_font_weight": "800",
-                        "description_typography_typography": "custom",
-                        "description_typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "description_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.55,
-                          "sizes": []
-                        },
-                        "description_color": "#4B5563",
-                        "title_color": "#0F1411",
-                        "icon_size": {
+                        "title": "02",
+                        "header_size": "h3",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#43A94B",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
                           "unit": "px",
                           "size": 42,
                           "sizes": []
                         },
-                        "icon_padding": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 36,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "7e688a92",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "Facility Score",
+                        "header_size": "h4",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 20,
                           "sizes": []
                         },
-                        "position": "top",
-                        "title_bottom_space": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 8,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "c73ab707",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>Written assessment of every surface. Yours to keep.</p>",
+                        "align": "center",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.55,
                           "sizes": []
                         }
                       },
@@ -626,17 +536,17 @@
                   "isInner": true
                 },
                 {
-                  "id": "cc66c21d",
+                  "id": "882d2d45",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
                     "flex_gap": {
-                      "column": "20",
-                      "row": "20",
+                      "column": "6",
+                      "row": "6",
                       "isLinked": true,
                       "unit": "px",
-                      "size": 20
+                      "size": 6
                     },
                     "padding": {
                       "unit": "px",
@@ -647,7 +557,6 @@
                       "isLinked": true
                     },
                     "flex_align_items": "center",
-                    "_css_classes": "midland-page",
                     "_flex_size": "none",
                     "_element_width": "initial",
                     "width": {
@@ -658,54 +567,80 @@
                   },
                   "elements": [
                     {
-                      "id": "8fc4a984",
+                      "id": "db1bdbb5",
                       "elType": "widget",
-                      "widgetType": "icon-box",
+                      "widgetType": "heading",
                       "settings": {
-                        "selected_icon": {
-                          "value": "fas fa-circle",
-                          "library": "fa-solid"
-                        },
-                        "title_text": "24-48 Hour Quote",
-                        "description_text": "Line-item pricing, no hidden fees, no annual lock-ins.",
-                        "view": "default",
-                        "shape": "circle",
-                        "primary_color": "#43A94B",
-                        "icon_secondary_color": "#FFFFFF",
-                        "title_typography_typography": "custom",
-                        "title_typography_font_size": {
-                          "unit": "px",
-                          "size": 21,
-                          "sizes": []
-                        },
-                        "title_typography_font_weight": "800",
-                        "description_typography_typography": "custom",
-                        "description_typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "description_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.55,
-                          "sizes": []
-                        },
-                        "description_color": "#4B5563",
-                        "title_color": "#0F1411",
-                        "icon_size": {
+                        "title": "03",
+                        "header_size": "h3",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#43A94B",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
                           "unit": "px",
                           "size": 42,
                           "sizes": []
                         },
-                        "icon_padding": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 36,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "c45079ca",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "24-48 Hour Quote",
+                        "header_size": "h4",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 20,
                           "sizes": []
                         },
-                        "position": "top",
-                        "title_bottom_space": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 8,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "b713bdfd",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>Line-item pricing, no hidden fees, no annual lock-ins.</p>",
+                        "align": "center",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.55,
                           "sizes": []
                         }
                       },
@@ -716,17 +651,17 @@
                   "isInner": true
                 },
                 {
-                  "id": "30308644",
+                  "id": "ffd56dec",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
                     "flex_gap": {
-                      "column": "20",
-                      "row": "20",
+                      "column": "6",
+                      "row": "6",
                       "isLinked": true,
                       "unit": "px",
-                      "size": 20
+                      "size": 6
                     },
                     "padding": {
                       "unit": "px",
@@ -737,7 +672,6 @@
                       "isLinked": true
                     },
                     "flex_align_items": "center",
-                    "_css_classes": "midland-page",
                     "_flex_size": "none",
                     "_element_width": "initial",
                     "width": {
@@ -748,54 +682,80 @@
                   },
                   "elements": [
                     {
-                      "id": "a5a9006d",
+                      "id": "2071dfac",
                       "elType": "widget",
-                      "widgetType": "icon-box",
+                      "widgetType": "heading",
                       "settings": {
-                        "selected_icon": {
-                          "value": "fas fa-circle",
-                          "library": "fa-solid"
-                        },
-                        "title_text": "Schedule",
-                        "description_text": "Nights, weekends, holidays. Your tenants only see the result.",
-                        "view": "default",
-                        "shape": "circle",
-                        "primary_color": "#43A94B",
-                        "icon_secondary_color": "#FFFFFF",
-                        "title_typography_typography": "custom",
-                        "title_typography_font_size": {
-                          "unit": "px",
-                          "size": 21,
-                          "sizes": []
-                        },
-                        "title_typography_font_weight": "800",
-                        "description_typography_typography": "custom",
-                        "description_typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "description_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.55,
-                          "sizes": []
-                        },
-                        "description_color": "#4B5563",
-                        "title_color": "#0F1411",
-                        "icon_size": {
+                        "title": "04",
+                        "header_size": "h3",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#43A94B",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
                           "unit": "px",
                           "size": 42,
                           "sizes": []
                         },
-                        "icon_padding": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 36,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "3961f5da",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "Schedule",
+                        "header_size": "h4",
+                        "align": "center",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 20,
                           "sizes": []
                         },
-                        "position": "top",
-                        "title_bottom_space": {
+                        "typography_font_weight": "800",
+                        "_margin": {
                           "unit": "px",
-                          "size": 8,
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "4",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "ca7692fb",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>Nights, weekends, holidays. Your tenants only see the result.</p>",
+                        "align": "center",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.55,
                           "sizes": []
                         }
                       },
@@ -815,263 +775,7 @@
       "isInner": false
     },
     {
-      "id": "4e0efa69",
-      "elType": "container",
-      "settings": {
-        "flex_direction": "column",
-        "content_width": "full",
-        "flex_gap": {
-          "column": "20",
-          "row": "20",
-          "isLinked": true,
-          "unit": "px",
-          "size": 20
-        },
-        "padding": {
-          "unit": "px",
-          "top": "0",
-          "right": "0",
-          "bottom": "0",
-          "left": "0",
-          "isLinked": true
-        },
-        "background_background": "classic",
-        "background_color": "#FFFFFF",
-        "_title": "Side Job + Form",
-        "_css_classes": "midland-page"
-      },
-      "elements": [
-        {
-          "id": "8f155502",
-          "elType": "container",
-          "settings": {
-            "flex_direction": "row",
-            "content_width": "boxed",
-            "flex_gap": {
-              "column": "56",
-              "row": "56",
-              "isLinked": true,
-              "unit": "px",
-              "size": 56
-            },
-            "boxed_width": {
-              "unit": "px",
-              "size": 1140,
-              "sizes": []
-            },
-            "padding": {
-              "unit": "em",
-              "top": "3",
-              "right": "1.5",
-              "bottom": "3",
-              "left": "1.5",
-              "isLinked": false
-            },
-            "flex_align_items": "flex-start",
-            "_css_classes": "midland-page"
-          },
-          "elements": [
-            {
-              "id": "aaa2bf50",
-              "elType": "container",
-              "settings": {
-                "flex_direction": "column",
-                "content_width": "full",
-                "flex_gap": {
-                  "column": "20",
-                  "row": "20",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 20
-                },
-                "padding": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "0",
-                  "left": "0",
-                  "isLinked": true
-                },
-                "_css_classes": "midland-page",
-                "_flex_size": "none",
-                "_element_width": "initial",
-                "width": {
-                  "unit": "%",
-                  "size": 50,
-                  "sizes": []
-                }
-              },
-              "elements": [
-                {
-                  "id": "8fa1e7ee",
-                  "elType": "widget",
-                  "widgetType": "heading",
-                  "settings": {
-                    "title": "Floors and Carpet Aren't a Side Job. They're the Whole Job.",
-                    "header_size": "h2",
-                    "align": "left",
-                    "size": "default",
-                    "title_color": "#0F1411",
-                    "typography_typography": "custom",
-                    "typography_font_size": {
-                      "unit": "px",
-                      "size": 40,
-                      "sizes": []
-                    },
-                    "typography_font_weight": "800"
-                  },
-                  "elements": [],
-                  "isInner": false
-                },
-                {
-                  "id": "ecee973a",
-                  "elType": "widget",
-                  "widgetType": "image",
-                  "settings": {
-                    "image": {
-                      "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland%20floor%20team.png",
-                      "id": "",
-                      "size": "",
-                      "alt": "Midland Floor Care team",
-                      "source": "library"
-                    }
-                  },
-                  "elements": [],
-                  "isInner": false
-                }
-              ],
-              "isInner": true
-            },
-            {
-              "id": "4cf616a3",
-              "elType": "container",
-              "settings": {
-                "flex_direction": "column",
-                "content_width": "full",
-                "flex_gap": {
-                  "column": "14",
-                  "row": "14",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 14
-                },
-                "padding": {
-                  "unit": "px",
-                  "top": "28",
-                  "right": "28",
-                  "bottom": "28",
-                  "left": "28",
-                  "isLinked": true
-                },
-                "background_background": "classic",
-                "background_color": "#FFFFFF",
-                "_css_classes": "midland-page",
-                "_flex_size": "none",
-                "_element_width": "initial",
-                "width": {
-                  "unit": "%",
-                  "size": 50,
-                  "sizes": []
-                },
-                "border_border": "solid",
-                "border_color": "#E5EAE6",
-                "border_width": {
-                  "unit": "px",
-                  "top": "1",
-                  "right": "1",
-                  "bottom": "1",
-                  "left": "1",
-                  "isLinked": true
-                },
-                "border_radius": {
-                  "unit": "px",
-                  "top": "4",
-                  "right": "4",
-                  "bottom": "4",
-                  "left": "4",
-                  "isLinked": true
-                }
-              },
-              "elements": [
-                {
-                  "id": "fcc999df",
-                  "elType": "widget",
-                  "widgetType": "heading",
-                  "settings": {
-                    "title": "Schedule a visit here.",
-                    "header_size": "h3",
-                    "align": "left",
-                    "size": "default",
-                    "title_color": "#0F1411",
-                    "typography_typography": "custom",
-                    "typography_font_size": {
-                      "unit": "px",
-                      "size": 26,
-                      "sizes": []
-                    },
-                    "typography_font_weight": "800",
-                    "_margin": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "4",
-                      "left": "0",
-                      "isLinked": false
-                    }
-                  },
-                  "elements": [],
-                  "isInner": false
-                },
-                {
-                  "id": "3bb4aed8",
-                  "elType": "widget",
-                  "widgetType": "text-editor",
-                  "settings": {
-                    "editor": "<p>Free site evaluation. No pressure, no obligation.</p>",
-                    "align": "left",
-                    "text_color": "#4B5563",
-                    "typography_typography": "custom",
-                    "typography_font_size": {
-                      "unit": "px",
-                      "size": 14,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [],
-                  "isInner": false
-                },
-                {
-                  "id": "4702d18e",
-                  "elType": "widget",
-                  "widgetType": "shortcode",
-                  "settings": {
-                    "shortcode": "[smart-forms-pro id='1']"
-                  },
-                  "elements": [],
-                  "isInner": false
-                },
-                {
-                  "id": "87c56add",
-                  "elType": "widget",
-                  "widgetType": "text-editor",
-                  "settings": {
-                    "editor": "<p style=\"text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid #E5EAE6;font-size:13px;color:#4B5563\">Or call us right now: <strong><a href=\"tel:2405329097\" style=\"color:#0F1411;text-decoration:none;display:block;margin-top:4px;font-size:22px\">(240) 532-9097</a></strong></p>",
-                    "align": "center"
-                  },
-                  "elements": [],
-                  "isInner": false
-                }
-              ],
-              "isInner": true
-            }
-          ],
-          "isInner": true
-        }
-      ],
-      "isInner": false
-    },
-    {
-      "id": "20011494",
+      "id": "f1d96231",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -1093,12 +797,11 @@
         },
         "background_background": "classic",
         "background_color": "#F3FCF4",
-        "_title": "About",
-        "_css_classes": "midland-page"
+        "_title": "About"
       },
       "elements": [
         {
-          "id": "c2f0ad5c",
+          "id": "7281a52e",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
@@ -1123,45 +826,15 @@
               "left": "1.5",
               "isLinked": false
             },
-            "flex_align_items": "center",
-            "_css_classes": "midland-page"
+            "flex_align_items": "center"
           },
           "elements": [
             {
-              "id": "34ae64e8",
+              "id": "75258183",
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
-                "title": "About",
-                "header_size": "h6",
-                "align": "center",
-                "size": "default",
-                "title_color": "#2F8137",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 13,
-                  "sizes": []
-                },
-                "typography_font_weight": "800",
-                "_margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "10",
-                  "left": "0",
-                  "isLinked": false
-                }
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "72596d47",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "Midland Floor Care delivers.",
+                "title": "Midland Floor Care Delivers",
                 "header_size": "h2",
                 "align": "center",
                 "size": "default",
@@ -1169,7 +842,7 @@
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 48,
+                  "size": 40,
                   "sizes": []
                 },
                 "typography_font_weight": "800"
@@ -1178,17 +851,17 @@
               "isInner": false
             },
             {
-              "id": "470a7908",
+              "id": "56938f6d",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Family-owned, serving DC, Maryland, and Virginia. From Bethesda homeowners pressing for family visits to Arlington property managers needing a 40K sq ft office cleaned overnight and same-play-book show-up on time, we do the work right and leave better than we found it.</p>",
+                "editor": "<p>Family-owned, serving DC, Maryland, and Virginia. We do the work right and leave better than we found it.</p>",
                 "align": "center",
                 "text_color": "#4B5563",
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 19,
+                  "size": 18,
                   "sizes": []
                 },
                 "typography_line_height": {
@@ -1201,7 +874,7 @@
               "isInner": false
             },
             {
-              "id": "b7bbf98e",
+              "id": "ccae0dd1",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
@@ -1222,12 +895,11 @@
                   "isLinked": true
                 },
                 "flex_align_items": "center",
-                "flex_justify_content": "center",
-                "_css_classes": "midland-page"
+                "flex_justify_content": "center"
               },
               "elements": [
                 {
-                  "id": "fb7b3d0f",
+                  "id": "4f9ef1b4",
                   "elType": "widget",
                   "widgetType": "button",
                   "settings": {
@@ -1288,11 +960,11 @@
                   "isInner": false
                 },
                 {
-                  "id": "78143781",
+                  "id": "12ad0d94",
                   "elType": "widget",
                   "widgetType": "button",
                   "settings": {
-                    "text": "\ud83d\udcde (240) 532-9097",
+                    "text": "(240) 532-9097",
                     "link": {
                       "url": "tel:2405329097",
                       "is_external": "",
@@ -1358,7 +1030,7 @@
       "isInner": false
     },
     {
-      "id": "e970afa3",
+      "id": "a86a8194",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -1380,12 +1052,11 @@
         },
         "background_background": "classic",
         "background_color": "#FFFFFF",
-        "_title": "Residential Services",
-        "_css_classes": "midland-page"
+        "_title": "Residential Services"
       },
       "elements": [
         {
-          "id": "4539dfad",
+          "id": "9ad7834c",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
@@ -1409,78 +1080,40 @@
               "bottom": "3",
               "left": "1.5",
               "isLinked": false
-            },
-            "_css_classes": "midland-page"
+            }
           },
           "elements": [
             {
-              "id": "5247a18a",
-              "elType": "container",
+              "id": "2c8c36e6",
+              "elType": "widget",
+              "widgetType": "heading",
               "settings": {
-                "flex_direction": "column",
-                "content_width": "full",
-                "flex_gap": {
-                  "column": "8",
-                  "row": "8",
-                  "isLinked": true,
+                "title": "Residential Services",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
                   "unit": "px",
-                  "size": 8
+                  "size": 40,
+                  "sizes": []
                 },
-                "padding": {
+                "typography_font_weight": "800",
+                "_margin": {
                   "unit": "px",
                   "top": "0",
                   "right": "0",
-                  "bottom": "0",
+                  "bottom": "18",
                   "left": "0",
-                  "isLinked": true
-                },
-                "_css_classes": "midland-page",
-                "_flex_size": "none",
-                "_element_width": "initial",
-                "width": {
-                  "unit": "%",
-                  "size": 100,
-                  "sizes": []
+                  "isLinked": false
                 }
               },
-              "elements": [
-                {
-                  "id": "01580f72",
-                  "elType": "widget",
-                  "widgetType": "heading",
-                  "settings": {
-                    "title": "Residential Services",
-                    "header_size": "h2",
-                    "align": "center",
-                    "size": "default",
-                    "title_color": "#0F1411",
-                    "typography_typography": "custom",
-                    "typography_font_size": {
-                      "unit": "px",
-                      "size": 48,
-                      "sizes": []
-                    },
-                    "typography_font_weight": "800"
-                  },
-                  "elements": [],
-                  "isInner": false
-                },
-                {
-                  "id": "f1d7336c",
-                  "elType": "widget",
-                  "widgetType": "text-editor",
-                  "settings": {
-                    "editor": "<p style=\"font-style:italic;font-size:18px;color:#4B5563;text-align:center;max-width:50ch;margin:8px auto 0\">\"Carpet like new after 8 years of kids and pets.\" \u2014 <strong style=\"color:#0F1411\">Sandy, Bethesda</strong></p>",
-                    "align": "center"
-                  },
-                  "elements": [],
-                  "isInner": false
-                }
-              ],
-              "isInner": true
+              "elements": [],
+              "isInner": false
             },
             {
-              "id": "ea78976a",
+              "id": "02a5a750",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
@@ -1494,18 +1127,17 @@
                 },
                 "padding": {
                   "unit": "px",
-                  "top": "32",
+                  "top": "0",
                   "right": "0",
                   "bottom": "0",
                   "left": "0",
-                  "isLinked": false
+                  "isLinked": true
                 },
-                "flex_align_items": "flex-start",
-                "_css_classes": "midland-page"
+                "flex_align_items": "center"
               },
               "elements": [
                 {
-                  "id": "4dba11fe",
+                  "id": "46a0850c",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -1525,7 +1157,6 @@
                       "left": "0",
                       "isLinked": true
                     },
-                    "_css_classes": "midland-page",
                     "_flex_size": "none",
                     "_element_width": "initial",
                     "width": {
@@ -1536,7 +1167,7 @@
                   },
                   "elements": [
                     {
-                      "id": "c2904c20",
+                      "id": "cdf96064",
                       "elType": "widget",
                       "widgetType": "image",
                       "settings": {
@@ -1544,7 +1175,7 @@
                           "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/carpet.png",
                           "id": "",
                           "size": "",
-                          "alt": "Real Midland residential carpet cleaning",
+                          "alt": "Residential carpet cleaning",
                           "source": "library"
                         }
                       },
@@ -1555,7 +1186,7 @@
                   "isInner": true
                 },
                 {
-                  "id": "59f0316c",
+                  "id": "d14c9e3f",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -1575,8 +1206,6 @@
                       "left": "0",
                       "isLinked": true
                     },
-                    "flex_align_items": "flex-start",
-                    "_css_classes": "midland-page",
                     "_flex_size": "none",
                     "_element_width": "initial",
                     "width": {
@@ -1587,17 +1216,17 @@
                   },
                   "elements": [
                     {
-                      "id": "10253c4f",
+                      "id": "109e1b8b",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
-                        "editor": "<p>From Bethesda single-family homes to Tysons townhouses, Midland brings commercial-grade equipment and eco-friendly chemistry into your living room. Our crews show up on time, treat your home like their own, and leave behind carpet and floors that look like the day they were installed.</p>",
+                        "editor": "<p>From Bethesda single-family homes to Tysons townhouses, we bring commercial-grade equipment and eco-friendly chemistry into your living room.</p>",
                         "align": "left",
                         "text_color": "#4B5563",
                         "typography_typography": "custom",
                         "typography_font_size": {
                           "unit": "px",
-                          "size": 17,
+                          "size": 16,
                           "sizes": []
                         },
                         "typography_line_height": {
@@ -1610,98 +1239,35 @@
                       "isInner": false
                     },
                     {
-                      "id": "906ea051",
+                      "id": "0bec2c86",
                       "elType": "widget",
-                      "widgetType": "icon-list",
+                      "widgetType": "text-editor",
                       "settings": {
-                        "icon_list": [
-                          {
-                            "text": "Carpet Cleaning (steam extraction)",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "5a9afbe9"
-                          },
-                          {
-                            "text": "Pet Stain & Odor Removal",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "4cb48d33"
-                          },
-                          {
-                            "text": "Area Rug Cleaning (pickup available)",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "70d60f25"
-                          },
-                          {
-                            "text": "Hardwood Cleaning & Refinishing",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "8601367a"
-                          },
-                          {
-                            "text": "Tile & Grout Cleaning + Sealing",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "1787c043"
-                          },
-                          {
-                            "text": "Upholstery Cleaning",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "6b3ac322"
-                          },
-                          {
-                            "text": "Move-In / Move-Out Cleaning",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "1f40f3b8"
-                          }
-                        ],
-                        "icon_color": "#43A94B",
-                        "icon_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "space_between": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        },
-                        "view": "traditional",
+                        "editor": "<ul><li>Carpet Cleaning (steam extraction)</li><li>Pet Stain &amp; Odor Removal</li><li>Area Rug Cleaning (pickup available)</li><li>Hardwood Cleaning &amp; Refinishing</li><li>Tile &amp; Grout Cleaning + Sealing</li><li>Upholstery Cleaning</li><li>Move-In / Move-Out Cleaning</li></ul>",
+                        "align": "left",
+                        "text_color": "#0F1411",
                         "typography_typography": "custom",
                         "typography_font_size": {
                           "unit": "px",
                           "size": 16,
                           "sizes": []
                         },
-                        "typography_font_weight": "700",
-                        "text_color": "#0F1411"
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.8,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "600"
                       },
                       "elements": [],
                       "isInner": false
                     },
                     {
-                      "id": "375bf5bf",
+                      "id": "506889c3",
                       "elType": "widget",
                       "widgetType": "button",
                       "settings": {
-                        "text": "Get a Residential Quote \u2192",
+                        "text": "Get a Residential Quote",
                         "link": {
                           "url": "#schedule",
                           "is_external": "",
@@ -1709,8 +1275,8 @@
                         },
                         "size": "lg",
                         "align": "left",
-                        "background_color": "#FFFFFF",
-                        "button_text_color": "#2F8137",
+                        "background_color": "#43A94B",
+                        "button_text_color": "#FFFFFF",
                         "border_border": "solid",
                         "border_color": "#43A94B",
                         "border_width": {
@@ -1739,20 +1305,20 @@
                         },
                         "typography_font_size": {
                           "unit": "px",
-                          "size": 13,
+                          "size": 14,
                           "sizes": []
                         },
                         "text_padding": {
                           "unit": "px",
-                          "top": "12",
-                          "right": "20",
-                          "bottom": "12",
-                          "left": "20",
+                          "top": "14",
+                          "right": "22",
+                          "bottom": "14",
+                          "left": "22",
                           "isLinked": false
                         },
                         "hover_color": "#FFFFFF",
-                        "button_background_hover_color": "#43A94B",
-                        "border_hover_color": "#43A94B"
+                        "button_background_hover_color": "#2F8137",
+                        "border_hover_color": "#2F8137"
                       },
                       "elements": [],
                       "isInner": false
@@ -1770,7 +1336,7 @@
       "isInner": false
     },
     {
-      "id": "60c33cb9",
+      "id": "bff022a1",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -1792,22 +1358,21 @@
         },
         "background_background": "classic",
         "background_color": "#0E2F14",
-        "_title": "Stats Band",
-        "_css_classes": "midland-page"
+        "_title": "Stats Band"
       },
       "elements": [
         {
-          "id": "d1b7eee9",
+          "id": "ad32ddd8",
           "elType": "container",
           "settings": {
-            "flex_direction": "row",
+            "flex_direction": "column",
             "content_width": "boxed",
             "flex_gap": {
-              "column": "32",
-              "row": "32",
+              "column": "20",
+              "row": "20",
               "isLinked": true,
               "unit": "px",
-              "size": 32
+              "size": 20
             },
             "boxed_width": {
               "unit": "px",
@@ -1822,22 +1387,205 @@
               "left": "1.5",
               "isLinked": false
             },
-            "flex_align_items": "center",
-            "_css_classes": "midland-page"
+            "flex_align_items": "center"
           },
           "elements": [
             {
-              "id": "67c784ee",
+              "id": "16ffb03f",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "3,000+ Homes Cleaned & 758+ Commercial Jobs",
+                "header_size": "h3",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 28,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.2,
+                  "sizes": []
+                },
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "16",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "a3f7f0d8",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Let's See Your Floors Shine",
+                "link": {
+                  "url": "#schedule",
+                  "is_external": "",
+                  "nofollow": ""
+                },
+                "size": "lg",
+                "align": "center",
+                "background_color": "#43A94B",
+                "button_text_color": "#FFFFFF",
+                "border_border": "solid",
+                "border_color": "#43A94B",
+                "border_width": {
+                  "unit": "px",
+                  "top": "2",
+                  "right": "2",
+                  "bottom": "2",
+                  "left": "2",
+                  "isLinked": true
+                },
+                "border_radius": {
+                  "unit": "px",
+                  "top": "4",
+                  "right": "4",
+                  "bottom": "4",
+                  "left": "4",
+                  "isLinked": true
+                },
+                "typography_typography": "custom",
+                "typography_font_weight": "800",
+                "typography_text_transform": "uppercase",
+                "typography_letter_spacing": {
+                  "unit": "px",
+                  "size": 1,
+                  "sizes": []
+                },
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 17,
+                  "sizes": []
+                },
+                "text_padding": {
+                  "unit": "px",
+                  "top": "20",
+                  "right": "32",
+                  "bottom": "20",
+                  "left": "32",
+                  "isLinked": false
+                },
+                "hover_color": "#FFFFFF",
+                "button_background_hover_color": "#2F8137",
+                "border_hover_color": "#2F8137"
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "a7a1aa83",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Commercial Services"
+      },
+      "elements": [
+        {
+          "id": "25ef1e21",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "9bfe7789",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Commercial Services",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 40,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "18",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "fe74c59c",
               "elType": "container",
               "settings": {
-                "flex_direction": "column",
+                "flex_direction": "row",
                 "content_width": "full",
                 "flex_gap": {
-                  "column": "4",
-                  "row": "4",
+                  "column": "32",
+                  "row": "32",
                   "isLinked": true,
                   "unit": "px",
-                  "size": 4
+                  "size": 32
                 },
                 "padding": {
                   "unit": "px",
@@ -1847,86 +1595,678 @@
                   "left": "0",
                   "isLinked": true
                 },
-                "_css_classes": "midland-page",
-                "_flex_size": "none",
-                "_element_width": "initial",
-                "width": {
-                  "unit": "%",
-                  "size": 66,
-                  "sizes": []
-                }
+                "flex_align_items": "center"
               },
               "elements": [
                 {
-                  "id": "d990d0df",
-                  "elType": "widget",
-                  "widgetType": "heading",
+                  "id": "cbb82004",
+                  "elType": "container",
                   "settings": {
-                    "title": "Serving the Mid-Atlantic Region",
-                    "header_size": "h6",
-                    "align": "left",
-                    "size": "default",
-                    "title_color": "#43A94B",
-                    "typography_typography": "custom",
-                    "typography_font_size": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "14",
+                      "row": "14",
+                      "isLinked": true,
                       "unit": "px",
-                      "size": 13,
-                      "sizes": []
+                      "size": 14
                     },
-                    "typography_font_weight": "800",
-                    "_margin": {
+                    "padding": {
                       "unit": "px",
                       "top": "0",
                       "right": "0",
-                      "bottom": "8",
+                      "bottom": "0",
                       "left": "0",
-                      "isLinked": false
+                      "isLinked": true
+                    },
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 50,
+                      "sizes": []
                     }
                   },
-                  "elements": [],
-                  "isInner": false
+                  "elements": [
+                    {
+                      "id": "7bce7fb1",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>Built for facilities that can't shut down. We work nights, weekends, and holidays so your tenants and customers never see the disruption, only the result.</p>",
+                        "align": "left",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 16,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.6,
+                          "sizes": []
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "a31688c4",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<ul><li>Carpet Cleaning (after-hours)</li><li>Tile &amp; Grout Deep Clean</li><li>Hard Surface Floor Restoration (VCT, stone)</li><li>Concrete Polishing</li><li>Janitorial Services</li><li>Upholstery + Leather Cleaning</li><li>EPA-Approved Disinfecting</li></ul>",
+                        "align": "left",
+                        "text_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 16,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.8,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "600"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "2485ec3a",
+                      "elType": "widget",
+                      "widgetType": "button",
+                      "settings": {
+                        "text": "Get a Commercial Quote",
+                        "link": {
+                          "url": "#schedule",
+                          "is_external": "",
+                          "nofollow": ""
+                        },
+                        "size": "lg",
+                        "align": "left",
+                        "background_color": "#43A94B",
+                        "button_text_color": "#FFFFFF",
+                        "border_border": "solid",
+                        "border_color": "#43A94B",
+                        "border_width": {
+                          "unit": "px",
+                          "top": "2",
+                          "right": "2",
+                          "bottom": "2",
+                          "left": "2",
+                          "isLinked": true
+                        },
+                        "border_radius": {
+                          "unit": "px",
+                          "top": "4",
+                          "right": "4",
+                          "bottom": "4",
+                          "left": "4",
+                          "isLinked": true
+                        },
+                        "typography_typography": "custom",
+                        "typography_font_weight": "800",
+                        "typography_text_transform": "uppercase",
+                        "typography_letter_spacing": {
+                          "unit": "px",
+                          "size": 1,
+                          "sizes": []
+                        },
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 14,
+                          "sizes": []
+                        },
+                        "text_padding": {
+                          "unit": "px",
+                          "top": "14",
+                          "right": "22",
+                          "bottom": "14",
+                          "left": "22",
+                          "isLinked": false
+                        },
+                        "hover_color": "#FFFFFF",
+                        "button_background_hover_color": "#2F8137",
+                        "border_hover_color": "#2F8137"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
                 },
                 {
-                  "id": "65b6a014",
-                  "elType": "widget",
-                  "widgetType": "heading",
+                  "id": "c3c8c84b",
+                  "elType": "container",
                   "settings": {
-                    "title": "3,000+ Homes Cleaned & 758+ Commercial Jobs.",
-                    "header_size": "h3",
-                    "align": "left",
-                    "size": "default",
-                    "title_color": "#FFFFFF",
-                    "typography_typography": "custom",
-                    "typography_font_size": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "20",
+                      "row": "20",
+                      "isLinked": true,
                       "unit": "px",
-                      "size": 32,
-                      "sizes": []
+                      "size": 20
                     },
-                    "typography_font_weight": "800",
-                    "typography_line_height": {
-                      "unit": "em",
-                      "size": 1.2,
+                    "padding": {
+                      "unit": "px",
+                      "top": "0",
+                      "right": "0",
+                      "bottom": "0",
+                      "left": "0",
+                      "isLinked": true
+                    },
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 50,
                       "sizes": []
                     }
                   },
-                  "elements": [],
-                  "isInner": false
+                  "elements": [
+                    {
+                      "id": "797504bc",
+                      "elType": "widget",
+                      "widgetType": "image",
+                      "settings": {
+                        "image": {
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/office%20floor.png",
+                          "id": "",
+                          "size": "",
+                          "alt": "Commercial office floor",
+                          "source": "library"
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
                 }
               ],
               "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "ceedd788",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#0E2F14",
+        "_title": "Testimonials"
+      },
+      "elements": [
+        {
+          "id": "52a57934",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "56ce87c5",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Our Happy Clients",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 40,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "18",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
             },
             {
-              "id": "f9e34c3b",
+              "id": "df282e73",
               "elType": "container",
               "settings": {
-                "flex_direction": "column",
+                "flex_direction": "row",
                 "content_width": "full",
                 "flex_gap": {
-                  "column": "20",
-                  "row": "20",
+                  "column": "18",
+                  "row": "18",
                   "isLinked": true,
                   "unit": "px",
-                  "size": 20
+                  "size": 18
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_align_items": "stretch"
+              },
+              "elements": [
+                {
+                  "id": "b9604e47",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "22",
+                      "right": "22",
+                      "bottom": "22",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "rgba(255,255,255,0.04)",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 33,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "dc57a7da",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FACC15;font-size:14px;letter-spacing:.1em\">\u2605\u2605\u2605\u2605\u2605</p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "86d98ee7",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>\"Very professional. Knowledgeable and willing to educate. Will refer Midland to anyone.\"</p>",
+                        "align": "left",
+                        "text_color": "#FFFFFF",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.6,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "500"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "347fa41c",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FFF;font-weight:800;margin-top:8px;font-size:14px\">Patricia B.<br><span style=\"color:#B7BCB8;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700\">Business Advisor, Bethesda</span></p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                },
+                {
+                  "id": "00353726",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "22",
+                      "right": "22",
+                      "bottom": "22",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "rgba(255,255,255,0.04)",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 33,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "a62a08b8",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FACC15;font-size:14px;letter-spacing:.1em\">\u2605\u2605\u2605\u2605\u2605</p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "a95168ac",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>\"40K sq ft office cleaned overnight. No downtime. We see the result, not the work.\"</p>",
+                        "align": "left",
+                        "text_color": "#FFFFFF",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.6,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "500"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "5fffcd07",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FFF;font-weight:800;margin-top:8px;font-size:14px\">Property Manager<br><span style=\"color:#B7BCB8;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700\">Class A Office, Arlington</span></p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                },
+                {
+                  "id": "709f0a56",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "10",
+                      "row": "10",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 10
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "22",
+                      "right": "22",
+                      "bottom": "22",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "rgba(255,255,255,0.04)",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 33,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "8212d272",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FACC15;font-size:14px;letter-spacing:.1em\">\u2605\u2605\u2605\u2605\u2605</p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "74b85a95",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>\"Carpet like new after 8 years of kids and pets. Treated the place like their own.\"</p>",
+                        "align": "left",
+                        "text_color": "#FFFFFF",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.6,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "500"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "168c3f51",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#FFF;font-weight:800;margin-top:8px;font-size:14px\">Sandy K.<br><span style=\"color:#B7BCB8;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700\">Bethesda</span></p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "a7fe9b41",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "CTA"
+      },
+      "elements": [
+        {
+          "id": "e29b3f07",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "center"
+          },
+          "elements": [
+            {
+              "id": "2b18f3c6",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready for Floors That Sell For You?",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 40,
+                  "sizes": []
+                },
+                "typography_font_weight": "800"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "00f815e8",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Get a free on-site evaluation and your written Facility Score in 48 hours.</p>",
+                "align": "center",
+                "text_color": "#4B5563",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 18,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.6,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "1c036b0c",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "12",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 12
                 },
                 "padding": {
                   "unit": "px",
@@ -1937,30 +2277,22 @@
                   "isLinked": true
                 },
                 "flex_align_items": "center",
-                "flex_justify_content": "flex-end",
-                "_css_classes": "midland-page",
-                "_flex_size": "none",
-                "_element_width": "initial",
-                "width": {
-                  "unit": "%",
-                  "size": 33,
-                  "sizes": []
-                }
+                "flex_justify_content": "center"
               },
               "elements": [
                 {
-                  "id": "c4095fa7",
+                  "id": "0fb1fc56",
                   "elType": "widget",
                   "widgetType": "button",
                   "settings": {
-                    "text": "Let's See Your Floors Shine \u2192",
+                    "text": "Call (240) 532-9097",
                     "link": {
-                      "url": "#schedule",
+                      "url": "tel:2405329097",
                       "is_external": "",
                       "nofollow": ""
                     },
                     "size": "lg",
-                    "align": "right",
+                    "align": "center",
                     "background_color": "#43A94B",
                     "button_text_color": "#FFFFFF",
                     "border_border": "solid",
@@ -2002,1070 +2334,76 @@
                       "left": "32",
                       "isLinked": false
                     },
-                    "hover_color": "#0F1411",
-                    "button_background_hover_color": "#FFFFFF",
-                    "border_hover_color": "#FFFFFF"
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
                   },
                   "elements": [],
                   "isInner": false
-                }
-              ],
-              "isInner": true
-            }
-          ],
-          "isInner": true
-        }
-      ],
-      "isInner": false
-    },
-    {
-      "id": "5bf69086",
-      "elType": "container",
-      "settings": {
-        "flex_direction": "column",
-        "content_width": "full",
-        "flex_gap": {
-          "column": "20",
-          "row": "20",
-          "isLinked": true,
-          "unit": "px",
-          "size": 20
-        },
-        "padding": {
-          "unit": "px",
-          "top": "0",
-          "right": "0",
-          "bottom": "0",
-          "left": "0",
-          "isLinked": true
-        },
-        "background_background": "classic",
-        "background_color": "#FFFFFF",
-        "_title": "Commercial Services",
-        "_css_classes": "midland-page"
-      },
-      "elements": [
-        {
-          "id": "c0d30cf4",
-          "elType": "container",
-          "settings": {
-            "flex_direction": "column",
-            "content_width": "boxed",
-            "flex_gap": {
-              "column": "20",
-              "row": "20",
-              "isLinked": true,
-              "unit": "px",
-              "size": 20
-            },
-            "boxed_width": {
-              "unit": "px",
-              "size": 1140,
-              "sizes": []
-            },
-            "padding": {
-              "unit": "em",
-              "top": "3",
-              "right": "1.5",
-              "bottom": "3",
-              "left": "1.5",
-              "isLinked": false
-            },
-            "_css_classes": "midland-page"
-          },
-          "elements": [
-            {
-              "id": "65a7e4a0",
-              "elType": "container",
-              "settings": {
-                "flex_direction": "column",
-                "content_width": "full",
-                "flex_gap": {
-                  "column": "8",
-                  "row": "8",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 8
                 },
-                "padding": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "0",
-                  "left": "0",
-                  "isLinked": true
-                },
-                "_css_classes": "midland-page",
-                "_flex_size": "none",
-                "_element_width": "initial",
-                "width": {
-                  "unit": "%",
-                  "size": 100,
-                  "sizes": []
-                }
-              },
-              "elements": [
                 {
-                  "id": "4c5bdd7e",
+                  "id": "7998de9f",
                   "elType": "widget",
-                  "widgetType": "heading",
+                  "widgetType": "button",
                   "settings": {
-                    "title": "Commercial Services",
-                    "header_size": "h2",
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "#schedule",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
                     "align": "center",
-                    "size": "default",
-                    "title_color": "#0F1411",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
                     "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
                     "typography_font_size": {
                       "unit": "px",
-                      "size": 48,
+                      "size": 17,
                       "sizes": []
                     },
-                    "typography_font_weight": "800"
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "20",
+                      "right": "32",
+                      "bottom": "20",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
                   },
                   "elements": [],
                   "isInner": false
-                },
-                {
-                  "id": "968d5928",
-                  "elType": "widget",
-                  "widgetType": "text-editor",
-                  "settings": {
-                    "editor": "<p style=\"font-style:italic;font-size:18px;color:#4B5563;text-align:center;max-width:56ch;margin:8px auto 0\">\"40K sq ft office cleaned overnight. No downtime.\" \u2014 <strong style=\"color:#0F1411\">Arlington Property Manager</strong></p>",
-                    "align": "center"
-                  },
-                  "elements": [],
-                  "isInner": false
                 }
               ],
               "isInner": true
-            },
-            {
-              "id": "da0ae62f",
-              "elType": "container",
-              "settings": {
-                "flex_direction": "row",
-                "content_width": "full",
-                "flex_gap": {
-                  "column": "32",
-                  "row": "32",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 32
-                },
-                "padding": {
-                  "unit": "px",
-                  "top": "32",
-                  "right": "0",
-                  "bottom": "0",
-                  "left": "0",
-                  "isLinked": false
-                },
-                "flex_align_items": "flex-start",
-                "_css_classes": "midland-page"
-              },
-              "elements": [
-                {
-                  "id": "bfeb16f2",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "14",
-                      "row": "14",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 14
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "0",
-                      "left": "0",
-                      "isLinked": true
-                    },
-                    "flex_align_items": "flex-start",
-                    "_css_classes": "midland-page",
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 50,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [
-                    {
-                      "id": "7c00b687",
-                      "elType": "widget",
-                      "widgetType": "text-editor",
-                      "settings": {
-                        "editor": "<p>Built for facilities that can't shut down. Midland works nights, weekends, and holidays so your tenants and customers never see the disruption, only the result. COI-ready crews, EPA-registered chemistry, and one named DMV account lead on every visit.</p>",
-                        "align": "left",
-                        "text_color": "#4B5563",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 17,
-                          "sizes": []
-                        },
-                        "typography_line_height": {
-                          "unit": "em",
-                          "size": 1.6,
-                          "sizes": []
-                        }
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "ce84514e",
-                      "elType": "widget",
-                      "widgetType": "icon-list",
-                      "settings": {
-                        "icon_list": [
-                          {
-                            "text": "Carpet Cleaning (after-hours)",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "3965de2b"
-                          },
-                          {
-                            "text": "Tile & Grout Deep Clean",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "e42ff2a6"
-                          },
-                          {
-                            "text": "Hard Surface Floor Restoration (VCT, stone)",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "e3203109"
-                          },
-                          {
-                            "text": "Concrete Polishing",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "697cbedb"
-                          },
-                          {
-                            "text": "Janitorial Services",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "8c75c715"
-                          },
-                          {
-                            "text": "Upholstery + Leather Cleaning",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "792d064f"
-                          },
-                          {
-                            "text": "EPA-Approved Disinfecting",
-                            "selected_icon": {
-                              "value": "fas fa-arrow-right",
-                              "library": "fa-solid"
-                            },
-                            "_id": "45970b85"
-                          }
-                        ],
-                        "icon_color": "#43A94B",
-                        "icon_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "space_between": {
-                          "unit": "px",
-                          "size": 10,
-                          "sizes": []
-                        },
-                        "view": "traditional",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "700",
-                        "text_color": "#0F1411"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "2189b065",
-                      "elType": "widget",
-                      "widgetType": "button",
-                      "settings": {
-                        "text": "Get a Commercial Quote \u2192",
-                        "link": {
-                          "url": "#schedule",
-                          "is_external": "",
-                          "nofollow": ""
-                        },
-                        "size": "lg",
-                        "align": "left",
-                        "background_color": "#FFFFFF",
-                        "button_text_color": "#2F8137",
-                        "border_border": "solid",
-                        "border_color": "#43A94B",
-                        "border_width": {
-                          "unit": "px",
-                          "top": "2",
-                          "right": "2",
-                          "bottom": "2",
-                          "left": "2",
-                          "isLinked": true
-                        },
-                        "border_radius": {
-                          "unit": "px",
-                          "top": "4",
-                          "right": "4",
-                          "bottom": "4",
-                          "left": "4",
-                          "isLinked": true
-                        },
-                        "typography_typography": "custom",
-                        "typography_font_weight": "800",
-                        "typography_text_transform": "uppercase",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 13,
-                          "sizes": []
-                        },
-                        "text_padding": {
-                          "unit": "px",
-                          "top": "12",
-                          "right": "20",
-                          "bottom": "12",
-                          "left": "20",
-                          "isLinked": false
-                        },
-                        "hover_color": "#FFFFFF",
-                        "button_background_hover_color": "#43A94B",
-                        "border_hover_color": "#43A94B"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                },
-                {
-                  "id": "a2611829",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "20",
-                      "row": "20",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 20
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "0",
-                      "left": "0",
-                      "isLinked": true
-                    },
-                    "_css_classes": "midland-page",
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 50,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [
-                    {
-                      "id": "5548600e",
-                      "elType": "widget",
-                      "widgetType": "image",
-                      "settings": {
-                        "image": {
-                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/office%20floor.png",
-                          "id": "",
-                          "size": "",
-                          "alt": "Real Midland commercial office floor",
-                          "source": "library"
-                        }
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                }
-              ],
-              "isInner": true
-            }
-          ],
-          "isInner": true
-        }
-      ],
-      "isInner": false
-    },
-    {
-      "id": "a41fd856",
-      "elType": "container",
-      "settings": {
-        "flex_direction": "column",
-        "content_width": "full",
-        "flex_gap": {
-          "column": "20",
-          "row": "20",
-          "isLinked": true,
-          "unit": "px",
-          "size": 20
-        },
-        "padding": {
-          "unit": "px",
-          "top": "0",
-          "right": "0",
-          "bottom": "0",
-          "left": "0",
-          "isLinked": true
-        },
-        "background_background": "classic",
-        "background_color": "#0E2F14",
-        "_title": "Testimonials",
-        "_css_classes": "midland-page"
-      },
-      "elements": [
-        {
-          "id": "58ffcc09",
-          "elType": "container",
-          "settings": {
-            "flex_direction": "column",
-            "content_width": "boxed",
-            "flex_gap": {
-              "column": "20",
-              "row": "20",
-              "isLinked": true,
-              "unit": "px",
-              "size": 20
-            },
-            "boxed_width": {
-              "unit": "px",
-              "size": 1140,
-              "sizes": []
-            },
-            "padding": {
-              "unit": "em",
-              "top": "3",
-              "right": "1.5",
-              "bottom": "3",
-              "left": "1.5",
-              "isLinked": false
-            },
-            "_css_classes": "midland-page"
-          },
-          "elements": [
-            {
-              "id": "a557c7f5",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "Testimonials",
-                "header_size": "h6",
-                "align": "center",
-                "size": "default",
-                "title_color": "#43A94B",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 13,
-                  "sizes": []
-                },
-                "typography_font_weight": "800",
-                "_margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "10",
-                  "left": "0",
-                  "isLinked": false
-                }
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "59143efe",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "Our Happy Clients.",
-                "header_size": "h2",
-                "align": "center",
-                "size": "default",
-                "title_color": "#FFFFFF",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 48,
-                  "sizes": []
-                },
-                "typography_font_weight": "800"
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "939a7d9d",
-              "elType": "widget",
-              "widgetType": "text-editor",
-              "settings": {
-                "editor": "<p>We believe our clients' testimonials speak louder than our marketing. Here's what DMV homeowners and facility managers say about working with us.</p>",
-                "align": "center",
-                "text_color": "#B7BCB8",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 18,
-                  "sizes": []
-                },
-                "typography_line_height": {
-                  "unit": "em",
-                  "size": 1.6,
-                  "sizes": []
-                }
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "b24d0754",
-              "elType": "container",
-              "settings": {
-                "flex_direction": "row",
-                "content_width": "full",
-                "flex_gap": {
-                  "column": "18",
-                  "row": "18",
-                  "isLinked": true,
-                  "unit": "px",
-                  "size": 18
-                },
-                "padding": {
-                  "unit": "px",
-                  "top": "28",
-                  "right": "0",
-                  "bottom": "0",
-                  "left": "0",
-                  "isLinked": false
-                },
-                "flex_align_items": "stretch",
-                "_css_classes": "midland-page"
-              },
-              "elements": [
-                {
-                  "id": "80908b00",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "20",
-                      "row": "20",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 20
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "22",
-                      "right": "22",
-                      "bottom": "22",
-                      "left": "22",
-                      "isLinked": true
-                    },
-                    "background_background": "classic",
-                    "background_color": "rgba(255,255,255,0.04)",
-                    "_css_classes": "midland-page",
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 33,
-                      "sizes": []
-                    },
-                    "border_border": "solid",
-                    "border_color": "rgba(255,255,255,0.12)",
-                    "border_width": {
-                      "unit": "px",
-                      "top": "1",
-                      "right": "1",
-                      "bottom": "1",
-                      "left": "1",
-                      "isLinked": true
-                    },
-                    "border_radius": {
-                      "unit": "px",
-                      "top": "4",
-                      "right": "4",
-                      "bottom": "4",
-                      "left": "4",
-                      "isLinked": true
-                    }
-                  },
-                  "elements": [
-                    {
-                      "id": "ea124d09",
-                      "elType": "widget",
-                      "widgetType": "testimonial",
-                      "settings": {
-                        "testimonial_content": "Very professional. Knowledgeable and willing to educate. Will refer Midland to anyone that needs carpet cleaning and repair soon to come.",
-                        "testimonial_name": "Patricia B.",
-                        "testimonial_job": "Business Advisor | Bethesda",
-                        "testimonial_alignment": "left",
-                        "testimonial_image_position": "none",
-                        "name_typography_typography": "custom",
-                        "name_typography_font_size": {
-                          "unit": "px",
-                          "size": 15,
-                          "sizes": []
-                        },
-                        "name_typography_font_weight": "800",
-                        "job_typography_typography": "custom",
-                        "job_typography_font_size": {
-                          "unit": "px",
-                          "size": 12,
-                          "sizes": []
-                        },
-                        "job_typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "job_typography_text_transform": "uppercase",
-                        "content_typography_typography": "custom",
-                        "content_typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "content_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.6,
-                          "sizes": []
-                        },
-                        "content_typography_font_weight": "500",
-                        "name_color": "#FFFFFF",
-                        "job_color": "#B7BCB8",
-                        "content_color": "#FFFFFF"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                },
-                {
-                  "id": "7d5ab50e",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "20",
-                      "row": "20",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 20
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "22",
-                      "right": "22",
-                      "bottom": "22",
-                      "left": "22",
-                      "isLinked": true
-                    },
-                    "background_background": "classic",
-                    "background_color": "rgba(255,255,255,0.04)",
-                    "_css_classes": "midland-page",
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 33,
-                      "sizes": []
-                    },
-                    "border_border": "solid",
-                    "border_color": "rgba(255,255,255,0.12)",
-                    "border_width": {
-                      "unit": "px",
-                      "top": "1",
-                      "right": "1",
-                      "bottom": "1",
-                      "left": "1",
-                      "isLinked": true
-                    },
-                    "border_radius": {
-                      "unit": "px",
-                      "top": "4",
-                      "right": "4",
-                      "bottom": "4",
-                      "left": "4",
-                      "isLinked": true
-                    }
-                  },
-                  "elements": [
-                    {
-                      "id": "35f86cdc",
-                      "elType": "widget",
-                      "widgetType": "testimonial",
-                      "settings": {
-                        "testimonial_content": "40K sq ft office cleaned overnight. No downtime, no excuses. We see the result, not the work. Exactly what we wanted from a vendor.",
-                        "testimonial_name": "Property Manager",
-                        "testimonial_job": "Class A Office, Arlington",
-                        "testimonial_alignment": "left",
-                        "testimonial_image_position": "none",
-                        "name_typography_typography": "custom",
-                        "name_typography_font_size": {
-                          "unit": "px",
-                          "size": 15,
-                          "sizes": []
-                        },
-                        "name_typography_font_weight": "800",
-                        "job_typography_typography": "custom",
-                        "job_typography_font_size": {
-                          "unit": "px",
-                          "size": 12,
-                          "sizes": []
-                        },
-                        "job_typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "job_typography_text_transform": "uppercase",
-                        "content_typography_typography": "custom",
-                        "content_typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "content_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.6,
-                          "sizes": []
-                        },
-                        "content_typography_font_weight": "500",
-                        "name_color": "#FFFFFF",
-                        "job_color": "#B7BCB8",
-                        "content_color": "#FFFFFF"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                },
-                {
-                  "id": "10eaafe2",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "20",
-                      "row": "20",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 20
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "22",
-                      "right": "22",
-                      "bottom": "22",
-                      "left": "22",
-                      "isLinked": true
-                    },
-                    "background_background": "classic",
-                    "background_color": "rgba(255,255,255,0.04)",
-                    "_css_classes": "midland-page",
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 33,
-                      "sizes": []
-                    },
-                    "border_border": "solid",
-                    "border_color": "rgba(255,255,255,0.12)",
-                    "border_width": {
-                      "unit": "px",
-                      "top": "1",
-                      "right": "1",
-                      "bottom": "1",
-                      "left": "1",
-                      "isLinked": true
-                    },
-                    "border_radius": {
-                      "unit": "px",
-                      "top": "4",
-                      "right": "4",
-                      "bottom": "4",
-                      "left": "4",
-                      "isLinked": true
-                    }
-                  },
-                  "elements": [
-                    {
-                      "id": "b6e454e1",
-                      "elType": "widget",
-                      "widgetType": "testimonial",
-                      "settings": {
-                        "testimonial_content": "Carpet like new after 8 years of kids and pets. The team showed up on time and treated the place like their own.",
-                        "testimonial_name": "Sandy K.",
-                        "testimonial_job": "Bethesda",
-                        "testimonial_alignment": "left",
-                        "testimonial_image_position": "none",
-                        "name_typography_typography": "custom",
-                        "name_typography_font_size": {
-                          "unit": "px",
-                          "size": 15,
-                          "sizes": []
-                        },
-                        "name_typography_font_weight": "800",
-                        "job_typography_typography": "custom",
-                        "job_typography_font_size": {
-                          "unit": "px",
-                          "size": 12,
-                          "sizes": []
-                        },
-                        "job_typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "job_typography_text_transform": "uppercase",
-                        "content_typography_typography": "custom",
-                        "content_typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "content_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.6,
-                          "sizes": []
-                        },
-                        "content_typography_font_weight": "500",
-                        "name_color": "#FFFFFF",
-                        "job_color": "#B7BCB8",
-                        "content_color": "#FFFFFF"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                }
-              ],
-              "isInner": true
-            }
-          ],
-          "isInner": true
-        }
-      ],
-      "isInner": false
-    },
-    {
-      "id": "f996d9cf",
-      "elType": "container",
-      "settings": {
-        "flex_direction": "column",
-        "content_width": "full",
-        "flex_gap": {
-          "column": "20",
-          "row": "20",
-          "isLinked": true,
-          "unit": "px",
-          "size": 20
-        },
-        "padding": {
-          "unit": "px",
-          "top": "0",
-          "right": "0",
-          "bottom": "0",
-          "left": "0",
-          "isLinked": true
-        },
-        "background_background": "classic",
-        "background_color": "#F3FCF4",
-        "_title": "FAQ",
-        "_css_classes": "midland-page"
-      },
-      "elements": [
-        {
-          "id": "44aabde8",
-          "elType": "container",
-          "settings": {
-            "flex_direction": "column",
-            "content_width": "boxed",
-            "flex_gap": {
-              "column": "18",
-              "row": "18",
-              "isLinked": true,
-              "unit": "px",
-              "size": 18
-            },
-            "boxed_width": {
-              "unit": "px",
-              "size": 920,
-              "sizes": []
-            },
-            "padding": {
-              "unit": "em",
-              "top": "3",
-              "right": "1.5",
-              "bottom": "3",
-              "left": "1.5",
-              "isLinked": false
-            },
-            "_css_classes": "midland-page"
-          },
-          "elements": [
-            {
-              "id": "9a0eb5d3",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "FAQ",
-                "header_size": "h6",
-                "align": "center",
-                "size": "default",
-                "title_color": "#2F8137",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 13,
-                  "sizes": []
-                },
-                "typography_font_weight": "800",
-                "_margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "10",
-                  "left": "0",
-                  "isLinked": false
-                }
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "5d09221e",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "Questions DMV Homeowners and Facility Managers Ask First.",
-                "header_size": "h2",
-                "align": "center",
-                "size": "default",
-                "title_color": "#0F1411",
-                "typography_typography": "custom",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 36,
-                  "sizes": []
-                },
-                "typography_font_weight": "800",
-                "_margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "24",
-                  "left": "0",
-                  "isLinked": false
-                }
-              },
-              "elements": [],
-              "isInner": false
-            },
-            {
-              "id": "16195f9a",
-              "elType": "widget",
-              "widgetType": "toggle",
-              "settings": {
-                "tabs": [
-                  {
-                    "_id": "e2ce9996",
-                    "tab_title": "How fast can you get on-site?",
-                    "tab_content": "<p>Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after. Same-day emergency dispatch. Call (240) 532-9097.</p>"
-                  },
-                  {
-                    "_id": "e43c517b",
-                    "tab_title": "Are you insured and COI-ready?",
-                    "tab_content": "<p>Yes. Fully insured. COI, W-9, and SDS sheets are emailed the same business day you ask.</p>"
-                  },
-                  {
-                    "_id": "e600841d",
-                    "tab_title": "Do you handle nights, weekends, and emergencies?",
-                    "tab_content": "<p>Yes. Most commercial work happens nights, weekends, and holidays. Same-day emergency response is available. Call (240) 532-9097.</p>"
-                  },
-                  {
-                    "_id": "a9e63a95",
-                    "tab_title": "What's the difference vs. national chains?",
-                    "tab_content": "<p>We're a local DMV flooring contractor, not a national franchise. One named account lead, custom programs, faster response, no annual lock-ins.</p>"
-                  }
-                ],
-                "selected_icon": {
-                  "value": "fas fa-plus",
-                  "library": "fa-solid"
-                },
-                "selected_active_icon": {
-                  "value": "fas fa-times",
-                  "library": "fa-solid"
-                },
-                "title_typography_typography": "custom",
-                "title_typography_font_size": {
-                  "unit": "px",
-                  "size": 18,
-                  "sizes": []
-                },
-                "title_typography_font_weight": "800",
-                "border_radius": {
-                  "unit": "px",
-                  "top": "8",
-                  "right": "8",
-                  "bottom": "8",
-                  "left": "8",
-                  "isLinked": true
-                }
-              },
-              "elements": [],
-              "isInner": false
             }
           ],
           "isInner": true
