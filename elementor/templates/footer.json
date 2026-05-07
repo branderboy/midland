@@ -118,24 +118,13 @@
                       "widgetType": "image",
                       "settings": {
                         "image": {
-                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png",
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-logo-white.png",
                           "id": "",
                           "size": "",
                           "alt": "Midland Floor Care",
                           "source": "library"
                         },
-                        "_css_filters_css_filter": "custom",
-                        "_css_filters_invert": {
-                          "unit": "%",
-                          "size": 100,
-                          "sizes": []
-                        },
-                        "_css_filters_brightness": {
-                          "unit": "%",
-                          "size": 1000,
-                          "sizes": []
-                        },
-                        "_css_classes": "footer-logo-white"
+                        "_css_classes": ""
                       },
                       "elements": [],
                       "isInner": false

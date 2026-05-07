@@ -232,7 +232,7 @@
           "isLinked": true
         },
         "background_background": "classic",
-        "background_color": "#FFFFFF",
+        "background_color": "#F3FCF4",
         "_title": "Process"
       },
       "elements": [
@@ -341,7 +341,7 @@
               },
               "elements": [
                 {
-                  "id": "96520551",
+                  "id": "6977a5d1",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -372,91 +372,38 @@
                   },
                   "elements": [
                     {
-                      "id": "cf835563",
-                      "elType": "container",
+                      "id": "2c155fe1",
+                      "elType": "widget",
+                      "widgetType": "image",
                       "settings": {
-                        "flex_direction": "column",
-                        "content_width": "full",
-                        "padding": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "0",
-                          "left": "0",
-                          "isLinked": true
+                        "image": {
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/process-step-01.png",
+                          "id": "",
+                          "size": "",
+                          "alt": "Step 01: Walkthrough",
+                          "source": "library"
                         },
-                        "flex_gap": {
-                          "column": "0",
-                          "row": "0",
-                          "isLinked": true,
-                          "unit": "px",
-                          "size": 0
-                        },
-                        "flex_align_items": "center",
-                        "flex_justify_content": "center",
-                        "background_background": "classic",
-                        "background_color": "#43A94B",
-                        "border_radius": {
-                          "unit": "%",
-                          "top": "50",
-                          "right": "50",
-                          "bottom": "50",
-                          "left": "50",
-                          "isLinked": true
-                        },
-                        "_flex_size": "none",
-                        "_element_width": "initial",
+                        "align": "center",
                         "width": {
                           "unit": "px",
-                          "size": 80,
+                          "size": 160,
                           "sizes": []
                         },
-                        "min_height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
-                        },
+                        "_element_width": "initial",
                         "_margin": {
                           "unit": "px",
                           "top": "0",
                           "right": "0",
-                          "bottom": "12",
+                          "bottom": "14",
                           "left": "0",
                           "isLinked": false
-                        },
-                        "height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
                         }
                       },
-                      "elements": [
-                        {
-                          "id": "8bb233f5",
-                          "elType": "widget",
-                          "widgetType": "heading",
-                          "settings": {
-                            "title": "01",
-                            "header_size": "div",
-                            "align": "center",
-                            "size": "default",
-                            "title_color": "#FFFFFF",
-                            "typography_typography": "custom",
-                            "typography_font_size": {
-                              "unit": "px",
-                              "size": 24,
-                              "sizes": []
-                            },
-                            "typography_font_weight": "800"
-                          },
-                          "elements": [],
-                          "isInner": false
-                        }
-                      ],
-                      "isInner": true
+                      "elements": [],
+                      "isInner": false
                     },
                     {
-                      "id": "93cd4c2a",
+                      "id": "0739df07",
                       "elType": "widget",
                       "widgetType": "heading",
                       "settings": {
@@ -485,7 +432,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "229c467d",
+                      "id": "0df61363",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
@@ -511,7 +458,7 @@
                   "isInner": true
                 },
                 {
-                  "id": "b9df95dd",
+                  "id": "5cc2be89",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -542,91 +489,38 @@
                   },
                   "elements": [
                     {
-                      "id": "df066153",
-                      "elType": "container",
+                      "id": "38d2d51a",
+                      "elType": "widget",
+                      "widgetType": "image",
                       "settings": {
-                        "flex_direction": "column",
-                        "content_width": "full",
-                        "padding": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "0",
-                          "left": "0",
-                          "isLinked": true
+                        "image": {
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/process-step-02.png",
+                          "id": "",
+                          "size": "",
+                          "alt": "Step 02: Facility Score",
+                          "source": "library"
                         },
-                        "flex_gap": {
-                          "column": "0",
-                          "row": "0",
-                          "isLinked": true,
-                          "unit": "px",
-                          "size": 0
-                        },
-                        "flex_align_items": "center",
-                        "flex_justify_content": "center",
-                        "background_background": "classic",
-                        "background_color": "#43A94B",
-                        "border_radius": {
-                          "unit": "%",
-                          "top": "50",
-                          "right": "50",
-                          "bottom": "50",
-                          "left": "50",
-                          "isLinked": true
-                        },
-                        "_flex_size": "none",
-                        "_element_width": "initial",
+                        "align": "center",
                         "width": {
                           "unit": "px",
-                          "size": 80,
+                          "size": 160,
                           "sizes": []
                         },
-                        "min_height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
-                        },
+                        "_element_width": "initial",
                         "_margin": {
                           "unit": "px",
                           "top": "0",
                           "right": "0",
-                          "bottom": "12",
+                          "bottom": "14",
                           "left": "0",
                           "isLinked": false
-                        },
-                        "height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
                         }
                       },
-                      "elements": [
-                        {
-                          "id": "c0069a99",
-                          "elType": "widget",
-                          "widgetType": "heading",
-                          "settings": {
-                            "title": "02",
-                            "header_size": "div",
-                            "align": "center",
-                            "size": "default",
-                            "title_color": "#FFFFFF",
-                            "typography_typography": "custom",
-                            "typography_font_size": {
-                              "unit": "px",
-                              "size": 24,
-                              "sizes": []
-                            },
-                            "typography_font_weight": "800"
-                          },
-                          "elements": [],
-                          "isInner": false
-                        }
-                      ],
-                      "isInner": true
+                      "elements": [],
+                      "isInner": false
                     },
                     {
-                      "id": "0696cc68",
+                      "id": "fdc4f03b",
                       "elType": "widget",
                       "widgetType": "heading",
                       "settings": {
@@ -655,7 +549,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "bfe31e4c",
+                      "id": "b9c1c999",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
@@ -681,7 +575,7 @@
                   "isInner": true
                 },
                 {
-                  "id": "4d01274a",
+                  "id": "a01abcec",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -712,91 +606,38 @@
                   },
                   "elements": [
                     {
-                      "id": "8510e5fb",
-                      "elType": "container",
+                      "id": "a6ebc9fa",
+                      "elType": "widget",
+                      "widgetType": "image",
                       "settings": {
-                        "flex_direction": "column",
-                        "content_width": "full",
-                        "padding": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "0",
-                          "left": "0",
-                          "isLinked": true
+                        "image": {
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/process-step-03.png",
+                          "id": "",
+                          "size": "",
+                          "alt": "Step 03: 24-48 Hour Quote",
+                          "source": "library"
                         },
-                        "flex_gap": {
-                          "column": "0",
-                          "row": "0",
-                          "isLinked": true,
-                          "unit": "px",
-                          "size": 0
-                        },
-                        "flex_align_items": "center",
-                        "flex_justify_content": "center",
-                        "background_background": "classic",
-                        "background_color": "#43A94B",
-                        "border_radius": {
-                          "unit": "%",
-                          "top": "50",
-                          "right": "50",
-                          "bottom": "50",
-                          "left": "50",
-                          "isLinked": true
-                        },
-                        "_flex_size": "none",
-                        "_element_width": "initial",
+                        "align": "center",
                         "width": {
                           "unit": "px",
-                          "size": 80,
+                          "size": 160,
                           "sizes": []
                         },
-                        "min_height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
-                        },
+                        "_element_width": "initial",
                         "_margin": {
                           "unit": "px",
                           "top": "0",
                           "right": "0",
-                          "bottom": "12",
+                          "bottom": "14",
                           "left": "0",
                           "isLinked": false
-                        },
-                        "height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
                         }
                       },
-                      "elements": [
-                        {
-                          "id": "18dede13",
-                          "elType": "widget",
-                          "widgetType": "heading",
-                          "settings": {
-                            "title": "03",
-                            "header_size": "div",
-                            "align": "center",
-                            "size": "default",
-                            "title_color": "#FFFFFF",
-                            "typography_typography": "custom",
-                            "typography_font_size": {
-                              "unit": "px",
-                              "size": 24,
-                              "sizes": []
-                            },
-                            "typography_font_weight": "800"
-                          },
-                          "elements": [],
-                          "isInner": false
-                        }
-                      ],
-                      "isInner": true
+                      "elements": [],
+                      "isInner": false
                     },
                     {
-                      "id": "05b1fe44",
+                      "id": "2fe58573",
                       "elType": "widget",
                       "widgetType": "heading",
                       "settings": {
@@ -825,7 +666,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "9656f6cb",
+                      "id": "f5996508",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
@@ -851,7 +692,7 @@
                   "isInner": true
                 },
                 {
-                  "id": "708ac311",
+                  "id": "8f3a2879",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -882,91 +723,38 @@
                   },
                   "elements": [
                     {
-                      "id": "ba16b30b",
-                      "elType": "container",
+                      "id": "22398175",
+                      "elType": "widget",
+                      "widgetType": "image",
                       "settings": {
-                        "flex_direction": "column",
-                        "content_width": "full",
-                        "padding": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "0",
-                          "left": "0",
-                          "isLinked": true
+                        "image": {
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/process-step-04.png",
+                          "id": "",
+                          "size": "",
+                          "alt": "Step 04: Schedule",
+                          "source": "library"
                         },
-                        "flex_gap": {
-                          "column": "0",
-                          "row": "0",
-                          "isLinked": true,
-                          "unit": "px",
-                          "size": 0
-                        },
-                        "flex_align_items": "center",
-                        "flex_justify_content": "center",
-                        "background_background": "classic",
-                        "background_color": "#43A94B",
-                        "border_radius": {
-                          "unit": "%",
-                          "top": "50",
-                          "right": "50",
-                          "bottom": "50",
-                          "left": "50",
-                          "isLinked": true
-                        },
-                        "_flex_size": "none",
-                        "_element_width": "initial",
+                        "align": "center",
                         "width": {
                           "unit": "px",
-                          "size": 80,
+                          "size": 160,
                           "sizes": []
                         },
-                        "min_height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
-                        },
+                        "_element_width": "initial",
                         "_margin": {
                           "unit": "px",
                           "top": "0",
                           "right": "0",
-                          "bottom": "12",
+                          "bottom": "14",
                           "left": "0",
                           "isLinked": false
-                        },
-                        "height": {
-                          "unit": "px",
-                          "size": 80,
-                          "sizes": []
                         }
                       },
-                      "elements": [
-                        {
-                          "id": "ffd4b33a",
-                          "elType": "widget",
-                          "widgetType": "heading",
-                          "settings": {
-                            "title": "04",
-                            "header_size": "div",
-                            "align": "center",
-                            "size": "default",
-                            "title_color": "#FFFFFF",
-                            "typography_typography": "custom",
-                            "typography_font_size": {
-                              "unit": "px",
-                              "size": 24,
-                              "sizes": []
-                            },
-                            "typography_font_weight": "800"
-                          },
-                          "elements": [],
-                          "isInner": false
-                        }
-                      ],
-                      "isInner": true
+                      "elements": [],
+                      "isInner": false
                     },
                     {
-                      "id": "b168d3ac",
+                      "id": "fff7fe9b",
                       "elType": "widget",
                       "widgetType": "heading",
                       "settings": {
@@ -995,7 +783,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "cf6ffc22",
+                      "id": "637a75b5",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
@@ -1051,7 +839,7 @@
           "isLinked": true
         },
         "background_background": "classic",
-        "background_color": "#F3FCF4",
+        "background_color": "#FFFFFF",
         "_title": "Side Job + CTA",
         "_element_id": "schedule"
       },
