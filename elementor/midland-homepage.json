@@ -5,37 +5,69 @@
   "metadata": {},
   "content": [
     {
-      "id": "1a2bf0ba",
+      "id": "3f0b18d1",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
+        "padding": {
+          "unit": "em",
+          "top": "6",
+          "right": "1.5",
+          "bottom": "6",
+          "left": "1.5",
+          "isLinked": false
+        },
+        "padding_mobile": {
+          "unit": "em",
+          "top": "3",
+          "right": "1",
+          "bottom": "3",
+          "left": "1",
+          "isLinked": false
+        },
         "flex_gap": {
-          "column": "20",
-          "row": "20",
+          "column": "0",
+          "row": "0",
           "isLinked": true,
           "unit": "px",
-          "size": 20
-        },
-        "padding": {
-          "unit": "px",
-          "top": "0",
-          "right": "0",
-          "bottom": "0",
-          "left": "0",
-          "isLinked": true
+          "size": 0
         },
         "background_background": "classic",
-        "background_color": "#F3FCF4",
+        "background_color": "#0F1411",
+        "background_image": {
+          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/Midland%20Floors%20Hero%20image.jpg",
+          "id": "",
+          "size": "",
+          "alt": "",
+          "source": "library"
+        },
+        "background_position": "center right",
+        "background_size": "cover",
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(15,20,17,0.78)",
         "_title": "Hero"
       },
       "elements": [
         {
-          "id": "8e3c2b9e",
+          "id": "79c27d05",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
             "content_width": "boxed",
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": true
+            },
             "flex_gap": {
               "column": "18",
               "row": "18",
@@ -43,36 +75,23 @@
               "unit": "px",
               "size": 18
             },
-            "boxed_width": {
-              "unit": "px",
-              "size": 1140,
-              "sizes": []
-            },
-            "padding": {
-              "unit": "em",
-              "top": "4",
-              "right": "1.5",
-              "bottom": "4",
-              "left": "1.5",
-              "isLinked": false
-            },
-            "flex_align_items": "center"
+            "flex_align_items": "flex-start"
           },
           "elements": [
             {
-              "id": "66c44a8b",
+              "id": "d7b39aa3",
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
                 "title": "Professional Floor & Carpet Care in DC, MD & VA",
                 "header_size": "h1",
-                "align": "center",
+                "align": "left",
                 "size": "default",
-                "title_color": "#0F1411",
+                "title_color": "#FFFFFF",
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 48,
+                  "size": 56,
                   "sizes": []
                 },
                 "typography_font_weight": "800",
@@ -86,41 +105,42 @@
               "isInner": false
             },
             {
-              "id": "036cc89e",
+              "id": "1685fd81",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Family-owned, locally operated. Trusted by DMV homeowners and facility managers for carpet cleaning, hardwood refinishing, tile and grout, upholstery, and full commercial floor care.</p>",
-                "align": "center",
-                "text_color": "#4B5563",
+                "editor": "<p>Family-owned, locally operated. Trusted by DMV homeowners and facility managers for carpet cleaning, hardwood refinishing, tile and grout, upholstery, and full commercial floor care. <strong style='color:#43A94B'>Call for immediate availability.</strong></p>",
+                "align": "left",
+                "text_color": "#D5DAD7",
                 "typography_typography": "custom",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 18,
+                  "size": 19,
                   "sizes": []
                 },
                 "typography_line_height": {
                   "unit": "em",
-                  "size": 1.6,
+                  "size": 1.55,
                   "sizes": []
-                }
+                },
+                "typography_font_weight": "500"
               },
               "elements": [],
               "isInner": false
             },
             {
-              "id": "8c57273d",
+              "id": "b703579b",
               "elType": "widget",
               "widgetType": "button",
               "settings": {
-                "text": "Call now (240) 532-9097",
+                "text": "\ud83d\udcde Call now (240) 532-9097",
                 "link": {
                   "url": "tel:2405329097",
                   "is_external": "",
                   "nofollow": ""
                 },
                 "size": "lg",
-                "align": "center",
+                "align": "left",
                 "background_color": "#43A94B",
                 "button_text_color": "#FFFFFF",
                 "border_border": "solid",
@@ -151,20 +171,31 @@
                 },
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 17,
+                  "size": 18,
                   "sizes": []
                 },
                 "text_padding": {
                   "unit": "px",
-                  "top": "20",
-                  "right": "32",
-                  "bottom": "20",
-                  "left": "32",
+                  "top": "22",
+                  "right": "38",
+                  "bottom": "22",
+                  "left": "38",
                   "isLinked": false
                 },
                 "hover_color": "#FFFFFF",
                 "button_background_hover_color": "#2F8137",
                 "border_hover_color": "#2F8137"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "3a9052fe",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"color:#FACC15;font-size:14px;letter-spacing:.1em;margin-top:12px\">\u2605\u2605\u2605\u2605\u2605 <span style=\"color:#FFF;font-weight:800;margin-left:8px\">5.0 Google Rating</span> <span style=\"color:#B7BCB8;margin-left:6px\">| 774+ DMV Clients | Fully Insured</span></p>",
+                "align": "left"
               },
               "elements": [],
               "isInner": false
@@ -764,6 +795,349 @@
                     }
                   ],
                   "isInner": true
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "fec6f38f",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "_title": "Side Job + CTA"
+      },
+      "elements": [
+        {
+          "id": "a9f5ee98",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "row",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "40",
+              "row": "40",
+              "isLinked": true,
+              "unit": "px",
+              "size": 40
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 1140,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            },
+            "flex_align_items": "flex-start"
+          },
+          "elements": [
+            {
+              "id": "da27068e",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "column",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "18",
+                  "row": "18",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 18
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "_flex_size": "none",
+                "_element_width": "initial",
+                "width": {
+                  "unit": "%",
+                  "size": 50,
+                  "sizes": []
+                }
+              },
+              "elements": [
+                {
+                  "id": "6fd47cb1",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Floors and Carpet Aren't a Side Job. They're the Whole Job.",
+                    "header_size": "h2",
+                    "align": "left",
+                    "size": "default",
+                    "title_color": "#0F1411",
+                    "typography_typography": "custom",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 36,
+                      "sizes": []
+                    },
+                    "typography_font_weight": "800"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "fbacc445",
+                  "elType": "widget",
+                  "widgetType": "image",
+                  "settings": {
+                    "image": {
+                      "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland%20floor%20team.png",
+                      "id": "",
+                      "size": "",
+                      "alt": "Midland Floor Care team",
+                      "source": "library"
+                    }
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            },
+            {
+              "id": "10fb99e8",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "column",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "14",
+                  "row": "14",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 14
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "32",
+                  "right": "32",
+                  "bottom": "32",
+                  "left": "32",
+                  "isLinked": true
+                },
+                "background_background": "classic",
+                "background_color": "#F3FCF4",
+                "_flex_size": "none",
+                "_element_width": "initial",
+                "width": {
+                  "unit": "%",
+                  "size": 50,
+                  "sizes": []
+                }
+              },
+              "elements": [
+                {
+                  "id": "1cb54de9",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "Schedule a Visit Today",
+                    "header_size": "h3",
+                    "align": "left",
+                    "size": "default",
+                    "title_color": "#0F1411",
+                    "typography_typography": "custom",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 26,
+                      "sizes": []
+                    },
+                    "typography_font_weight": "800"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "df25bd6b",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p>Free site evaluation. No pressure, no obligation.</p><p>We're family-owned, locally operated. Every job is run by a named DMV account lead, not a national call center. Same-day emergency response available.</p>",
+                    "align": "left",
+                    "text_color": "#4B5563",
+                    "typography_typography": "custom",
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 16,
+                      "sizes": []
+                    },
+                    "typography_line_height": {
+                      "unit": "em",
+                      "size": 1.65,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "7ca7946e",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style=\"font-size:14px;color:#4B5563\"><strong>Or call us right now:</strong></p>",
+                    "align": "left"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "9d2f4c0c",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "(240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "left",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 22,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "22",
+                      "right": "32",
+                      "bottom": "22",
+                      "left": "32",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "d4976a8d",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "Schedule a Visit",
+                    "link": {
+                      "url": "#schedule",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "left",
+                    "background_color": "#FFFFFF",
+                    "button_text_color": "#2F8137",
+                    "border_border": "solid",
+                    "border_color": "#43A94B",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 14,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "14",
+                      "right": "22",
+                      "bottom": "14",
+                      "left": "22",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#43A94B",
+                    "border_hover_color": "#43A94B"
+                  },
+                  "elements": [],
+                  "isInner": false
                 }
               ],
               "isInner": true
@@ -2140,6 +2514,505 @@
                       "settings": {
                         "editor": "<p style=\"color:#FFF;font-weight:800;margin-top:8px;font-size:14px\">Sandy K.<br><span style=\"color:#B7BCB8;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700\">Bethesda</span></p>",
                         "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                }
+              ],
+              "isInner": true
+            }
+          ],
+          "isInner": true
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "e11afdbb",
+      "elType": "container",
+      "settings": {
+        "flex_direction": "column",
+        "content_width": "full",
+        "flex_gap": {
+          "column": "20",
+          "row": "20",
+          "isLinked": true,
+          "unit": "px",
+          "size": 20
+        },
+        "padding": {
+          "unit": "px",
+          "top": "0",
+          "right": "0",
+          "bottom": "0",
+          "left": "0",
+          "isLinked": true
+        },
+        "background_background": "classic",
+        "background_color": "#F3FCF4",
+        "_title": "FAQ"
+      },
+      "elements": [
+        {
+          "id": "973ebbb7",
+          "elType": "container",
+          "settings": {
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "boxed_width": {
+              "unit": "px",
+              "size": 920,
+              "sizes": []
+            },
+            "padding": {
+              "unit": "em",
+              "top": "3",
+              "right": "1.5",
+              "bottom": "3",
+              "left": "1.5",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "9b7b8f7b",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "FAQ",
+                "header_size": "h6",
+                "align": "center",
+                "size": "default",
+                "title_color": "#2F8137",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 13,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "8",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "81c0aa27",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Questions DMV Homeowners and Facility Managers Ask First",
+                "header_size": "h2",
+                "align": "center",
+                "size": "default",
+                "title_color": "#0F1411",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 32,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "_margin": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "24",
+                  "left": "0",
+                  "isLinked": false
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "23b8cb0e",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "column",
+                "content_width": "full",
+                "flex_gap": {
+                  "column": "10",
+                  "row": "10",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 10
+                },
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "_flex_size": "none",
+                "_element_width": "initial",
+                "width": {
+                  "unit": "%",
+                  "size": 100,
+                  "sizes": []
+                }
+              },
+              "elements": [
+                {
+                  "id": "bb8849d3",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "4",
+                      "row": "4",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 4
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "18",
+                      "right": "22",
+                      "bottom": "18",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "#FFFFFF",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 100,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "335f0635",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "How fast can you get on-site?",
+                        "header_size": "h4",
+                        "align": "left",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 18,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "800",
+                        "_margin": {
+                          "unit": "px",
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "6",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "03b918cc",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after. Same-day emergency dispatch. Call (240) 532-9097.</p>",
+                        "align": "left",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.65,
+                          "sizes": []
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                },
+                {
+                  "id": "b1287954",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "4",
+                      "row": "4",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 4
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "18",
+                      "right": "22",
+                      "bottom": "18",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "#FFFFFF",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 100,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "0ea94237",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "Are you insured and COI-ready?",
+                        "header_size": "h4",
+                        "align": "left",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 18,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "800",
+                        "_margin": {
+                          "unit": "px",
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "6",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "f9c8fa8a",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>Yes. Fully insured. COI, W-9, and SDS sheets are emailed the same business day you ask.</p>",
+                        "align": "left",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.65,
+                          "sizes": []
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                },
+                {
+                  "id": "c3422805",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "4",
+                      "row": "4",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 4
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "18",
+                      "right": "22",
+                      "bottom": "18",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "#FFFFFF",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 100,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "b80dac33",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "Do you handle nights, weekends, and emergencies?",
+                        "header_size": "h4",
+                        "align": "left",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 18,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "800",
+                        "_margin": {
+                          "unit": "px",
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "6",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "631c8a0b",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>Yes. Most commercial work happens nights, weekends, and holidays. Same-day emergency response is available. Call (240) 532-9097.</p>",
+                        "align": "left",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.65,
+                          "sizes": []
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    }
+                  ],
+                  "isInner": true
+                },
+                {
+                  "id": "7b257e99",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "4",
+                      "row": "4",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 4
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "18",
+                      "right": "22",
+                      "bottom": "18",
+                      "left": "22",
+                      "isLinked": true
+                    },
+                    "background_background": "classic",
+                    "background_color": "#FFFFFF",
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 100,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "110f18f4",
+                      "elType": "widget",
+                      "widgetType": "heading",
+                      "settings": {
+                        "title": "What's the difference vs. national chains?",
+                        "header_size": "h4",
+                        "align": "left",
+                        "size": "default",
+                        "title_color": "#0F1411",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 18,
+                          "sizes": []
+                        },
+                        "typography_font_weight": "800",
+                        "_margin": {
+                          "unit": "px",
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "6",
+                          "left": "0",
+                          "isLinked": false
+                        }
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "13f7733a",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p>We're a local DMV flooring contractor, not a national franchise. One named account lead, custom programs, faster response, no annual lock-ins.</p>",
+                        "align": "left",
+                        "text_color": "#4B5563",
+                        "typography_typography": "custom",
+                        "typography_font_size": {
+                          "unit": "px",
+                          "size": 15,
+                          "sizes": []
+                        },
+                        "typography_line_height": {
+                          "unit": "em",
+                          "size": 1.65,
+                          "sizes": []
+                        }
                       },
                       "elements": [],
                       "isInner": false
