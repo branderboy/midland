@@ -298,12 +298,17 @@ nav.primary a:hover{ color: var(--green-deep); }
 /* ============== SERVICES (residential / commercial — photo + bullets) ============== */
 .svc-block{ display:grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: stretch; margin-top: 20px; }
 .svc-block > div:not(.photo){ display:flex; flex-direction: column; justify-content: center; }
+.svc-block p.lede{ font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 .svc-block .photo{ border-radius: 4px; overflow: hidden; border: 1px solid var(--line); display:flex; }
 .svc-block .photo img{ width:100%; height: 100%; min-height: 320px; object-fit: cover; }
-.svc-block ul{ list-style: none; padding: 0; margin: 0 0 18px; display:grid; gap: 6px; }
-.svc-block li{ display:flex; gap: 10px; align-items: flex-start; font-size: 16px; }
+.svc-block ul{ list-style: none; padding: 0; margin: 0 0 18px; display:grid; gap: 8px; }
+.svc-block li{
+  display:flex; gap: 10px; align-items: flex-start;
+  font-size: 16px; font-weight: 700; color: var(--ink);
+}
 .svc-block li::before{
-  content:"●"; color: var(--green); font-weight: 800; flex-shrink: 0; font-size: 8px; padding-top: 8px;
+  content:"→"; color: var(--green); font-weight: 800;
+  flex-shrink: 0; font-size: 18px; line-height: 1.4;
 }
 .svc-pull{
   font-style: italic; font-size: 15px; color: var(--ink-2);
