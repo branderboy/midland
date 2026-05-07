@@ -45,7 +45,7 @@ a{ color:inherit; text-decoration:none }
 button{ font-family:inherit; cursor:pointer }
 input, select, textarea{ font-family: inherit; font-size: 16px; }
 
-h1, h2, h3, h4 { font-family: var(--sans); font-weight: 800; color: var(--ink); margin:0; letter-spacing:-.02em; line-height: 1.1; }
+h1, h2, h3, h4 { font-family: var(--sans); font-weight: 800; color: var(--ink); margin:0; letter-spacing:-.02em; line-height: 1.1; text-transform: capitalize; }
 h1 { font-size: clamp(44px, 5.8vw, 72px); line-height: 1.04; }
 h2 { font-size: clamp(32px, 3.8vw, 50px); }
 h3 { font-size: 26px; }
@@ -110,7 +110,7 @@ header.nav .inner{
   display:flex; align-items:center; justify-content: space-between;
   max-width: 1200px; margin: 0 auto; padding: 12px 24px;
 }
-.logo img{ height: 38px; width: auto; display:block; }
+.logo img{ height: 60px; width: auto; display:block; }
 nav.primary ul{ list-style: none; padding:0; margin:0; display:flex; gap: 24px; }
 nav.primary a{
   font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
@@ -351,49 +351,29 @@ nav.primary a:hover{ color: var(--green-deep); }
 .testi-card .who span{ font-size: 11px; color: #B7BCB8; letter-spacing: .04em; }
 @media (max-width: 800px){ .testi-grid{ grid-template-columns: 1fr; } }
 
-/* ============== FOOTER (green block + black block, like live site) ============== */
-footer{ background: var(--ink); }
-.footer-grid{
-  display:grid; grid-template-columns: 1fr 2fr; gap: 0;
-}
-.footer-green{
-  background: var(--green); color: #FFF;
-  padding: 48px 32px;
-  display: flex; flex-direction: column; gap: 16px;
-}
-.footer-green img{ height: 56px; width: auto; }
-.footer-green p{ color: rgba(255,255,255,.95); font-size: 14px; line-height: 1.6; max-width: 36ch; }
-.footer-black{
-  background: var(--ink); color: #B7BCB8;
-  padding: 48px 32px;
-}
-.footer-black .top{
-  display: flex; align-items: center; gap: 18px; padding-bottom: 24px;
-  border-bottom: 1px solid #1F2A22; margin-bottom: 24px;
-}
-.footer-black .top h5{ color: #FFF; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin: 0; }
-.footer-black .socials{ display:flex; gap: 8px; }
-.footer-black .socials a{
-  width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.08);
+/* ============== FOOTER — single dark band, 4 columns ============== */
+footer{ padding: 56px 0 24px; background: var(--ink); color: #B7BCB8; }
+footer .grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
+footer h5{ font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--green); margin: 0 0 14px; }
+footer p.brand-line{ color: #B7BCB8; font-size: 15px; line-height: 1.6; max-width: 36ch; margin: 0; }
+footer ul{ list-style: none; padding: 0; margin: 0; }
+footer li{ padding: 4px 0; font-size: 15px; }
+footer a:hover{ color: var(--green); }
+footer .socials{ display:flex; gap: 8px; margin-top: 14px; }
+footer .socials a{
+  width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.08);
   display:grid; place-items:center; color: #FFF; font-weight: 800; font-size: 13px;
   transition: background .15s ease;
 }
-.footer-black .socials a:hover{ background: var(--green); }
-.footer-black .cols{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-.footer-black h6{ color: #FFF; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 12px; }
-.footer-black ul{ list-style: none; padding: 0; margin: 0; }
-.footer-black li{ padding: 4px 0; font-size: 14px; }
-.footer-black a:hover{ color: var(--green); }
-.footer-meta{
-  background: var(--ink); border-top: 1px solid #1F2A22;
-  color: #6B7280; font-size: 12px;
-  padding: 16px 32px;
-  display:flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+footer .socials a:hover{ background: var(--green); }
+footer .meta{
+  font-size: 12px; color: #6B7280;
+  padding-top: 24px; margin-top: 28px;
+  border-top: 1px solid #1F2A22;
+  display:flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
 }
-@media (max-width: 800px){
-  .footer-grid{ grid-template-columns: 1fr; }
-  .footer-black .cols{ grid-template-columns: 1fr 1fr; gap: 18px; }
-}
+@media (max-width: 800px){ footer .grid{ grid-template-columns: 1fr 1fr; } }
+@media (max-width: 500px){ footer .grid{ grid-template-columns: 1fr; } }
 
 /* helpers */
 .center{ text-align:center }
@@ -559,7 +539,7 @@ footer{ background: var(--ink); }
 <section id="services">
   <div class="wrap">
     <div class="sect-head">
-      <h2 style="text-transform: uppercase; letter-spacing: .04em">Residential Services</h2>
+      <h2>Residential Services</h2>
       <blockquote class="svc-pull center" style="border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 50ch">
         "Carpet like new after 8 years of kids and pets."
         <cite>Sandy, Bethesda</cite>
@@ -602,7 +582,7 @@ footer{ background: var(--ink); }
 <section>
   <div class="wrap">
     <div class="sect-head">
-      <h2 style="text-transform: uppercase; letter-spacing: .04em">Commercial Services</h2>
+      <h2>Commercial Services</h2>
       <blockquote class="svc-pull center" style="border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 56ch">
         "40K sq ft office cleaned overnight. No downtime."
         <cite>Arlington Property Manager</cite>
@@ -686,19 +666,15 @@ footer{ background: var(--ink); }
   </div>
 </section>
 
-<!-- ============== FOOTER (green block + black block, like live site) ============== -->
+<!-- ============== FOOTER ============== -->
 <footer id="footer">
-  <div class="footer-grid">
-    <div class="footer-green">
-      <h4 style="color:#FFF; font-size: 22px; font-weight: 800; line-height: 1.2; margin: 0">Serving the DMV with commercial floor care since day one.</h4>
-      <p>
-        We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.
-      </p>
-      <a class="btn" href="tel:2405329097" style="background:#FFF; color: var(--green-deep); border-color: #FFF; align-self: flex-start; margin-top: 8px">📞 (240) 532-9097</a>
-    </div>
-    <div class="footer-black">
-      <div class="top">
-        <h5>Follow Us:</h5>
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <h5>Midland Floor Care</h5>
+        <p class="brand-line">
+          We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.
+        </p>
         <div class="socials">
           <a href="#" aria-label="Instagram">IG</a>
           <a href="#" aria-label="Facebook">FB</a>
@@ -706,37 +682,39 @@ footer{ background: var(--ink); }
           <a href="#" aria-label="Google Business Profile">G</a>
         </div>
       </div>
-      <div class="cols">
-        <div>
-          <h6>About Midland</h6>
-          <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#schedule">Schedule Your Visit &amp; Quote</a></li>
-          </ul>
-        </div>
-        <div>
-          <h6>What We Offer</h6>
-          <ul>
-            <li><a href="#">Reach Us</a></li>
-            <li><a href="#faq">FAQ</a></li>
-            <li><a href="tel:2405329097">(240) 532-9097</a></li>
-          </ul>
-        </div>
-        <div>
-          <h6>Additional Links</h6>
-          <ul>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Service Area</a></li>
-            <li><a href="#testimonials">Clients</a></li>
-          </ul>
-        </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="#about">About Midland</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#schedule">Schedule a Visit</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Services</h5>
+        <ul>
+          <li><a href="#">Carpet Cleaning</a></li>
+          <li><a href="#">Tile &amp; Grout</a></li>
+          <li><a href="#">Hardwood Refinishing</a></li>
+          <li><a href="#">Concrete Polishing</a></li>
+          <li><a href="#">Janitorial</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Reach Us</h5>
+        <ul>
+          <li><a href="tel:2405329097">(240) 532-9097</a></li>
+          <li><a href="#schedule">Free Quote</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#testimonials">Clients</a></li>
+        </ul>
       </div>
     </div>
-  </div>
-  <div class="footer-meta">
-    <span>© 2026 Midland Floor Care</span>
-    <span>Terms and Conditions · Privacy Policy</span>
+    <div class="meta">
+      <span>© 2026 Midland Floor Care | Serving DC, MD, VA</span>
+      <span>Terms and Conditions | Privacy Policy</span>
+    </div>
   </div>
 </footer>
 
