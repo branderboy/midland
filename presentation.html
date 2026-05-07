@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midland Floor Care Urgent Data Audit</title>
+    <style>
+        /* DIRECT RESPONSE / CLICKFUNNELS STYLE DESIGN SYSTEM */
+        :root {
+            --bg-main: #ffffff;
+            --bg-gray: #f0f7f2; /* Light mint wash from Midland website sections */
+            --bg-dark: #1a1a1a; /* Dark charcoal from Midland footer/hero */
+            --brand-green: #3aa050; /* Exact Midland Brand Green */
+            --cta-color: #3fa652; /* Vibrant Midland Green for CTA Buttons */
+            --cta-hover: #328a43;
+            --text-dark: #0b1220;
+            --text-body: #1f2937;
+            --highlight: #fef08a;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-sig: "Brush Script MT", "Lucida Handwriting", "Snell Roundhand", cursive;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-gray);
+            color: var(--text-body);
+            line-height: 1.55;
+            font-weight: 500;
+            -webkit-font-smoothing: antialiased;
+        }
+        p, li { font-weight: 500; }
+
+        .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+        .content-box { background: var(--bg-main); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); margin: 0 auto 20px auto; }
+        
+        /* TOP WARNING BAR */
+        .warning-bar { background-color: #1a4524; color: white; padding: 12px 0; font-size: 14px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; overflow: hidden; white-space: nowrap; }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+        
+        /* TYPOGRAPHY */
+        .text-center { text-align: center; }
+        .bold { font-weight: 800; }
+        .highlight { background-color: var(--highlight); padding: 0 5px; color: var(--text-dark); }
+        .text-dark-bold { color: var(--text-dark); font-weight: 900; text-transform: uppercase; }
+        
+        /* HERO SECTION */
+        .hero { padding: 28px 20px 18px; border-bottom: 3px solid #e5e7eb; }
+        .pre-headline { color: var(--text-dark); font-weight: 800; font-size: 16px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+        .main-headline { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; color: var(--text-dark); font-weight: 900; margin-bottom: 14px; letter-spacing: -1px; }
+        .sub-headline { font-size: clamp(16px, 3vw, 22px); color: var(--text-body); font-weight: 600; margin-bottom: 22px; line-height: 1.4; }
+        
+        /* GSC IMAGE MOCKUP (REPLACING VSL) */
+        .gsc-mockup { width: 100%; max-width: 800px; margin: 0 auto 18px; background: #ffffff; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0,0,0,0.02); overflow: hidden; text-align: left; font-family: "Helvetica Neue", Arial, sans-serif; }
+        .gsc-header { padding: 12px 20px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; color: #5f6368; font-size: 18px; font-weight: 500; letter-spacing: -0.5px;}
+        .gsc-header svg { width: 24px; height: 24px; margin-right: 10px; fill: #5f6368; }
+        .gsc-filters { padding: 12px 20px; border-bottom: 1px solid #dadce0; display: flex; gap: 10px; flex-wrap: wrap; }
+        .gsc-filter-pill { background: #f1f3f4; padding: 6px 12px; border-radius: 16px; font-size: 13px; color: #3c4043; border: 1px solid #dadce0; display: flex; align-items: center; gap: 6px; font-weight: 500;}
+        .gsc-metrics { display: grid; grid-template-columns: repeat(4, 1fr); padding: 20px; gap: 10px; }
+        @media (max-width: 600px) { .gsc-metrics { grid-template-columns: 1fr 1fr; } }
+        .gsc-metric { border: 1px solid transparent; padding: 15px; border-radius: 8px; }
+        .gsc-metric.active-blue { background: #e8f0fe; border-color: #1a73e8; }
+        .gsc-metric.active-purple { background: #f3e8fd; border-color: #a142f4; }
+        .gsc-metric span { display: block; font-size: 13px; color: #5f6368; margin-bottom: 4px; font-weight: 500; }
+        .gsc-metric strong { display: block; font-size: 26px; color: #202124; font-weight: 400; line-height: 1; }
+        .gsc-metric.active-blue strong { color: #1a73e8; }
+        .gsc-metric.active-purple strong { color: #a142f4; }
+        .gsc-chart { padding: 0 20px 20px; height: 220px; width: 100%; position: relative; }
+        .gsc-chart svg { width: 100%; height: 100%; overflow: visible; }
+        .chart-line-blue { stroke: #1a73e8; stroke-width: 2.5; fill: none; }
+        .chart-line-purple { stroke: #a142f4; stroke-width: 2.5; fill: none; }
+        .chart-axis { stroke: #f1f3f4; stroke-width: 1; }
+
+        /* BUTTONS (CF STYLE) */
+        .cta-button { display: inline-block; width: 100%; max-width: 600px; background-color: var(--cta-color); color: white; padding: 16px; text-decoration: none; border-radius: 6px; box-shadow: 0 6px 0 var(--cta-hover), 0 15px 20px rgba(0,0,0,0.2); transition: all 0.1s; border: none; cursor: pointer; margin: 10px auto; text-align: center; }
+        .cta-button:active { transform: translateY(6px); box-shadow: 0 0 0 var(--cta-hover); }
+        .cta-main-text { display: block; font-size: clamp(20px, 4vw, 28px); font-weight: 900; text-transform: uppercase; line-height: 1.2; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .cta-sub-text { display: block; font-size: 14px; font-weight: 500; opacity: 0.9; margin-top: 5px; }
+
+        /* THE DATA (PROBLEM) SECTION */
+        .section-padding { padding: 80px 40px; scroll-margin-top: 110px; }
+        @media (max-width: 600px) { .section-padding { padding: 56px 20px; scroll-margin-top: 90px; } }
+        .section-title { font-size: clamp(42px, 8vw, 76px); font-weight: 900; color: var(--text-dark); margin: 0 auto 6px; text-align: center; letter-spacing: -1.5px; line-height: 1; max-width: 1000px; }
+        .section-title::after { content: ""; display: block; width: 110px; height: 7px; background: var(--brand-green); border-radius: 4px; margin: 20px auto 28px; }
+        .section-eyebrow { display: block; text-align: center; font-size: clamp(16px, 2vw, 20px); font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--brand-green); margin-bottom: 14px; }
+
+        /* TABLE OF CONTENTS (sticky nav) */
+        .toc-callout { background: #fef9c3; border-bottom: 2px dashed #facc15; text-align: center; padding: 8px 16px; font-size: 14px; font-weight: 800; color: #854d0e; letter-spacing: 1px; text-transform: uppercase; }
+        .toc-callout .arrow-down { display: inline-block; font-size: 18px; margin: 0 6px; animation: bounce-down 1.4s ease-in-out infinite; }
+        @keyframes bounce-down { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+        .toc { position: sticky; top: 0; z-index: 50; background: #0f172a; border-bottom: 4px solid var(--brand-green); box-shadow: 0 4px 14px rgba(0,0,0,0.18); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .toc::-webkit-scrollbar { height: 0; display: none; }
+        .toc-inner { margin: 0 auto; padding: 12px 16px; display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; justify-content: center; min-width: max-content; }
+        .toc-label { display: inline-flex; align-items: center; gap: 6px; font-size: clamp(13px, 1.4vw, 16px); font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; margin-right: 4px; flex-shrink: 0; }
+        .toc-label .arrow { display: inline-block; font-size: 18px; color: var(--brand-green); animation: arrow-nudge 1.2s ease-in-out infinite; }
+        @keyframes arrow-nudge { 0%,100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+        .toc a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border-radius: 7px; font-size: clamp(12px, 1.2vw, 14px); font-weight: 900; color: #ffffff; background: #1e293b; text-decoration: none; border: 2px solid #334155; transition: all 0.15s; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+        .toc a:hover { background: var(--brand-green); color: #ffffff; border-color: var(--brand-green); transform: translateY(-2px); box-shadow: 0 6px 14px rgba(58,160,80,0.4); }
+        .toc a .num { font-size: 11px; font-weight: 900; color: #0f172a; background: var(--brand-green); border-radius: 4px; padding: 2px 6px; line-height: 1; }
+        .toc a:hover .num { color: var(--brand-green); background: #ffffff; }
+        @media (max-width: 640px) {
+            .toc-inner { padding: 10px 12px; gap: 6px; justify-content: flex-start; }
+            .toc a { padding: 8px 10px; font-size: 12px; }
+        }
+        .subsection-title { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; font-size: clamp(26px, 4vw, 36px); font-weight: 900; color: var(--text-dark); margin: 56px 0 20px; padding-left: 16px; border-left: 6px solid var(--brand-green); line-height: 1.15; letter-spacing: -0.5px; }
+        .subsection-title .subsection-sub { font-size: 14px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); }
+        
+        .stat-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 22px; }
+        @media (min-width: 600px) { .stat-grid { grid-template-columns: 1fr 1fr; } }
+        .stat-box { border: 2px solid #e5e7eb; background: #ffffff; padding: 25px; border-radius: 8px; text-align: center; }
+        .stat-box.amber { border-color: #fef08a; background: #fefce8; }
+        .stat-num { font-size: 42px; font-weight: 900; color: var(--text-dark); line-height: 1; margin-bottom: 10px; }
+        .stat-box.amber .stat-num { color: #b45309; }
+        .stat-desc { font-size: 16px; font-weight: 600; color: var(--text-dark); }
+
+        /* DATA TABLE */
+        .table-wrap { overflow-x: auto; margin-bottom: 18px; border: 1px solid #e5e7eb; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: white; }
+        th, td { padding: 15px; border-bottom: 1px solid #e5e7eb; font-size: 15px; }
+        th { background: var(--bg-dark); color: white; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
+        tr:nth-child(even) { background-color: #f9fafb; }
+        .urgent-row { background-color: #fefce8 !important; font-weight: bold; }
+
+        /* THE SOLUTION / WHY NOW */
+        .gray-section { background-color: #f9fafb; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        .three-col { display: grid; grid-template-columns: 1fr; gap: 18px; }
+        @media (min-width: 768px) { .three-col { grid-template-columns: repeat(3, 1fr); } }
+        .benefit-col h3 { font-size: 20px; color: var(--text-dark); margin-bottom: 15px; border-bottom: 2px solid var(--brand-green); padding-bottom: 10px; display: inline-block; }
+        .benefit-col p { font-size: 15px; line-height: 1.6; font-weight: 500; color: var(--text-body); }
+
+        /* THE PLAN: 4 PILLARS */
+        .pillars-stack { display: grid; gap: 32px; margin: 12px 0 0; }
+        .pillar { border: 1px solid #e5e7eb; border-radius: 12px; background: #ffffff; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .pillar-header { display: grid; grid-template-columns: 72px 1fr; gap: 18px; align-items: center; padding: 22px 26px; background: linear-gradient(135deg, #f0f7f2 0%, #ffffff 60%); border-bottom: 1px solid #e5e7eb; }
+        .pillar-num { width: 72px; height: 72px; border-radius: 16px; background: var(--brand-green); color: #ffffff; font-weight: 900; font-size: 36px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .pillar.foundation .pillar-num { background: #dc2626; }
+        .pillar.visibility .pillar-num { background: #1a73e8; }
+        .pillar.conversion .pillar-num { background: #b45309; }
+        .pillar.retention .pillar-num { background: #15803d; }
+        .pillar-titlewrap .pillar-name { font-size: 15px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--brand-green); display: block; margin-bottom: 6px; }
+        .pillar.foundation .pillar-name { color: #b91c1c; }
+        .pillar.visibility .pillar-name { color: #1a73e8; }
+        .pillar.conversion .pillar-name { color: #b45309; }
+        .pillar.retention .pillar-name { color: #15803d; }
+        .pillar-titlewrap .pillar-title { font-size: clamp(28px, 4.5vw, 40px); font-weight: 900; color: var(--text-dark); line-height: 1.1; margin-bottom: 8px; letter-spacing: -0.8px; }
+        .pillar-strategy { font-size: 14px; color: var(--text-body); font-weight: 500; line-height: 1.45; }
+        .pillar-body { display: flex; flex-direction: column; }
+        .pillar-deliverables { padding: 28px 32px; }
+        .pillar-deliverables h4, .pillar-kpi h4 { font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; }
+        .plugin-banner { display: grid; grid-template-columns: 38px 1fr auto; gap: 12px; align-items: center; padding: 14px 16px; background: #0f172a; color: #fff; border-radius: 10px; margin-bottom: 14px; }
+        .plugin-banner .wp-logo { width: 38px; height: 38px; flex-shrink: 0; }
+        .plugin-banner .wp-logo svg { width: 100%; height: 100%; display: block; }
+        .plugin-banner .plugin-name { font-size: clamp(18px, 2.4vw, 22px); font-weight: 900; line-height: 1.1; letter-spacing: -0.4px; color: #ffffff; }
+        .plugin-banner .plugin-tag { font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #cbd5e1; margin-top: 2px; }
+        .plugin-banner .plugin-count { font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; padding: 6px 10px; border-radius: 5px; color: #ffffff; background: var(--brand-green); white-space: nowrap; }
+        .pillar.visibility .plugin-count { background: #1a73e8; }
+        .pillar.conversion .plugin-count { background: #b45309; }
+        .pillar.retention .plugin-count { background: #15803d; }
+
+        /* PRODUCT-STYLE FEATURE CARDS WITH THUMBNAILS */
+        .pillar-deliverables ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 24px; grid-template-columns: 1fr; }
+        @media (min-width: 700px) { .pillar-deliverables ul { grid-template-columns: 1fr 1fr; gap: 28px; } }
+        @media (min-width: 1024px) { .pillar-deliverables ul { grid-template-columns: 1fr 1fr 1fr; gap: 28px; } }
+        .feat-card { display: flex; flex-direction: column; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; box-shadow: 0 6px 20px rgba(15,23,42,0.07); transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; position: relative; overflow: hidden; }
+        .feat-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(15,23,42,0.14); border-color: #cbd5e1; }
+        .feat-card.is-flagship { box-shadow: 0 12px 32px rgba(26,115,232,0.22); border-color: #93c5fd; }
+        .feat-card.is-flagship::after { content: "FLAGSHIP"; position: absolute; top: 18px; right: 18px; z-index: 2; font-size: 10px; font-weight: 900; letter-spacing: 1.8px; color: #ffffff; background: #1a73e8; padding: 5px 10px; border-radius: 5px; box-shadow: 0 4px 10px rgba(26,115,232,0.4); }
+
+        .feat-icon { height: 180px; width: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); color: var(--brand-green); position: relative; }
+        .feat-icon::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.5), transparent 50%); pointer-events: none; }
+        .feat-icon svg { width: 80px; height: 80px; position: relative; z-index: 1; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15)); }
+        .pillar.visibility .feat-icon { background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); color: #1a73e8; }
+        .pillar.conversion .feat-icon { background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%); color: #b45309; }
+        .pillar.retention .feat-icon { background: linear-gradient(135deg, #dcfce7 0%, #86efac 100%); color: #15803d; }
+
+        .feat-body { display: flex; flex-direction: column; flex: 1; padding: 26px 28px 22px; }
+        .feat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px; }
+        .feat-num { font-size: 11px; font-weight: 900; letter-spacing: 1.8px; text-transform: uppercase; color: #64748b; padding: 5px 10px; background: #f1f5f9; border-radius: 5px; }
+        .pillar.visibility .feat-num { color: #1a73e8; background: #eff6ff; }
+        .pillar.conversion .feat-num { color: #b45309; background: #fffbeb; }
+        .pillar.retention .feat-num { color: #15803d; background: #f0fdf4; }
+        .feat-price { font-size: 28px; font-weight: 900; color: var(--text-dark); letter-spacing: -1px; line-height: 1; font-variant-numeric: tabular-nums; }
+        .pillar.visibility .feat-price { color: #1a73e8; }
+        .pillar.conversion .feat-price { color: #b45309; }
+        .pillar.retention .feat-price { color: #15803d; }
+        .feat-name { font-size: 22px; font-weight: 900; color: var(--text-dark); line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 12px; }
+        .feat-pitch { font-size: 15px; line-height: 1.55; color: var(--text-body); font-weight: 500; flex: 1; margin-bottom: 20px; }
+        .feat-foot { display: flex; align-items: center; padding-top: 14px; border-top: 1px dashed #e5e7eb; }
+        .feat-included { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; color: var(--brand-green); }
+        .pillar.visibility .feat-included { color: #1a73e8; }
+        .pillar.conversion .feat-included { color: #b45309; }
+        .pillar.retention .feat-included { color: #15803d; }
+
+        .pillar-kpi { background: #f9fafb; padding: 20px 32px; border-top: 1px solid #e5e7eb; }
+        .pillar-kpi .kpi-grid { grid-template-columns: 1fr; }
+        @media (min-width: 640px) { .pillar-kpi .kpi-grid { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) { .pillar-kpi .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+        .kpi-grid { display: grid; gap: 10px; }
+        .kpi-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 10px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; }
+        .kpi-row .label { font-size: 12px; color: var(--text-body); font-weight: 600; }
+        .kpi-row .value { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; }
+        .kpi-row .value .arrow { color: var(--brand-green); font-weight: 900; padding: 0 4px; }
+
+        /* PROCESS STEPS (3-stage flow) */
+        .process-flow { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 4px 0 0; align-items: stretch; position: relative; }
+        @media (min-width: 768px) { .process-flow { grid-template-columns: 1fr 28px 1fr 28px 1fr; gap: 0; } }
+        .process-step { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .process-step .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--brand-green); color: #ffffff; font-weight: 900; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .process-step h3 { font-size: 17px; font-weight: 900; color: var(--text-dark); line-height: 1.25; margin: 0; }
+        .process-step p { font-size: 14px; line-height: 1.55; color: var(--text-body); font-weight: 500; margin: 0; }
+        .process-step .step-tag { display: inline-block; align-self: flex-start; background: #f0f7f2; color: #15803d; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px; }
+        .process-step.cleanup .step-num { background: #dc2626; }
+        .process-step.cleanup .step-tag { background: #fef2f2; color: #b91c1c; }
+        .process-step.build .step-num { background: #1a73e8; }
+        .process-step.build .step-tag { background: #e8f0fe; color: #1a73e8; }
+        .process-arrow { display: none; align-items: center; justify-content: center; color: var(--brand-green); font-size: 26px; font-weight: 900; }
+        @media (min-width: 768px) { .process-arrow { display: flex; } }
+        .process-arrow.mobile { display: flex; justify-content: center; color: var(--brand-green); font-size: 22px; font-weight: 900; transform: rotate(90deg); padding: 2px 0; }
+        @media (min-width: 768px) { .process-arrow.mobile { display: none; } }
+
+        /* SERVICES IN DEMAND + TAGGING */
+        .demand-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin: 18px 0 24px; }
+        @media (min-width: 768px) { .demand-grid { grid-template-columns: repeat(2, 1fr); } }
+        .demand-card { border: 2px solid #e5e7eb; background: #ffffff; border-radius: 8px; padding: 22px; }
+        .demand-card.focus { border-color: var(--brand-green); background: #f0f7f2; }
+        .demand-card h4 { font-size: 17px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .demand-card .tag { display: inline-block; background: var(--brand-green); color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px; margin-left: 6px; }
+        .demand-card .tag.alt { background: #6b7280; }
+        .demand-card ul { list-style: none; padding: 0; margin: 8px 0 0; }
+        .demand-card ul li { font-size: 14px; line-height: 1.6; padding: 4px 0; color: var(--text-body); font-weight: 500; }
+        .demand-card ul li::before { content: "▸ "; color: var(--brand-green); font-weight: 900; }
+
+        .trigger-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 18px 0 24px; }
+        @media (min-width: 768px) { .trigger-grid { grid-template-columns: repeat(2, 1fr); } }
+        .trigger-card { border-left: 5px solid var(--brand-green); background: #ffffff; border-radius: 6px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        .trigger-card.urgent { border-left-color: #dc2626; }
+        .trigger-card.research { border-left-color: #f59e0b; }
+        .trigger-card.referral { border-left-color: #2563eb; }
+        .trigger-card.mismatch { border-left-color: #6b7280; }
+        .trigger-card h5 { font-size: 15px; font-weight: 900; color: var(--text-dark); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .trigger-card p { font-size: 14px; line-height: 1.55; color: var(--text-body); margin-bottom: 8px; font-weight: 500; }
+        .trigger-card .crm-tag { display: inline-block; background: #111827; color: #d1fae5; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; padding: 3px 8px; border-radius: 4px; margin-right: 4px; margin-top: 4px; }
+
+        .funnel-flow { background: #ffffff; color: var(--text-dark); border: 1px solid #e5e7eb; border-radius: 10px; padding: 24px; margin: 18px 0 24px; }
+        .funnel-flow h3 { color: var(--text-dark); font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; text-align: center; }
+        .funnel-row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .funnel-step { background: #f9fafb; border: 1px solid #e5e7eb; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 700; color: var(--text-dark); }
+        .funnel-step.start { border-color: #dc2626; color: #b91c1c; background: #fef2f2; }
+        .funnel-step.end { border-color: #16a34a; color: #15803d; background: #f0fdf4; }
+        .funnel-arrow { color: var(--brand-green); font-size: 22px; font-weight: 900; }
+
+        .segment-row { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 20px; }
+        @media (min-width: 640px) { .segment-row { grid-template-columns: 1fr 1fr; } }
+        .segment-box { background: #fefce8; border: 2px solid #fbbf24; padding: 18px; border-radius: 8px; }
+        .segment-box.commercial { background: #eff6ff; border-color: #60a5fa; }
+        .segment-box h5 { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; color: var(--text-dark); }
+        .segment-box p { font-size: 14px; line-height: 1.55; color: var(--text-body); font-weight: 500; }
+
+        /* GEO-GRID HEATMAP MOCKUP */
+        /* OPPORTUNITY CARD */
+        .opportunity-card { background: #fef2f2; border: 2px solid #fca5a5; border-radius: 10px; padding: 26px; margin: 18px 0 24px; }
+        .opp-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 16px; }
+        @media (min-width: 768px) { .opp-grid { grid-template-columns: repeat(3, 1fr); } }
+        .opp-stat { background: #ffffff; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; text-align: center; }
+        .opp-num { font-size: clamp(36px, 5vw, 52px); font-weight: 900; color: #b91c1c; line-height: 1; letter-spacing: -1.5px; }
+        .opp-label { font-size: 13px; font-weight: 800; color: var(--text-dark); margin-top: 8px; line-height: 1.3; }
+        .opp-label span { display: block; font-weight: 500; color: #64748b; font-size: 12px; margin-top: 2px; }
+        .opp-comp { background: #ffffff; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+        .opp-comp-head { font-size: 12px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: #b91c1c; margin-bottom: 10px; }
+        .opp-comp-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
+        @media (min-width: 768px) { .opp-comp-grid { grid-template-columns: 1fr 1fr; } }
+        .opp-comp-tag { font-size: 13px; line-height: 1.4; color: var(--text-body); font-weight: 500; padding: 6px 10px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; }
+        .opp-comp-tag strong { color: var(--text-dark); font-weight: 800; }
+        .opp-thesis { font-size: 14.5px; line-height: 1.55; color: var(--text-dark); font-weight: 600; padding: 14px 16px; background: #ffffff; border-left: 5px solid #dc2626; border-radius: 6px; }
+        .opp-thesis strong { color: #b91c1c; font-weight: 900; }
+
+        /* GSC INSIGHT */
+        .gsc-insight { background: #f0f7f2; border: 2px solid #bbf7d0; border-radius: 10px; padding: 26px; margin: 18px 0 24px; }
+        .gsc-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 18px; }
+        @media (min-width: 768px) { .gsc-grid { grid-template-columns: repeat(3, 1fr); } }
+        .gsc-stat { background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; text-align: center; }
+        .gsc-stat.warn { background: #fefce8; border-color: #fcd34d; }
+        .gsc-num { font-size: clamp(26px, 4vw, 40px); font-weight: 900; color: var(--text-dark); line-height: 1.05; letter-spacing: -1px; }
+        .gsc-stat.warn .gsc-num { color: #b45309; }
+        .gsc-label { font-size: 12px; font-weight: 800; color: var(--text-dark); margin-top: 6px; line-height: 1.3; }
+        .gsc-label span { display: block; font-weight: 500; color: #64748b; font-size: 11px; margin-top: 2px; }
+        .gsc-cols { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 768px) { .gsc-cols { grid-template-columns: 1fr 1fr; } }
+        .gsc-col { background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; }
+        .gsc-col h5 { font-size: 13px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #15803d; margin-bottom: 10px; }
+        .gsc-col ul { list-style: none; padding: 0; margin: 0; }
+        .gsc-col ul li { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #bbf7d0; font-size: 13px; color: var(--text-body); font-weight: 500; }
+        .gsc-col ul li:last-child { border-bottom: none; }
+        .gsc-col ul li strong { color: var(--text-dark); font-weight: 800; }
+        .gsc-col ul li .cnt { font-weight: 800; color: #b91c1c; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+        /* GMB INSIGHT */
+        .gmb-insight { background: #fff8f1; border: 2px solid #fcd9b4; border-radius: 10px; padding: 26px; margin: 18px 0 24px; }
+        .gmb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+        @media (min-width: 768px) { .gmb-grid { grid-template-columns: repeat(3, 1fr); } }
+        .gmb-stat { background: #ffffff; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; text-align: center; }
+        .gmb-stat.critical { background: #fef2f2; border-color: #fca5a5; }
+        .gmb-stat.warn { background: #fefce8; border-color: #facc15; }
+        .gmb-stat-num { font-size: clamp(24px, 3.5vw, 36px); font-weight: 900; color: var(--text-dark); line-height: 1.05; letter-spacing: -1px; }
+        .gmb-stat.critical .gmb-stat-num { color: #b91c1c; }
+        .gmb-stat.warn .gmb-stat-num { color: #b45309; }
+        .gmb-stat-label { font-size: 12px; font-weight: 800; color: var(--text-dark); margin-top: 6px; line-height: 1.3; }
+        .gmb-stat-label span { display: block; font-weight: 500; color: #64748b; font-size: 11px; margin-top: 2px; }
+        .gmb-cols { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 768px) { .gmb-cols { grid-template-columns: 1fr 1fr; } }
+        .gmb-col { background: #ffffff; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; }
+        .gmb-col h5 { font-size: 13px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #b45309; margin-bottom: 10px; }
+        .gmb-col ul { list-style: none; padding: 0; margin: 0; }
+        .gmb-col ul li { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #fde68a; font-size: 13px; color: var(--text-body); font-weight: 500; }
+        .gmb-col ul li:last-child { border-bottom: none; }
+        .gmb-col ul li strong { color: var(--text-dark); font-weight: 800; }
+        .gmb-col ul li .cnt { font-weight: 800; color: #b45309; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+        .gmb-col ul li .ok { color: #15803d; font-weight: 900; }
+        .gmb-col ul li .bad { color: #b91c1c; font-weight: 800; font-size: 11px; }
+        .gmb-note { font-size: 12.5px; line-height: 1.5; color: #92400e; font-weight: 500; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #fde68a; }
+        .gmb-takeaway { font-size: 14px; line-height: 1.55; color: var(--text-dark); font-weight: 600; margin-top: 16px; padding: 14px 16px; background: #ffffff; border-left: 5px solid #b45309; border-radius: 6px; }
+
+        .geogrid-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; margin: 18px 0 24px; }
+        .geogrid-section h3 { font-size: 20px; font-weight: 900; color: var(--text-dark); text-align: center; margin-bottom: 8px; }
+        .geogrid-section .lede { font-size: 14px; color: var(--text-body); text-align: center; max-width: 700px; margin: 0 auto 22px; line-height: 1.5; }
+        .geogrid-wrap { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: center; }
+        @media (min-width: 768px) { .geogrid-wrap { grid-template-columns: 1fr 1fr; } }
+        .geogrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 320px; margin: 0 auto; }
+        .geogrid .cell { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
+        .geogrid .r1 { background: #16a34a; }
+        .geogrid .r2 { background: #65a30d; }
+        .geogrid .r3 { background: #ca8a04; }
+        .geogrid .r4 { background: #ea580c; }
+        .geogrid .r5 { background: #b91c1c; }
+        .geogrid .center { outline: 3px solid #1a73e8; outline-offset: 1px; }
+        .geogrid-legend { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; font-size: 12px; }
+        .geogrid-legend .lg { display: inline-flex; align-items: center; gap: 5px; color: var(--text-body); }
+        .geogrid-legend .sw { width: 14px; height: 14px; border-radius: 3px; }
+        .geogrid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .geogrid-stat { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; }
+        .geogrid-stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; }
+        .geogrid-stat .num { font-size: 22px; font-weight: 900; color: var(--text-dark); margin-top: 2px; }
+        .geogrid-stat .delta { font-size: 12px; font-weight: 700; margin-top: 2px; }
+        .geogrid-stat .delta.up { color: #16a34a; }
+        .geogrid-stat .delta.down { color: #dc2626; }
+
+        /* YELP REVERSE-ENGINEER */
+        .yelp-section { background: #fff8f1; border: 2px solid #fcd9b4; border-radius: 10px; padding: 26px; margin: 18px 0 24px; }
+        .yelp-section h3 { font-size: 22px; font-weight: 900; color: #b45309; margin-bottom: 12px; text-align: center; }
+        .yelp-section .lede { font-size: 16px; line-height: 1.6; text-align: center; max-width: 760px; margin: 0 auto 22px; color: var(--text-body); }
+        .yelp-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 768px) { .yelp-grid { grid-template-columns: repeat(3, 1fr); } }
+        .yelp-card { background: #ffffff; border: 1px solid #fcd9b4; border-radius: 8px; padding: 16px; }
+        .yelp-card h5 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; margin-bottom: 8px; }
+        .yelp-card .pill { display: inline-block; background: #fef3c7; color: #92400e; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin: 2px 3px 2px 0; font-weight: 600; }
+        .yelp-pipeline { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 22px; font-size: 14px; font-weight: 700; }
+        .yelp-pipeline .step { background: #ffffff; border: 1px solid #fcd9b4; padding: 8px 14px; border-radius: 6px; color: var(--text-dark); }
+        .yelp-pipeline .arrow { color: #b45309; font-weight: 900; }
+
+        /* OFFER STACK (CLASSIC CF) */
+        .offer-stack { border: 4px solid var(--brand-green); padding: 24px; border-radius: 12px; background: white; margin: 18px 0; }
+        .offer-title { text-align: center; font-size: clamp(30px, 5vw, 44px); font-weight: 900; margin-bottom: 10px; text-transform: uppercase; letter-spacing: -0.8px; line-height: 1.1; }
+        .offer-item { display: flex; align-items: flex-start; margin-bottom: 14px; }
+        .check-icon { width: 24px; height: 24px; color: var(--cta-color); flex-shrink: 0; margin-right: 15px; margin-top: 2px; }
+        .offer-text h4 { font-size: 18px; color: var(--text-dark); margin-bottom: 4px; }
+        .offer-text p { font-size: 14px; color: var(--text-body); font-weight: 500; line-height: 1.55; }
+
+        /* BONUS HOMEPAGE REDO CARD */
+        .bonus-card { background: #fffbeb; border: 3px dashed #f59e0b; border-radius: 14px; padding: 28px 28px 22px; position: relative; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.12); }
+        @media (max-width: 600px) { .bonus-card { padding: 22px 18px 18px; } }
+        .bonus-ribbon { display: inline-block; position: absolute; top: -16px; left: 28px; background: #b45309; color: #ffffff; font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; padding: 8px 14px; border-radius: 6px; box-shadow: 0 4px 10px rgba(180, 83, 9, 0.35); }
+        .bonus-title { font-size: clamp(28px, 4.5vw, 40px); font-weight: 900; color: var(--text-dark); line-height: 1.1; letter-spacing: -0.7px; margin-bottom: 10px; }
+        .bonus-lede { font-size: 16px; line-height: 1.55; color: var(--text-body); font-weight: 500; margin-bottom: 22px; max-width: 880px; }
+        .bonus-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 18px; }
+        @media (min-width: 768px) { .bonus-grid { grid-template-columns: 1fr 1fr; } }
+        .bonus-item { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 14px; background: #ffffff; border: 1px solid #fde68a; border-radius: 10px; }
+        .bonus-num { width: 44px; height: 44px; border-radius: 10px; background: #b45309; color: #ffffff; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .bonus-item h4 { font-size: 16px; font-weight: 900; color: var(--text-dark); margin-bottom: 4px; line-height: 1.2; }
+        .bonus-item p { font-size: 13.5px; line-height: 1.5; color: var(--text-body); font-weight: 500; }
+        .bonus-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; padding-top: 14px; border-top: 1px dashed #fbbf24; }
+        .bonus-strike { font-size: 14px; color: #92400e; text-decoration: line-through; font-weight: 700; }
+        .bonus-include { font-size: 16px; color: #15803d; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* THE FORM / CLOSE */
+        .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; color: var(--text-dark); }
+        .form-container h2 { text-align: center; margin-bottom: 10px; font-size: 28px; font-weight: 900; }
+        .form-container p.sub { text-align: center; margin-bottom: 30px; font-size: 15px; color: var(--text-body); }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; color: var(--text-body); }
+        input[type="text"], input[type="email"] { width: 100%; padding: 15px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; font-family: inherit; }
+        input[type="text"]:focus, input[type="email"]:focus { outline: none; border-color: var(--brand-green); }
+        
+        .signature-box { border: 2px solid #9ca3af; background: #f9fafb; padding: 20px; text-align: center; margin-top: 30px; border-radius: 6px; }
+        .sig-input { font-family: var(--font-sig); font-size: 40px !important; text-align: center; border: none !important; border-bottom: 2px solid var(--text-dark) !important; background: transparent !important; padding: 10px 0 !important; border-radius: 0 !important; }
+        .sig-input:focus { border-bottom-color: var(--brand-green) !important; }
+        
+        .price-tag { text-align: center; font-size: 48px; font-weight: 900; color: var(--text-dark); margin: 30px 0 10px; line-height: 1; }
+        .price-sub { text-align: center; color: var(--text-body); font-weight: bold; text-transform: uppercase; font-size: 14px; margin-bottom: 20px; }
+
+        .secure-badge { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; color: var(--text-body); font-size: 12px; font-weight: bold; }
+
+        /* BEFORE / AFTER */
+        .ba-section { background: #ffffff; padding: 28px 40px; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        @media (max-width: 640px) { .ba-section { padding: 24px 20px; } }
+        .ba-section .section-title { color: var(--text-dark); }
+        .ba-section .section-sub { color: var(--text-body); margin-bottom: 18px; text-align: center; font-size: 15px; }
+        .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 18px; }
+        @media (max-width: 640px) { .ba-grid { grid-template-columns: 1fr; } }
+        .ba-col { border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+        .ba-col-header { padding: 16px 24px; display: flex; align-items: center; gap: 10px; }
+        .ba-col.before .ba-col-header { background: #dc2626; }
+        .ba-col.after .ba-col-header { background: #16a34a; }
+        .ba-label { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .ba-col-body { padding: 8px 0; background: #ffffff; }
+        .ba-col ul { list-style: none; padding: 0; margin: 0; }
+        .ba-col ul li { font-size: 14px; line-height: 1.5; padding: 12px 24px; border-bottom: 1px solid #f3f4f6; color: var(--text-body); display: flex; align-items: flex-start; gap: 10px; }
+        .ba-col ul li:last-child { border-bottom: none; }
+        .ba-col.before ul li .ba-icon { color: #dc2626; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
+        .ba-col.after ul li .ba-icon { color: #16a34a; font-size: 16px; flex-shrink: 0; margin-top: 1px; font-style: normal; }
+        .ba-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+        @media (max-width: 640px) { .ba-stats { grid-template-columns: 1fr 1fr; } }
+        .ba-stat { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center; }
+        .ba-stat-num { font-size: 30px; font-weight: 900; color: #16a34a; line-height: 1; }
+        .ba-stat-label { font-size: 12px; color: var(--text-body); margin-top: 6px; font-weight: 600; }
+
+        /* BOTTOM LINE OUTCOMES */
+        .bottom-line { background: var(--brand-green); padding: 60px 20px; }
+        .bottom-line-inner { max-width: 1000px; margin: 0 auto; }
+        .bl-head { text-align: center; color: #ffffff; margin-bottom: 22px; }
+        .bl-eyebrow { display: block; font-size: 13px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #bbf7d0; margin-bottom: 8px; }
+        .bl-title { font-size: clamp(28px, 4.5vw, 44px); font-weight: 900; color: #ffffff; line-height: 1.1; letter-spacing: -1px; margin-bottom: 6px; }
+        .bl-sub { font-size: 15px; font-weight: 500; color: #d1fae5; max-width: 680px; margin: 0 auto; }
+        .bl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (min-width: 768px) { .bl-grid { grid-template-columns: repeat(4, 1fr); } }
+        .bl-card { background: #ffffff; border-radius: 12px; padding: 18px 16px; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        .bl-icon { width: 36px; height: 36px; color: var(--brand-green); margin: 0 auto 10px; display: block; }
+        .bl-num { font-size: clamp(18px, 2.4vw, 22px); font-weight: 900; color: var(--text-dark); line-height: 1.15; letter-spacing: -0.4px; margin-bottom: 4px; }
+        .bl-desc { font-size: 13px; color: var(--text-body); font-weight: 500; line-height: 1.4; }
+
+        /* VALUE STACK */
+        .value-stack { background: #ffffff; border: 2px solid var(--brand-green); border-radius: 12px; padding: 22px 24px; margin: 0 auto 24px; max-width: 760px; box-shadow: 0 8px 22px rgba(58,160,80,0.12); }
+        .value-stack-head { font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--brand-green); text-align: center; margin-bottom: 14px; }
+        .value-stack-rows { display: grid; gap: 6px; margin-bottom: 14px; }
+        .vs-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .vs-row.bonus { background: #fffbeb; border-color: #fcd9b4; color: #b45309; }
+        .vs-row.bonus span:first-child::before { content: "★ "; color: #b45309; }
+        .vs-amt { font-weight: 900; font-variant-numeric: tabular-nums; color: var(--text-dark); }
+        .vs-row.bonus .vs-amt { color: #b45309; }
+        .vs-total { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 16px 12px; background: #0f172a; color: #ffffff; border-radius: 10px; flex-wrap: wrap; }
+        .vs-total > div { text-align: center; }
+        .vs-label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+        .vs-big { display: block; font-size: clamp(28px, 4vw, 38px); font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .vs-price { color: #4ade80; }
+        .vs-arrow { font-size: 28px; color: #4ade80; font-weight: 900; }
+        .vs-note { text-align: center; font-size: 14px; font-weight: 600; color: var(--text-body); margin-top: 14px; }
+        .vs-note strong { color: var(--brand-green); }
+
+        /* MILESTONE PHASES */
+        .phases { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin: 16px 0; }
+        @media (max-width: 640px) { .phases { grid-template-columns: 1fr; } }
+        .phase { border: 2px solid #e5e7eb; border-radius: 8px; padding: 24px; background: white; }
+        .phase-num { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--brand-green); margin-bottom: 6px; }
+        .phase-title { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
+        .phase-weeks { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+        .phase-items { list-style: none; padding: 0; margin: 0 0 16px; }
+        .phase-items li { font-size: 13px; color: var(--text-body); padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+        .phase-items li:last-child { border-bottom: none; }
+        .phase-price { font-size: 22px; font-weight: 900; color: var(--text-dark); }
+        .phase-trigger { font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 2px; }
+
+        /* SIGNATURE CANVAS */
+        .sig-canvas-wrap { border: 2px solid #9ca3af; border-radius: 6px; background: white; position: relative; }
+        #sig-canvas { display: block; width: 100%; height: 120px; cursor: crosshair; touch-action: none; }
+        .sig-actions { display: flex; justify-content: flex-end; padding: 6px 10px; border-top: 1px solid #e5e7eb; }
+        .sig-clear { font-size: 12px; color: #6b7280; cursor: pointer; background: none; border: none; text-decoration: underline; }
+
+        /* SUCCESS STATE */
+        #success-state { display: none; text-align: center; padding: 50px 20px; background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 8px; margin-top: 40px; }
+        #success-state svg { width: 80px; height: 80px; color: var(--cta-color); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav class="toc" aria-label="Plan sections">
+        <div class="toc-inner">
+            <span class="toc-label">The Plan <span class="arrow">→</span></span>
+            <a href="#foundation"><span class="num">01</span> Foundation</a>
+            <a href="#insights"><span class="num">02</span> Insights</a>
+            <a href="#strategy"><span class="num">03</span> Strategy</a>
+            <a href="#proof"><span class="num">04</span> Proof</a>
+            <a href="#investment"><span class="num">05</span> Investment</a>
+            <a href="#bonus" style="background:#fbbf24;color:#0f172a;border-color:#fbbf24;"><span class="num" style="color:#fbbf24;background:#0f172a;">★</span> Bonus</a>
+            <a href="#checkout"><span class="num">→</span> Sign</a>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 18px;">
+        <div class="content-box">
+            
+            <!-- 1. HERO SECTION (THE HOOK) -->
+            <div class="hero text-center">
+                <div class="pre-headline">[URGENT DATA AUDIT] FOR MIDLAND FLOOR CARE</div>
+                <h1 class="main-headline">There Are <span class="highlight">19,772 Searches</span> For Your Exact Services Every Quarter...<br>But You Only Got 60 Clicks.</h1>
+                <p class="sub-headline">Your website is actively blocking leads from finding you. Here is exactly what is broken, what it is costing you, and the 90 day plan to fix it.</p>
+                
+                <!-- GSC Image Mockup -->
+                <div class="gsc-mockup">
+                    <div class="gsc-header">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        Google Search Console
+                    </div>
+                    <div class="gsc-filters">
+                        <div class="gsc-filter-pill">Search type: Web</div>
+                        <div class="gsc-filter-pill">Date: Last 3 months</div>
+                        <div class="gsc-filter-pill">+ New</div>
+                    </div>
+                    <div class="gsc-metrics">
+                        <div class="gsc-metric active-blue">
+                            <span>Total clicks</span>
+                            <strong>60</strong>
+                        </div>
+                        <div class="gsc-metric active-purple">
+                            <span>Total impressions</span>
+                            <strong>19.7K</strong>
+                        </div>
+                        <div class="gsc-metric">
+                            <span>Average CTR</span>
+                            <strong>0.3%</strong>
+                        </div>
+                        <div class="gsc-metric">
+                            <span>Average position</span>
+                            <strong>35.8</strong>
+                        </div>
+                    </div>
+                    <div class="gsc-chart">
+                        <svg viewBox="0 0 1000 200" preserveAspectRatio="none">
+                            <!-- Grid lines -->
+                            <line x1="0" y1="40" x2="1000" y2="40" class="chart-axis" />
+                            <line x1="0" y1="80" x2="1000" y2="80" class="chart-axis" />
+                            <line x1="0" y1="120" x2="1000" y2="120" class="chart-axis" />
+                            <line x1="0" y1="160" x2="1000" y2="160" class="chart-axis" />
+                            <line x1="0" y1="200" x2="1000" y2="200" stroke="#dadce0" stroke-width="2" />
+                            
+                            <!-- Purple Line (Impressions - High & fluctuating) -->
+                            <path class="chart-line-purple" d="M 0 120 L 50 90 L 100 140 L 150 70 L 200 110 L 250 50 L 300 80 L 350 40 L 400 90 L 450 30 L 500 70 L 550 40 L 600 60 L 650 20 L 700 80 L 750 30 L 800 60 L 850 40 L 900 50 L 950 20 L 1000 60" />
+                            
+                            <!-- Blue Line (Clicks - Flatlined at the bottom) -->
+                            <path class="chart-line-blue" d="M 0 195 L 50 196 L 100 195 L 150 192 L 200 197 L 250 196 L 300 195 L 350 194 L 400 198 L 450 195 L 500 193 L 550 196 L 600 197 L 650 195 L 700 192 L 750 196 L 800 194 L 850 195 L 900 197 L 950 195 L 1000 196" />
+                        </svg>
+                    </div>
+                </div>
+
+                <a href="#checkout" class="cta-button">
+                    <span class="cta-main-text">Yes! I Want To Fix My Site</span>
+                    <span class="cta-sub-text">Click here to jump to the action plan & agreement</span>
+                </a>
+            </div>
+
+            <!-- 01. FOUNDATION -->
+            <div class="section-padding" id="foundation">
+                <span class="section-eyebrow">01 · Foundation</span>
+                <h2 class="section-title">What's Broken Today</h2>
+                <p style="font-size: 16px; margin-bottom: 18px; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; font-weight: 500;">
+                    The audit. Before we talk strategy, here is what Google sees, what the site delivers, and which queries you are leaking. These are the leaks. Patch them first, then build on top.
+                </p>
+
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-num">857</div>
+                        <div class="stat-desc">Pages Google Won't Index (URL Bloat)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num">34<span style="font-size:20px">/100</span></div>
+                        <div class="stat-desc">Mobile Speed Score (Losing 20%+ of visitors)</div>
+                    </div>
+                    <div class="stat-box amber">
+                        <div class="stat-num">0.30%</div>
+                        <div class="stat-desc">Click Through Rate (19.7k impressions, 60 clicks)</div>
+                    </div>
+                    <div class="stat-box amber">
+                        <div class="stat-num">1 Click</div>
+                        <div class="stat-desc">For "Carpet Cleaning" in 90 Days (500k+ demand)</div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 22px; margin-bottom: 15px; text-align: center;">Queries You Are Losing By A Few Positions:</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>High-Intent Query</th>
+                                <th>Impressions</th>
+                                <th>Position</th>
+                                <th>The Reality</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>commercial floor care germantown</strong></td>
+                                <td>842</td>
+                                <td>#7</td>
+                                <td class="text-dark-bold">Only 3 spots from #1</td>
+                            </tr>
+                            <tr>
+                                <td><strong>warehouse floor cleaning company</strong></td>
+                                <td>101</td>
+                                <td>#11</td>
+                                <td class="text-dark-bold">Buried on Page 2</td>
+                            </tr>
+                            <tr>
+                                <td><strong>commercial floor cleaning services near me</strong></td>
+                                <td>280</td>
+                                <td>#20</td>
+                                <td class="text-dark-bold">Invisible</td>
+                            </tr>
+                            <tr class="urgent-row">
+                                <td><strong>commercial floor maintenance</strong></td>
+                                <td>1,720</td>
+                                <td>#49</td>
+                                <td>No targeted page exists for this!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="background: #ffffff; color: var(--text-dark); border: 1px solid #e5e7eb; padding: 16px 20px; text-align: center; border-radius: 8px; font-size: 15px; font-weight: 500; margin-top: 16px;">
+                    The carpet cleaning market alone gets <span class="highlight" style="padding: 2px 5px;">500,000+ monthly searches</span>. Your site captures 1 click every 3 months on that page. The demand is not the problem.
+                </div>
+            </div>
+
+            <!-- 02. INSIGHTS -->
+            <div class="section-padding" id="insights">
+                <span class="section-eyebrow">02 · Insights</span>
+                <h2 class="section-title">Where The Leverage Is Hiding</h2>
+                <p style="font-size: 16px; line-height: 1.55; text-align: center; max-width: 820px; margin: 0 auto 18px; font-weight: 500;">
+                    Two leverage sources: <strong>your own data</strong> (GSC, GA, GMB, customer behaviour) and <strong>reverse-engineered competitor data</strong> (Yelp city pages, Local Falcon-style geo-grid). Both feed the strategy that follows.
+                </p>
+
+                <h3 class="subsection-title">Insight 1 · What Your GSC Data Reveals <span class="subsection-sub">Demand you're already showing for, but not capturing</span></h3>
+                <div class="gsc-insight">
+                    <div class="gsc-grid">
+                        <div class="gsc-stat">
+                            <div class="gsc-num">19,772</div>
+                            <div class="gsc-label">Quarterly impressions<br><span>People already see your listings</span></div>
+                        </div>
+                        <div class="gsc-stat warn">
+                            <div class="gsc-num">60</div>
+                            <div class="gsc-label">Quarterly clicks<br><span>0.30% CTR, you barely capture them</span></div>
+                        </div>
+                        <div class="gsc-stat warn">
+                            <div class="gsc-num">35.8</div>
+                            <div class="gsc-label">Average position<br><span>Most listings buried below page 1</span></div>
+                        </div>
+                    </div>
+                    <div class="gsc-cols">
+                        <div class="gsc-col">
+                            <h5>Queries you rank for but lose by a few spots</h5>
+                            <ul>
+                                <li><strong>commercial floor care germantown</strong> <span class="cnt">#7</span></li>
+                                <li><strong>warehouse floor cleaning company</strong> <span class="cnt">#11</span></li>
+                                <li><strong>commercial floor cleaning near me</strong> <span class="cnt">#20</span></li>
+                                <li><strong>commercial floor maintenance</strong> <span class="cnt">#49</span></li>
+                            </ul>
+                            <p class="gmb-note">Each one is gettable with focused on-page work and the right city pages. The demand is already there, you just aren't winning the click.</p>
+                        </div>
+                        <div class="gsc-col">
+                            <h5>The biggest leak</h5>
+                            <p style="font-size:14px;line-height:1.55;color:var(--text-body);font-weight:500;margin-bottom:10px;">The carpet cleaning vertical has <strong>500,000+ monthly searches</strong> in the DMV. Your site captures <strong>1 click every 3 months</strong> on that page. The market is huge. The page just isn't showing up.</p>
+                            <p class="gmb-note">Insights 2 and 3 below show how to fix it: harvest the demand graph (Yelp) and own the map pack (geo-grid). Pillar 1 ships the plugins that do the work.</p>
+                        </div>
+                    </div>
+                    <p class="gmb-takeaway"><strong>Takeaway:</strong> You don't have a demand problem. You have a visibility and capture problem. Every plugin in Pillar 1 is built to convert these existing impressions into clicks, calls, and form fills.</p>
+                </div>
+
+                <h3 class="subsection-title">Insight 2 · Why Leads Actually Contact You <span class="subsection-sub">4 triggers, learned from the business</span></h3>
+                <div class="trigger-grid">
+                    <div class="trigger-card urgent">
+                        <h5>1. Emergency</h5>
+                        <p>The #1 reason people book. Spill, flood, last-minute event, damaged floor before move-in. Needs same-day response.</p>
+                        <span class="crm-tag">trigger:emergency</span>
+                        <span class="crm-tag">priority:high</span>
+                        <span class="crm-tag">sla:same-day</span>
+                    </div>
+                    <div class="trigger-card research">
+                        <h5>2. Future Project</h5>
+                        <p>Prospect is doing homework, wants to be an informed consumer but is not in-market today. Long nurture, education content, seasonal check-ins.</p>
+                        <span class="crm-tag">trigger:future-project</span>
+                        <span class="crm-tag">stage:research</span>
+                        <span class="crm-tag">nurture:long</span>
+                    </div>
+                    <div class="trigger-card referral">
+                        <h5>3. Referral / Upper-Mgmt Visit</h5>
+                        <p>Faster turnaround, often triggered by a property visit from upper management or an inspection. Hot lead, expedited quote.</p>
+                        <span class="crm-tag">trigger:referral</span>
+                        <span class="crm-tag">priority:expedite</span>
+                        <span class="crm-tag">source:referral</span>
+                    </div>
+                    <div class="trigger-card mismatch">
+                        <h5>4. Out Of Scope</h5>
+                        <p>Inquiry for a service Midland doesn't provide. Logged, politely declined, optionally referred, but never lost in the inbox.</p>
+                        <span class="crm-tag">trigger:out-of-scope</span>
+                        <span class="crm-tag">action:decline-or-refer</span>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Insight 3 · Reverse-Engineered Competitor Demand <span class="subsection-sub">Yelp already mapped the DMV</span></h3>
+                <div class="yelp-section">
+                    <p class="lede">
+                        Yelp publishes the full demand graph for our market on their city pages, which services prospects search for, which neighborhoods cluster, what FAQs they ask before booking. Smart SEO Pro <strong>scrapes those signals once</strong> and turns them into a city × service page grid. We don't guess what demand looks like, we harvest it.
+                    </p>
+                    <div class="yelp-grid">
+                        <div class="yelp-card">
+                            <h5>Cities &amp; Neighborhoods</h5>
+                            <span class="pill">Alexandria, VA</span>
+                            <span class="pill">Bethesda, MD</span>
+                            <span class="pill">Arlington, VA</span>
+                            <span class="pill">Old Town</span>
+                            <span class="pill">Pentagon City</span>
+                            <span class="pill">Silver Spring</span>
+                            <span class="pill">+ 15 more</span>
+                        </div>
+                        <div class="yelp-card">
+                            <h5>Related Service Searches</h5>
+                            <span class="pill">Hardwood Floor Refinishing</span>
+                            <span class="pill">Carpet Installation</span>
+                            <span class="pill">Tile Installation</span>
+                            <span class="pill">LVP / Vinyl</span>
+                            <span class="pill">Epoxy Garage Floor</span>
+                            <span class="pill">Floor Polishing</span>
+                            <span class="pill">Stain Removal</span>
+                        </div>
+                        <div class="yelp-card">
+                            <h5>FAQ &amp; Intent Signals</h5>
+                            <span class="pill">"best near me"</span>
+                            <span class="pill">popular services</span>
+                            <span class="pill">people also searched</span>
+                            <span class="pill">emergency services</span>
+                            <span class="pill">virtual consultations</span>
+                            <span class="pill">fast-responding</span>
+                        </div>
+                    </div>
+                    <div class="yelp-pipeline">
+                        <span class="step">Scrape Yelp city pages</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Extract cities × services × FAQs</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Map to Midland's focus services</span>
+                        <span class="arrow">→</span>
+                        <span class="step">Generate 160 programmatic pages + FAQ schema</span>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Insight 4 · Reverse-Engineered Map-Pack Position <span class="subsection-sub">Local Falcon-style geo-grid</span></h3>
+                <div class="geogrid-section">
+                    <p class="lede">
+                        A lat/lng grid scan around your HQ for every focus keyword tells you exactly which neighborhoods rank you in the 3-pack and which ones bury you. Same intelligence Local Falcon and BrightLocal sell as a $25-$300/mo subscription, baked into Smart SEO Pro so the data joins with your GSC clicks, form submissions, and CRM tags.
+                    </p>
+                    <div class="geogrid-wrap">
+                        <div>
+                            <div class="geogrid" aria-label="Sample geo-grid heatmap for 'carpet cleaning near me'">
+                                <div class="cell r5">14</div><div class="cell r4">9</div><div class="cell r4">8</div><div class="cell r3">6</div><div class="cell r4">9</div><div class="cell r5">12</div><div class="cell r5">15</div>
+                                <div class="cell r4">10</div><div class="cell r3">5</div><div class="cell r2">3</div><div class="cell r2">3</div><div class="cell r3">4</div><div class="cell r4">7</div><div class="cell r5">11</div>
+                                <div class="cell r3">6</div><div class="cell r2">3</div><div class="cell r1">2</div><div class="cell r1">1</div><div class="cell r2">3</div><div class="cell r3">5</div><div class="cell r4">8</div>
+                                <div class="cell r3">4</div><div class="cell r2">2</div><div class="cell r1">1</div><div class="cell r1 center">1</div><div class="cell r1">2</div><div class="cell r2">3</div><div class="cell r3">6</div>
+                                <div class="cell r4">7</div><div class="cell r3">4</div><div class="cell r2">3</div><div class="cell r1">2</div><div class="cell r2">3</div><div class="cell r3">5</div><div class="cell r4">9</div>
+                                <div class="cell r5">11</div><div class="cell r4">8</div><div class="cell r3">5</div><div class="cell r3">4</div><div class="cell r4">7</div><div class="cell r5">12</div><div class="cell r5">14</div>
+                                <div class="cell r5">17</div><div class="cell r5">13</div><div class="cell r4">9</div><div class="cell r4">8</div><div class="cell r5">11</div><div class="cell r5">16</div><div class="cell r5">19</div>
+                            </div>
+                            <div class="geogrid-legend">
+                                <span class="lg"><span class="sw" style="background:#16a34a;"></span>1-3 (3-pack)</span>
+                                <span class="lg"><span class="sw" style="background:#65a30d;"></span>4-5</span>
+                                <span class="lg"><span class="sw" style="background:#ca8a04;"></span>6-10</span>
+                                <span class="lg"><span class="sw" style="background:#ea580c;"></span>11-14</span>
+                                <span class="lg"><span class="sw" style="background:#b91c1c;"></span>15+</span>
+                            </div>
+                            <p style="text-align:center;font-size:12px;color:#64748b;margin-top:10px;">Sample 7×7 grid: "carpet cleaning near me" centered on Marlow Heights HQ.</p>
+                        </div>
+                        <div class="geogrid-stats">
+                            <div class="geogrid-stat">
+                                <div class="label">Average Map Rank</div>
+                                <div class="num">6.4</div>
+                                <div class="delta up">▲ 1.8 vs last week</div>
+                            </div>
+                            <div class="geogrid-stat">
+                                <div class="label">Top 3 Coverage</div>
+                                <div class="num">22%</div>
+                                <div class="delta up">▲ 6 pts</div>
+                            </div>
+                            <div class="geogrid-stat">
+                                <div class="label">Local Visibility</div>
+                                <div class="num">31%</div>
+                                <div class="delta up">▲ 4 pts</div>
+                            </div>
+                            <div class="geogrid-stat">
+                                <div class="label">Pins on Page 2+</div>
+                                <div class="num">14 / 49</div>
+                                <div class="delta down">▼ 3</div>
+                            </div>
+                            <div class="geogrid-stat" style="grid-column: 1 / -1;">
+                                <div class="label">Top Competitor (Same Grid)</div>
+                                <div class="num" style="font-size:16px;">Sears Carpet Cleaning, 27 of 49 pins</div>
+                                <div class="delta" style="color:#64748b;font-weight:600;">Citation gap + 41 GMB reviews lead, action items in weekly digest</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Insight 5 · Your GMB Is Bleeding <span class="subsection-sub">6 months of profile data</span></h3>
+                <div class="gmb-insight">
+                    <div class="gmb-grid">
+                        <div class="gmb-stat critical">
+                            <div class="gmb-stat-num">279</div>
+                            <div class="gmb-stat-label">Total Profile Interactions<br><span>Dec 2025 - May 2026</span></div>
+                        </div>
+                        <div class="gmb-stat critical">
+                            <div class="gmb-stat-num">0</div>
+                            <div class="gmb-stat-label">Interactions in May 2026<br><span>Profile went silent</span></div>
+                        </div>
+                        <div class="gmb-stat warn">
+                            <div class="gmb-stat-num">89 → 33</div>
+                            <div class="gmb-stat-label">Monthly Decline<br><span>Dec to Apr, dropping</span></div>
+                        </div>
+                        <div class="gmb-stat">
+                            <div class="gmb-stat-num">751</div>
+                            <div class="gmb-stat-label">Profile Views<br><span>35% mobile search</span></div>
+                        </div>
+                        <div class="gmb-stat">
+                            <div class="gmb-stat-num">35</div>
+                            <div class="gmb-stat-label">Search Impressions<br><span>that surfaced you</span></div>
+                        </div>
+                        <div class="gmb-stat">
+                            <div class="gmb-stat-num">1</div>
+                            <div class="gmb-stat-label">Branded Search Term<br><span>"midland", 17 hits</span></div>
+                        </div>
+                    </div>
+                    <div class="gmb-cols">
+                        <div class="gmb-col">
+                            <h5>Top Search Terms Surfacing You</h5>
+                            <ul>
+                                <li><strong>commercial floor care</strong> <span class="cnt">18</span></li>
+                                <li><strong>midland</strong> <span class="cnt">17</span></li>
+                                <li>"commercial carpet cleaning" + miami fl <span class="cnt">&lt;15</span></li>
+                                <li>clean hardwood floors <span class="cnt">&lt;15</span></li>
+                                <li>floor care <span class="cnt">&lt;15</span></li>
+                                <li>floor care services / floor mantaince / hardwood floor cleaning <span class="cnt">&lt;15</span></li>
+                            </ul>
+                            <p class="gmb-note">A Miami search is surfacing the DMV profile, a category-targeting leak that costs impressions you should be capturing locally.</p>
+                        </div>
+                        <div class="gmb-col">
+                            <h5>Category Mess (Primary + Additional)</h5>
+                            <ul>
+                                <li><strong>Flooring contractor</strong> (primary) <span class="ok">✓</span></li>
+                                <li>Contractor, Carpentry services, Gutter cleaning <span class="bad">⚠ noise</span></li>
+                                <li>Floor refinishing service, Carpet cleaning service, Wood floor refinishing service <span class="ok">✓</span></li>
+                                <li>Janitorial, Tile cleaning, Upholstery cleaning <span class="ok">✓</span></li>
+                                <li>General repairs, Tile work replacement <span class="bad">⚠ off-brand</span></li>
+                            </ul>
+                            <p class="gmb-note">The category mix dilutes your relevance. Off-brand tags (gutter cleaning, general repairs) bleed authority that should compound on your focus services.</p>
+                        </div>
+                    </div>
+                    <p class="gmb-takeaway"><strong>Takeaway:</strong> The GMB is the highest-leverage surface for emergency leads (mobile-search heavy, 58% of discovery is on a phone) and it is currently going dark. Mirror the website services, hours, posts, and photos to GMB. Clean the categories. Push GMB engagement back into the funnel. Pillar 1 ships this as a built-in feature.</p>
+                </div>
+
+                <h3 class="subsection-title">Insight 6 · Emergency Is The Fastest Path To Revenue <span class="subsection-sub">Highest urgency, highest willingness to pay</span></h3>
+                <div class="opportunity-card">
+                    <div class="opp-grid">
+                        <div class="opp-stat">
+                            <div class="opp-num">#1</div>
+                            <div class="opp-label">Reason people book Midland<br><span>Spill, flood, damage, last-minute</span></div>
+                        </div>
+                        <div class="opp-stat">
+                            <div class="opp-num">58%</div>
+                            <div class="opp-label">Mobile search discovery<br><span>Phone in hand, ready to call</span></div>
+                        </div>
+                        <div class="opp-stat">
+                            <div class="opp-num">&lt;2 min</div>
+                            <div class="opp-label">Pickup window we promise<br><span>Whoever answers, books</span></div>
+                        </div>
+                    </div>
+                    <p class="opp-thesis"><strong>The opportunity:</strong> When a floor floods or a carpet gets ruined, people don't shop around. They call whoever picks up first. Midland already handles every floor type, carpet, hardwood, tile, concrete, so we position Midland as the single 24/7 number for any floor emergency. The phone number becomes the biggest button on the website on mobile. Then every panic call gets routed into the Emergency-to-Plan follow-up so a one-time job becomes a recurring Floor Care Plan customer.</p>
+                </div>
+            </div>
+
+            <!-- 03. STRATEGY -->
+            <div class="section-padding gray-section" id="strategy">
+                <span class="section-eyebrow">03 · Strategy</span>
+                <h2 class="section-title">Marketing As Infrastructure</h2>
+                <p style="font-size: 17px; line-height: 1.55; text-align: center; max-width: 880px; margin: 0 auto 14px; font-weight: 600; color: var(--text-dark);">
+                    Stop renting marketing tools. <strong style="color:var(--brand-green);">3 custom WordPress plugins, 10 features</strong>, built into Midland's own stack. One integrated system that owns the search, captures the call, and converts the customer, with no monthly seat fees stacking up against you.
+                </p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 auto 22px;max-width:820px;">
+                    <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#1a73e8;color:#fff;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">Smart SEO Pro · 5 features</span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#b45309;color:#fff;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">Midland CRM · 2 features</span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#15803d;color:#fff;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">Smart Reviews Pro · 3 features</span>
+                </div>
+
+                <div class="pillars-stack">
+                    <div class="pillar visibility">
+                        <div class="pillar-header">
+                            <div class="pillar-num">1</div>
+                            <div class="pillar-titlewrap">
+                                <span class="pillar-name">Pillar 1 · Fix &amp; Visibility</span>
+                                <div class="pillar-title">Fix What's Broken, Then Dominate DMV Search</div>
+                                <p class="pillar-strategy"><em>Strategy:</em> Patch the foundation first, kill the 857 zombie URLs, fix mobile speed, deploy schema, then own the map pack and organic for every focus service across the DMV. You cannot rank what Google cannot crawl, and you cannot convert what visitors cannot load. Fix, then build.</p>
+                            </div>
+                        </div>
+                        <div class="pillar-body">
+                            <div class="pillar-deliverables">
+                                <div class="plugin-banner">
+                                    <span class="wp-logo" data-banner="1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.5 122.5"><circle cx="61.3" cy="61.3" r="60" fill="#21759b"/><path fill="#fff" d="M8.7 61.3c0 20.8 12.1 38.7 29.6 47.3L13.2 39.9c-2.9 6.5-4.5 13.7-4.5 21.4zm88-2.7c0-6.5-2.3-11-4.3-14.5-2.7-4.3-5.2-8-5.2-12.4 0-4.8 3.7-9.3 8.9-9.3.2 0 .5 0 .7.1-9.4-8.6-21.9-13.9-35.6-13.9-18.5 0-34.7 9.5-44.1 23.8 1.2 0 2.4.1 3.4.1 5.5 0 14.1-.7 14.1-.7 2.9-.2 3.2 4 .4 4.4 0 0-2.9.3-6.1.5l19.4 57.7L59 65l-8.3-22.7c-2.9-.2-5.6-.5-5.6-.5-2.9-.2-2.5-4.5.3-4.4 0 0 8.7.7 13.9.7 5.5 0 14.1-.7 14.1-.7 2.9-.2 3.2 4 .4 4.4 0 0-2.9.3-6.1.5l19.3 57.3 5.3-17.8c2.3-7.4 4.1-12.8 4.1-17.4zM62.9 64.2L46.8 110.8c4.8 1.4 9.9 2.2 15.2 2.2 6.3 0 12.3-1.1 17.9-3.1-.1-.2-.3-.5-.4-.8L62.9 64.2zm44.9-29.6c.2 1.7.4 3.5.4 5.4 0 5.3-1 11.4-4 18.9l-16.2 46.9c15.8-9.2 26.4-26.3 26.4-45.9 0-9.2-2.4-17.9-6.6-25.4z"/></svg></span>
+                                    <div>
+                                        <div class="plugin-name">Midland Smart SEO Pro</div>
+                                        <div class="plugin-tag">Custom WordPress Plugin · Built For Midland</div>
+                                    </div>
+                                    <span class="plugin-count">5 Features</span>
+                                </div>
+                                <h4>Features Inside This Plugin</h4>
+                                <ul>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 01</span>
+                                            <span class="feat-price">$800</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland Smart SEO + GSC Cleanup</h5>
+                                        <p class="feat-pitch">Kill the 857 zombie URLs and force Google to index every real page.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 02</span>
+                                            <span class="feat-price">$600</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland Site Speed Overhaul</h5>
+                                        <p class="feat-pitch">PageSpeed 34 to 85+. Mobile visitors stop bouncing.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                    <li class="feat-card is-flagship">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 03</span>
+                                            <span class="feat-price">$1,500</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland Programmatic City Pages</h5>
+                                        <p class="feat-pitch">160 city x service pages. The Yelp playbook, scaled to the DMV.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 04</span>
+                                            <span class="feat-price">$600</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland Geo-Grid Rank Tracker</h5>
+                                        <p class="feat-pitch">Weekly map showing where you rank in every DMV neighborhood.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a4 4 0 0 0-4 4v2a4 4 0 0 0 0 8v2a4 4 0 0 0 8 0v-2a4 4 0 0 0 0-8V6a4 4 0 0 0-4-4z"/><path d="M9 12l2 2 4-4"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 05</span>
+                                            <span class="feat-price">$500</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland AI Rank + GEO Module</h5>
+                                        <p class="feat-pitch">Get cited by ChatGPT, Perplexity, and Google AI Overviews.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                </ul>
+                            </div>
+                            <div class="pillar-kpi">
+                                <h4>Outcomes by Day 90</h4>
+                                <div class="kpi-grid">
+                                    <div class="kpi-row"><span class="label">Pages indexed</span><span class="value">38 <span class="arrow">→</span> 180+</span></div>
+                                    <div class="kpi-row"><span class="label">Monthly impressions</span><span class="value">6.5K <span class="arrow">→</span> 60K+</span></div>
+                                    <div class="kpi-row"><span class="label">Monthly clicks</span><span class="value">20 <span class="arrow">→</span> 400+</span></div>
+                                    <div class="kpi-row"><span class="label">PageSpeed (mobile)</span><span class="value">34 <span class="arrow">→</span> 85+</span></div>
+                                    <div class="kpi-row"><span class="label">Average map rank</span><span class="value">target ≤5</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pillar conversion">
+                        <div class="pillar-header">
+                            <div class="pillar-num">2</div>
+                            <div class="pillar-titlewrap">
+                                <span class="pillar-name">Pillar 2 · Conversion</span>
+                                <div class="pillar-title">Capture, Tag &amp; Route Every Lead In Under 2 Minutes</div>
+                                <p class="pillar-strategy"><em>Strategy:</em> Apply the 4-trigger insight directly to the intake. Every form submission auto-tags by trigger, segment, brand, and city, then routes to the right pipeline with the right urgency. Zero leads lost to spam, the inbox, or human delay.</p>
+                            </div>
+                        </div>
+                        <div class="pillar-body">
+                            <div class="pillar-deliverables">
+                                <div class="plugin-banner">
+                                    <span class="wp-logo" data-banner="1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.5 122.5"><circle cx="61.3" cy="61.3" r="60" fill="#21759b"/><path fill="#fff" d="M8.7 61.3c0 20.8 12.1 38.7 29.6 47.3L13.2 39.9c-2.9 6.5-4.5 13.7-4.5 21.4zm88-2.7c0-6.5-2.3-11-4.3-14.5-2.7-4.3-5.2-8-5.2-12.4 0-4.8 3.7-9.3 8.9-9.3.2 0 .5 0 .7.1-9.4-8.6-21.9-13.9-35.6-13.9-18.5 0-34.7 9.5-44.1 23.8 1.2 0 2.4.1 3.4.1 5.5 0 14.1-.7 14.1-.7 2.9-.2 3.2 4 .4 4.4 0 0-2.9.3-6.1.5l19.4 57.7L59 65l-8.3-22.7c-2.9-.2-5.6-.5-5.6-.5-2.9-.2-2.5-4.5.3-4.4 0 0 8.7.7 13.9.7 5.5 0 14.1-.7 14.1-.7 2.9-.2 3.2 4 .4 4.4 0 0-2.9.3-6.1.5l19.3 57.3 5.3-17.8c2.3-7.4 4.1-12.8 4.1-17.4zM62.9 64.2L46.8 110.8c4.8 1.4 9.9 2.2 15.2 2.2 6.3 0 12.3-1.1 17.9-3.1-.1-.2-.3-.5-.4-.8L62.9 64.2zm44.9-29.6c.2 1.7.4 3.5.4 5.4 0 5.3-1 11.4-4 18.9l-16.2 46.9c15.8-9.2 26.4-26.3 26.4-45.9 0-9.2-2.4-17.9-6.6-25.4z"/></svg></span>
+                                    <div>
+                                        <div class="plugin-name">Midland CRM</div>
+                                        <div class="plugin-tag">Custom WordPress Plugin · Built For Midland</div>
+                                    </div>
+                                    <span class="plugin-count">2 Features</span>
+                                </div>
+                                <h4>Features Inside This Plugin</h4>
+                                <ul>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 06</span>
+                                            <span class="feat-price">$1,400</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland CRM</h5>
+                                        <p class="feat-pitch">Custom CRM with intake forms, auto-tagging, lead routing, and post-job lifecycle automation. Captures every lead, classifies it, escalates if no reply, and sends a Floor Care Plan offer once the job is complete.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 07</span>
+                                            <span class="feat-price">$200</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland Branded Mailer</h5>
+                                        <p class="feat-pitch">Resend transactional email. 100% inbox delivery, zero spam.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                </ul>
+                            </div>
+                            <div class="pillar-kpi">
+                                <h4>Outcomes by Day 90</h4>
+                                <div class="kpi-grid">
+                                    <div class="kpi-row"><span class="label">Lead response time</span><span class="value">&lt;2 min</span></div>
+                                    <div class="kpi-row"><span class="label">Email deliverability</span><span class="value">100%</span></div>
+                                    <div class="kpi-row"><span class="label">Leads lost to spam</span><span class="value">0</span></div>
+                                    <div class="kpi-row"><span class="label">Auto-tag coverage</span><span class="value">100% of submissions</span></div>
+                                    <div class="kpi-row"><span class="label">Self-booking rate</span><span class="value">target 40%+</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pillar retention">
+                        <div class="pillar-header">
+                            <div class="pillar-num">3</div>
+                            <div class="pillar-titlewrap">
+                                <span class="pillar-name">Pillar 3 · Retention &amp; Growth</span>
+                                <div class="pillar-title">Convert One-Time Jobs Into Floor Care Plan Subscribers</div>
+                                <p class="pillar-strategy"><em>Strategy:</em> Run the lifecycle insight: a satisfied emergency customer is the highest-leverage path to recurring revenue. Automate the post-job NPS, the GMB review request, and the Floor Care Plan offer. Watch demand signals daily so you act on rising opportunities, not on hindsight.</p>
+                            </div>
+                        </div>
+                        <div class="pillar-body">
+                            <div class="pillar-deliverables">
+                                <div class="plugin-banner">
+                                    <span class="wp-logo" data-banner="1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.5 122.5"><circle cx="61.3" cy="61.3" r="60" fill="#21759b"/><path fill="#fff" d="M8.7 61.3c0 20.8 12.1 38.7 29.6 47.3L13.2 39.9c-2.9 6.5-4.5 13.7-4.5 21.4zm88-2.7c0-6.5-2.3-11-4.3-14.5-2.7-4.3-5.2-8-5.2-12.4 0-4.8 3.7-9.3 8.9-9.3.2 0 .5 0 .7.1-9.4-8.6-21.9-13.9-35.6-13.9-18.5 0-34.7 9.5-44.1 23.8 1.2 0 2.4.1 3.4.1 5.5 0 14.1-.7 14.1-.7 2.9-.2 3.2 4 .4 4.4 0 0-2.9.3-6.1.5l19.4 57.7L59 65l-8.3-22.7c-2.9-.2-5.6-.5-5.6-.5-2.9-.2-2.5-4.5.3-4.4 0 0 8.7.7 13.9.7 5.5 0 14.1-.7 14.1-.7 2.9-.2 3.2 4 .4 4.4 0 0-2.9.3-6.1.5l19.3 57.3 5.3-17.8c2.3-7.4 4.1-12.8 4.1-17.4zM62.9 64.2L46.8 110.8c4.8 1.4 9.9 2.2 15.2 2.2 6.3 0 12.3-1.1 17.9-3.1-.1-.2-.3-.5-.4-.8L62.9 64.2zm44.9-29.6c.2 1.7.4 3.5.4 5.4 0 5.3-1 11.4-4 18.9l-16.2 46.9c15.8-9.2 26.4-26.3 26.4-45.9 0-9.2-2.4-17.9-6.6-25.4z"/></svg></span>
+                                    <div>
+                                        <div class="plugin-name">Midland Smart Reviews Pro</div>
+                                        <div class="plugin-tag">Custom WordPress Plugin · Built For Midland</div>
+                                    </div>
+                                    <span class="plugin-count">3 Features</span>
+                                </div>
+                                <h4>Features Inside This Plugin</h4>
+                                <ul>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 08</span>
+                                            <span class="feat-price">$500</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland Smart Reviews Pro</h5>
+                                        <p class="feat-pitch">25+ new five-star GMB reviews per 90 days, automated.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 09</span>
+                                            <span class="feat-price">$400</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland Daily Intel</h5>
+                                        <p class="feat-pitch">Predictive alerts on rising keywords and competitor moves. The manager wakes up with direction and the data to optimize for more revenue.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                    <li class="feat-card">
+                                        <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/></svg></div>
+                                        <div class="feat-body">
+                                            <div class="feat-top">
+                                            <span class="feat-num">Feature 10</span>
+                                            <span class="feat-price">$400</span>
+                                        </div>
+                                        <h5 class="feat-name">Midland GitHub Vault & Deploy</h5>
+                                        <p class="feat-pitch">Backup, version, and deploy fixes across all pages in one push.</p>
+                                        <div class="feat-foot"><span class="feat-included">✓ Included</span></div>
+                                    
+                                        </div></li>
+                                </ul>
+                            </div>
+                            <div class="pillar-kpi">
+                                <h4>Outcomes by Day 90</h4>
+                                <div class="kpi-grid">
+                                    <div class="kpi-row"><span class="label">New GMB reviews</span><span class="value">25+ in 90 days</span></div>
+                                    <div class="kpi-row"><span class="label">Plan conversion rate</span><span class="value">target 15%+</span></div>
+                                    <div class="kpi-row"><span class="label">Reactivation revenue</span><span class="value">unlocked</span></div>
+                                    <div class="kpi-row"><span class="label">Demand-shift visibility</span><span class="value">daily digest</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 90 Day Targets summary -->
+                <div style="text-align: center; margin-top: 22px;">
+                    <h3 style="font-size: 18px; font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; color: var(--brand-green);">Headline Targets · Day 90</h3>
+                    <p style="font-size: 16px; line-height: 1.7; font-weight: 500;">
+                        Pages Indexed: 38 → <strong class="highlight">180+</strong> &middot;
+                        Monthly Impressions: 6.5K → <strong class="highlight">60K+</strong> &middot;
+                        Monthly Clicks: 20 → <strong class="highlight">400+</strong><br>
+                        Carpet Cleaning Vertical: <strong style="color: var(--cta-color)">Producing First Leads</strong>
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- 04. PROOF -->
+            <div class="ba-section" id="proof">
+                <span class="section-eyebrow">04 · Proof</span>
+                <h2 class="section-title">Before This Plan vs. After</h2>
+                <p class="ba-section section-sub">The #1 reason small businesses lose jobs isn't lack of demand, it's the broken lead system. Every form submission that goes unresponded is a job your competitor is booking.</p>
+                <div class="ba-grid">
+                    <div class="ba-col before">
+                        <div class="ba-col-header">
+                            <i class="ba-icon" style="color:#ffffff;font-style:normal;font-size:20px;">✗</i>
+                            <span class="ba-label">Before This Plan</span>
+                        </div>
+                        <div class="ba-col-body">
+                            <ul>
+                                <li><i class="ba-icon">✗</i>9pm form lands in spam, owner never sees it</li>
+                                <li><i class="ba-icon">✗</i>Lead books the next competitor who picks up</li>
+                                <li><i class="ba-icon">✗</i>Cold leads die in the inbox, zero follow-up</li>
+                                <li><i class="ba-icon">✗</i>No review ask, GMB stuck while rivals hit 50+</li>
+                                <li><i class="ba-icon">✗</i>Past customers never reactivated, no LTV</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="ba-col after">
+                        <div class="ba-col-header">
+                            <i class="ba-icon" style="color:#ffffff;font-style:normal;font-size:20px;">✓</i>
+                            <span class="ba-label">After This Plan</span>
+                        </div>
+                        <div class="ba-col-body">
+                            <ul>
+                                <li><i class="ba-icon">✓</i>Lead → owner alerted in &lt;2 min, branded confirm</li>
+                                <li><i class="ba-icon">✓</i>Self-booking calendar with auto-reminders</li>
+                                <li><i class="ba-icon">✓</i>Escalation fires if no reply in 2 hours</li>
+                                <li><i class="ba-icon">✓</i>Post-job NPS routes promoters straight to GMB</li>
+                                <li><i class="ba-icon">✓</i>Every lead tagged + tracked in ActiveCampaign</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ba-stats">
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">&lt;2 min</div>
+                        <div class="ba-stat-label">Lead Response Time</div>
+                    </div>
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">100%</div>
+                        <div class="ba-stat-label">Email Deliverability</div>
+                    </div>
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">0</div>
+                        <div class="ba-stat-label">Leads Lost to Spam</div>
+                    </div>
+                    <div class="ba-stat">
+                        <div class="ba-stat-num">25+</div>
+                        <div class="ba-stat-label">New GMB Reviews / 90 Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM LINE OUTCOMES -->
+            <div class="bottom-line">
+                <div class="bottom-line-inner">
+                    <div class="bl-head">
+                        <span class="bl-eyebrow">Bottom Line</span>
+                        <h2 class="bl-title">Why We're Doing This</h2>
+                        <p class="bl-sub">Every plugin, every feature, every page exists to move these four numbers up.</p>
+                    </div>
+                    <div class="bl-grid">
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <div class="bl-num">More Calls</div>
+                            <div class="bl-desc">Phones ring more often, with the right buyers</div>
+                        </div>
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                            <div class="bl-num">More Form Fills</div>
+                            <div class="bl-desc">Every submission tagged, routed, never lost</div>
+                        </div>
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <div class="bl-num">More Walkthroughs</div>
+                            <div class="bl-desc">Self-booked site visits, fewer no-shows</div>
+                        </div>
+                        <div class="bl-card">
+                            <svg class="bl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <div class="bl-num">More Revenue</div>
+                            <div class="bl-desc">One-time jobs convert to recurring Floor Care Plans</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 05. INVESTMENT -->
+            <div class="section-padding gray-section" id="investment">
+                <span class="section-eyebrow">05 · Investment</span>
+                <h2 class="section-title">2-Payment Plan</h2>
+
+                <div class="value-stack">
+                    <div class="value-stack-head">Total Build Value</div>
+                    <div class="value-stack-rows">
+                        <div class="vs-row"><span>Smart SEO Pro · 5 features</span><span class="vs-amt">$4,000</span></div>
+                        <div class="vs-row"><span>Midland CRM · 2 features</span><span class="vs-amt">$1,600</span></div>
+                        <div class="vs-row"><span>Smart Reviews Pro · 3 features</span><span class="vs-amt">$1,300</span></div>
+                        <div class="vs-row bonus"><span>Bonus · Carpet Cleaning Ad Page</span><span class="vs-amt">$800</span></div>
+                        <div class="vs-row bonus"><span>Bonus · Homepage Redo &amp; SEO Pass</span><span class="vs-amt">$1,200</span></div>
+                    </div>
+                    <div class="vs-total">
+                        <div><span class="vs-label">Total Value</span><span class="vs-big">$8,900</span></div>
+                        <div class="vs-arrow">→</div>
+                        <div><span class="vs-label">Your Price</span><span class="vs-big vs-price">$2,965</span></div>
+                    </div>
+                    <p class="vs-note">You save <strong>$5,935</strong>. Plugins alone clear $6,900 in retail value before either bonus.</p>
+                </div>
+
+                <p style="text-align:center;margin-top:18px;margin-bottom:22px;color:#6b7280;">Split into two payments. Second payment due only after the first milestone is delivered and confirmed.</p>
+                <div class="phases">
+                    <div class="phase" style="border-color:var(--brand-green);">
+                        <div class="phase-num">Payment 1, Kickoff</div>
+                        <div class="phase-title">Foundation & Build</div>
+                        <div class="phase-weeks">Weeks 1-6 · Due on start</div>
+                        <ul class="phase-items">
+                            <li>GSC cleanup, kill 857 junk URLs</li>
+                            <li>Resend email transport (zero spam)</li>
+                            <li>sameAs entity schema live</li>
+                            <li>IndexNow + Rapid URL Indexer wired</li>
+                            <li>Site speed overhaul (34 → 85+ target)</li>
+                            <li>GitHub backup deployed</li>
+                            <li>160 city × service pages live</li>
+                            <li>Google Calendar integration</li>
+                            <li>Midland Smart Forms Pro + ActiveCampaign</li>
+                            <li>Carpet cleaning ad landing page</li>
+                        </ul>
+                        <div class="phase-price">$1,500</div>
+                        <div class="phase-trigger">Due on project kickoff</div>
+                    </div>
+                    <div class="phase">
+                        <div class="phase-num">Payment 2, Completion</div>
+                        <div class="phase-title">Systems & Domination</div>
+                        <div class="phase-weeks">Weeks 7-12 · Due on milestone</div>
+                        <ul class="phase-items">
+                            <li>Automated lead follow-up sequence</li>
+                            <li>AEO + GEO optimization (llms.txt)</li>
+                            <li>Midland Smart Reviews Pro live</li>
+                            <li>Survey-gated GMB review engine</li>
+                            <li>Daily Intel microservice</li>
+                            <li>pytrends + GSC keyword digest</li>
+                            <li>Final QA + handoff documentation</li>
+                        </ul>
+                        <div class="phase-price">$1,465</div>
+                        <div class="phase-trigger">Due on Payment 1 milestone delivery</div>
+                    </div>
+                </div>
+                <div style="text-align:center;font-size:18px;font-weight:700;color:var(--text-dark);margin-top:10px;">Total: $2,965, two payments, no surprises. <span style="color:var(--cta-color);">+ Carpet Cleaning Ad Page (Bonus)</span></div>
+            </div>
+
+            <!-- BONUS: HOMEPAGE REDO -->
+            <div class="section-padding" id="bonus" style="padding-top: 32px; padding-bottom: 32px;">
+                <div class="bonus-card">
+                    <div class="bonus-ribbon">FREEBIE · ON THE HOUSE</div>
+                    <div class="bonus-body">
+                        <span class="section-eyebrow" style="color:#b45309;text-align:left;margin-bottom:6px;">Bonus Deliverable</span>
+                        <h2 class="bonus-title">A Brand-New, Search-Optimized Homepage. Free.</h2>
+                        <p class="bonus-lede">
+                            On top of everything in the 3-pillar plan above, I will <strong>fully redo your homepage</strong> at no extra cost, structured around every Insight we just walked through: the focus services, the two-brand split, the four lead triggers, the geo-grid demand map, and the Yelp reverse-engineered DMV demand graph. Your current homepage is the #1 page Google sees and the #1 page leaks happen on. We rebuild it so it ranks and converts.
+                        </p>
+                        <div class="bonus-grid">
+                            <div class="bonus-item">
+                                <div class="bonus-num">1</div>
+                                <div>
+                                    <h4>Rebuilt around your focus services</h4>
+                                    <p>Hardwood finishing, carpet cleaning &amp; install, flooring installs, concrete polishing, each with its own conversion path and CRM trigger wired in.</p>
+                                </div>
+                            </div>
+                            <div class="bonus-item">
+                                <div class="bonus-num">2</div>
+                                <div>
+                                    <h4>Two-brand split front and centre</h4>
+                                    <p>Residential (Midland Carpet Care) and Commercial (Midland Service) routed to the right funnel from the hero, no more single funnel for two different buyers.</p>
+                                </div>
+                            </div>
+                            <div class="bonus-item">
+                                <div class="bonus-num">3</div>
+                                <div>
+                                    <h4>SEO-tuned for the queries you are leaking</h4>
+                                    <p>Title, H1, schema, internal links, and entity markup all targeted at the exact GSC queries currently ranking #7 to #49 (commercial floor care, warehouse cleaning, hardwood DMV). Optimised against the Yelp-harvested DMV demand graph.</p>
+                                </div>
+                            </div>
+                            <div class="bonus-item">
+                                <div class="bonus-num">4</div>
+                                <div>
+                                    <h4>Conversion architecture from the plan</h4>
+                                    <p>Midland Smart Forms Pro embedded with the 4-trigger logic, click-to-call, GMB rating proof, and a clear emergency CTA. Every section ties back to a Pillar 1, 2, or 3 deliverable.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bonus-foot">
+                            <span class="bonus-strike">Normally a $1,200 project.</span>
+                            <span class="bonus-include">Included free when you sign below.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. CHECKOUT / FORM SECTION -->
+            <div id="checkout" style="background:#ffffff;padding:50px 40px;border-top:3px solid #e5e7eb;">
+                <div style="max-width:700px;margin:0 auto;" id="form-ui">
+                    <h2 style="text-align:center;margin-bottom:10px;font-size:28px;font-weight:900;color:var(--text-dark);">Approve & Start Project</h2>
+                    <p style="text-align:center;margin-bottom:30px;font-size:15px;color:var(--text-body);">Fill out the secure form below to authorize the scope of work. Week 1 begins within 48 hours.</p>
+
+                    <div class="price-tag">$2,965</div>
+                    <div class="price-sub">2-Payment Plan · Everything Above Included</div>
+                    <p style="text-align:center;margin-top:-15px;margin-bottom:25px;color:#6b7280;font-size:13px;">$1,500 on kickoff · $1,465 on milestone delivery</p>
+
+                    <form id="approval-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="fullName" required placeholder="John Doe">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Company</label>
+                            <input type="text" id="company" value="Midland Floor Care" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="email" required placeholder="name@midlandfloors.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="text" id="date" required readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Draw Your Signature</label>
+                            <div class="sig-canvas-wrap">
+                                <canvas id="sig-canvas" width="560" height="120"></canvas>
+                                <div class="sig-actions">
+                                    <button type="button" class="sig-clear" id="sig-clear">Clear</button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="sig-data" name="signature">
+                            <p style="font-size:12px;color:#9ca3af;margin-top:6px;">Use mouse or finger to sign above</p>
+                        </div>
+
+                        <button type="submit" class="cta-button" style="width:100%;max-width:100%;margin-top:20px;display:block;">
+                            <span class="cta-main-text" style="font-size:22px;">I Approve This Scope, Start Week 1</span>
+                            <span class="cta-sub-text">Commit to capturing your lost traffic today.</span>
+                        </button>
+
+                        <p style="text-align:center;font-size:12px;color:#6b7280;margin-top:15px;">By signing, you authorize the full build above totalling $2,965 USD, payable in two installments ($1,500 on kickoff, $1,465 on milestone delivery). Engagement begins within 48 hours.</p>
+
+                        <div class="secure-badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Secure 256-Bit SSL Connection
+                        </div>
+                    </form>
+                </div>
+
+                <!-- SUCCESS STATE -->
+                <div id="success-state" style="display:none;max-width:700px;margin:40px auto 0;text-align:center;padding:50px 20px;background:#f0fdf4;border:2px solid #bbf7d0;border-radius:8px;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 20px;display:block;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <h2 style="color:var(--cta-color);margin:0 0 10px;font-size:28px;">Signed & Approved</h2>
+                    <p style="font-size:18px;color:var(--text-dark);margin-bottom:24px;">Your approval has been securely recorded. You will receive a kickoff email and invoice within 24 hours.</p>
+                    <a href="https://calendly.com" target="_blank" class="cta-button" style="max-width:400px;margin:0 auto;display:block;">
+                        <span class="cta-main-text" style="font-size:18px;">Book Your Kickoff Call →</span>
+                        <span class="cta-sub-text">Lock in your Week 1 start time</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Dynamic date
+            const dateField = document.getElementById('date');
+            if (dateField) {
+                const d = new Date();
+                dateField.value = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+
+            // Canvas signature
+            const canvas = document.getElementById('sig-canvas');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            let hasSig = false;
+
+            function resize() {
+                const ratio = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * ratio;
+                canvas.height = rect.height * ratio;
+                ctx.scale(ratio, ratio);
+                ctx.strokeStyle = '#111827';
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const src = e.touches ? e.touches[0] : e;
+                return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+            }
+
+            canvas.addEventListener('mousedown',  e => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+            canvas.addEventListener('mousemove',  e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; });
+            canvas.addEventListener('mouseup',    () => drawing = false);
+            canvas.addEventListener('mouseleave', () => drawing = false);
+            canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); }, { passive: false });
+            canvas.addEventListener('touchmove',  e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; }, { passive: false });
+            canvas.addEventListener('touchend',   () => drawing = false);
+
+            document.getElementById('sig-clear').addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                hasSig = false;
+                document.getElementById('sig-data').value = '';
+            });
+
+            // Form submit
+            const form = document.getElementById('approval-form');
+            const formUI = document.getElementById('form-ui');
+            const successUI = document.getElementById('success-state');
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+
+                if (!hasSig) {
+                    canvas.style.outline = '2px solid #dc2626';
+                    canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                canvas.style.outline = '';
+
+                document.getElementById('sig-data').value = canvas.toDataURL();
+
+                const payload = {
+                    name:      document.getElementById('fullName').value,
+                    company:   document.getElementById('company').value,
+                    email:     document.getElementById('email').value,
+                    date:      document.getElementById('date').value,
+                    signature: canvas.toDataURL(),
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem('midland_proposal_signature', JSON.stringify(payload));
+
+                formUI.style.display = 'none';
+                successUI.style.display = 'block';
+                successUI.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        });
+    </script>
+</body>
+</html>
