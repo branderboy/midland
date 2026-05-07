@@ -64,14 +64,18 @@ section.mint{ background: var(--mint); }
 .btn{
   display:inline-flex; align-items:center; justify-content: center; gap: 12px;
   font-weight: 800; font-size: 17px;
-  padding: 20px 32px; border: 2px solid var(--green);
-  background: var(--green); color: #FFF;
+  padding: 20px 32px; border: 2px solid var(--ink);
+  background: var(--ink); color: #FFF;
   border-radius: 4px;
   text-transform: uppercase; letter-spacing: .04em;
-  transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
+  transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
   line-height: 1; text-align: center;
 }
-.btn:hover{ background: var(--green-deep); border-color: var(--green-deep); transform: translateY(-1px); }
+.btn:hover{
+  background: #FFFFFF; color: var(--ink); border-color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -8px rgba(15,20,17,.35);
+}
 .btn--ghost{ background: transparent; color: #FFF; border-color: #FFF; }
 .btn--ghost:hover{ background: #FFF; color: var(--ink); border-color: #FFF; }
 .btn--ink{ background: var(--ink); border-color: var(--ink); color: #FFF; }
