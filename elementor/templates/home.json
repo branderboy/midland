@@ -232,7 +232,7 @@
           "isLinked": true
         },
         "background_background": "classic",
-        "background_color": "#FFFFFF",
+        "background_color": "#F3FCF4",
         "_title": "Process"
       },
       "elements": [
@@ -851,7 +851,7 @@
           "isLinked": true
         },
         "background_background": "classic",
-        "background_color": "#F3FCF4",
+        "background_color": "#FFFFFF",
         "_title": "Side Job + CTA",
         "_element_id": "schedule"
       },
