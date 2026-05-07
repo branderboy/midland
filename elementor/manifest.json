@@ -21,36 +21,24 @@
             "screenshot": "screenshots/header.jpg",
             "source": "templates/header.json",
             "preview_url": "",
-            "type": "header",
+            "type": "section",
             "category": "section",
             "metadata": {
-                "template_type": "section-header",
-                "include_in_zip": "1",
-                "elementor_pro_required": "1",
-                "elementor_library_type": "header",
-                "elementor_pro_conditions": [
-                    "include/general"
-                ]
-            },
-            "elementor_pro_required": true
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
         },
         {
             "name": "Footer",
             "screenshot": "screenshots/footer.jpg",
             "source": "templates/footer.json",
             "preview_url": "",
-            "type": "footer",
+            "type": "section",
             "category": "section",
             "metadata": {
-                "template_type": "section-footer",
-                "include_in_zip": "1",
-                "elementor_pro_required": "1",
-                "elementor_library_type": "footer",
-                "elementor_pro_conditions": [
-                    "include/general"
-                ]
-            },
-            "elementor_pro_required": true
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
         },
         {
             "name": "Long-Term & Recurring Commercial Floor Care Services",
@@ -416,41 +404,113 @@
     "required_plugins": [
         {
             "name": "Elementor",
-            "plugin": "elementor/elementor.php"
-        },
-        {
-            "name": "Elementor Pro",
-            "plugin": "elementor-pro/elementor-pro.php"
+            "version": "3.21.0",
+            "file": "elementor/elementor.php",
+            "author": "Elementor.com"
         }
     ],
     "images": [
         {
-            "id": 1,
-            "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/1000151618.jpg"
+            "filename": "Midland Floors Hero image.jpg",
+            "thumbnail_url": "https://raw.githubusercontent.com/branderboy/midland/main/images/Midland%20Floors%20Hero%20image.jpg",
+            "templates": [
+                {
+                    "source": "templates/home.json",
+                    "name": "Home"
+                },
+                {
+                    "source": "templates/header.json",
+                    "name": "Header"
+                },
+                {
+                    "source": "templates/footer.json",
+                    "name": "Footer"
+                }
+            ],
+            "filesize": 193304,
+            "dimensions": [
+                1200,
+                800
+            ],
+            "image_source": "external",
+            "person_or_place": "no",
+            "image_urls": "https://raw.githubusercontent.com/branderboy/midland/main/images/Midland%20Floors%20Hero%20image.jpg"
         },
         {
-            "id": 2,
-            "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/1000151832.jpg"
+            "filename": "carpet.png",
+            "thumbnail_url": "https://raw.githubusercontent.com/branderboy/midland/main/images/carpet.png",
+            "templates": [
+                {
+                    "source": "templates/home.json",
+                    "name": "Home"
+                }
+            ],
+            "filesize": 1241219,
+            "dimensions": [
+                1200,
+                800
+            ],
+            "image_source": "external",
+            "person_or_place": "no",
+            "image_urls": "https://raw.githubusercontent.com/branderboy/midland/main/images/carpet.png"
         },
         {
-            "id": 3,
-            "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/Midland%20Floors%20Hero%20image.jpg"
+            "filename": "midland floor team.png",
+            "thumbnail_url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland%20floor%20team.png",
+            "templates": [
+                {
+                    "source": "templates/home.json",
+                    "name": "Home"
+                }
+            ],
+            "filesize": 932259,
+            "dimensions": [
+                1200,
+                800
+            ],
+            "image_source": "external",
+            "person_or_place": "no",
+            "image_urls": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland%20floor%20team.png"
         },
         {
-            "id": 4,
-            "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/carpet.png"
+            "filename": "midland-small-logo.png",
+            "thumbnail_url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png",
+            "templates": [
+                {
+                    "source": "templates/header.json",
+                    "name": "Header"
+                },
+                {
+                    "source": "templates/footer.json",
+                    "name": "Footer"
+                }
+            ],
+            "filesize": 6861,
+            "dimensions": [
+                1200,
+                800
+            ],
+            "image_source": "external",
+            "person_or_place": "no",
+            "image_urls": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png"
         },
         {
-            "id": 5,
-            "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland%20floor%20team.png"
-        },
-        {
-            "id": 6,
-            "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png"
-        },
-        {
-            "id": 7,
-            "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/office%20floor.png"
+            "filename": "office floor.png",
+            "thumbnail_url": "https://raw.githubusercontent.com/branderboy/midland/main/images/office%20floor.png",
+            "templates": [
+                {
+                    "source": "templates/home.json",
+                    "name": "Home"
+                }
+            ],
+            "filesize": 1488691,
+            "dimensions": [
+                1200,
+                800
+            ],
+            "image_source": "external",
+            "person_or_place": "no",
+            "image_urls": "https://raw.githubusercontent.com/branderboy/midland/main/images/office%20floor.png"
         }
     ]
 }
