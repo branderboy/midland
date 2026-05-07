@@ -5,7 +5,7 @@
   "metadata": {},
   "content": [
     {
-      "id": "868f432e",
+      "id": "0be2b83a",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -36,7 +36,7 @@
       },
       "elements": [
         {
-          "id": "885ff705",
+          "id": "dd85c1bb",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -49,16 +49,16 @@
       "isInner": false
     },
     {
-      "id": "6a6f9399",
+      "id": "0f0bb509",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -82,7 +82,7 @@
       },
       "elements": [
         {
-          "id": "c88561ab",
+          "id": "4b4e5114",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -95,16 +95,16 @@
       "isInner": false
     },
     {
-      "id": "ceaa6b31",
+      "id": "678b136f",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -126,7 +126,7 @@
       },
       "elements": [
         {
-          "id": "aab5c153",
+          "id": "a3566ea4",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -139,16 +139,16 @@
       "isInner": false
     },
     {
-      "id": "14bc8b5d",
+      "id": "aad22884",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -166,33 +166,250 @@
           "isLinked": true,
           "unit": "px",
           "size": 0
+        },
+        "background_background": "classic",
+        "background_image": {
+          "url": "https://midlandfloors.com/wp-content/uploads/2025/08/Midland-Floor-Care-Photo-1.png",
+          "id": "",
+          "size": "",
+          "alt": "",
+          "source": "library"
+        },
+        "background_position": "center right",
+        "background_size": "cover",
+        "background_overlay_background": "gradient",
+        "background_overlay_color": "rgba(15,20,17,0.94)",
+        "background_overlay_color_b": "rgba(15,20,17,0.25)",
+        "background_overlay_color_b_stop": {
+          "unit": "%",
+          "size": 100,
+          "sizes": []
+        },
+        "background_overlay_color_stop": {
+          "unit": "%",
+          "size": 0,
+          "sizes": []
+        },
+        "background_overlay_gradient_angle": {
+          "unit": "deg",
+          "size": 90,
+          "sizes": []
         }
       },
       "elements": [
         {
-          "id": "276a2971",
-          "elType": "widget",
-          "widgetType": "html",
+          "id": "359c53a5",
+          "elType": "container",
           "settings": {
-            "html": "<section class=\"hero\">\n  <div class=\"bg\" aria-hidden=\"true\"></div>\n  <div class=\"wrap\">\n    <div class=\"chip-row\">\n      <span>Carpet</span><span>Hardwood</span><span>Tile</span><span>Concrete</span><span>Commercial</span>\n    </div>\n    <h1>Professional Floor &amp; Carpet Care in DC, MD &amp; VA.</h1>\n    <p class=\"sub\">\n      Family-owned, locally operated. Trusted by DMV homeowners and facility managers for <b>carpet cleaning, hardwood refinishing, tile &amp; grout, upholstery, and full commercial floor care.</b> <span class=\"urgent\">Call for immediate availability.</span>\n    </p>\n    <div class=\"ctas\">\n      <a class=\"btn btn--xl\" href=\"tel:2405329097\">\ud83d\udcde Call now (240) 532-9097</a>\n      <span class=\"secondary\">or <a href=\"#schedule\"><u>schedule a free site visit \u2192</u></a></span>\n    </div>\n    <div class=\"reviews\">\n      <span class=\"stars\">\u2605\u2605\u2605\u2605\u2605</span>\n      <span><b>5.0 Google Rating</b> \u00b7 774+ DMV Clients</span>\n      <span><b>Fully Insured</b> \u00b7 COI on Demand</span>\n    </div>\n  </div>\n</section>"
+            "flex_direction": "column",
+            "content_width": "boxed",
+            "boxed_width": {
+              "unit": "px",
+              "size": 1200,
+              "sizes": []
+            },
+            "flex_gap": {
+              "column": "20",
+              "row": "20",
+              "isLinked": true,
+              "unit": "px",
+              "size": 20
+            },
+            "padding": {
+              "unit": "em",
+              "top": "5",
+              "right": "2",
+              "bottom": "5",
+              "left": "4",
+              "isLinked": false
+            },
+            "flex_align_items": "flex-start"
           },
-          "elements": [],
-          "isInner": false
+          "elements": [
+            {
+              "id": "6a5f1b40",
+              "elType": "widget",
+              "widgetType": "html",
+              "settings": {
+                "html": "<div style=\"display:flex;gap:0;flex-wrap:wrap;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#43A94B;margin-bottom:24px\"><span style=\"position:relative;padding-right:14px;margin-right:14px\">Carpet</span><span style=\"position:relative;padding-right:14px;margin-right:14px\">Hardwood</span><span style=\"position:relative;padding-right:14px;margin-right:14px\">Tile</span><span style=\"position:relative;padding-right:14px;margin-right:14px\">Concrete</span><span>Commercial</span></div>"
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "da9302b0",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Professional Floor & Carpet Care in DC, MD & VA.",
+                "header_size": "h1",
+                "align": "left",
+                "size": "default",
+                "title_color": "#FFFFFF",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 64,
+                  "sizes": []
+                },
+                "typography_font_weight": "800",
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.04,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "2791c551",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Family-owned, locally operated. Trusted by DMV homeowners and facility managers for <strong>carpet cleaning, hardwood refinishing, tile &amp; grout, upholstery, and full commercial floor care.</strong> <span style=\"color:#43A94B;font-weight:800\">Call for immediate availability.</span></p>",
+                "align": "left",
+                "text_color": "#D5DAD7",
+                "typography_typography": "custom",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 20,
+                  "sizes": []
+                },
+                "typography_line_height": {
+                  "unit": "em",
+                  "size": 1.55,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "isInner": false
+            },
+            {
+              "id": "086bc4e2",
+              "elType": "container",
+              "settings": {
+                "flex_direction": "row",
+                "content_width": "full",
+                "padding": {
+                  "unit": "px",
+                  "top": "0",
+                  "right": "0",
+                  "bottom": "0",
+                  "left": "0",
+                  "isLinked": true
+                },
+                "flex_gap": {
+                  "column": "16",
+                  "row": "12",
+                  "isLinked": true,
+                  "unit": "px",
+                  "size": 16
+                },
+                "flex_align_items": "center"
+              },
+              "elements": [
+                {
+                  "id": "9f36e658",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "\ud83d\udcde Call now (240) 532-9097",
+                    "link": {
+                      "url": "tel:2405329097",
+                      "is_external": "",
+                      "nofollow": ""
+                    },
+                    "size": "lg",
+                    "align": "left",
+                    "background_color": "#43A94B",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_width": {
+                      "unit": "px",
+                      "top": "2",
+                      "right": "2",
+                      "bottom": "2",
+                      "left": "2",
+                      "isLinked": true
+                    },
+                    "border_color": "#43A94B",
+                    "border_radius": {
+                      "unit": "px",
+                      "top": "4",
+                      "right": "4",
+                      "bottom": "4",
+                      "left": "4",
+                      "isLinked": true
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_weight": "800",
+                    "typography_text_transform": "uppercase",
+                    "typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "typography_font_size": {
+                      "unit": "px",
+                      "size": 20,
+                      "sizes": []
+                    },
+                    "text_padding": {
+                      "unit": "px",
+                      "top": "26",
+                      "right": "46",
+                      "bottom": "26",
+                      "left": "46",
+                      "isLinked": false
+                    },
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
+                  },
+                  "elements": [],
+                  "isInner": false
+                },
+                {
+                  "id": "2370a470",
+                  "elType": "widget",
+                  "widgetType": "html",
+                  "settings": {
+                    "html": "<span style=\"display:inline-flex;align-items:center;height:100%;font-size:14px;font-weight:600;color:#B7BCB8\">or <a href=\"#schedule\" style=\"color:#FFF;text-decoration:underline;margin-left:6px\">schedule a free site visit \u2192</a></span>"
+                  },
+                  "elements": [],
+                  "isInner": false
+                }
+              ],
+              "isInner": true
+            },
+            {
+              "id": "54cd7f39",
+              "elType": "widget",
+              "widgetType": "html",
+              "settings": {
+                "html": "<div style=\"margin-top:28px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-size:13px;color:#B7BCB8\"><span style=\"color:#FACC15;letter-spacing:.12em;font-size:16px\">\u2605\u2605\u2605\u2605\u2605</span><span><strong style=\"color:#FFF;font-weight:800\">5.0 Google Rating</strong> \u00b7 774+ DMV Clients</span><span><strong style=\"color:#FFF;font-weight:800\">Fully Insured</strong> \u00b7 COI on Demand</span></div>"
+              },
+              "elements": [],
+              "isInner": false
+            }
+          ],
+          "isInner": true
         }
       ],
       "isInner": false
     },
     {
-      "id": "2fadb99e",
+      "id": "f4b377cc",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -216,7 +433,7 @@
       },
       "elements": [
         {
-          "id": "db0f2116",
+          "id": "d73a0612",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -229,16 +446,16 @@
       "isInner": false
     },
     {
-      "id": "cf03efac",
+      "id": "44c31898",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -260,7 +477,7 @@
       },
       "elements": [
         {
-          "id": "aa7a7503",
+          "id": "05a54c0c",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -273,7 +490,7 @@
       "isInner": false
     },
     {
-      "id": "d4b45a73",
+      "id": "5d3977c8",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -306,7 +523,7 @@
       },
       "elements": [
         {
-          "id": "856e1ca5",
+          "id": "79af7392",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
@@ -335,17 +552,17 @@
           },
           "elements": [
             {
-              "id": "ecfec002",
+              "id": "dcc0139b",
               "elType": "widget",
               "widgetType": "html",
               "settings": {
-                "html": "<p style=\"display:inline-block;font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#2F8137;margin:0 auto 10px;text-align:center\">About</p>"
+                "html": "<p style=\"display:block;font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#2F8137;margin:0 auto 10px;text-align:center\">About</p>"
               },
               "elements": [],
               "isInner": false
             },
             {
-              "id": "376a3633",
+              "id": "a765b0dd",
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
@@ -366,7 +583,7 @@
               "isInner": false
             },
             {
-              "id": "5ab5bcb2",
+              "id": "3bf680bf",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
@@ -384,7 +601,7 @@
               "isInner": false
             },
             {
-              "id": "db7e6623",
+              "id": "7b60cf8c",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
@@ -408,7 +625,7 @@
               },
               "elements": [
                 {
-                  "id": "719cc7e6",
+                  "id": "4f8a3b63",
                   "elType": "widget",
                   "widgetType": "button",
                   "settings": {
@@ -420,7 +637,7 @@
                     },
                     "size": "lg",
                     "align": "center",
-                    "background_color": "#0F1411",
+                    "background_color": "#43A94B",
                     "button_text_color": "#FFFFFF",
                     "border_border": "solid",
                     "border_width": {
@@ -431,7 +648,7 @@
                       "left": "2",
                       "isLinked": true
                     },
-                    "border_color": "#0F1411",
+                    "border_color": "#43A94B",
                     "border_radius": {
                       "unit": "px",
                       "top": "4",
@@ -461,15 +678,15 @@
                       "left": "32",
                       "isLinked": false
                     },
-                    "hover_color": "#0F1411",
-                    "button_background_hover_color": "#FFFFFF",
-                    "border_hover_color": "#0F1411"
+                    "hover_color": "#FFFFFF",
+                    "button_background_hover_color": "#2F8137",
+                    "border_hover_color": "#2F8137"
                   },
                   "elements": [],
                   "isInner": false
                 },
                 {
-                  "id": "11fb98b8",
+                  "id": "0928ddfa",
                   "elType": "widget",
                   "widgetType": "button",
                   "settings": {
@@ -539,7 +756,7 @@
       "isInner": false
     },
     {
-      "id": "b2fc51a2",
+      "id": "4e071794",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -572,7 +789,7 @@
       },
       "elements": [
         {
-          "id": "70ddd793",
+          "id": "0cec64b0",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
@@ -600,7 +817,7 @@
           },
           "elements": [
             {
-              "id": "cec8631e",
+              "id": "b9dd8185",
               "elType": "container",
               "settings": {
                 "flex_direction": "column",
@@ -619,19 +836,11 @@
                   "isLinked": true,
                   "unit": "px",
                   "size": 12
-                },
-                "margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "24",
-                  "left": "0",
-                  "isLinked": false
                 }
               },
               "elements": [
                 {
-                  "id": "d62ecbce",
+                  "id": "9258aaaa",
                   "elType": "widget",
                   "widgetType": "heading",
                   "settings": {
@@ -652,7 +861,7 @@
                   "isInner": false
                 },
                 {
-                  "id": "3cb304aa",
+                  "id": "c4e4bc3f",
                   "elType": "widget",
                   "widgetType": "text-editor",
                   "settings": {
@@ -666,7 +875,7 @@
               "isInner": true
             },
             {
-              "id": "5d0d4a4a",
+              "id": "2a5f7282",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
@@ -689,7 +898,7 @@
               },
               "elements": [
                 {
-                  "id": "1d80a426",
+                  "id": "04d2a1d3",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -719,7 +928,7 @@
                   },
                   "elements": [
                     {
-                      "id": "7a26ebb9",
+                      "id": "d90c32eb",
                       "elType": "widget",
                       "widgetType": "image",
                       "settings": {
@@ -738,7 +947,7 @@
                   "isInner": true
                 },
                 {
-                  "id": "acb0de8d",
+                  "id": "79182dad",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -769,7 +978,7 @@
                   },
                   "elements": [
                     {
-                      "id": "8e956cbd",
+                      "id": "0842b1b3",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
@@ -787,7 +996,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "1d7022cf",
+                      "id": "5a286511",
                       "elType": "widget",
                       "widgetType": "icon-list",
                       "settings": {
@@ -798,7 +1007,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "002e8e4a"
+                            "_id": "4a76b2e2"
                           },
                           {
                             "text": "Pet Stain & Odor Removal",
@@ -806,7 +1015,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "828f1cc6"
+                            "_id": "94d6992a"
                           },
                           {
                             "text": "Area Rug Cleaning (pickup available)",
@@ -814,7 +1023,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "9803555e"
+                            "_id": "ef79bb8f"
                           },
                           {
                             "text": "Hardwood Cleaning & Refinishing",
@@ -822,7 +1031,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "c20f5dd1"
+                            "_id": "f4c75c17"
                           },
                           {
                             "text": "Tile & Grout Cleaning + Sealing",
@@ -830,7 +1039,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "eba69091"
+                            "_id": "a022d211"
                           },
                           {
                             "text": "Upholstery Cleaning",
@@ -838,7 +1047,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "8e2d872e"
+                            "_id": "385a8aef"
                           },
                           {
                             "text": "Move-In / Move-Out Cleaning",
@@ -846,7 +1055,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "8c53004e"
+                            "_id": "5b827da4"
                           }
                         ],
                         "icon_color": "#43A94B",
@@ -873,7 +1082,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "2ef67dc9",
+                      "id": "9c6bb27c",
                       "elType": "widget",
                       "widgetType": "button",
                       "settings": {
@@ -885,8 +1094,8 @@
                         },
                         "size": "lg",
                         "align": "left",
-                        "background_color": "#0F1411",
-                        "button_text_color": "#FFFFFF",
+                        "background_color": "#FFFFFF",
+                        "button_text_color": "#2F8137",
                         "border_border": "solid",
                         "border_width": {
                           "unit": "px",
@@ -896,7 +1105,7 @@
                           "left": "2",
                           "isLinked": true
                         },
-                        "border_color": "#0F1411",
+                        "border_color": "#43A94B",
                         "border_radius": {
                           "unit": "px",
                           "top": "4",
@@ -915,20 +1124,20 @@
                         },
                         "typography_font_size": {
                           "unit": "px",
-                          "size": 17,
+                          "size": 13,
                           "sizes": []
                         },
                         "text_padding": {
                           "unit": "px",
-                          "top": "20",
-                          "right": "32",
-                          "bottom": "20",
-                          "left": "32",
+                          "top": "12",
+                          "right": "20",
+                          "bottom": "12",
+                          "left": "20",
                           "isLinked": false
                         },
-                        "hover_color": "#0F1411",
-                        "button_background_hover_color": "#FFFFFF",
-                        "border_hover_color": "#0F1411"
+                        "hover_color": "#FFFFFF",
+                        "button_background_hover_color": "#43A94B",
+                        "border_hover_color": "#43A94B"
                       },
                       "elements": [],
                       "isInner": false
@@ -946,7 +1155,7 @@
       "isInner": false
     },
     {
-      "id": "b05393dc",
+      "id": "12fd9e1b",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -979,7 +1188,7 @@
       },
       "elements": [
         {
-          "id": "87301771",
+          "id": "7a84a661",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
@@ -1007,7 +1216,7 @@
           },
           "elements": [
             {
-              "id": "a4fb9cb4",
+              "id": "c425c3f5",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
@@ -1031,7 +1240,7 @@
               },
               "elements": [
                 {
-                  "id": "9d919460",
+                  "id": "f37b65fb",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -1061,7 +1270,7 @@
                   },
                   "elements": [
                     {
-                      "id": "c5196e92",
+                      "id": "a2049b9e",
                       "elType": "widget",
                       "widgetType": "html",
                       "settings": {
@@ -1071,7 +1280,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "f4f11782",
+                      "id": "8aa3065f",
                       "elType": "widget",
                       "widgetType": "heading",
                       "settings": {
@@ -1095,7 +1304,7 @@
                   "isInner": true
                 },
                 {
-                  "id": "5e889674",
+                  "id": "33b8c6a1",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -1127,7 +1336,7 @@
                   },
                   "elements": [
                     {
-                      "id": "8744c6ef",
+                      "id": "18538521",
                       "elType": "widget",
                       "widgetType": "button",
                       "settings": {
@@ -1180,9 +1389,9 @@
                           "left": "32",
                           "isLinked": false
                         },
-                        "hover_color": "#0F1411",
-                        "button_background_hover_color": "#FFFFFF",
-                        "border_hover_color": "#0F1411"
+                        "hover_color": "#FFFFFF",
+                        "button_background_hover_color": "#2F8137",
+                        "border_hover_color": "#2F8137"
                       },
                       "elements": [],
                       "isInner": false
@@ -1200,7 +1409,7 @@
       "isInner": false
     },
     {
-      "id": "d73b7606",
+      "id": "4e095d57",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -1233,7 +1442,7 @@
       },
       "elements": [
         {
-          "id": "f4b8bd6c",
+          "id": "2e9fb7ed",
           "elType": "container",
           "settings": {
             "flex_direction": "column",
@@ -1261,7 +1470,7 @@
           },
           "elements": [
             {
-              "id": "b3e06d08",
+              "id": "d0fbc87e",
               "elType": "container",
               "settings": {
                 "flex_direction": "column",
@@ -1280,19 +1489,11 @@
                   "isLinked": true,
                   "unit": "px",
                   "size": 12
-                },
-                "margin": {
-                  "unit": "px",
-                  "top": "0",
-                  "right": "0",
-                  "bottom": "24",
-                  "left": "0",
-                  "isLinked": false
                 }
               },
               "elements": [
                 {
-                  "id": "783c2e4c",
+                  "id": "7779e4c5",
                   "elType": "widget",
                   "widgetType": "heading",
                   "settings": {
@@ -1313,7 +1514,7 @@
                   "isInner": false
                 },
                 {
-                  "id": "ced875c2",
+                  "id": "ac2fa8f0",
                   "elType": "widget",
                   "widgetType": "text-editor",
                   "settings": {
@@ -1327,7 +1528,7 @@
               "isInner": true
             },
             {
-              "id": "bc7d6c92",
+              "id": "68189f3d",
               "elType": "container",
               "settings": {
                 "flex_direction": "row",
@@ -1350,7 +1551,7 @@
               },
               "elements": [
                 {
-                  "id": "2d69faaf",
+                  "id": "b79d44ae",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -1381,7 +1582,7 @@
                   },
                   "elements": [
                     {
-                      "id": "e77533e7",
+                      "id": "787b2c67",
                       "elType": "widget",
                       "widgetType": "text-editor",
                       "settings": {
@@ -1399,7 +1600,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "a0fd94ae",
+                      "id": "15eaf85d",
                       "elType": "widget",
                       "widgetType": "icon-list",
                       "settings": {
@@ -1410,7 +1611,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "d67d359b"
+                            "_id": "1fd8c01f"
                           },
                           {
                             "text": "Tile & Grout Deep Clean",
@@ -1418,7 +1619,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "6e89eec9"
+                            "_id": "ec7027ec"
                           },
                           {
                             "text": "Hard Surface Floor Restoration (VCT, stone)",
@@ -1426,7 +1627,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "65372198"
+                            "_id": "6e3241dd"
                           },
                           {
                             "text": "Concrete Polishing",
@@ -1434,7 +1635,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "3ceed670"
+                            "_id": "6e4b7e3a"
                           },
                           {
                             "text": "Janitorial Services",
@@ -1442,7 +1643,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "8695b280"
+                            "_id": "bb113bfd"
                           },
                           {
                             "text": "Upholstery + Leather Cleaning",
@@ -1450,7 +1651,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "3097de67"
+                            "_id": "fafc5591"
                           },
                           {
                             "text": "EPA-Approved Disinfecting",
@@ -1458,7 +1659,7 @@
                               "value": "fas fa-arrow-right",
                               "library": "fa-solid"
                             },
-                            "_id": "e905f774"
+                            "_id": "41fef7c5"
                           }
                         ],
                         "icon_color": "#43A94B",
@@ -1485,7 +1686,7 @@
                       "isInner": false
                     },
                     {
-                      "id": "39752f09",
+                      "id": "98aa350d",
                       "elType": "widget",
                       "widgetType": "button",
                       "settings": {
@@ -1497,8 +1698,8 @@
                         },
                         "size": "lg",
                         "align": "left",
-                        "background_color": "#0F1411",
-                        "button_text_color": "#FFFFFF",
+                        "background_color": "#FFFFFF",
+                        "button_text_color": "#2F8137",
                         "border_border": "solid",
                         "border_width": {
                           "unit": "px",
@@ -1508,7 +1709,7 @@
                           "left": "2",
                           "isLinked": true
                         },
-                        "border_color": "#0F1411",
+                        "border_color": "#43A94B",
                         "border_radius": {
                           "unit": "px",
                           "top": "4",
@@ -1527,20 +1728,20 @@
                         },
                         "typography_font_size": {
                           "unit": "px",
-                          "size": 17,
+                          "size": 13,
                           "sizes": []
                         },
                         "text_padding": {
                           "unit": "px",
-                          "top": "20",
-                          "right": "32",
-                          "bottom": "20",
-                          "left": "32",
+                          "top": "12",
+                          "right": "20",
+                          "bottom": "12",
+                          "left": "20",
                           "isLinked": false
                         },
-                        "hover_color": "#0F1411",
-                        "button_background_hover_color": "#FFFFFF",
-                        "border_hover_color": "#0F1411"
+                        "hover_color": "#FFFFFF",
+                        "button_background_hover_color": "#43A94B",
+                        "border_hover_color": "#43A94B"
                       },
                       "elements": [],
                       "isInner": false
@@ -1549,7 +1750,7 @@
                   "isInner": true
                 },
                 {
-                  "id": "75ce4299",
+                  "id": "444cd2bb",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -1579,7 +1780,7 @@
                   },
                   "elements": [
                     {
-                      "id": "94cec863",
+                      "id": "930d67a4",
                       "elType": "widget",
                       "widgetType": "image",
                       "settings": {
@@ -1607,16 +1808,16 @@
       "isInner": false
     },
     {
-      "id": "c537b363",
+      "id": "745ffaec",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -1636,11 +1837,11 @@
           "size": 0
         },
         "background_background": "classic",
-        "background_color": "#0F1411"
+        "background_color": "#0E2F14"
       },
       "elements": [
         {
-          "id": "a916f41b",
+          "id": "d3976a48",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -1653,16 +1854,16 @@
       "isInner": false
     },
     {
-      "id": "756a539f",
+      "id": "2200026a",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -1686,7 +1887,7 @@
       },
       "elements": [
         {
-          "id": "1dfa941c",
+          "id": "6fc60530",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -1699,16 +1900,16 @@
       "isInner": false
     },
     {
-      "id": "0b41a912",
+      "id": "ee242853",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
         "content_width": "full",
         "padding": {
           "unit": "em",
-          "top": "3",
+          "top": "0",
           "right": "0",
-          "bottom": "3",
+          "bottom": "0",
           "left": "0",
           "isLinked": false
         },
@@ -1732,7 +1933,7 @@
       },
       "elements": [
         {
-          "id": "c1083f12",
+          "id": "90f1b8e1",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
