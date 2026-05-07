@@ -1,11 +1,11 @@
 {
   "version": "0.4",
-  "title": "Footer",
-  "type": "footer",
+  "title": "Process",
+  "type": "section",
   "metadata": {},
   "content": [
     {
-      "id": "87a83eb3",
+      "id": "b5c139ca",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -30,7 +30,7 @@
       },
       "elements": [
         {
-          "id": "692e972f",
+          "id": "19fdfb9e",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -43,7 +43,7 @@
       "isInner": false
     },
     {
-      "id": "b68b49c9",
+      "id": "46b9dcc0",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -63,16 +63,16 @@
           "unit": "px",
           "size": 0
         },
-        "_title": "Footer",
+        "_title": "Process",
         "_css_classes": "midland-page"
       },
       "elements": [
         {
-          "id": "ede3d6fe",
+          "id": "1511e89e",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
-            "html": "<footer id=\"footer\">\n  <div class=\"wrap\">\n    <div class=\"grid\">\n      <div>\n        <a href=\"/\" class=\"footer-logo\" aria-label=\"Midland Floor Care home\">\n          <img src=\"https://raw.githubusercontent.com/branderboy/midland/main/images/midland-small-logo.png\" alt=\"Midland Floor Care\">\n        </a>\n        <p class=\"brand-line\">\n          We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.\n        </p>\n        <div class=\"socials\">\n          <a href=\"#\" aria-label=\"Instagram\">IG</a>\n          <a href=\"#\" aria-label=\"Facebook\">FB</a>\n          <a href=\"#\" aria-label=\"LinkedIn\">LI</a>\n          <a href=\"#\" aria-label=\"Google Business Profile\">G</a>\n        </div>\n      </div>\n      <div>\n        <h5>About</h5>\n        <ul>\n          <li><a href=\"#about\">About Midland</a></li>\n          <li><a href=\"#services\">Services</a></li>\n          <li><a href=\"#schedule\">Schedule a Visit</a></li>\n          <li><a href=\"#\">Blog</a></li>\n        </ul>\n      </div>\n      <div>\n        <h5>Services</h5>\n        <ul>\n          <li><a href=\"#\">Carpet Cleaning</a></li>\n          <li><a href=\"#\">Tile &amp; Grout</a></li>\n          <li><a href=\"#\">Hardwood Refinishing</a></li>\n          <li><a href=\"#\">Concrete Polishing</a></li>\n          <li><a href=\"#\">Janitorial</a></li>\n        </ul>\n      </div>\n      <div>\n        <h5>Reach Us</h5>\n        <ul>\n          <li><a href=\"tel:2405329097\">(240) 532-9097</a></li>\n          <li><a href=\"#schedule\">Free Quote</a></li>\n          <li><a href=\"#faq\">FAQ</a></li>\n          <li><a href=\"#testimonials\">Clients</a></li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"meta\">\n      <span>\u00a9 2026 Midland Floor Care | Serving DC, MD, VA</span>\n      <span>Terms and Conditions | Privacy Policy</span>\n    </div>\n  </div>\n</footer>"
+            "html": "<section class=\"mint\" id=\"process\">\n  <div class=\"wrap\">\n    <div class=\"sect-head\">\n      <span class=\"eyebrow\">The Midland Process Explained</span>\n      <h2>How our process works.</h2>\n      <p class=\"lede\">\n        Our process makes it easy to see exactly how we deliver quality results and complete client satisfaction. Clear steps, no guesswork, and a smooth experience from first visit to final clean.\n      </p>\n    </div>\n    <div class=\"process-row\">\n      <div class=\"process-step\">\n        <div class=\"circle-wrap\"><div class=\"circle\">SITE</div><div class=\"badge\">01</div></div>\n        <h4>Walkthrough</h4>\n        <p>We inspect the space in person, identify surfaces and trouble spots.</p>\n      </div>\n      <div class=\"process-step\">\n        <div class=\"circle-wrap\"><div class=\"circle\">PLAN</div><div class=\"badge\">02</div></div>\n        <h4>Facility Score</h4>\n        <p>You get a written assessment of every surface. Yours to keep.</p>\n      </div>\n      <div class=\"process-step\">\n        <div class=\"circle-wrap\"><div class=\"circle\">QUOTE</div><div class=\"badge\">03</div></div>\n        <h4>24-48 Hour Quote</h4>\n        <p>Line-item pricing, no hidden fees, no annual lock-ins.</p>\n      </div>\n      <div class=\"process-step\">\n        <div class=\"circle-wrap\"><div class=\"circle\">CLEAN</div><div class=\"badge\">04</div></div>\n        <h4>Schedule</h4>\n        <p>Nights, weekends, holidays. Your tenants only see the result.</p>\n      </div>\n    </div>\n  </div>\n</section>"
           },
           "elements": [],
           "isInner": false

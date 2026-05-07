@@ -41,6 +41,54 @@
             }
         },
         {
+            "name": "Process",
+            "screenshot": "screenshots/process.jpg",
+            "source": "templates/process.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Residential Services",
+            "screenshot": "screenshots/residential.jpg",
+            "source": "templates/residential.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Commercial Services",
+            "screenshot": "screenshots/commercial.jpg",
+            "source": "templates/commercial.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
+            "name": "Reviews",
+            "screenshot": "screenshots/reviews.jpg",
+            "source": "templates/reviews.json",
+            "preview_url": "",
+            "type": "section",
+            "category": "section",
+            "metadata": {
+                "template_type": "section",
+                "include_in_zip": "1"
+            }
+        },
+        {
             "name": "Long-Term & Recurring Commercial Floor Care Services",
             "screenshot": "screenshots/long-term-recurring-commercial-floor-care-programs.jpg",
             "source": "templates/long-term-recurring-commercial-floor-care-programs.json",
