@@ -4,133 +4,104 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Commercial Floor Care DC, MD &amp; VA | Midland Floor Care</title>
-<meta name="description" content="Commercial floor cleaning across DC, Maryland & Virginia — carpet, tile & grout, hardwood, concrete polishing. Free site eval, 24-48 hr quote. Call (240) 532-9097." />
+<meta name="description" content="Commercial floor cleaning across DC, Maryland & Virginia - carpet, tile & grout, hardwood, concrete polishing. Free site eval, 24-48 hr quote. Call (240) 532-9097." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 /* ================================================================
-   MIDLAND FLOOR CARE — Homepage Redesign
-   Aesthetic: Industrial / Utilitarian × Sales-direct B2B
-   Reference: Stripe Press × Basecamp × Linear docs
-   Type:      IBM Plex Sans (display + body) / IBM Plex Mono (numerals, tags)
-   Color:     Bone #F7F6F1 + Ink #0A0A0A + Midland Green #43A94B
-   Signature: Oversized mono numerals as recurring "Facility Score" tag
+   MIDLAND FLOOR CARE — Homepage Redesign  v=20260507-3
+   White background + light mint sections + Midland green accent
+   IBM Plex Sans + Plex Mono. Tight section rhythm. Real images.
    ================================================================ */
 
 :root{
-  --bone: #F7F6F1;
-  --bone-2: #EFEDE5;
-  --ink: #0A0A0A;
+  --white: #FFFFFF;
+  --mint:  #F3FCF4;       /* Midland section wash */
+  --ink:   #0A0A0A;
   --ink-2: #2D2D2D;
-  --paper: #FFFFFF;
-  --rule: #1A1A1A;
-  --line: #DDE4E2;
-  --green: #43A94B;
+  --line:  #E2E8E0;
+  --green: #43A94B;       /* Midland brand green */
   --green-deep: #2F8137;
   --green-dark: #0E2F14;
-  --green-wash: #F3FCF4;
-  --red: #DC2525;
-  --shadow: 0 1px 0 rgba(10,10,10,.06);
+  --red:   #DC2525;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 *,*::before,*::after{ box-sizing:border-box }
-html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth }
+html{ scroll-behavior:smooth }
 body{
   margin:0;
   font-family: var(--sans);
-  font-weight: 400;
   font-size: 17px;
   line-height: 1.55;
   color: var(--ink);
-  background: var(--bone);
+  background: var(--white);
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
-img{ max-width:100%; display:block }
+img{ max-width:100%; display:block; height:auto }
 a{ color:inherit; text-decoration:none }
 button{ font-family:inherit }
 
 /* ---------- Type ---------- */
 .eyebrow{
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
+  display: inline-flex; align-items: center; gap: 10px;
 }
-.eyebrow::before{
-  content:"";
-  width:18px; height:1px; background:var(--ink);
-}
-h1, h2, h3, h4 { font-family: var(--sans); font-weight: 700; letter-spacing: -.018em; color: var(--ink); margin:0 }
-/* Pro Wash house rule: ALL-CAPS for hero h1 and section h2s; sentence case for h3+ */
-.hero h1, h2 {
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: -.005em;
-}
-h1 { font-size: clamp(40px, 6.2vw, 76px); line-height: 1.02; }
-h2 { font-size: clamp(30px, 3.6vw, 48px); line-height: 1.06; }
-h3 { font-size: 22px; line-height: 1.25; text-transform: none; letter-spacing: -.018em; }
-h4 { font-size: 16px; line-height: 1.3; font-weight: 600; text-transform: none; letter-spacing: -.01em; }
+.eyebrow::before{ content:""; width:18px; height:1px; background:var(--ink); }
+h1, h2, h3, h4 { font-family: var(--sans); font-weight: 700; color: var(--ink); margin:0; letter-spacing:-.018em }
+.hero h1, h2 { text-transform: uppercase; letter-spacing: -.005em; }
+h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1.02; }
+h2 { font-size: clamp(28px, 3.4vw, 44px); line-height: 1.06; }
+h3 { font-size: 22px; line-height: 1.25; text-transform: none; }
+h4 { font-size: 16px; line-height: 1.3; font-weight: 600; text-transform: none; }
 p { margin: 0; }
-
 .lede { font-size: 19px; line-height: 1.55; color: var(--ink-2); max-width: 60ch; }
-.kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
 
-/* ---------- Layout ---------- */
+/* ---------- Layout (tight rhythm) ---------- */
 .wrap{ max-width: 1240px; margin: 0 auto; padding: 0 32px; }
-.wrap-narrow { max-width: 980px; margin: 0 auto; padding: 0 32px; }
-section{ padding: 96px 0; border-top: 1px solid var(--line); }
-section.tight{ padding: 64px 0; }
+.wrap-narrow{ max-width: 980px; margin: 0 auto; padding: 0 32px; }
+section{ padding: 40px 0; border-top: 1px solid var(--line); background: var(--white); }
+section.tight{ padding: 24px 0; }
+section.mint{ background: var(--mint); }
 section.dark{ background: var(--ink); color: #E8E8E5; border-top: 0; }
 section.dark h1, section.dark h2, section.dark h3 { color: #FFF; }
-section.green{ background: var(--green-dark); color: #E8F2EA; border-top: 0;}
+section.green{ background: var(--green-dark); color: #E8F2EA; border-top: 0; }
 section.green h1, section.green h2, section.green h3 { color: #FFF; }
-section.bone-2 { background: var(--bone-2); }
-
 @media (max-width: 720px){
-  section{ padding: 64px 0; }
+  section{ padding: 32px 0; }
   .wrap, .wrap-narrow{ padding: 0 20px; }
 }
 
 /* ---------- Buttons ---------- */
 .btn{
   display:inline-flex; align-items:center; gap:10px;
-  font-family: var(--sans); font-weight: 600; font-size: 15px;
+  font-weight: 600; font-size: 15px;
   padding: 14px 22px; border: 1px solid var(--ink); background: var(--ink); color: #FFF;
-  border-radius: 0;
   transition: transform .15s ease, background .2s ease, color .2s ease;
   cursor: pointer; line-height: 1;
 }
 .btn:hover{ transform: translateY(-1px); }
 .btn .arrow{ transition: transform .2s ease; }
 .btn:hover .arrow{ transform: translateX(3px); }
-
 .btn--primary{ background: var(--green); border-color: var(--green); color:#fff; }
 .btn--primary:hover{ background: var(--green-deep); border-color: var(--green-deep); }
 .btn--ghost{ background: transparent; color: var(--ink); }
 .btn--ghost:hover{ background: var(--ink); color: #FFF; }
 .btn--ghost-light{ background: transparent; color:#FFF; border-color:#FFF; }
 .btn--ghost-light:hover{ background:#FFF; color: var(--ink); }
-.btn--lg{ padding: 18px 28px; font-size: 16px; }
+.btn--lg{ padding: 16px 24px; font-size: 16px; }
 
 /* ---------- Top utility bar ---------- */
 .topbar{
   background: var(--ink); color: #E5E5E2;
   font-family: var(--mono); font-size: 12px; letter-spacing: .04em;
-  border-bottom: 1px solid #1A1A1A;
 }
 .topbar .inner{
   display:flex; justify-content:space-between; align-items:center;
-  padding: 10px 32px; gap: 24px; flex-wrap: wrap;
+  padding: 8px 32px; gap: 24px; flex-wrap: wrap;
   max-width: 1240px; margin: 0 auto;
 }
 .topbar a{ color:#E5E5E2; }
@@ -148,119 +119,87 @@ section.bone-2 { background: var(--bone-2); }
 /* ---------- Header / nav ---------- */
 header.nav{
   position: sticky; top: 0; z-index: 50;
-  background: rgba(247,246,241,.92); backdrop-filter: saturate(150%) blur(8px);
+  background: rgba(255,255,255,.95); backdrop-filter: saturate(150%) blur(8px);
   border-bottom: 1px solid var(--line);
 }
 header.nav .inner{
   display:flex; align-items:center; justify-content: space-between;
-  max-width: 1240px; margin: 0 auto; padding: 14px 32px;
+  max-width: 1240px; margin: 0 auto; padding: 12px 32px;
 }
-.logo{
-  font-family: var(--sans); font-weight: 700; font-size: 20px; letter-spacing: -.02em;
-  display:inline-flex; align-items:center; gap:10px;
-}
-.logo .mark{
-  width: 28px; height: 28px; background: var(--green);
-  display: inline-grid; place-items: center; color:#fff;
-  font-family: var(--mono); font-weight: 600; font-size: 14px;
-}
-nav.primary ul{ list-style: none; padding:0; margin:0; display:flex; gap: 28px; }
+.logo img{ height: 36px; width: auto; display:block; }
+nav.primary ul{ list-style: none; padding:0; margin:0; display:flex; gap: 24px; }
 nav.primary a{ font-size: 15px; font-weight: 500; color: var(--ink-2); }
-nav.primary a:hover{ color: var(--ink); }
+nav.primary a:hover{ color: var(--green-deep); }
 .nav-cta{ display:flex; gap: 10px; align-items:center; }
 .nav-cta .phone{ font-family: var(--mono); font-weight: 500; font-size: 14px; color: var(--ink); }
-@media (max-width: 900px){ nav.primary{ display:none } }
+@media (max-width: 900px){ nav.primary{ display:none } .nav-cta .phone{ display:none } }
 
 /* ---------- Hero ---------- */
-.hero{
-  position: relative; padding: 112px 0 96px;
-  border-top: 0;
-  background:
-    linear-gradient(180deg, rgba(247,246,241,1) 0%, rgba(247,246,241,.96) 60%, rgba(247,246,241,.92) 100%);
-}
+.hero{ padding: 32px 0 16px; border-top: 0; background: var(--white); }
 .hero .grid{
-  display:grid; grid-template-columns: 1.15fr 1fr; gap: 72px; align-items: center;
+  display:grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center;
 }
 .hero h1 .accent{
   background: linear-gradient(transparent 60%, rgba(67,169,75,.32) 60%);
-  padding: 0 .15em;
+  padding: 0 .12em;
 }
-.hero .lede{ margin-top: 22px; font-size: 20px; }
-.hero .ctas{ margin-top: 32px; display:flex; gap: 12px; flex-wrap: wrap; }
+.hero .lede{ margin-top: 18px; font-size: 18px; }
+.hero .ctas{ margin-top: 24px; display:flex; gap: 10px; flex-wrap: wrap; }
 .hero .trust{
-  margin-top: 36px; padding-top: 28px;
+  margin-top: 24px; padding-top: 20px;
   border-top: 1px solid var(--line);
-  display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
 }
-.hero .trust .stat{ font-family: var(--mono); }
-.hero .trust .stat b{ display:block; font-size: 26px; font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
-.hero .trust .stat span{ font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
-
-.hero-card{
-  position: relative;
-  border: 1px solid var(--ink); background: var(--paper);
-  padding: 0; overflow: hidden;
+.hero .trust .stat b{ display:block; font-family: var(--mono); font-size: 24px; font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
+.hero .trust .stat span{ font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.hero-photo{
+  border: 1px solid var(--ink);
   box-shadow: 6px 6px 0 0 var(--ink);
+  background: var(--white);
 }
-.hero-card .photo{
-  aspect-ratio: 4/5;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%) url('https://midlandfloors.com/wp-content/uploads/2025/08/Midland-Floor-Care-Photo-1.png') center/cover;
-}
-.hero-card .meta{
-  display:flex; justify-content: space-between; align-items: flex-end;
-  padding: 20px 22px; border-top: 1px solid var(--ink);
-  font-family: var(--mono); font-size: 12px;
-}
-.hero-card .meta .num{ font-size: 40px; font-weight: 600; line-height: 1; color: var(--ink); letter-spacing: -.02em; }
-.hero-card .meta .label{ text-transform: uppercase; letter-spacing: .12em; color: var(--ink-2); max-width: 180px; text-align: right; }
-
+.hero-photo img{ aspect-ratio: 4/3; object-fit: cover; width: 100%; }
 @media (max-width: 980px){
-  .hero{ padding: 64px 0 72px; }
-  .hero .grid{ grid-template-columns: 1fr; gap: 40px; }
+  .hero .grid{ grid-template-columns: 1fr; gap: 28px; }
   .hero .trust{ grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ---------- Logo strip ---------- */
-.logos{
-  display:flex; gap: 48px; flex-wrap: wrap; align-items: center;
-  font-family: var(--mono); font-size: 13px; color: var(--ink-2);
-  padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-  justify-content: center;
-}
-.logos .label{ text-transform: uppercase; letter-spacing: .14em; font-size: 11px; }
-.logos .name{ font-family: var(--sans); font-weight: 600; font-size: 17px; color: var(--ink); letter-spacing: -.01em; }
-
 /* ---------- Section header ---------- */
 .section-head{
-  display:grid; grid-template-columns: 1fr 1.6fr; gap: 56px;
-  align-items: end; margin-bottom: 56px;
+  display:grid; grid-template-columns: 1fr 1.6fr; gap: 40px;
+  align-items: end; margin-bottom: 24px;
 }
-.section-head .left .eyebrow{ margin-bottom: 18px; }
-.section-head .right p{ font-size: 18px; color: var(--ink-2); max-width: 60ch; }
-@media (max-width: 800px){ .section-head{ grid-template-columns: 1fr; gap:24px; } }
+.section-head .left .eyebrow{ margin-bottom: 12px; }
+.section-head .right p{ font-size: 17px; color: var(--ink-2); max-width: 60ch; }
+@media (max-width: 800px){ .section-head{ grid-template-columns: 1fr; gap: 16px; } }
 
-/* ---------- Service Modes (3 cards) ---------- */
-.modes{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--ink); }
+/* ---------- Logo strip ---------- */
+.logos{
+  display:flex; gap: 36px; flex-wrap: wrap; align-items: center;
+  font-family: var(--mono); font-size: 13px; color: var(--ink-2);
+  padding: 16px 0; justify-content: center;
+}
+.logos .label{ text-transform: uppercase; letter-spacing: .14em; font-size: 11px; }
+.logos .name{ font-family: var(--sans); font-weight: 600; font-size: 16px; color: var(--ink); }
+
+/* ---------- Service Modes ---------- */
+.modes{ display:grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--ink); }
 .mode{
-  padding: 36px; background: var(--paper);
+  padding: 28px; background: var(--white);
   border-right: 1px solid var(--ink);
-  display:flex; flex-direction:column; gap: 16px;
-  position: relative;
+  display:flex; flex-direction:column; gap: 12px;
 }
 .mode:last-child{ border-right: 0; }
-.mode .num{
-  font-family: var(--mono); font-size: 13px; color: var(--ink-2); letter-spacing: .14em;
-}
-.mode h3{ font-size: 24px; }
-.mode p{ color: var(--ink-2); }
+.mode .num{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); letter-spacing: .14em; }
+.mode h3{ font-size: 22px; }
+.mode p{ color: var(--ink-2); font-size: 15px; line-height: 1.55; }
 .mode .tag{
   display:inline-block; align-self: flex-start;
   font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
-  background: var(--green-wash); color: var(--green-deep); padding: 4px 10px; border:1px solid var(--green);
+  background: var(--mint); color: var(--green-deep); padding: 4px 10px; border:1px solid var(--green);
 }
 .mode.urgent .tag{ background:#FEE2E2; color: var(--red); border-color: var(--red); }
 .mode .arrow-link{
-  margin-top: 8px; font-weight: 600; font-size: 14px;
+  margin-top: 4px; font-weight: 600; font-size: 14px;
   display:inline-flex; gap:6px; align-items:center;
 }
 .mode .arrow-link:hover .arrow{ transform: translateX(3px); }
@@ -271,90 +210,104 @@ nav.primary a:hover{ color: var(--ink); }
   .mode:last-child{ border-bottom: 0; }
 }
 
-/* ---------- Industries grid ---------- */
+/* ---------- Industries ---------- */
 .industries{
-  display:grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+  display:grid; grid-template-columns: repeat(3, 1fr);
   border-left: 1px solid var(--line); border-top: 1px solid var(--line);
 }
 .industry{
-  padding: 32px;
+  padding: 24px; background: var(--white);
   border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
-  background: var(--paper);
-  display:flex; flex-direction:column; gap: 10px;
+  display:flex; flex-direction:column; gap: 8px;
   transition: background .2s ease;
 }
-.industry:hover{ background: var(--bone-2); }
+.industry:hover{ background: var(--mint); }
 .industry .num{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
 .industry h4{ font-size: 18px; }
-.industry p{ color: var(--ink-2); font-size: 15px; line-height: 1.5; }
+.industry p{ color: var(--ink-2); font-size: 14px; line-height: 1.5; }
 @media (max-width: 900px){ .industries{ grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px){ .industries{ grid-template-columns: 1fr; } }
 
-/* ---------- Founder Video ---------- */
-.founder{ display:grid; grid-template-columns: 1fr 1.2fr; gap: 56px; align-items:center; }
+/* ---------- Founder block ---------- */
+.founder{ display:grid; grid-template-columns: 1fr 1.1fr; gap: 32px; align-items:center; }
 .founder .video{
-  aspect-ratio: 16/10;
-  background: linear-gradient(135deg,#0E2F14, #1B4D24);
   border: 1px solid var(--ink); position: relative;
-  display: grid; place-items: center;
-  box-shadow: 6px 6px 0 0 var(--ink);
+  box-shadow: 6px 6px 0 0 var(--ink); overflow: hidden;
 }
+.founder .video img{ aspect-ratio: 16/10; object-fit: cover; width: 100%; }
 .founder .play{
-  width: 88px; height: 88px; border-radius: 50%;
+  position: absolute; inset: 0; display:grid; place-items: center;
+  cursor: pointer;
+}
+.founder .play span{
+  width: 76px; height: 76px; border-radius: 50%;
   background: var(--green); border: 2px solid #fff;
-  display:grid; place-items: center; cursor: pointer;
+  display:grid; place-items:center;
   transition: transform .2s ease;
 }
-.founder .play:hover{ transform: scale(1.06); }
-.founder .play svg{ width: 28px; height: 28px; fill: #FFF; margin-left: 4px; }
+.founder .play:hover span{ transform: scale(1.06); }
+.founder .play svg{ width: 26px; height: 26px; fill: #FFF; margin-left: 4px; }
 .founder .pill-overlay{
-  position:absolute; bottom: 16px; left: 16px;
+  position:absolute; bottom: 12px; left: 12px;
   font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-  color: #fff; background: rgba(0,0,0,.6); padding: 6px 10px;
+  color: #fff; background: rgba(0,0,0,.65); padding: 6px 10px;
 }
 @media (max-width: 900px){ .founder{ grid-template-columns: 1fr; } }
 
 /* ---------- Process ---------- */
 .process{
-  display:grid; grid-template-columns: repeat(4, 1fr); gap: 0;
-  border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+  display:grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid currentColor; border-bottom: 1px solid currentColor;
 }
 .step{
-  padding: 36px 28px;
-  border-right: 1px solid var(--ink);
-  position: relative;
+  padding: 24px 22px;
+  border-right: 1px solid currentColor;
 }
 .step:last-child{ border-right: 0; }
 .step .num{
-  font-family: var(--mono); font-size: 64px; font-weight: 600;
-  color: var(--ink); line-height: 1; letter-spacing: -.04em;
-  margin-bottom: 18px; display: block;
+  font-family: var(--mono); font-size: 56px; font-weight: 600;
+  line-height: 1; letter-spacing: -.04em;
+  margin-bottom: 12px; display: block;
 }
 .step .num .slash{ color: var(--green); }
-.step h4{ font-size: 18px; margin-bottom: 8px; }
-.step p{ color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+.step h4{ font-size: 17px; margin-bottom: 6px; }
+.step p{ color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+section.dark .step p{ color: #B7B7B0; }
+
 @media (max-width: 900px){
   .process{ grid-template-columns: repeat(2, 1fr); }
   .step:nth-child(2){ border-right: 0; }
-  .step:nth-child(1), .step:nth-child(2){ border-bottom: 1px solid var(--ink); }
+  .step:nth-child(1), .step:nth-child(2){ border-bottom: 1px solid currentColor; }
 }
 @media (max-width: 560px){
   .process{ grid-template-columns: 1fr; }
-  .step{ border-right: 0; border-bottom: 1px solid var(--ink); }
+  .step{ border-right: 0; border-bottom: 1px solid currentColor; }
   .step:last-child{ border-bottom: 0; }
 }
 
-/* ---------- Comparison table ---------- */
-.compare{
-  border: 1px solid #FFF;
-  background: rgba(255,255,255,.04);
+/* ---------- Stats ---------- */
+.stats{ display:grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #FFF; }
+.stats > div{ padding: 20px; border-right: 1px solid rgba(255,255,255,.18); }
+.stats > div:last-child{ border-right: 0; }
+.stats .n{
+  font-family: var(--mono); font-size: 40px; font-weight: 600;
+  color: #fff; line-height: 1; letter-spacing: -.02em;
 }
+.stats .n .accent{ color: var(--green); }
+.stats .l{ font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #B7E5BD; margin-top: 8px; }
+@media (max-width: 800px){
+  .stats{ grid-template-columns: repeat(2, 1fr); }
+  .stats > div:nth-child(2){ border-right: 0; }
+}
+
+/* ---------- Compare table ---------- */
+.compare{ border: 1px solid #FFF; }
 .compare-row{
-  display:grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 0;
+  display:grid; grid-template-columns: 1.6fr 1fr 1fr;
   border-bottom: 1px solid rgba(255,255,255,.12);
 }
 .compare-row:last-child{ border-bottom: 0; }
-.compare-row > div{ padding: 20px 24px; }
+.compare-row > div{ padding: 14px 18px; }
 .compare-row.head > div{
   font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
   border-bottom: 1px solid #FFF;
@@ -365,128 +318,96 @@ nav.primary a:hover{ color: var(--ink); }
 .compare-row .spec small{ display:block; font-family: var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8a8a82; margin-top: 4px; }
 @media (max-width: 720px){
   .compare-row{ grid-template-columns: 1fr; }
-  .compare-row > div{ border-bottom: 1px solid rgba(255,255,255,.08); }
 }
 
 /* ---------- Services grid ---------- */
 .services{
-  display:grid; grid-template-columns: repeat(2, 1fr); gap: 0;
+  display:grid; grid-template-columns: repeat(2, 1fr);
   border-top: 1px solid var(--ink); border-left: 1px solid var(--ink);
 }
 .service{
-  padding: 36px; background: var(--paper);
+  padding: 24px; background: var(--white);
   border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
-  display:flex; flex-direction:column; gap: 12px;
-  position: relative; transition: background .2s ease;
+  display:flex; flex-direction:column; gap: 10px;
+  transition: background .2s ease;
 }
-.service:hover{ background: var(--bone-2); }
-.service .num{
-  font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--ink-2);
-  text-transform: uppercase;
-}
-.service h3{ font-size: 22px; }
-.service p{ color: var(--ink-2); font-size: 15px; line-height: 1.55; }
-.service .arrow-link{
-  margin-top: auto; padding-top: 10px;
-  font-weight: 600; font-size: 14px;
-  display:inline-flex; gap:6px; align-items:center;
-}
+.service:hover{ background: var(--mint); }
+.service .num{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--ink-2); text-transform: uppercase; }
+.service h3{ font-size: 20px; }
+.service p{ color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+.service .arrow-link{ margin-top: auto; padding-top: 8px; font-weight: 600; font-size: 14px; display:inline-flex; gap:6px; align-items:center; }
 @media (max-width: 720px){ .services{ grid-template-columns: 1fr; } }
 
-/* ---------- Stats strip ---------- */
-.stats{
-  display:grid; grid-template-columns: repeat(4, 1fr);
-  border: 1px solid #FFF;
-}
-.stats > div{ padding: 32px; border-right: 1px solid rgba(255,255,255,.18); }
-.stats > div:last-child{ border-right: 0; }
-.stats .n{
-  font-family: var(--mono); font-size: 48px; font-weight: 600;
-  color: #fff; line-height: 1; letter-spacing: -.02em;
-}
-.stats .n .accent{ color: var(--green); }
-.stats .l{ font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #B7E5BD; margin-top: 12px; }
-@media (max-width: 800px){
-  .stats{ grid-template-columns: repeat(2, 1fr); }
-  .stats > div:nth-child(2){ border-right: 0; }
-}
-
 /* ---------- Service area ---------- */
-.area{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
-.area .col h4{ font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--ink); }
-.area .col ul{ list-style: none; padding: 0; margin: 0; columns: 1; }
-.area .col li{ padding: 6px 0; font-size: 15px; }
+.area{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.area .col h4{ font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--ink); }
+.area .col ul{ list-style: none; padding: 0; margin: 0; }
+.area .col li{ padding: 5px 0; font-size: 15px; }
 @media (max-width: 800px){ .area{ grid-template-columns: 1fr; } }
 
+/* ---------- Side-job team block ---------- */
+.sidejob{ display:grid; grid-template-columns: 1fr 1.1fr; gap: 32px; align-items:center; }
+.sidejob .team-photo{ border: 1px solid var(--ink); box-shadow: 6px 6px 0 0 var(--ink); overflow: hidden; }
+.sidejob .team-photo img{ aspect-ratio: 5/4; object-fit: cover; width: 100%; }
+@media (max-width: 900px){ .sidejob{ grid-template-columns: 1fr; } }
+
 /* ---------- Testimonials ---------- */
-.tlist{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.tlist{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .t{
-  padding: 28px; background: var(--paper); border: 1px solid var(--ink);
-  display:flex; flex-direction:column; gap: 16px;
+  padding: 22px; background: var(--white); border: 1px solid var(--ink);
+  display:flex; flex-direction:column; gap: 12px;
   box-shadow: 4px 4px 0 0 var(--ink);
 }
 .t .stars{ color: var(--green); font-family: var(--mono); letter-spacing: .15em; font-size: 14px; }
-.t blockquote{ margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink); }
-.t .who{ display:flex; flex-direction:column; gap:2px; padding-top: 12px; border-top: 1px solid var(--line); }
+.t blockquote{ margin: 0; font-size: 15px; line-height: 1.55; }
+.t .who{ display:flex; flex-direction:column; gap:2px; padding-top: 10px; border-top: 1px solid var(--line); }
 .t .who b{ font-size: 14px; }
 .t .who span{ font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
 @media (max-width: 900px){ .tlist{ grid-template-columns: 1fr; } }
 
 /* ---------- FAQ ---------- */
 .faq{ border-top: 1px solid var(--ink); }
-.faq details{
-  border-bottom: 1px solid var(--ink);
-  padding: 24px 0;
-  cursor: pointer;
-}
+.faq details{ border-bottom: 1px solid var(--ink); padding: 18px 0; cursor: pointer; }
 .faq summary{
-  list-style: none; display: flex; justify-content: space-between; gap: 24px; align-items: center;
-  font-size: 20px; font-weight: 600; letter-spacing: -.01em;
+  list-style: none; display: flex; justify-content: space-between; gap: 18px; align-items: center;
+  font-size: 18px; font-weight: 600;
 }
 .faq summary::-webkit-details-marker{ display: none; }
 .faq summary .ic{
-  width: 28px; height: 28px; display:grid; place-items:center;
+  width: 26px; height: 26px; display:grid; place-items:center;
   border:1px solid var(--ink); font-family: var(--mono); font-size: 16px;
-  transition: transform .2s ease;
+  transition: transform .2s ease; flex-shrink: 0;
 }
 .faq details[open] summary .ic{ transform: rotate(45deg); background: var(--green); color:#fff; border-color: var(--green); }
-.faq .a{ margin-top: 14px; color: var(--ink-2); font-size: 16px; line-height: 1.6; max-width: 80ch; }
+.faq .a{ margin-top: 10px; color: var(--ink-2); font-size: 15px; line-height: 1.6; max-width: 80ch; }
 
 /* ---------- Bottom CTA ---------- */
-.bigcta{
-  display:grid; grid-template-columns: 1.4fr 1fr; gap: 56px; align-items: center;
-}
-.bigcta h2{ font-size: clamp(36px, 5vw, 64px); }
-.bigcta .ctas{ display:flex; gap: 12px; flex-wrap:wrap; margin-top: 24px; }
-.bigcta .right{
-  font-family: var(--mono); font-size: 13px; letter-spacing: .04em;
-}
-.bigcta .right .row{ display:flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.18); }
+.bigcta{ display:grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center; }
+.bigcta h2{ font-size: clamp(32px, 4.6vw, 56px); }
+.bigcta .ctas{ display:flex; gap: 10px; flex-wrap:wrap; margin-top: 18px; }
+.bigcta .right{ font-family: var(--mono); font-size: 13px; }
+.bigcta .right .row{ display:flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.18); }
 .bigcta .right .row:last-child{ border-bottom: 0; }
 .bigcta .right .row b{ color: #fff; font-weight: 500; }
 .bigcta .right .row span{ color: #B7B7B0; }
-@media (max-width: 900px){ .bigcta{ grid-template-columns: 1fr; gap: 32px; } }
+@media (max-width: 900px){ .bigcta{ grid-template-columns: 1fr; gap: 22px; } }
 
 /* ---------- Footer ---------- */
-footer{
-  padding: 64px 0 32px; border-top: 1px solid var(--line);
-  background: var(--bone);
-}
-footer .grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 48px; }
-footer h5{ font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 16px; }
+footer{ padding: 40px 0 24px; border-top: 1px solid var(--line); background: var(--white); }
+footer .grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
+footer .logo img{ height: 40px; }
+footer h5{ font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 12px; }
 footer ul{ list-style: none; padding: 0; margin: 0; }
-footer li{ padding: 4px 0; font-size: 15px; }
+footer li{ padding: 3px 0; font-size: 15px; }
 footer a:hover{ color: var(--green-deep); }
-footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); padding-top: 32px; margin-top: 32px; border-top: 1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap: 12px; }
+footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); padding-top: 24px; margin-top: 24px; border-top: 1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap: 12px; }
 @media (max-width: 800px){ footer .grid{ grid-template-columns: 1fr 1fr; } }
 @media (max-width: 500px){ footer .grid{ grid-template-columns: 1fr; } }
 
-/* ---------- Reveal on scroll ---------- */
-.reveal{ opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+/* ---------- Reveal ---------- */
+.reveal{ opacity: 0; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease; }
 .reveal.in{ opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce){
-  .reveal{ opacity: 1; transform:none; transition:none; }
-}
+@media (prefers-reduced-motion: reduce){ .reveal{ opacity: 1; transform:none; transition:none; } }
 
 </style>
 </head>
@@ -495,10 +416,10 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
 <!-- ============== TOP UTILITY BAR ============== -->
 <div class="topbar">
   <div class="inner">
-    <div><span class="pill">Open Now</span> <span style="margin-left:14px">24-48 HR Quote &nbsp;·&nbsp; Same-Day Emergency Response</span></div>
+    <div><span class="pill">Open Now</span> <span style="margin-left:14px">24-48 HR Quote, Same-Day Emergency Response</span></div>
     <div class="right">
-      <span>Fully Insured · COI-Ready</span>
-      <a href="tel:+12405329097" style="font-weight:600;color:#fff">CALL (240) 532-9097 →</a>
+      <span>Fully Insured | COI-Ready</span>
+      <a href="tel:2405329097" style="font-weight:600;color:#fff">CALL (240) 532-9097 →</a>
     </div>
   </div>
 </div>
@@ -506,7 +427,9 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
 <!-- ============== NAV ============== -->
 <header class="nav">
   <div class="inner">
-    <a href="/" class="logo"><span class="mark">M</span> Midland <span style="font-weight:400;color:var(--ink-2)">Floor Care</span></a>
+    <a href="/" class="logo" aria-label="Midland Floor Care home">
+      <img src="https://midlandfloors.com/wp-content/uploads/2023/12/MFC_LOGO_website.png" alt="Midland Floor Care">
+    </a>
     <nav class="primary">
       <ul>
         <li><a href="#services">Services</a></li>
@@ -517,7 +440,7 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
       </ul>
     </nav>
     <div class="nav-cta">
-      <a class="phone" href="tel:+12405329097">(240) 532-9097</a>
+      <a class="phone" href="tel:2405329097">(240) 532-9097</a>
       <a class="btn btn--primary" href="#quote">Free Site Eval <span class="arrow">→</span></a>
     </div>
   </div>
@@ -528,127 +451,131 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="grid">
       <div class="reveal">
-        <span class="eyebrow">DC · Maryland · Virginia · Est. Local</span>
-        <h1 style="margin-top:24px">
-          Commercial floor care for the DMV — built for facilities that <span class="accent">can't shut down.</span>
+        <span class="eyebrow">DC, Maryland, Virginia | Locally Owned</span>
+        <h1 style="margin-top:18px">
+          Commercial floor care for the DMV, built for facilities that <span class="accent">can't shut down.</span>
         </h1>
         <p class="lede">
-          Carpet, tile &amp; grout, hardwood, and hard-surface restoration for offices, retail, healthcare, schools, and government facilities across Washington D.C., Maryland, and Virginia. A faster, more accountable alternative to MilliCare, Stanley Steemer, and Aramark.
+          Carpet, tile and grout, hardwood, and hard-surface restoration for offices, retail, healthcare, schools, and government facilities across Washington D.C., Maryland, and Virginia. A faster, more accountable alternative to MilliCare, Stanley Steemer, and Aramark.
         </p>
         <div class="ctas">
           <a class="btn btn--primary btn--lg" href="#quote">Get My Facility Score <span class="arrow">→</span></a>
-          <a class="btn btn--ghost btn--lg" href="tel:+12405329097">Call (240) 532-9097</a>
+          <a class="btn btn--ghost btn--lg" href="tel:2405329097">Call (240) 532-9097</a>
         </div>
         <div class="trust">
-          <div class="stat"><b>774+</b><span>Satisfied DMV Clients</span></div>
+          <div class="stat"><b>774+</b><span>DMV Clients</span></div>
           <div class="stat"><b>5.0★</b><span>Google Rating</span></div>
           <div class="stat"><b>24-48h</b><span>Quote Turnaround</span></div>
         </div>
       </div>
-      <div class="hero-card reveal">
-        <div class="photo" role="img" aria-label="Midland Floor Care technician cleaning a commercial carpet"></div>
-        <div class="meta">
-          <div class="num">01<span style="color:var(--green)">/</span><span style="color:var(--ink-2)">04</span></div>
-          <div class="label">Walkthrough — we inspect the space in person</div>
-        </div>
+      <div class="hero-photo reveal">
+        <img src="https://midlandfloors.com/wp-content/uploads/2025/08/Midland-Floor-Care-Photo-1.png" alt="Midland Floor Care founder in a commercial office space" loading="eager">
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============== TRUST LOGO STRIP ============== -->
-<div class="wrap">
-  <div class="logos">
-    <span class="label">Trusted by DMV facility teams</span>
-    <span class="name">Federal Contractor</span>
-    <span class="name">Class A Office</span>
-    <span class="name">Healthcare Network</span>
-    <span class="name">Retail Portfolio</span>
-    <span class="name">K-12 District</span>
-  </div>
-</div>
-
 <!-- ============== SERVICE MODES ============== -->
-<section id="modes">
+<section id="modes" class="mint">
   <div class="wrap">
     <div class="section-head">
       <div class="left">
-        <span class="eyebrow">01 · How we work</span>
-        <h2 style="margin-top:18px">Three ways to engage. Zero national playbooks.</h2>
+        <span class="eyebrow">01 | How we work</span>
+        <h2 style="margin-top:12px">Three ways to engage. Zero national playbooks.</h2>
       </div>
       <div class="right">
-        <p>We don't dispatch from a call center. Pick the engagement that fits your facility, your hours, and your budget — every program is run by a named DMV account lead.</p>
+        <p>We don't dispatch from a call center. Pick the engagement that fits your facility, your hours, and your budget. Every program is run by a named DMV account lead.</p>
       </div>
     </div>
-
     <div class="modes reveal">
       <div class="mode">
         <span class="tag">Recurring</span>
-        <span class="num">01 / Long-Term Programs</span>
+        <span class="num">01 | Long-Term Programs</span>
         <h3>Programs that scale with your portfolio.</h3>
         <p>Weekly, monthly, or quarterly commercial floor maintenance contracts tailored to your facility, foot traffic, and budget. Single suite or multi-site.</p>
         <a class="arrow-link" href="#quote">Build a program <span class="arrow">→</span></a>
       </div>
       <div class="mode">
         <span class="tag">Custom</span>
-        <span class="num">02 / Customized Cleaning</span>
+        <span class="num">02 | Customized Cleaning</span>
         <h3>Built around your space, your hours.</h3>
-        <p>Nights, weekends, holidays — we work when you don't. Your tenants and customers never see the work; they only see the result.</p>
+        <p>Nights, weekends, holidays. We work when you don't. Your tenants and customers never see the work, they only see the result.</p>
         <a class="arrow-link" href="#quote">Plan after-hours <span class="arrow">→</span></a>
       </div>
       <div class="mode urgent">
         <span class="tag">Same-day</span>
-        <span class="num">03 / Last-Minute &amp; Emergency</span>
+        <span class="num">03 | Last-Minute, Emergency</span>
         <h3>Same-day response when it matters.</h3>
-        <p>Water events, post-event cleanup, move-outs, inspections, unexpected stains. Call (240) 532-9097 — most DMV emergencies get a tech the same day.</p>
-        <a class="arrow-link" href="tel:+12405329097" style="color:var(--red)">Call now <span class="arrow">→</span></a>
+        <p>Water events, post-event cleanup, move-outs, inspections, unexpected stains. Most DMV emergencies get a tech the same day.</p>
+        <a class="arrow-link" href="tel:2405329097" style="color:var(--red)">Call now <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== TEAM / SIDE JOB ============== -->
+<section id="team">
+  <div class="wrap">
+    <div class="sidejob reveal">
+      <div class="team-photo">
+        <img src="https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-Work.jpeg" alt="Midland Floor Care crew on site in DMV commercial space" loading="lazy">
+      </div>
+      <div>
+        <span class="eyebrow">02 | Locally owned, locally run</span>
+        <h2 style="margin-top:12px">Floors and carpet aren't a side job. They're the whole job.</h2>
+        <p class="lede" style="margin-top:14px">
+          Family-owned, locally operated. Trusted by DMV facility teams and property managers for carpet cleaning, hardwood refinishing, tile and grout, upholstery, and full commercial floor care. Every job is run out of the DMV, not dispatched from a national call center.
+        </p>
+        <div class="ctas" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+          <a class="btn btn--primary" href="#quote">Get a Quote <span class="arrow">→</span></a>
+          <a class="btn btn--ghost" href="#process">See our process</a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ============== INDUSTRIES ============== -->
-<section id="industries" class="bone-2">
+<section id="industries" class="mint">
   <div class="wrap">
     <div class="section-head">
       <div class="left">
-        <span class="eyebrow">02 · Industries served</span>
-        <h2 style="margin-top:18px">Tailored for the DMV — not cookie-cutter contracts.</h2>
+        <span class="eyebrow">03 | Industries served</span>
+        <h2 style="margin-top:12px">Tailored for the DMV. Not cookie-cutter contracts.</h2>
       </div>
       <div class="right">
-        <p>Six industries, hundreds of buildings, one accountable team. We build programs around the surfaces, security clearances, and operating hours specific to each sector.</p>
+        <p>Six industries, hundreds of buildings, one accountable team. Programs built around the surfaces, security clearances, and operating hours specific to each sector.</p>
       </div>
     </div>
-
     <div class="industries reveal">
       <div class="industry">
-        <span class="num">01 / Retail</span>
-        <h4>Retail Stores &amp; Showrooms</h4>
-        <p>Storefronts, showrooms, and shopping centers in Bethesda, Tysons, Pentagon City, and Navy Yard.</p>
+        <span class="num">01 | Retail</span>
+        <h4>Retail Stores, Showrooms</h4>
+        <p>Storefronts, showrooms, and shopping centers in Bethesda, Tysons, Pentagon City, Navy Yard.</p>
       </div>
       <div class="industry">
-        <span class="num">02 / Office</span>
+        <span class="num">02 | Office</span>
         <h4>Corporate Offices</h4>
-        <p>Class A office towers, coworking spaces, and law/finance firms in DC, Arlington, and Silver Spring.</p>
+        <p>Class A office towers, coworking spaces, law and finance firms in DC, Arlington, Silver Spring.</p>
       </div>
       <div class="industry">
-        <span class="num">03 / Government</span>
+        <span class="num">03 | Government</span>
         <h4>Government Facilities</h4>
         <p>Federal contractors and municipal buildings with security, COI, and compliance requirements.</p>
       </div>
       <div class="industry">
-        <span class="num">04 / Healthcare</span>
-        <h4>Healthcare &amp; Clinics</h4>
+        <span class="num">04 | Healthcare</span>
+        <h4>Healthcare, Clinics</h4>
         <p>Medical office floor cleaning with EPA-registered hospital-grade disinfectants and SDS on file.</p>
       </div>
       <div class="industry">
-        <span class="num">05 / Education</span>
+        <span class="num">05 | Education</span>
         <h4>Educational Campuses</h4>
         <p>K-12 schools, charter networks, and universities across Maryland and Virginia.</p>
       </div>
       <div class="industry">
-        <span class="num">06 / Hospitality</span>
-        <h4>Hospitality &amp; Restaurants</h4>
+        <span class="num">06 | Hospitality</span>
+        <h4>Hospitality, Restaurants</h4>
         <p>Hotels, event venues, and restaurants where first impressions are revenue.</p>
       </div>
     </div>
@@ -660,19 +587,20 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="founder">
       <div>
-        <span class="eyebrow">03 · From the founder</span>
-        <h2 style="margin-top:18px">Why clean floors are a revenue lever, not a line item.</h2>
-        <p class="lede" style="margin-top:18px">
-          A 2-minute look at how DMV facility managers are turning floor care from a cost center into a defensible plan — using the Midland Facility Score to track condition, frequency, and risk across every surface in the building.
+        <span class="eyebrow">04 | From the founder</span>
+        <h2 style="margin-top:12px">Why clean floors are a revenue lever, not a line item.</h2>
+        <p class="lede" style="margin-top:14px">
+          A 2-minute look at how DMV facility managers are turning floor care from a cost center into a defensible plan, using the Midland Facility Score to track condition, frequency, and risk across every surface in the building.
         </p>
-        <div class="ctas" style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+        <div class="ctas" style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
           <a class="btn btn--primary" href="#quote">Get My Facility Score <span class="arrow">→</span></a>
           <a class="btn btn--ghost" href="#process">See the process</a>
         </div>
       </div>
       <div class="video reveal">
-        <div class="play" aria-label="Play founder video"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-        <div class="pill-overlay">02:14 · Founder Brief</div>
+        <img src="https://midlandfloors.com/wp-content/uploads/2024/01/Midland-Floors-4.jpg" alt="Midland Floor Care founder, video poster" loading="lazy">
+        <div class="play" aria-label="Play founder video"><span><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="pill-overlay">02:14 | Founder Brief</div>
       </div>
     </div>
   </div>
@@ -683,40 +611,38 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="section-head">
       <div class="left">
-        <span class="eyebrow" style="color:#B7E5BD">04 · The Midland process</span>
-        <h2 style="margin-top:18px;color:#fff">Let's see your floors shine. <br/>Four steps. No guesswork.</h2>
+        <span class="eyebrow" style="color:#B7E5BD">05 | The Midland process</span>
+        <h2 style="margin-top:12px;color:#fff">Let's see your floors shine. Four steps. No guesswork.</h2>
       </div>
       <div class="right">
-        <p style="color:#B7B7B0">From walkthrough to weekly schedule, every step is documented. The Facility Score that comes out of the visit is yours to keep — even if you don't hire us.</p>
+        <p style="color:#B7B7B0">From walkthrough to weekly schedule, every step is documented. The Facility Score that comes out of the visit is yours to keep, even if you don't hire us.</p>
       </div>
     </div>
-
-    <div class="process reveal" style="border-color:#FFF">
-      <div class="step" style="border-color:#FFF">
+    <div class="process reveal" style="color:#FFF">
+      <div class="step">
         <span class="num" style="color:#fff">01<span class="slash">/</span></span>
         <h4>Site Evaluation</h4>
-        <p style="color:#B7B7B0">A Midland tech walks the facility, identifies surfaces, traffic patterns, and trouble spots — and listens to what's not working with your current vendor.</p>
+        <p>A Midland tech walks the facility, identifies surfaces, traffic patterns, and trouble spots, and listens to what's not working with your current vendor.</p>
       </div>
-      <div class="step" style="border-color:#FFF">
+      <div class="step">
         <span class="num" style="color:#fff">02<span class="slash">/</span></span>
         <h4>Facility Score</h4>
-        <p style="color:#B7B7B0">A written assessment of current condition, recommended care frequency, and the surfaces most at risk. Yours to keep.</p>
+        <p>Written assessment of current condition, recommended care frequency, and the surfaces most at risk. Yours to keep.</p>
       </div>
-      <div class="step" style="border-color:#FFF">
+      <div class="step">
         <span class="num" style="color:#fff">03<span class="slash">/</span></span>
         <h4>Get a Quote</h4>
-        <p style="color:#B7B7B0">A complete program quote in 24-48 hours after the site visit. Line-item pricing. No hidden fees. No annual lock-ins.</p>
+        <p>A complete program quote in 24-48 hours after the site visit. Line-item pricing. No hidden fees. No annual lock-ins.</p>
       </div>
-      <div class="step" style="border-color:#FFF">
+      <div class="step">
         <span class="num" style="color:#fff">04<span class="slash">/</span></span>
         <h4>Schedule Your Service</h4>
-        <p style="color:#B7B7B0">Nights, weekends, holidays — your tenants and customers never see the work. They only see the result.</p>
+        <p>Nights, weekends, holidays. Your tenants and customers never see the work. They only see the result.</p>
       </div>
     </div>
-
-    <div style="margin-top:48px;display:flex;gap:12px;flex-wrap:wrap">
+    <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
       <a class="btn btn--primary btn--lg" href="#quote">Start with a Site Evaluation <span class="arrow">→</span></a>
-      <a class="btn btn--ghost-light btn--lg" href="tel:+12405329097">Call (240) 532-9097</a>
+      <a class="btn btn--ghost-light btn--lg" href="tel:2405329097">Call (240) 532-9097</a>
     </div>
   </div>
 </section>
@@ -725,22 +651,10 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
 <section class="green tight">
   <div class="wrap">
     <div class="stats reveal">
-      <div>
-        <div class="n">3,000<span class="accent">+</span></div>
-        <div class="l">Homes &amp; offices cleaned</div>
-      </div>
-      <div>
-        <div class="n">774<span class="accent">+</span></div>
-        <div class="l">Satisfied DMV clients</div>
-      </div>
-      <div>
-        <div class="n">5.0<span class="accent">★</span></div>
-        <div class="l">Google review rating</div>
-      </div>
-      <div>
-        <div class="n">24-48<span class="accent">h</span></div>
-        <div class="l">Avg quote turnaround</div>
-      </div>
+      <div><div class="n">3,000<span class="accent">+</span></div><div class="l">Homes &amp; offices cleaned</div></div>
+      <div><div class="n">774<span class="accent">+</span></div><div class="l">Satisfied DMV clients</div></div>
+      <div><div class="n">5.0<span class="accent">★</span></div><div class="l">Google review rating</div></div>
+      <div><div class="n">24-48<span class="accent">h</span></div><div class="l">Avg quote turnaround</div></div>
     </div>
   </div>
 </section>
@@ -750,14 +664,13 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="section-head">
       <div class="left">
-        <span class="eyebrow" style="color:#B7E5BD">05 · Why Midland</span>
-        <h2 style="margin-top:18px;color:#fff">A real local alternative to MilliCare, Stanley Steemer &amp; Aramark.</h2>
+        <span class="eyebrow" style="color:#B7E5BD">06 | Why Midland</span>
+        <h2 style="margin-top:12px;color:#fff">A real local alternative to MilliCare, Stanley Steemer, Aramark.</h2>
       </div>
       <div class="right">
         <p style="color:#B7B7B0">Side-by-side: how Midland's DMV crew compares to a national franchise dispatch model.</p>
       </div>
     </div>
-
     <div class="compare reveal">
       <div class="compare-row head">
         <div>What you get</div>
@@ -780,7 +693,7 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
         <div class="nat">National playbook</div>
       </div>
       <div class="compare-row">
-        <div class="spec">Emergency response <small>Same-day &amp; next-day</small></div>
+        <div class="spec">Emergency response <small>Same-day, next-day</small></div>
         <div class="midland">✓ Same-day available</div>
         <div class="nat">3-7 business days</div>
       </div>
@@ -790,13 +703,12 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
         <div class="nat">12-month minimums</div>
       </div>
       <div class="compare-row">
-        <div class="spec">COI &amp; W-9 turnaround <small>Compliance paperwork</small></div>
+        <div class="spec">COI, W-9 turnaround <small>Compliance paperwork</small></div>
         <div class="midland">✓ Same-day delivery</div>
         <div class="nat">2-5 business days</div>
       </div>
     </div>
-
-    <div style="margin-top:32px">
+    <div style="margin-top:24px">
       <a class="btn btn--primary btn--lg" href="#quote">Switch from your national vendor <span class="arrow">→</span></a>
     </div>
   </div>
@@ -807,61 +719,60 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="section-head">
       <div class="left">
-        <span class="eyebrow">06 · Services</span>
-        <h2 style="margin-top:18px">Commercial floor care services — DC, Maryland &amp; Virginia.</h2>
+        <span class="eyebrow">07 | Services</span>
+        <h2 style="margin-top:12px">Commercial floor care services. DC, Maryland, Virginia.</h2>
       </div>
       <div class="right">
         <p>Office, industrial, retail, warehouse, medical, school, government, hotel, and bank floor cleaning across the DMV. Every surface, every shift.</p>
       </div>
     </div>
-
     <div class="services reveal">
       <div class="service">
-        <span class="num">Service 01 — Carpet</span>
+        <span class="num">Service 01 | Carpet</span>
         <h3>Commercial Carpet Cleaning</h3>
-        <p>Steam cleaning, stain &amp; odor removal, area rug cleaning, and stain protection — eco-friendly chemistry that lifts dirt and allergens without long dry times.</p>
+        <p>Steam cleaning, stain and odor removal, area rug cleaning, and stain protection. Eco-friendly chemistry that lifts dirt and allergens without long dry times.</p>
         <a class="arrow-link" href="/carpet-cleaning">Learn more <span class="arrow">→</span></a>
       </div>
       <div class="service">
-        <span class="num">Service 02 — Tile</span>
-        <h3>Tile + Grout Cleaning &amp; Sealing</h3>
-        <p>Deep tile and grout cleaning that pulls grime out of porous grout lines and restores original color. Optional sealing prolongs results in lobbies, restrooms, and kitchens.</p>
+        <span class="num">Service 02 | Tile</span>
+        <h3>Tile, Grout Cleaning &amp; Sealing</h3>
+        <p>Deep tile and grout cleaning that pulls grime out of porous grout lines and restores original color. Optional sealing prolongs results in lobbies, restrooms, kitchens.</p>
         <a class="arrow-link" href="#">Learn more <span class="arrow">→</span></a>
       </div>
       <div class="service">
-        <span class="num">Service 03 — Hardwood</span>
+        <span class="num">Service 03 | Hardwood</span>
         <h3>Hardwood Cleaning &amp; Refinishing</h3>
         <p>Sand, stain, and seal. Bring office, retail, and hospitality hardwood back to spec without replacement cost.</p>
         <a class="arrow-link" href="#">Learn more <span class="arrow">→</span></a>
       </div>
       <div class="service">
-        <span class="num">Service 04 — Hard Surface</span>
+        <span class="num">Service 04 | Hard Surface</span>
         <h3>Hard Surface Floor Restoration</h3>
-        <p>VCT, LVT, terrazzo, marble, and natural stone — strip, scrub, polish, and protect to a high-clarity finish.</p>
+        <p>VCT, LVT, terrazzo, marble, and natural stone. Strip, scrub, polish, and protect to a high-clarity finish.</p>
         <a class="arrow-link" href="#">Learn more <span class="arrow">→</span></a>
       </div>
       <div class="service">
-        <span class="num">Service 05 — Concrete</span>
+        <span class="num">Service 05 | Concrete</span>
         <h3>Commercial Concrete Polishing</h3>
-        <p>Durable, high-gloss polished concrete for warehouses, showrooms, and modern offices — light-reflective and forklift-rated.</p>
+        <p>Durable, high-gloss polished concrete for warehouses, showrooms, and modern offices. Light-reflective, forklift-rated.</p>
         <a class="arrow-link" href="#">Learn more <span class="arrow">→</span></a>
       </div>
       <div class="service">
-        <span class="num">Service 06 — Janitorial</span>
+        <span class="num">Service 06 | Janitorial</span>
         <h3>Full-Service Janitorial</h3>
         <p>Routine cleaning, restroom sanitation, waste management, and EPA-registered disinfecting. COI-ready crews. Recurring or one-time.</p>
         <a class="arrow-link" href="#">Learn more <span class="arrow">→</span></a>
       </div>
       <div class="service">
-        <span class="num">Service 07 — Upholstery</span>
-        <h3>Upholstery + Leather Cleaning</h3>
-        <p>Specialized cleaning for office furniture, hospitality fabrics, and leather seating — restoring appearance without damaging fibers, dyes, or finishes.</p>
+        <span class="num">Service 07 | Upholstery</span>
+        <h3>Upholstery, Leather Cleaning</h3>
+        <p>Specialized cleaning for office furniture, hospitality fabrics, and leather seating. Restoring appearance without damaging fibers, dyes, or finishes.</p>
         <a class="arrow-link" href="#">Learn more <span class="arrow">→</span></a>
       </div>
       <div class="service" style="background: var(--ink); color: #fff;">
-        <span class="num" style="color:#B7E5BD">Special — Compliance</span>
+        <span class="num" style="color:#B7E5BD">Special | Compliance</span>
         <h3 style="color:#fff">EPA-Approved Disinfecting</h3>
-        <p style="color:#B7B7B0">Hospital-grade chemistry, COI-ready crews, SDS sheets and certifications on request — for healthcare, schools, and food service.</p>
+        <p style="color:#B7B7B0">Hospital-grade chemistry, COI-ready crews, SDS sheets and certifications on request. For healthcare, schools, food service.</p>
         <a class="arrow-link" href="#" style="color:#fff">Learn more <span class="arrow">→</span></a>
       </div>
     </div>
@@ -869,43 +780,29 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
 </section>
 
 <!-- ============== SERVICE AREA ============== -->
-<section id="area" class="bone-2">
+<section id="area" class="mint">
   <div class="wrap">
     <div class="section-head">
       <div class="left">
-        <span class="eyebrow">07 · Service area</span>
-        <h2 style="margin-top:18px">On-site across the DMV. Daily.</h2>
+        <span class="eyebrow">08 | Service area</span>
+        <h2 style="margin-top:12px">On-site across the DMV. Daily.</h2>
       </div>
       <div class="right">
-        <p>If you're in the Mid-Atlantic and we're not on the list, call us — we likely already cover your zip.</p>
+        <p>If you're in the Mid-Atlantic and we're not on the list, call us. We likely already cover your zip.</p>
       </div>
     </div>
-
     <div class="area reveal">
       <div class="col">
         <h4>Washington D.C.</h4>
-        <ul>
-          <li>Navy Yard</li><li>Chinatown</li><li>Capitol Hill</li>
-          <li>Downtown</li><li>Georgetown</li><li>NoMa</li>
-        </ul>
+        <ul><li>Navy Yard</li><li>Chinatown</li><li>Capitol Hill</li><li>Downtown</li><li>Georgetown</li><li>NoMa</li></ul>
       </div>
       <div class="col">
         <h4>Maryland</h4>
-        <ul>
-          <li>Bethesda</li><li>Silver Spring</li><li>Rockville</li>
-          <li>Gaithersburg (20878)</li><li>Bowie</li><li>Laurel (20726)</li>
-          <li>College Park</li><li>Hyattsville</li>
-        </ul>
+        <ul><li>Bethesda</li><li>Silver Spring</li><li>Rockville</li><li>Gaithersburg (20878)</li><li>Bowie</li><li>Laurel (20726)</li><li>College Park</li><li>Hyattsville</li></ul>
       </div>
       <div class="col">
         <h4>Northern Virginia</h4>
-        <ul>
-          <li>Arlington (Ballston, Clarendon)</li>
-          <li>Alexandria (Old Town, Del Ray)</li>
-          <li>McLean · Vienna · Reston · Tysons</li>
-          <li>Fairfax · Chantilly · Sterling</li>
-          <li>Ashburn · Leesburg · Manassas</li>
-        </ul>
+        <ul><li>Arlington (Ballston, Clarendon)</li><li>Alexandria (Old Town, Del Ray)</li><li>McLean, Vienna, Reston, Tysons</li><li>Fairfax, Chantilly, Sterling</li><li>Ashburn, Leesburg, Manassas</li></ul>
       </div>
     </div>
   </div>
@@ -916,14 +813,13 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="section-head">
       <div class="left">
-        <span class="eyebrow">08 · Happy clients</span>
-        <h2 style="margin-top:18px">Our clients' words speak louder than our marketing.</h2>
+        <span class="eyebrow">09 | Happy clients</span>
+        <h2 style="margin-top:12px">Our clients' words speak louder than our marketing.</h2>
       </div>
       <div class="right">
         <p>What DMV facility managers, retail leads, and government coordinators say after switching to Midland.</p>
       </div>
     </div>
-
     <div class="tlist reveal">
       <div class="t">
         <span class="stars">★★★★★</span>
@@ -932,7 +828,7 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
       </div>
       <div class="t">
         <span class="stars">★★★★★</span>
-        <blockquote>"40K sq ft office cleaned overnight. No downtime, no excuses. We see the result, not the work — that's exactly what we wanted from a vendor."</blockquote>
+        <blockquote>"40K sq ft office cleaned overnight. No downtime, no excuses. We see the result, not the work, that's exactly what we wanted from a vendor."</blockquote>
         <div class="who"><b>Arlington Property Mgr</b><span>Class A Office</span></div>
       </div>
       <div class="t">
@@ -945,27 +841,26 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
 </section>
 
 <!-- ============== FAQ ============== -->
-<section id="faq">
+<section id="faq" class="mint">
   <div class="wrap-narrow">
-    <div class="section-head" style="grid-template-columns:1fr; text-align:center; margin-bottom:32px">
+    <div class="section-head" style="grid-template-columns:1fr; text-align:center; margin-bottom:18px">
       <div class="left">
-        <span class="eyebrow">09 · FAQ</span>
-        <h2 style="margin-top:18px">Frequently asked questions.</h2>
+        <span class="eyebrow">10 | FAQ</span>
+        <h2 style="margin-top:12px">Frequently asked questions.</h2>
       </div>
     </div>
-
     <div class="faq reveal">
       <details>
         <summary>How quickly can Midland clean our floors? <span class="ic">+</span></summary>
-        <div class="a">Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after that. For emergencies, we offer same-day and next-day response — call (240) 532-9097.</div>
+        <div class="a">Most DMV clients get a site visit within 48 hours and a written quote 24-48 hours after that. For emergencies, we offer same-day and next-day response. Call (240) 532-9097.</div>
       </details>
       <details>
         <summary>Do you serve all of DC, Maryland, and Virginia? <span class="ic">+</span></summary>
-        <div class="a">Yes. We work daily across Washington D.C., Montgomery County, Prince George's County, Arlington, Alexandria, Fairfax, Loudoun, and the rest of the Mid-Atlantic. If you're outside the DMV, ask — we travel for the right program.</div>
+        <div class="a">Yes. We work daily across Washington D.C., Montgomery County, Prince George's County, Arlington, Alexandria, Fairfax, Loudoun, and the rest of the Mid-Atlantic. If you're outside the DMV, ask. We travel for the right program.</div>
       </details>
       <details>
         <summary>What floor types do you handle? <span class="ic">+</span></summary>
-        <div class="a">Carpet, tile &amp; grout, VCT, LVT, terrazzo, marble, natural stone, polished concrete, and hardwood. Cleaning, restoration, refinishing, and protection.</div>
+        <div class="a">Carpet, tile and grout, VCT, LVT, terrazzo, marble, natural stone, polished concrete, and hardwood. Cleaning, restoration, refinishing, and protection.</div>
       </details>
       <details>
         <summary>Do you offer after-hours service? <span class="ic">+</span></summary>
@@ -977,7 +872,7 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
       </details>
       <details>
         <summary>How is Midland different from Stanley Steemer, MilliCare, or Aramark? <span class="ic">+</span></summary>
-        <div class="a">We're a local DMV flooring contractor, not a national franchise. You get one named account lead, custom programs, faster response, and direct accountability — not a routed ticket.</div>
+        <div class="a">We're a local DMV flooring contractor, not a national franchise. You get one named account lead, custom programs, faster response, and direct accountability. Not a routed ticket.</div>
       </details>
       <details>
         <summary>Do you provide one-time services or only recurring contracts? <span class="ic">+</span></summary>
@@ -992,13 +887,13 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="bigcta reveal">
       <div>
-        <span class="eyebrow" style="color:#B7E5BD">10 · Get started</span>
-        <h2 style="margin-top:18px">Ready for floors that sell for you?</h2>
-        <p class="lede" style="color:#D6E8D9; margin-top:18px">
-          Get a free on-site evaluation and your Facility Score in 48 hours. Yours to keep — even if you don't hire us.
+        <span class="eyebrow" style="color:#B7E5BD">11 | Get started</span>
+        <h2 style="margin-top:12px">Ready for floors that sell for you?</h2>
+        <p class="lede" style="color:#D6E8D9; margin-top:14px">
+          Get a free on-site evaluation and your Facility Score in 48 hours. Yours to keep, even if you don't hire us.
         </p>
         <div class="ctas">
-          <a class="btn btn--primary btn--lg" href="tel:+12405329097" style="background:#fff;color:var(--green-dark);border-color:#fff">Call (240) 532-9097</a>
+          <a class="btn btn--primary btn--lg" href="tel:2405329097" style="background:#fff;color:var(--green-dark);border-color:#fff">Call (240) 532-9097</a>
           <a class="btn btn--ghost-light btn--lg" href="#">Request a Quote <span class="arrow">→</span></a>
         </div>
       </div>
@@ -1006,7 +901,7 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
         <div class="row"><span>Site visit</span> <b>Within 48 hours</b></div>
         <div class="row"><span>Written quote</span> <b>24-48 hours after visit</b></div>
         <div class="row"><span>Emergency response</span> <b>Same-day available</b></div>
-        <div class="row"><span>Coverage</span> <b>DC · MD · VA</b></div>
+        <div class="row"><span>Coverage</span> <b>DC, MD, VA</b></div>
         <div class="row"><span>Insurance</span> <b>COI same day</b></div>
       </div>
     </div>
@@ -1018,9 +913,11 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
   <div class="wrap">
     <div class="grid">
       <div>
-        <a href="/" class="logo"><span class="mark">M</span> Midland <span style="font-weight:400;color:var(--ink-2)">Floor Care</span></a>
-        <p style="margin-top:18px; color:var(--ink-2); font-size:15px; max-width:36ch">
-          Commercial floor care, carpet cleaning, hardwood refinishing, tile &amp; grout restoration, concrete polishing, and EPA-approved disinfecting across the DMV. Locally owned. Fully insured.
+        <a href="/" class="logo" aria-label="Midland Floor Care home">
+          <img src="https://midlandfloors.com/wp-content/uploads/2023/12/MFC_LOGO_website.png" alt="Midland Floor Care">
+        </a>
+        <p style="margin-top:14px; color:var(--ink-2); font-size:15px; max-width:36ch">
+          Commercial floor care, carpet cleaning, hardwood refinishing, tile and grout restoration, concrete polishing, and EPA-approved disinfecting across the DMV. Locally owned. Fully insured.
         </p>
       </div>
       <div>
@@ -1036,7 +933,7 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
         <h5>What We Offer</h5>
         <ul>
           <li><a href="#">Carpet Cleaning</a></li>
-          <li><a href="#">Tile &amp; Grout</a></li>
+          <li><a href="#">Tile, Grout</a></li>
           <li><a href="#">Hardwood Refinishing</a></li>
           <li><a href="#">Concrete Polishing</a></li>
           <li><a href="#">Janitorial</a></li>
@@ -1045,7 +942,7 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
       <div>
         <h5>Reach Us</h5>
         <ul>
-          <li><a href="tel:+12405329097">(240) 532-9097</a></li>
+          <li><a href="tel:2405329097">(240) 532-9097</a></li>
           <li><a href="#">Schedule a Visit</a></li>
           <li><a href="#">Request a Quote</a></li>
           <li><a href="#">Instagram</a></li>
@@ -1054,18 +951,15 @@ footer .meta{ font-family: var(--mono); font-size: 12px; color: var(--ink-2); pa
       </div>
     </div>
     <div class="meta">
-      <span>© 2026 Midland Floor Care · DC · MD · VA</span>
-      <span>Terms · Privacy Policy</span>
+      <span>© 2026 Midland Floor Care | DC, MD, VA</span>
+      <span>Terms | Privacy Policy</span>
     </div>
   </div>
 </footer>
 
 <script>
-  // Reveal-on-scroll
   const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-    });
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
