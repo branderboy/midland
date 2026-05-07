@@ -5,7 +5,7 @@
   "metadata": {},
   "content": [
     {
-      "id": "ea0cb7e0",
+      "id": "c634cfe9",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -29,7 +29,7 @@
       },
       "elements": [
         {
-          "id": "35c837ea",
+          "id": "e9e61ee2",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -42,7 +42,7 @@
       "isInner": false
     },
     {
-      "id": "00a44767",
+      "id": "1d8b3cae",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -66,7 +66,7 @@
       },
       "elements": [
         {
-          "id": "1bf2760a",
+          "id": "5c4cbbeb",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -79,7 +79,7 @@
       "isInner": false
     },
     {
-      "id": "6f089fb5",
+      "id": "bfb3ecd1",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -103,7 +103,7 @@
       },
       "elements": [
         {
-          "id": "482f55a4",
+          "id": "927cb1f9",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -116,7 +116,7 @@
       "isInner": false
     },
     {
-      "id": "1d675289",
+      "id": "3e4b8b15",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -140,7 +140,7 @@
       },
       "elements": [
         {
-          "id": "5f5b2d05",
+          "id": "0aaf90ac",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -153,7 +153,7 @@
       "isInner": false
     },
     {
-      "id": "48461d78",
+      "id": "b095d78f",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -177,7 +177,7 @@
       },
       "elements": [
         {
-          "id": "33326200",
+          "id": "e151a903",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -190,7 +190,7 @@
       "isInner": false
     },
     {
-      "id": "6c69946f",
+      "id": "e7b43278",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -214,7 +214,7 @@
       },
       "elements": [
         {
-          "id": "3375c6a7",
+          "id": "7e602db5",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -227,7 +227,7 @@
       "isInner": false
     },
     {
-      "id": "0675fcac",
+      "id": "fe44fcd5",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -251,11 +251,11 @@
       },
       "elements": [
         {
-          "id": "505dff05",
+          "id": "d57d4d6e",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
-            "html": "<!-- RESIDENTIAL SERVICES -->\n<section id=\"services\">\n  <div class=\"wrap\">\n    <div class=\"sect-head\">\n      <h2>Residential Services</h2>\n      <blockquote class=\"svc-pull center\" style=\"border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 50ch\">\n        \"Carpet like new after 8 years of kids and pets.\"\n        <cite>Sandy, Bethesda</cite>\n      </blockquote>\n    </div>\n    <div class=\"svc-block reveal\">\n      <div class=\"photo\">\n        <img src=\"images/carpet.png\" alt=\"Real Midland residential carpet cleaning in DMV home\" loading=\"lazy\">\n      </div>\n      <div>\n        <ul>\n          <li>Carpet Cleaning (steam extraction)</li>\n          <li>Pet Stain &amp; Odor Removal</li>\n          <li>Area Rug Cleaning (pickup available)</li>\n          <li>Hardwood Cleaning &amp; Refinishing</li>\n          <li>Tile &amp; Grout Cleaning + Sealing</li>\n          <li>Upholstery Cleaning</li>\n          <li>Move-In / Move-Out Cleaning</li>\n        </ul>\n        <a class=\"btn\" href=\"#schedule\">Get a residential quote \u2192</a>\n      </div>\n    </div>\n  </div>\n</section>"
+            "html": "<!-- RESIDENTIAL SERVICES -->\n<section id=\"services\">\n  <div class=\"wrap\">\n    <div class=\"sect-head\">\n      <h2>Residential Services</h2>\n      <blockquote class=\"svc-pull center\" style=\"border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 50ch\">\n        \"Carpet like new after 8 years of kids and pets.\"\n        <cite>Sandy, Bethesda</cite>\n      </blockquote>\n    </div>\n    <div class=\"svc-block reveal\">\n      <div class=\"photo\">\n        <img src=\"images/carpet.png\" alt=\"Real Midland residential carpet cleaning in DMV home\" loading=\"lazy\">\n      </div>\n      <div>\n        <p class=\"lede\" style=\"margin-bottom: 16px\">\n          From Bethesda single-family homes to Tysons townhouses, Midland brings commercial-grade equipment and eco-friendly chemistry into your living room. Our crews show up on time, treat your home like their own, and leave behind carpet and floors that look like the day they were installed. Fast dry times, kid-safe and pet-safe products, and a guarantee in writing.\n        </p>\n        <ul>\n          <li>Carpet Cleaning (steam extraction)</li>\n          <li>Pet Stain &amp; Odor Removal</li>\n          <li>Area Rug Cleaning (pickup available)</li>\n          <li>Hardwood Cleaning &amp; Refinishing</li>\n          <li>Tile &amp; Grout Cleaning + Sealing</li>\n          <li>Upholstery Cleaning</li>\n          <li>Move-In / Move-Out Cleaning</li>\n        </ul>\n        <a class=\"btn\" href=\"#schedule\">Get a residential quote \u2192</a>\n      </div>\n    </div>\n  </div>\n</section>"
           },
           "elements": [],
           "isInner": false
@@ -264,7 +264,7 @@
       "isInner": false
     },
     {
-      "id": "a47cd2bf",
+      "id": "198c7f88",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -288,7 +288,7 @@
       },
       "elements": [
         {
-          "id": "972484ba",
+          "id": "2175e9d7",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -301,7 +301,7 @@
       "isInner": false
     },
     {
-      "id": "4c339240",
+      "id": "0977d9d8",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -325,11 +325,11 @@
       },
       "elements": [
         {
-          "id": "ab615d31",
+          "id": "873bc721",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
-            "html": "<!-- COMMERCIAL SERVICES -->\n<section>\n  <div class=\"wrap\">\n    <div class=\"sect-head\">\n      <h2>Commercial Services</h2>\n      <blockquote class=\"svc-pull center\" style=\"border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 56ch\">\n        \"40K sq ft office cleaned overnight. No downtime.\"\n        <cite>Arlington Property Manager</cite>\n      </blockquote>\n    </div>\n    <div class=\"svc-block reveal\" style=\"grid-template-columns: 1fr 1fr\">\n      <div>\n        <ul>\n          <li>Carpet Cleaning (after-hours)</li>\n          <li>Tile &amp; Grout Deep Clean</li>\n          <li>Hard Surface Floor Restoration (VCT, stone)</li>\n          <li>Concrete Polishing</li>\n          <li>Janitorial Services</li>\n          <li>Upholstery + Leather Cleaning</li>\n          <li>EPA-Approved Disinfecting</li>\n        </ul>\n        <a class=\"btn\" href=\"#schedule\">Get a commercial quote \u2192</a>\n      </div>\n      <div class=\"photo\">\n        <img src=\"images/office%20floor.png\" alt=\"Real Midland commercial office floor cleaning in DMV\" loading=\"lazy\">\n      </div>\n    </div>\n  </div>\n</section>"
+            "html": "<!-- COMMERCIAL SERVICES -->\n<section>\n  <div class=\"wrap\">\n    <div class=\"sect-head\">\n      <h2>Commercial Services</h2>\n      <blockquote class=\"svc-pull center\" style=\"border-left: 0; padding-left: 0; margin: 12px auto 0; max-width: 56ch\">\n        \"40K sq ft office cleaned overnight. No downtime.\"\n        <cite>Arlington Property Manager</cite>\n      </blockquote>\n    </div>\n    <div class=\"svc-block reveal\" style=\"grid-template-columns: 1fr 1fr\">\n      <div>\n        <p class=\"lede\" style=\"margin-bottom: 16px\">\n          Built for facilities that can't shut down. Midland works nights, weekends, and holidays so your tenants and customers never see the disruption, only the result. COI-ready crews, EPA-registered chemistry, and one named DMV account lead on every visit. From a 40K sq ft Class A office to a single-suite federal contractor, we'll build a program around your floors, your hours, and your budget.\n        </p>\n        <ul>\n          <li>Carpet Cleaning (after-hours)</li>\n          <li>Tile &amp; Grout Deep Clean</li>\n          <li>Hard Surface Floor Restoration (VCT, stone)</li>\n          <li>Concrete Polishing</li>\n          <li>Janitorial Services</li>\n          <li>Upholstery + Leather Cleaning</li>\n          <li>EPA-Approved Disinfecting</li>\n        </ul>\n        <a class=\"btn\" href=\"#schedule\">Get a commercial quote \u2192</a>\n      </div>\n      <div class=\"photo\">\n        <img src=\"images/office%20floor.png\" alt=\"Real Midland commercial office floor cleaning in DMV\" loading=\"lazy\">\n      </div>\n    </div>\n  </div>\n</section>"
           },
           "elements": [],
           "isInner": false
@@ -338,7 +338,7 @@
       "isInner": false
     },
     {
-      "id": "d5782fae",
+      "id": "88b8d70d",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -362,7 +362,7 @@
       },
       "elements": [
         {
-          "id": "54668ce9",
+          "id": "d8d3262b",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -375,7 +375,7 @@
       "isInner": false
     },
     {
-      "id": "fbf7ea14",
+      "id": "dba895d9",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -399,7 +399,7 @@
       },
       "elements": [
         {
-          "id": "3fabaeef",
+          "id": "de31fcec",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
@@ -412,7 +412,7 @@
       "isInner": false
     },
     {
-      "id": "85d4b832",
+      "id": "8bb76a8f",
       "elType": "container",
       "settings": {
         "flex_direction": "column",
@@ -436,7 +436,7 @@
       },
       "elements": [
         {
-          "id": "122276f5",
+          "id": "d4508944",
           "elType": "widget",
           "widgetType": "html",
           "settings": {
