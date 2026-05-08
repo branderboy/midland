@@ -89,14 +89,24 @@ class SCRM_Pro_Floor_Care_Plan {
             return;
         }
 
-        // Lean on the AC bridge's categorizer if it's loaded, otherwise do a
-        // smaller inline check so this class can run standalone.
-        $category = (string) $this->get_field( $lead, array( 'category', 'job_category' ) );
-        if ( '' === $category && class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
-            $ac       = SCRM_Pro_ActiveCampaign::get_instance();
-            $category = $ac->categorize_lead( $lead );
+        // Floor Care Plan is COMMERCIAL only — residential jobs get the review
+        // request flow instead. Emergency commercial gets the plan with extra
+        // weight (the AC bridge applies an additional emergency tag).
+        $segment      = 'residential';
+        $is_emergency = false;
+        if ( class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
+            $ac           = SCRM_Pro_ActiveCampaign::get_instance();
+            $segment      = $ac->lead_segment( $lead );
+            $is_emergency = $ac->is_emergency( $lead );
+        } else {
+            // Standalone fallback when the AC bridge isn't loaded.
+            $project = strtolower( (string) $this->get_field( $lead, array( 'project_type', 'service_type', 'segment', 'category' ) ) );
+            if ( false !== strpos( $project, 'commercial' ) || false !== strpos( $project, 'business' ) || false !== strpos( $project, 'office' ) ) {
+                $segment = 'commercial';
+            }
         }
-        if ( 'emergency' !== strtolower( $category ) ) {
+
+        if ( 'commercial' !== $segment ) {
             return;
         }
 
@@ -127,6 +137,8 @@ class SCRM_Pro_Floor_Care_Plan {
         }
         update_post_meta( $post_id, self::META_PLAN_TIER, $tier['name'] );
         update_post_meta( $post_id, self::META_PRICE, (int) $tier['monthly_price'] );
+        update_post_meta( $post_id, '_segment', $segment );
+        update_post_meta( $post_id, '_is_emergency', $is_emergency ? 1 : 0 );
 
         $url = get_permalink( $post_id );
 
@@ -296,7 +308,7 @@ class SCRM_Pro_Floor_Care_Plan {
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'Floor Care Plan Generator', 'smart-crm-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'When an emergency job completes, generates a personalized care plan, publishes it as a private CPT page, and forwards the URL to ActiveCampaign as the floor_care_plan_url field. AC flows link to it in their post-job email.', 'smart-crm-pro' ); ?></p>
+            <p class="description"><?php esc_html_e( 'When a COMMERCIAL job completes (any urgency), generates a personalized care plan, publishes it as a private CPT page, and forwards the URL to ActiveCampaign as the floor_care_plan_url field. AC flows link to it in their post-job email. Commercial-emergency jobs get the same plan plus the midland-floor-care-plan-offer-emergency tag so AC can run a more urgent version of the offer.', 'smart-crm-pro' ); ?></p>
 
             <?php if ( $saved ) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Floor Care Plan settings saved.', 'smart-crm-pro' ); ?></p></div>
