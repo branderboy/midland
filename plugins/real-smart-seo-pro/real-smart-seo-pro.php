@@ -57,7 +57,9 @@ class RSSEO_Pro_Plugin {
 
     public function activate() {
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-database.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-geogrid.php';
         RSSEO_Pro_Database::create_tables();
+        RSSEO_Pro_Geogrid::create_tables();
         flush_rewrite_rules();
     }
 
@@ -83,6 +85,7 @@ class RSSEO_Pro_Plugin {
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-programmatic.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-indexnow.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-speed.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-geogrid.php';
     }
 
     private function init_classes() {
