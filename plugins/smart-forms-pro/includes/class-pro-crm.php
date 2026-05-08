@@ -38,18 +38,16 @@ class SFCO_Pro_CRM {
             $crm_mode = 'none';
         }
 
-        $crm_type = isset( $_POST['crm_type'] ) ? sanitize_key( $_POST['crm_type'] ) : '';
-        $api_key  = isset( $_POST['crm_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['crm_api_key'] ) ) : '';
-        $api_url  = isset( $_POST['crm_api_url'] ) ? esc_url_raw( wp_unslash( $_POST['crm_api_url'] ) ) : '';
-        $active   = isset( $_POST['crm_active'] ) ? 1 : 0;
+        $api_key = isset( $_POST['crm_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['crm_api_key'] ) ) : '';
+        $api_url = isset( $_POST['crm_api_url'] ) ? esc_url_raw( wp_unslash( $_POST['crm_api_url'] ) ) : '';
+        $active  = isset( $_POST['crm_active'] ) ? 1 : 0;
 
-        if ( 'external' === $crm_mode && empty( $crm_type ) ) {
-            wp_safe_redirect( admin_url( 'admin.php?page=sfco-crm&error=missing_type' ) );
+        if ( 'external' === $crm_mode && empty( $api_url ) ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=sfco-crm&error=missing_url' ) );
             exit;
         }
 
         update_option( 'sfco_pro_crm_mode', $crm_mode );
-        update_option( 'sfco_pro_crm_type', $crm_type );
         update_option( 'sfco_pro_crm_active', $active );
         update_option( 'sfco_pro_crm_api_url', untrailingslashit( $api_url ) );
 
@@ -67,15 +65,14 @@ class SFCO_Pro_CRM {
             wp_send_json_error( array( 'message' => 'Unauthorized' ) );
         }
 
-        $crm_type = get_option( 'sfco_pro_crm_type', '' );
-        $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
-        $api_url  = get_option( 'sfco_pro_crm_api_url', '' );
+        $api_key = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url = get_option( 'sfco_pro_crm_api_url', '' );
 
-        if ( empty( $crm_type ) || empty( $api_key ) ) {
+        if ( empty( $api_key ) ) {
             wp_send_json_error( array( 'message' => __( 'No CRM configured.', 'smart-forms-pro' ) ) );
         }
 
-        $result = $this->test_connection( $crm_type, $api_key, $api_url );
+        $result = $this->test_connection( $api_key, $api_url );
 
         if ( $result['success'] ) {
             wp_send_json_success( array( 'message' => $result['message'] ) );
@@ -84,41 +81,18 @@ class SFCO_Pro_CRM {
         }
     }
 
-    private function test_connection( $crm_type, $api_key, $api_url = '' ) {
-        switch ( $crm_type ) {
-            case 'hubspot':
-                $response = wp_remote_get( 'https://api.hubapi.com/crm/v3/objects/contacts?limit=1', array(
-                    'headers' => array( 'Authorization' => 'Bearer ' . $api_key ),
-                    'timeout' => 10,
-                ) );
-                break;
-
-            case 'pipedrive':
-                $response = wp_remote_get( 'https://api.pipedrive.com/v1/users/me?api_token=' . $api_key, array(
-                    'timeout' => 10,
-                ) );
-                break;
-
-            case 'activecampaign':
-                if ( empty( $api_url ) ) {
-                    return array( 'success' => false, 'message' => __( 'ActiveCampaign requires an API URL (e.g. https://your-account.api-us1.com).', 'smart-forms-pro' ) );
-                }
-                $response = wp_remote_get( untrailingslashit( $api_url ) . '/api/3/users/me', array(
-                    'headers' => array(
-                        'Api-Token' => $api_key,
-                        'Accept'    => 'application/json',
-                    ),
-                    'timeout' => 10,
-                ) );
-                break;
-
-            case 'salesforce':
-                // Salesforce requires OAuth - simplified test.
-                return array( 'success' => true, 'message' => __( 'Salesforce credentials saved. OAuth flow required for full connection.', 'smart-forms-pro' ) );
-
-            default:
-                return array( 'success' => false, 'message' => __( 'Unknown CRM type.', 'smart-forms-pro' ) );
+    private function test_connection( $api_key, $api_url ) {
+        if ( empty( $api_url ) ) {
+            return array( 'success' => false, 'message' => __( 'ActiveCampaign requires an API URL (e.g. https://your-account.api-us1.com).', 'smart-forms-pro' ) );
         }
+
+        $response = wp_remote_get( untrailingslashit( $api_url ) . '/api/3/users/me', array(
+            'headers' => array(
+                'Api-Token' => $api_key,
+                'Accept'    => 'application/json',
+            ),
+            'timeout' => 10,
+        ) );
 
         if ( is_wp_error( $response ) ) {
             return array( 'success' => false, 'message' => $response->get_error_message() );
@@ -127,10 +101,10 @@ class SFCO_Pro_CRM {
         $code = wp_remote_retrieve_response_code( $response );
 
         if ( 200 === $code ) {
-            return array( 'success' => true, 'message' => sprintf( __( 'Connected to %s successfully!', 'smart-forms-pro' ), ucfirst( $crm_type ) ) );
+            return array( 'success' => true, 'message' => __( 'Connected to ActiveCampaign successfully!', 'smart-forms-pro' ) );
         }
 
-        return array( 'success' => false, 'message' => sprintf( __( 'Connection failed (HTTP %d). Check your API key.', 'smart-forms-pro' ), $code ) );
+        return array( 'success' => false, 'message' => sprintf( __( 'Connection failed (HTTP %d). Check your API key and URL.', 'smart-forms-pro' ), $code ) );
     }
 
     /**
@@ -147,12 +121,11 @@ class SFCO_Pro_CRM {
             return;
         }
 
-        $crm_type = get_option( 'sfco_pro_crm_type', '' );
-        $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
-        $api_url  = get_option( 'sfco_pro_crm_api_url', '' );
-        $active   = get_option( 'sfco_pro_crm_active', 0 );
+        $api_key = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url = get_option( 'sfco_pro_crm_api_url', '' );
+        $active  = get_option( 'sfco_pro_crm_active', 0 );
 
-        if ( empty( $crm_type ) || empty( $api_key ) || ! $active ) {
+        if ( empty( $api_key ) || empty( $api_url ) || ! $active ) {
             return;
         }
 
@@ -165,52 +138,7 @@ class SFCO_Pro_CRM {
             'zip_code'     => $lead->zip_code ?? '',
         );
 
-        switch ( $crm_type ) {
-            case 'hubspot':
-                $this->push_to_hubspot( $api_key, $contact );
-                break;
-            case 'pipedrive':
-                $this->push_to_pipedrive( $api_key, $contact );
-                break;
-            case 'activecampaign':
-                if ( ! empty( $api_url ) ) {
-                    $this->push_to_activecampaign( $api_url, $api_key, $contact );
-                }
-                break;
-        }
-    }
-
-    private function push_to_hubspot( $api_key, $contact ) {
-        $name_parts = explode( ' ', $contact['name'], 2 );
-
-        wp_remote_post( 'https://api.hubapi.com/crm/v3/objects/contacts', array(
-            'headers' => array(
-                'Authorization' => 'Bearer ' . $api_key,
-                'Content-Type'  => 'application/json',
-            ),
-            'body' => wp_json_encode( array(
-                'properties' => array(
-                    'firstname' => $name_parts[0] ?? '',
-                    'lastname'  => $name_parts[1] ?? '',
-                    'email'     => $contact['email'],
-                    'phone'     => $contact['phone'],
-                    'zip'       => $contact['zip_code'],
-                ),
-            ) ),
-            'timeout' => 15,
-        ) );
-    }
-
-    private function push_to_pipedrive( $api_key, $contact ) {
-        wp_remote_post( 'https://api.pipedrive.com/v1/persons?api_token=' . $api_key, array(
-            'headers' => array( 'Content-Type' => 'application/json' ),
-            'body'    => wp_json_encode( array(
-                'name'  => $contact['name'],
-                'email' => array( array( 'value' => $contact['email'], 'primary' => true ) ),
-                'phone' => array( array( 'value' => $contact['phone'], 'primary' => true ) ),
-            ) ),
-            'timeout' => 15,
-        ) );
+        $this->push_to_activecampaign( $api_url, $api_key, $contact );
     }
 
     private function push_to_activecampaign( $api_url, $api_key, $contact ) {
@@ -280,20 +208,11 @@ class SFCO_Pro_CRM {
         }
 
         $crm_mode = get_option( 'sfco_pro_crm_mode', 'none' );
-        $crm_type = get_option( 'sfco_pro_crm_type', '' );
         $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
         $api_url  = get_option( 'sfco_pro_crm_api_url', '' );
         $active   = get_option( 'sfco_pro_crm_active', 0 );
 
         $scrm_active = defined( 'SCRM_PRO_VERSION' );
-
-        $crm_options = array(
-            ''               => __( 'Select CRM...', 'smart-forms-pro' ),
-            'hubspot'        => 'HubSpot',
-            'pipedrive'      => 'Pipedrive',
-            'activecampaign' => 'ActiveCampaign',
-            'salesforce'     => 'Salesforce',
-        );
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'CRM Integration', 'smart-forms-pro' ); ?></h1>
@@ -327,8 +246,8 @@ class SFCO_Pro_CRM {
                             </label>
                             <label style="display:block;">
                                 <input type="radio" name="crm_mode" value="external" <?php checked( $crm_mode, 'external' ); ?>>
-                                <strong><?php esc_html_e( 'External provider', 'smart-forms-pro' ); ?></strong>
-                                — <?php esc_html_e( 'HubSpot, Pipedrive, ActiveCampaign, or Salesforce.', 'smart-forms-pro' ); ?>
+                                <strong><?php esc_html_e( 'ActiveCampaign', 'smart-forms-pro' ); ?></strong>
+                                — <?php esc_html_e( 'Push leads to ActiveCampaign as contacts.', 'smart-forms-pro' ); ?>
                             </label>
                         </td>
                     </tr>
@@ -337,19 +256,9 @@ class SFCO_Pro_CRM {
                 <div id="sfco-crm-external-section" style="<?php echo 'external' === $crm_mode ? '' : 'display:none;'; ?>">
                 <table class="form-table">
                     <tr>
-                        <th><label for="crm_type"><?php esc_html_e( 'CRM Provider', 'smart-forms-pro' ); ?></label></th>
-                        <td>
-                            <select name="crm_type" id="crm_type">
-                                <?php foreach ( $crm_options as $val => $label ) : ?>
-                                    <option value="<?php echo esc_attr( $val ); ?>" <?php selected( $crm_type, $val ); ?>><?php echo esc_html( $label ); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr id="sfco-crm-url-row" style="<?php echo 'activecampaign' === $crm_type ? '' : 'display:none;'; ?>">
                         <th><label for="crm_api_url"><?php esc_html_e( 'API URL', 'smart-forms-pro' ); ?></label></th>
                         <td>
-                            <input type="url" name="crm_api_url" id="crm_api_url" class="regular-text" value="<?php echo esc_attr( $api_url ); ?>" placeholder="https://your-account.api-us1.com">
+                            <input type="url" name="crm_api_url" id="crm_api_url" class="regular-text" value="<?php echo esc_attr( $api_url ); ?>" placeholder="https://your-account.api-us1.com" required>
                             <p class="description"><?php esc_html_e( 'ActiveCampaign account URL. Found in Settings → Developer.', 'smart-forms-pro' ); ?></p>
                         </td>
                     </tr>
@@ -359,17 +268,6 @@ class SFCO_Pro_CRM {
                             <input type="password" name="crm_api_key" id="crm_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" placeholder="<?php esc_attr_e( 'Enter your API key...', 'smart-forms-pro' ); ?>">
                             <button type="button" class="button" id="sfco-test-crm"><?php esc_html_e( 'Test Connection', 'smart-forms-pro' ); ?></button>
                             <span id="sfco-crm-test-result"></span>
-                            <script>
-                            (function(){
-                                var sel = document.getElementById('crm_type');
-                                var row = document.getElementById('sfco-crm-url-row');
-                                if ( sel && row ) {
-                                    sel.addEventListener('change', function(){
-                                        row.style.display = ( sel.value === 'activecampaign' ) ? '' : 'none';
-                                    });
-                                }
-                            })();
-                            </script>
                         </td>
                     </tr>
                     <tr>
