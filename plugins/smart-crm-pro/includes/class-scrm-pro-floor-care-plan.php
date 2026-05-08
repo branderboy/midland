@@ -196,19 +196,21 @@ class SCRM_Pro_Floor_Care_Plan {
     }
 
     private function default_tiers() {
-        // Commercial pricing: floor area is the primary driver but tiers also
-        // imply visit cadence. Operator can override per-account in Settings.
+        // Commercial cadence tiers by site size. No price — quotes are handled
+        // off-page. monthly_price is left in the schema as 0 in case the
+        // operator wants to bring it back in a custom template later.
         return array(
-            array( 'name' => 'Site Care',   'min_sqft' => 0,     'max_sqft' => 4999,  'monthly_price' => 249 ),
-            array( 'name' => 'Site Care+',  'min_sqft' => 5000,  'max_sqft' => 14999, 'monthly_price' => 549 ),
-            array( 'name' => 'Facility',    'min_sqft' => 15000, 'max_sqft' => 39999, 'monthly_price' => 1149 ),
-            array( 'name' => 'Enterprise',  'min_sqft' => 40000, 'max_sqft' => 999999,'monthly_price' => 2199 ),
+            array( 'name' => 'Site Care',   'min_sqft' => 0,     'max_sqft' => 4999,  'monthly_price' => 0 ),
+            array( 'name' => 'Site Care+',  'min_sqft' => 5000,  'max_sqft' => 14999, 'monthly_price' => 0 ),
+            array( 'name' => 'Facility',    'min_sqft' => 15000, 'max_sqft' => 39999, 'monthly_price' => 0 ),
+            array( 'name' => 'Enterprise',  'min_sqft' => 40000, 'max_sqft' => 999999,'monthly_price' => 0 ),
         );
     }
 
     private function default_template() {
         // Standard commercial post-job plan. Calmer pitch — "we kept things
-        // running, here's how to keep them that way".
+        // running, here's how to keep them that way". No price on the page;
+        // pricing is sent separately by the account manager.
         return "<div style=\"max-width:680px;margin:0 auto;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1f2937;line-height:1.55;\">\n"
              . "<p style=\"color:#6b7280;font-size:13px;margin:0 0 6px;\">Floor Care Plan prepared for</p>\n"
              . "<h1 style=\"margin:0 0 4px;font-size:28px;\">{customer_name}</h1>\n"
@@ -217,7 +219,6 @@ class SCRM_Pro_Floor_Care_Plan {
              . "<div style=\"border:1px solid #e5e7eb;border-radius:10px;padding:22px;margin:24px 0;background:#f9fafb;\">\n"
              . "<p style=\"text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;font-size:12px;margin:0 0 6px;\">Recommended plan</p>\n"
              . "<h2 style=\"margin:0 0 6px;font-size:24px;\">{plan_tier}</h2>\n"
-             . "<p style=\"font-size:20px;font-weight:600;margin:0 0 4px;\">{monthly_price}/month</p>\n"
              . "<p style=\"color:#6b7280;font-size:14px;margin:0;\">Visits: every {frequency} &middot; Month-to-month, cancel any time.</p>\n"
              . "</div>\n\n"
              . "<h3 style=\"margin:0 0 10px;font-size:18px;\">What you get</h3>\n"
@@ -225,13 +226,13 @@ class SCRM_Pro_Floor_Care_Plan {
              . "<li style=\"margin-bottom:6px;\">Scheduled deep-clean visits sized to your traffic and floor type</li>\n"
              . "<li style=\"margin-bottom:6px;\">Annual sealant / protective coating refresh included</li>\n"
              . "<li style=\"margin-bottom:6px;\">Priority response &mdash; under 4 hours for plan members</li>\n"
-             . "<li style=\"margin-bottom:6px;\">15% off any work outside the plan (spills, post-event, build-outs)</li>\n"
+             . "<li style=\"margin-bottom:6px;\">Discount on any work outside the plan (spills, post-event, build-outs)</li>\n"
              . "<li style=\"margin-bottom:6px;\">A dedicated point of contact and a tracked maintenance log per site</li>\n"
              . "</ul>\n\n"
              . "<h3 style=\"margin:0 0 10px;font-size:18px;\">Why this tier</h3>\n"
              . "<p style=\"margin:0 0 24px;\">At ~{sqft} sq ft of {floor_type}, this is the cadence that keeps the surface from degrading between visits without overspending on cleaning you don't need.</p>\n\n"
-             . "<p><strong>Ready to start?</strong> Reply to the email this came in, or call us &mdash; we'll have your first scheduled visit on the calendar inside a business day.</p>\n\n"
-             . "<p style=\"color:#9ca3af;font-size:12px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:14px;\">Plan terms are reviewed annually. Pricing locked for 12 months from activation. {business_name}.</p>\n"
+             . "<p><strong>Ready to start?</strong> Reply to the email this came in, or call us &mdash; we'll send a quote tailored to your site and have your first scheduled visit on the calendar inside a business day.</p>\n\n"
+             . "<p style=\"color:#9ca3af;font-size:12px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:14px;\">Plan terms reviewed annually. {business_name}.</p>\n"
              . "</div>";
     }
 
@@ -239,6 +240,7 @@ class SCRM_Pro_Floor_Care_Plan {
         // Commercial-emergency variant. The customer just had a costly call-out;
         // the pitch is "you don't want this to happen again — here's the
         // protection plan". Stronger urgency, leads with the prevention angle.
+        // No price on the page; quote is sent separately.
         return "<div style=\"max-width:680px;margin:0 auto;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1f2937;line-height:1.55;\">\n"
              . "<p style=\"color:#b91c1c;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px;\">Post-emergency plan</p>\n"
              . "<h1 style=\"margin:0 0 4px;font-size:28px;\">{customer_name}, let's not do that again.</h1>\n"
@@ -248,7 +250,6 @@ class SCRM_Pro_Floor_Care_Plan {
              . "<div style=\"border:2px solid #b91c1c;border-radius:10px;padding:22px;margin:24px 0;background:#fef2f2;\">\n"
              . "<p style=\"text-transform:uppercase;letter-spacing:0.08em;color:#b91c1c;font-size:12px;margin:0 0 6px;\">Recommended &middot; Priority enrollment</p>\n"
              . "<h2 style=\"margin:0 0 6px;font-size:24px;\">{plan_tier}</h2>\n"
-             . "<p style=\"font-size:20px;font-weight:600;margin:0 0 4px;\">{monthly_price}/month</p>\n"
              . "<p style=\"color:#6b7280;font-size:14px;margin:0;\">Visits: every {frequency} &middot; Same-day emergency window included &middot; Month-to-month.</p>\n"
              . "</div>\n\n"
              . "<h3 style=\"margin:0 0 10px;font-size:18px;\">What changes when you're on the plan</h3>\n"
@@ -256,13 +257,13 @@ class SCRM_Pro_Floor_Care_Plan {
              . "<li style=\"margin-bottom:6px;\"><strong>2-hour emergency response window</strong> &mdash; not the standard 4 hours</li>\n"
              . "<li style=\"margin-bottom:6px;\">Quarterly inspection log so we catch failures before they become call-outs</li>\n"
              . "<li style=\"margin-bottom:6px;\">Sealant + protective coating refresh on the schedule it actually needs</li>\n"
-             . "<li style=\"margin-bottom:6px;\">25% off any out-of-plan work (vs 15% for standard plans)</li>\n"
+             . "<li style=\"margin-bottom:6px;\">Better discount on any out-of-plan work than non-plan customers get</li>\n"
              . "<li style=\"margin-bottom:6px;\">Direct line to the technician who knows your site</li>\n"
              . "</ul>\n\n"
-             . "<h3 style=\"margin:0 0 10px;font-size:18px;\">The math</h3>\n"
-             . "<p style=\"margin:0 0 24px;\">A single emergency call-out on a site your size typically runs 4&ndash;8x a monthly plan visit. One avoided emergency a year usually pays for the plan twice over. We'll show you the math against your actual call-out invoice if you want it.</p>\n\n"
-             . "<p><strong>Lock in priority enrollment this week.</strong> Reply to the email this came in or call us &mdash; we'll have your first scheduled inspection on the calendar inside a business day, and your priority response window starts the moment you sign up.</p>\n\n"
-             . "<p style=\"color:#9ca3af;font-size:12px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:14px;\">Plan terms reviewed annually. Pricing locked for 12 months from activation. {business_name}.</p>\n"
+             . "<h3 style=\"margin:0 0 10px;font-size:18px;\">The case for it</h3>\n"
+             . "<p style=\"margin:0 0 24px;\">A single emergency call-out on a site your size typically runs several times what a routine plan visit would. One avoided emergency a year usually pays for the plan multiple times over &mdash; and we'll show you the math against your actual call-out invoice when we send the quote.</p>\n\n"
+             . "<p><strong>Lock in priority enrollment this week.</strong> Reply to the email this came in or call us &mdash; we'll send your tailored quote and have your first scheduled inspection on the calendar inside a business day. Your priority response window starts the moment you sign up.</p>\n\n"
+             . "<p style=\"color:#9ca3af;font-size:12px;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:14px;\">Plan terms reviewed annually. {business_name}.</p>\n"
              . "</div>";
     }
 
