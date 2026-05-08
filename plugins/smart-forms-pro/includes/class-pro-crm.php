@@ -35,6 +35,7 @@ class SFCO_Pro_CRM {
 
         $crm_type = isset( $_POST['crm_type'] ) ? sanitize_key( $_POST['crm_type'] ) : '';
         $api_key  = isset( $_POST['crm_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['crm_api_key'] ) ) : '';
+        $api_url  = isset( $_POST['crm_api_url'] ) ? esc_url_raw( wp_unslash( $_POST['crm_api_url'] ) ) : '';
         $active   = isset( $_POST['crm_active'] ) ? 1 : 0;
 
         if ( empty( $crm_type ) ) {
@@ -44,6 +45,7 @@ class SFCO_Pro_CRM {
 
         update_option( 'sfco_pro_crm_type', $crm_type );
         update_option( 'sfco_pro_crm_active', $active );
+        update_option( 'sfco_pro_crm_api_url', untrailingslashit( $api_url ) );
 
         if ( ! empty( $api_key ) ) {
             update_option( 'sfco_pro_crm_api_key', $api_key );
@@ -61,12 +63,13 @@ class SFCO_Pro_CRM {
 
         $crm_type = get_option( 'sfco_pro_crm_type', '' );
         $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url  = get_option( 'sfco_pro_crm_api_url', '' );
 
         if ( empty( $crm_type ) || empty( $api_key ) ) {
             wp_send_json_error( array( 'message' => __( 'No CRM configured.', 'smart-forms-pro' ) ) );
         }
 
-        $result = $this->test_connection( $crm_type, $api_key );
+        $result = $this->test_connection( $crm_type, $api_key, $api_url );
 
         if ( $result['success'] ) {
             wp_send_json_success( array( 'message' => $result['message'] ) );
@@ -75,7 +78,7 @@ class SFCO_Pro_CRM {
         }
     }
 
-    private function test_connection( $crm_type, $api_key ) {
+    private function test_connection( $crm_type, $api_key, $api_url = '' ) {
         switch ( $crm_type ) {
             case 'hubspot':
                 $response = wp_remote_get( 'https://api.hubapi.com/crm/v3/objects/contacts?limit=1', array(
@@ -86,6 +89,19 @@ class SFCO_Pro_CRM {
 
             case 'pipedrive':
                 $response = wp_remote_get( 'https://api.pipedrive.com/v1/users/me?api_token=' . $api_key, array(
+                    'timeout' => 10,
+                ) );
+                break;
+
+            case 'activecampaign':
+                if ( empty( $api_url ) ) {
+                    return array( 'success' => false, 'message' => __( 'ActiveCampaign requires an API URL (e.g. https://your-account.api-us1.com).', 'smart-forms-pro' ) );
+                }
+                $response = wp_remote_get( untrailingslashit( $api_url ) . '/api/3/users/me', array(
+                    'headers' => array(
+                        'Api-Token' => $api_key,
+                        'Accept'    => 'application/json',
+                    ),
                     'timeout' => 10,
                 ) );
                 break;
@@ -121,6 +137,7 @@ class SFCO_Pro_CRM {
 
         $crm_type = get_option( 'sfco_pro_crm_type', '' );
         $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url  = get_option( 'sfco_pro_crm_api_url', '' );
         $active   = get_option( 'sfco_pro_crm_active', 0 );
 
         if ( empty( $crm_type ) || empty( $api_key ) || ! $active ) {
@@ -142,6 +159,11 @@ class SFCO_Pro_CRM {
                 break;
             case 'pipedrive':
                 $this->push_to_pipedrive( $api_key, $contact );
+                break;
+            case 'activecampaign':
+                if ( ! empty( $api_url ) ) {
+                    $this->push_to_activecampaign( $api_url, $api_key, $contact );
+                }
                 break;
         }
     }
@@ -179,6 +201,44 @@ class SFCO_Pro_CRM {
         ) );
     }
 
+    private function push_to_activecampaign( $api_url, $api_key, $contact ) {
+        $name_parts = explode( ' ', $contact['name'], 2 );
+
+        $field_values = array();
+        if ( ! empty( $contact['project_type'] ) ) {
+            $field_values[] = array( 'field' => 'project_type', 'value' => $contact['project_type'] );
+        }
+        if ( ! empty( $contact['timeline'] ) ) {
+            $field_values[] = array( 'field' => 'timeline', 'value' => $contact['timeline'] );
+        }
+        if ( ! empty( $contact['zip_code'] ) ) {
+            $field_values[] = array( 'field' => 'zip_code', 'value' => $contact['zip_code'] );
+        }
+
+        $payload = array(
+            'contact' => array(
+                'email'     => $contact['email'],
+                'firstName' => $name_parts[0] ?? '',
+                'lastName'  => $name_parts[1] ?? '',
+                'phone'     => $contact['phone'],
+            ),
+        );
+
+        if ( ! empty( $field_values ) ) {
+            $payload['contact']['fieldValues'] = $field_values;
+        }
+
+        wp_remote_post( untrailingslashit( $api_url ) . '/api/3/contact/sync', array(
+            'headers' => array(
+                'Api-Token'    => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
+            ),
+            'body'    => wp_json_encode( $payload ),
+            'timeout' => 15,
+        ) );
+    }
+
     public function ajax_sync_lead() {
         check_ajax_referer( 'sfco_pro_admin', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
@@ -209,13 +269,15 @@ class SFCO_Pro_CRM {
 
         $crm_type = get_option( 'sfco_pro_crm_type', '' );
         $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url  = get_option( 'sfco_pro_crm_api_url', '' );
         $active   = get_option( 'sfco_pro_crm_active', 0 );
 
         $crm_options = array(
-            ''          => __( 'Select CRM...', 'smart-forms-pro' ),
-            'hubspot'   => 'HubSpot',
-            'pipedrive' => 'Pipedrive',
-            'salesforce' => 'Salesforce',
+            ''               => __( 'Select CRM...', 'smart-forms-pro' ),
+            'hubspot'        => 'HubSpot',
+            'pipedrive'      => 'Pipedrive',
+            'activecampaign' => 'ActiveCampaign',
+            'salesforce'     => 'Salesforce',
         );
         ?>
         <div class="wrap">
@@ -240,12 +302,30 @@ class SFCO_Pro_CRM {
                             </select>
                         </td>
                     </tr>
+                    <tr id="sfco-crm-url-row" style="<?php echo 'activecampaign' === $crm_type ? '' : 'display:none;'; ?>">
+                        <th><label for="crm_api_url"><?php esc_html_e( 'API URL', 'smart-forms-pro' ); ?></label></th>
+                        <td>
+                            <input type="url" name="crm_api_url" id="crm_api_url" class="regular-text" value="<?php echo esc_attr( $api_url ); ?>" placeholder="https://your-account.api-us1.com">
+                            <p class="description"><?php esc_html_e( 'ActiveCampaign account URL. Found in Settings → Developer.', 'smart-forms-pro' ); ?></p>
+                        </td>
+                    </tr>
                     <tr>
                         <th><label for="crm_api_key"><?php esc_html_e( 'API Key', 'smart-forms-pro' ); ?></label></th>
                         <td>
                             <input type="password" name="crm_api_key" id="crm_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" placeholder="<?php esc_attr_e( 'Enter your API key...', 'smart-forms-pro' ); ?>">
                             <button type="button" class="button" id="sfco-test-crm"><?php esc_html_e( 'Test Connection', 'smart-forms-pro' ); ?></button>
                             <span id="sfco-crm-test-result"></span>
+                            <script>
+                            (function(){
+                                var sel = document.getElementById('crm_type');
+                                var row = document.getElementById('sfco-crm-url-row');
+                                if ( sel && row ) {
+                                    sel.addEventListener('change', function(){
+                                        row.style.display = ( sel.value === 'activecampaign' ) ? '' : 'none';
+                                    });
+                                }
+                            })();
+                            </script>
                         </td>
                     </tr>
                     <tr>
