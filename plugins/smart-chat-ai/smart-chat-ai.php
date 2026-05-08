@@ -91,6 +91,8 @@ class SCAI_Plugin {
         require_once SCAI_PLUGIN_DIR . 'includes/class-analytics.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-handoff.php';
         SCAI_Handoff::get_instance();
+        require_once SCAI_PLUGIN_DIR . 'includes/class-content-context.php';
+        SCAI_Content_Context::get_instance();
     }
     
     /**
