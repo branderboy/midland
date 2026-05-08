@@ -167,24 +167,37 @@ class RSSEO_Pro_Programmatic {
         $raw_locations = sanitize_textarea_field( wp_unslash( $_POST['bulk_locations'] ?? '' ) );
         $bulk_services = isset( $_POST['bulk_services'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bulk_services'] ) ) : array();
 
-        $lines   = array_filter( array_map( 'trim', explode( "\n", $raw_locations ) ) );
+        $lines = array_filter( array_map( 'trim', explode( "\n", $raw_locations ) ) );
+
+        // Hard cap to keep wp_insert_post + IndexNow + term creation under one request budget.
+        // Bigger batches should be split or queued externally.
+        $batch_limit = (int) apply_filters( 'rsseo_programmatic_batch_limit', 50 );
+        $skipped     = max( 0, count( $lines ) - $batch_limit );
+        $lines       = array_slice( $lines, 0, $batch_limit );
+
         $created = 0;
         $urls    = array();
 
         foreach ( $lines as $line ) {
-            $parts   = array_map( 'trim', explode( ',', $line ) );
-            $city    = $parts[0] ?? '';
-            $state   = $parts[1] ?? 'MD';
-            $wiki    = $parts[2] ?? '';
+            // Limit to 3 splits so a Wikipedia URL like "Bethesda,_Maryland" stays intact in $parts[2].
+            $parts = array_map( 'trim', explode( ',', $line, 3 ) );
+            $city  = $parts[0] ?? '';
+            $state = $parts[1] ?? 'MD';
+            $wiki  = $parts[2] ?? '';
 
             if ( empty( $city ) ) {
                 continue;
             }
 
+            // Match on city+state so "Bethesda, MD" and "Bethesda, OH" don't collide.
             $existing = get_posts( array(
                 'post_type'   => self::CPT,
-                'meta_key'    => '_mfc_city', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-                'meta_value'  => $city,       // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+                'meta_query'  => array(
+                    'relation' => 'AND',
+                    array( 'key' => '_mfc_city', 'value' => $city, 'compare' => '=' ),
+                    array( 'key' => '_mfc_state', 'value' => $state, 'compare' => '=' ),
+                ),
                 'fields'      => 'ids',
                 'numberposts' => 1,
             ) );
@@ -236,7 +249,11 @@ class RSSEO_Pro_Programmatic {
             do_action( 'rsseo_indexnow_batch_ping', $urls );
         }
 
-        wp_safe_redirect( admin_url( 'admin.php?page=rsseo-programmatic&generated=' . $created ) );
+        $redirect = admin_url( 'admin.php?page=rsseo-programmatic&generated=' . $created );
+        if ( $skipped > 0 ) {
+            $redirect = add_query_arg( 'skipped', $skipped, $redirect );
+        }
+        wp_safe_redirect( $redirect );
         exit;
     }
 
@@ -365,14 +382,17 @@ class RSSEO_Pro_Programmatic {
         $svc_str = ! empty( $services ) ? implode( ', ', array_slice( $services, 0, 3 ) ) : 'floor care';
         $desc    = "Expert {$svc_str} in {$city}, {$state}. {$business} serves the DMV area — licensed, insured, same-day available. Free quote.";
 
-        echo '<meta name="description" content="' . esc_attr( substr( $desc, 0, 160 ) ) . '">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // Multibyte-safe truncate so a Spanish/French character at the boundary doesn't get half-chopped.
+        $truncated = function_exists( 'mb_substr' ) ? mb_substr( $desc, 0, 160 ) : substr( $desc, 0, 160 );
+        echo '<meta name="description" content="' . esc_attr( $truncated ) . '">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     public function render_page() {
         // phpcs:disable WordPress.Security.NonceVerification.Recommended
-        $generated     = isset( $_GET['generated'] ) ? absint( $_GET['generated'] ) : -1;
+        $generated      = isset( $_GET['generated'] ) ? absint( $_GET['generated'] ) : -1;
+        $skipped        = isset( $_GET['skipped'] ) ? absint( $_GET['skipped'] ) : 0;
         $location_saved = isset( $_GET['location_saved'] );
-        $error         = isset( $_GET['error'] ) ? sanitize_key( $_GET['error'] ) : '';
+        $error          = isset( $_GET['error'] ) ? sanitize_key( $_GET['error'] ) : '';
         // phpcs:enable
 
         $default_services = array(
@@ -404,6 +424,9 @@ class RSSEO_Pro_Programmatic {
 
             <?php if ( $generated >= 0 ) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php printf( esc_html__( '%d new location pages generated and submitted to IndexNow.', 'real-smart-seo-pro' ), $generated ); ?></p></div>
+            <?php endif; ?>
+            <?php if ( $skipped > 0 ) : ?>
+                <div class="notice notice-warning is-dismissible"><p><?php printf( esc_html__( '%d locations skipped because the batch limit was exceeded. Submit them in another run.', 'real-smart-seo-pro' ), $skipped ); ?></p></div>
             <?php endif; ?>
             <?php if ( $location_saved ) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Location saved and submitted to IndexNow.', 'real-smart-seo-pro' ); ?></p></div>

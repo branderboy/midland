@@ -62,7 +62,7 @@ class SRP_Survey {
             'survey_sent_at' => current_time( 'mysql' ),
         ) );
 
-        $token    = base64_encode( (string) $survey_id ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+        $token    = SRP_DB::build_token( $survey_id );
         $survey_url = add_query_arg( array(
             'srp_survey' => $token,
         ), home_url( '/' ) );
@@ -80,9 +80,12 @@ class SRP_Survey {
      * Render the survey email HTML.
      */
     private function survey_email_html( $greeting, $business, $survey_url, $token ) {
+        // Email shows score buttons that link to the on-site confirmation page.
+        // The actual score submission requires a POST + nonce there, so email-scanner
+        // pre-fetches (Mimecast / Defender / etc.) cannot record a fake score.
         $scores_html = '';
         for ( $i = 0; $i <= 10; $i++ ) {
-            $score_url    = add_query_arg( array( 'srp_survey' => $token, 'score' => $i ), home_url( '/' ) );
+            $score_url    = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
             $bg           = $i >= self::THRESHOLD ? '#22c55e' : ( $i >= 7 ? '#f59e0b' : '#ef4444' );
             $scores_html .= '<a href="' . esc_url( $score_url ) . '" style="display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:16px;border-radius:6px;text-decoration:none;margin:2px;">' . $i . '</a>';
         }
@@ -114,64 +117,100 @@ class SRP_Survey {
     }
 
     /**
-     * Handle the survey URL click (score embedded in URL).
+     * Handle the survey URL click.
+     * GET = render the confirm page (shows a Submit button if a score is "picked" via ?pick=).
+     * POST = actually record the score (nonce-verified, real user click required).
+     * This blocks email-scanner false positives.
      */
     public function handle_survey_page() {
         // phpcs:disable WordPress.Security.NonceVerification.Recommended
-        if ( ! isset( $_GET['srp_survey'] ) ) {
+        if ( ! isset( $_GET['srp_survey'] ) && ! isset( $_POST['srp_survey'] ) ) {
             return;
         }
-
-        $token = sanitize_text_field( wp_unslash( $_GET['srp_survey'] ) );
-        $score = isset( $_GET['score'] ) ? absint( $_GET['score'] ) : null;
         // phpcs:enable
 
+        if ( 'POST' === ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) && isset( $_POST['srp_survey'] ) ) {
+            $token = sanitize_text_field( wp_unslash( $_POST['srp_survey'] ) );
+            $survey = SRP_DB::get_survey_by_token( $token );
+            if ( ! $survey ) {
+                return;
+            }
+
+            $nonce = isset( $_POST['_srp_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_srp_nonce'] ) ) : '';
+            if ( ! wp_verify_nonce( $nonce, 'srp_score_' . $token ) ) {
+                wp_die( esc_html__( 'Security check failed. Please reload the page from the email link and try again.', 'smart-reviews-pro' ), 403 );
+            }
+
+            $score = isset( $_POST['score'] ) ? (int) $_POST['score'] : null;
+            if ( null !== $score && null === $survey->score ) {
+                $score = min( 10, max( 0, $score ) );
+                SRP_DB::update_survey( $survey->id, array(
+                    'score'        => $score,
+                    'responded_at' => current_time( 'mysql' ),
+                ) );
+                $survey->score = $score;
+                do_action( 'srp_score_received', $survey->id, $score, $survey );
+            }
+
+            $this->render_survey_page( $survey, $token );
+            exit;
+        }
+
+        // GET path — render the confirm page.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $token = sanitize_text_field( wp_unslash( $_GET['srp_survey'] ?? '' ) );
         $survey = SRP_DB::get_survey_by_token( $token );
         if ( ! $survey ) {
             return;
         }
 
-        if ( null !== $score && null === $survey->score ) {
-            $score = min( 10, max( 0, $score ) );
-
-            SRP_DB::update_survey( $survey->id, array(
-                'score'        => $score,
-                'responded_at' => current_time( 'mysql' ),
-            ) );
-
-            // Reload with updated survey.
-            $survey->score = $score;
-
-            // Fire the router action.
-            do_action( 'srp_score_received', $survey->id, $score, $survey );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $picked = isset( $_GET['pick'] ) ? (int) $_GET['pick'] : null;
+        if ( null !== $picked ) {
+            $picked = min( 10, max( 0, $picked ) );
         }
 
-        // Render the response page.
-        $this->render_survey_page( $survey, $token );
+        $this->render_survey_page( $survey, $token, $picked );
         exit;
     }
 
     /**
      * Output the inline survey response page.
+     * @param object   $survey
+     * @param string   $token
+     * @param int|null $picked Score the user picked from the email link, awaiting Submit.
      */
-    private function render_survey_page( $survey, $token ) {
+    private function render_survey_page( $survey, $token, $picked = null ) {
         $business = get_bloginfo( 'name' );
         $score    = $survey->score;
 
         if ( null === $score || '' === $score ) {
-            // Survey not yet answered — show the score buttons.
             $scores_html = '';
             for ( $i = 0; $i <= 10; $i++ ) {
-                $url = add_query_arg( array( 'srp_survey' => $token, 'score' => $i ), home_url( '/' ) );
+                $url = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
                 $bg  = $i >= self::THRESHOLD ? '#22c55e' : ( $i >= 7 ? '#f59e0b' : '#ef4444' );
                 $scores_html .= '<a href="' . esc_url( $url ) . '" style="display:inline-block;width:48px;height:48px;line-height:48px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '</a>';
             }
+
+            $confirm_html = '';
+            if ( null !== $picked ) {
+                $bg = $picked >= self::THRESHOLD ? '#22c55e' : ( $picked >= 7 ? '#f59e0b' : '#ef4444' );
+                $confirm_html = '
+<form method="post" action="' . esc_url( home_url( '/' ) ) . '" style="margin-top:24px;">
+  <input type="hidden" name="srp_survey" value="' . esc_attr( $token ) . '">
+  <input type="hidden" name="score" value="' . esc_attr( (string) $picked ) . '">
+  <input type="hidden" name="_srp_nonce" value="' . esc_attr( wp_create_nonce( 'srp_score_' . $token ) ) . '">
+  <p style="color:#333;font-size:15px;margin:0 0 16px;">You picked <strong style="color:' . $bg . ';">' . esc_html( (string) $picked ) . ' / 10</strong>. Tap submit to confirm.</p>
+  <button type="submit" style="background:#1a1a2e;color:#fff;border:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">Submit my score</button>
+</form>';
+            }
+
             echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How did we do?</title></head>
 <body style="margin:0;padding:40px 16px;background:#f4f4f4;font-family:system-ui,sans-serif;text-align:center;">
 <div style="max-width:540px;margin:0 auto;background:#fff;border-radius:12px;padding:40px;box-shadow:0 2px 16px rgba(0,0,0,.08);">
 <h1 style="font-size:22px;margin:0 0 8px;">How was your experience?</h1>
 <p style="color:#555;margin:0 0 32px;">0 = Not likely at all &nbsp;&nbsp; 10 = Extremely likely</p>
-' . $scores_html . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+' . $scores_html . $confirm_html . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 '</div></body></html>';
             return;
         }
@@ -254,36 +293,56 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
     }
 
     /**
-     * Cron: send reminder emails at 24h and 48h for non-respondents.
+     * Cron: send reminder emails at 24h (reminder1) and 48h (reminder2) for non-respondents.
      */
     public function process_reminders() {
-        $pending = SRP_DB::get_pending_reminders();
-        if ( ! $pending ) {
-            return;
-        }
-
         $business = get_bloginfo( 'name' );
 
-        foreach ( $pending as $survey ) {
-            $token  = base64_encode( (string) $survey->id ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
-            $url    = add_query_arg( array( 'srp_survey' => $token ), home_url( '/' ) );
-            $name   = $survey->customer_name ?: 'there';
-            $email  = $survey->customer_email;
-
-            $sent_at = strtotime( $survey->survey_sent_at );
-            $now     = time();
-
-            // Reminder 1: ~24h after survey sent, if no reminder1 yet.
-            if ( null === $survey->reminder1_at && ( $now - $sent_at ) >= DAY_IN_SECONDS ) {
-                wp_mail(
-                    $email,
-                    "Quick reminder — how did {$business} do?",
-                    "<p>Hi {$name}, we sent you a quick survey yesterday. If you have 20 seconds: <a href='{$url}'>rate your experience here</a>.</p>",
-                    array( 'Content-Type: text/html; charset=UTF-8' )
-                );
-                SRP_DB::update_survey( $survey->id, array( 'reminder1_at' => current_time( 'mysql' ) ) );
-            }
+        foreach ( (array) SRP_DB::get_pending_reminders() as $survey ) {
+            $this->send_reminder( $survey, $business, 1 );
+            SRP_DB::update_survey( $survey->id, array( 'reminder1_at' => current_time( 'mysql' ) ) );
         }
+
+        foreach ( (array) SRP_DB::get_pending_reminders_second() as $survey ) {
+            $this->send_reminder( $survey, $business, 2 );
+            SRP_DB::update_survey( $survey->id, array( 'reminder2_at' => current_time( 'mysql' ) ) );
+        }
+    }
+
+    private function send_reminder( $survey, $business, $which ) {
+        $email = sanitize_email( $survey->customer_email );
+        if ( ! is_email( $email ) ) {
+            return;
+        }
+        $token = SRP_DB::build_token( $survey->id );
+        $url   = add_query_arg( array( 'srp_survey' => $token ), home_url( '/' ) );
+        $name  = $survey->customer_name ?: 'there';
+
+        $subject = 1 === $which
+            ? "Quick reminder — how did {$business} do?"
+            : "Last chance to share your feedback — {$business}";
+
+        $intro = 1 === $which
+            ? 'we sent you a quick survey yesterday'
+            : 'we are still hoping to hear from you';
+
+        $body = '<!DOCTYPE html><html><body style="font-family:system-ui,sans-serif;background:#f4f4f4;padding:40px 16px;">'
+            . '<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;">'
+            . '<p style="font-size:16px;color:#333;">Hi ' . esc_html( $name ) . ',</p>'
+            . '<p style="color:#555;">' . esc_html( ucfirst( $intro ) ) . '. If you have 20 seconds: '
+            . '<a href="' . esc_url( $url ) . '" style="color:#2563eb;font-weight:600;">rate your experience here</a>.</p>'
+            . '<p style="color:#aaa;font-size:13px;margin-top:32px;">' . esc_html( $business ) . '</p>'
+            . '</div></body></html>';
+
+        wp_mail( $email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
+    }
+
+    public static function safe_truncate( $string, $length ) {
+        $string = (string) $string;
+        if ( function_exists( 'mb_substr' ) ) {
+            return mb_substr( $string, 0, $length );
+        }
+        return substr( $string, 0, $length );
     }
 }
 

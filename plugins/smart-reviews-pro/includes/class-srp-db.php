@@ -46,13 +46,58 @@ class SRP_DB {
         $wpdb->update( $wpdb->prefix . 'srp_surveys', $data, array( 'id' => $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
     }
 
+    /**
+     * Resolve a HMAC-signed token "<id>.<sig>" to a survey row.
+     * Returns null if the signature is invalid or the row is missing.
+     */
     public static function get_survey_by_token( $token ) {
-        global $wpdb;
-        $id = (int) base64_decode( $token ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+        $id = self::verify_token( (string) $token );
         if ( ! $id ) {
             return null;
         }
+        global $wpdb;
         return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}srp_surveys WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    }
+
+    /**
+     * Build a token from a survey id: "<id>.<hmac>".
+     */
+    public static function build_token( $survey_id ) {
+        $survey_id = (int) $survey_id;
+        return $survey_id . '.' . self::sign( $survey_id );
+    }
+
+    /**
+     * Validate a token and return the survey id, or 0 if it fails.
+     */
+    public static function verify_token( $token ) {
+        if ( ! is_string( $token ) || false === strpos( $token, '.' ) ) {
+            return 0;
+        }
+        list( $raw_id, $sig ) = array_pad( explode( '.', $token, 2 ), 2, '' );
+        $survey_id = (int) $raw_id;
+        if ( $survey_id <= 0 || '' === $sig ) {
+            return 0;
+        }
+        $expected = self::sign( $survey_id );
+        if ( ! hash_equals( $expected, $sig ) ) {
+            return 0;
+        }
+        return $survey_id;
+    }
+
+    private static function sign( $survey_id ) {
+        $secret = self::get_secret();
+        return hash_hmac( 'sha256', 'srp:' . (int) $survey_id, $secret );
+    }
+
+    private static function get_secret() {
+        $secret = (string) get_option( 'srp_token_secret', '' );
+        if ( '' === $secret ) {
+            $secret = wp_generate_password( 64, true, true );
+            add_option( 'srp_token_secret', $secret, '', 'no' );
+        }
+        return $secret;
     }
 
     public static function get_surveys( $args = array() ) {
@@ -75,17 +120,38 @@ class SRP_DB {
         return $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}srp_surveys WHERE {$where} ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}" );
     }
 
+    /**
+     * Surveys that need their first reminder (24h after send, no reminder1 yet).
+     */
     public static function get_pending_reminders() {
         global $wpdb;
-        $threshold = date( 'Y-m-d H:i:s', strtotime( '-24 hours' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        return $wpdb->get_results(
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
+        return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}srp_surveys
                 WHERE score IS NULL
                 AND survey_sent_at IS NOT NULL
                 AND survey_sent_at < %s
                 AND reminder1_at IS NULL",
+                $threshold
+            )
+        );
+    }
+
+    /**
+     * Surveys that need their second reminder (48h after send, reminder1 already gone, no reminder2 yet).
+     */
+    public static function get_pending_reminders_second() {
+        global $wpdb;
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-48 hours' ) );
+        return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}srp_surveys
+                WHERE score IS NULL
+                AND survey_sent_at IS NOT NULL
+                AND survey_sent_at < %s
+                AND reminder1_at IS NOT NULL
+                AND reminder2_at IS NULL",
                 $threshold
             )
         );

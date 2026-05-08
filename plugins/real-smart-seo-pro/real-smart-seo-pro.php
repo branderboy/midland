@@ -39,6 +39,21 @@ class RSSEO_Pro_Plugin {
     private function __construct() {
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
         add_action( 'plugins_loaded', array( $this, 'check_dependencies' ), 20 );
+        add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
+    }
+
+    /**
+     * Register a 'weekly' cron interval used by Geo-Grid and AI Rank modules.
+     * WordPress core ships hourly/twicedaily/daily — weekly must be added explicitly.
+     */
+    public function add_cron_schedules( $schedules ) {
+        if ( ! isset( $schedules['weekly'] ) ) {
+            $schedules['weekly'] = array(
+                'interval' => WEEK_IN_SECONDS,
+                'display'  => __( 'Once Weekly', 'real-smart-seo-pro' ),
+            );
+        }
+        return $schedules;
     }
 
     public function check_dependencies() {
@@ -57,7 +72,11 @@ class RSSEO_Pro_Plugin {
 
     public function activate() {
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-database.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-geogrid.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-ai-rank.php';
         RSSEO_Pro_Database::create_tables();
+        RSSEO_Pro_Geogrid::create_tables();
+        RSSEO_Pro_AI_Rank::create_tables();
         flush_rewrite_rules();
     }
 
@@ -82,6 +101,9 @@ class RSSEO_Pro_Plugin {
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-gsc-cleanup.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-programmatic.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-indexnow.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-speed.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-geogrid.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-ai-rank.php';
     }
 
     private function init_classes() {

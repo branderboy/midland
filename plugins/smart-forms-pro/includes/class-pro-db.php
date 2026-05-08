@@ -42,15 +42,13 @@ class SFCO_Pro_DB {
 
         CREATE TABLE {$crm_sync_table} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            crm_type varchar(50) NOT NULL,
             api_key_encrypted text NOT NULL,
             field_mapping longtext DEFAULT NULL,
             active tinyint(1) DEFAULT 1,
             last_sync_at datetime DEFAULT NULL,
             sync_count int(11) DEFAULT 0,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY crm_type (crm_type)
+            PRIMARY KEY (id)
         ) {$charset_collate};
 
         CREATE TABLE {$team_table} (

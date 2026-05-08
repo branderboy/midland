@@ -184,6 +184,52 @@ class RSSEO_Pro_DataForSEO {
     }
 
     /**
+     * Get live SERP for a keyword at a specific lat/lng — used by the Geo-Grid Rank Tracker.
+     * Returns the same shape as get_serp().
+     *
+     * @param string $keyword
+     * @param float  $lat
+     * @param float  $lng
+     * @param int    $radius_km
+     * @param string $language_code
+     * @param int    $depth
+     * @return array|WP_Error
+     */
+    public static function get_serp_at_coordinate( $keyword, $lat, $lng, $radius_km = 5, $language_code = 'en', $depth = 100 ) {
+        $payload = array(
+            array(
+                'keyword'             => sanitize_text_field( $keyword ),
+                'location_coordinate' => sprintf( '%F,%F,%d', (float) $lat, (float) $lng, (int) $radius_km ),
+                'language_code'       => sanitize_text_field( $language_code ),
+                'depth'               => (int) $depth,
+            ),
+        );
+
+        $result = self::post( 'serp/google/organic/live/advanced', $payload );
+
+        if ( is_wp_error( $result ) ) {
+            return $result;
+        }
+
+        $items  = $result['tasks'][0]['result'][0]['items'] ?? array();
+        $output = array();
+
+        foreach ( $items as $item ) {
+            if ( 'organic' !== ( $item['type'] ?? '' ) ) {
+                continue;
+            }
+            $output[] = array(
+                'rank'   => $item['rank_absolute'],
+                'url'    => $item['url'],
+                'title'  => $item['title'],
+                'domain' => $item['domain'],
+            );
+        }
+
+        return $output;
+    }
+
+    /**
      * Test credentials with a minimal API call.
      *
      * @return true|WP_Error
