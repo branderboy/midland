@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Chat
  * Plugin URI: https://tagglefish.com/smart-chat-ai
- * Description: Midland-branded AI chat widget. Leverages pre-existing site content (sitemap + pages) to answer customer questions and capture quote info 24/7. Hands off to live customer service via Midland Smart Messages (WhatsApp) during business hours when staff are available.
+ * Description: Midland-branded AI chat widget + live messaging. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and hands off to live customer service via the bundled WhatsApp + SMS layer during business hours. Replaces the standalone Smart Messages plugin.
  * Version: 1.0.0
  * Author: TaggleFish
  * Author URI: https://tagglefish.com
@@ -93,6 +93,33 @@ class SCAI_Plugin {
         SCAI_Handoff::get_instance();
         require_once SCAI_PLUGIN_DIR . 'includes/class-content-context.php';
         SCAI_Content_Context::get_instance();
+
+        // Bundled messaging layer (formerly the standalone Midland Smart Messages
+        // plugin). Class-exists guards keep us safe if an old install still has
+        // the standalone plugin active — we let that one win and skip our copies.
+        if ( ! defined( 'SMSG_VERSION' ) ) {
+            define( 'SMSG_VERSION', '2.1.0-merged' );
+            define( 'SMSG_PATH', SCAI_PLUGIN_DIR );
+            define( 'SMSG_URL', SCAI_PLUGIN_URL );
+        }
+        if ( ! class_exists( 'SMSG_WhatsApp_API' ) ) {
+            require_once SCAI_PLUGIN_DIR . 'includes/class-smsg-whatsapp-api.php';
+        }
+        if ( ! class_exists( 'SMSG_Hooks' ) ) {
+            require_once SCAI_PLUGIN_DIR . 'includes/class-smsg-hooks.php';
+        }
+        if ( ! class_exists( 'SMSG_Admin' ) ) {
+            require_once SCAI_PLUGIN_DIR . 'includes/class-smsg-admin.php';
+        }
+        if ( class_exists( 'SMSG_WhatsApp_API' ) ) {
+            SMSG_WhatsApp_API::get_instance();
+        }
+        if ( class_exists( 'SMSG_Hooks' ) ) {
+            SMSG_Hooks::get_instance();
+        }
+        if ( class_exists( 'SMSG_Admin' ) ) {
+            SMSG_Admin::get_instance();
+        }
     }
     
     /**
