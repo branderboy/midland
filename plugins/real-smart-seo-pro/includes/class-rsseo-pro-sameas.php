@@ -62,6 +62,16 @@ class RSSEO_Pro_SameAs {
             $data[ $field ] = sanitize_text_field( wp_unslash( $_POST[ $field ] ?? '' ) );
         }
 
+        // business_type is a controlled vocabulary — accept only schema.org types we present in the dropdown.
+        $allowed_types = array(
+            'LocalBusiness', 'HomeAndConstructionBusiness', 'HousePainter',
+            'RoofingContractor', 'Plumber', 'Electrician', 'HVACBusiness',
+            'CleaningService', 'GeneralContractor',
+        );
+        if ( ! in_array( $data['business_type'], $allowed_types, true ) ) {
+            $data['business_type'] = 'LocalBusiness';
+        }
+
         // Logo URL needs esc_url_raw.
         $data['logo_url']    = esc_url_raw( wp_unslash( $_POST['logo_url'] ?? '' ) );
         $data['og_image_url'] = esc_url_raw( wp_unslash( $_POST['og_image_url'] ?? '' ) );

@@ -28,6 +28,20 @@ class RSSEO_Pro_GSC_Cleanup {
         add_action( 'wp_head',    array( $this, 'output_noindex_rules' ), 1 );
         // Block attachment pages from being linked (WP default redirect).
         add_filter( 'redirect_canonical', array( $this, 'maybe_410_attachment' ) );
+        // Persistent robots.txt filter — must register on every request, not just at save.
+        add_filter( 'robots_txt', array( $this, 'filter_robots_txt' ), 10, 1 );
+    }
+
+    /**
+     * Apply the saved robots.txt block on every request.
+     */
+    public function filter_robots_txt( $output ) {
+        $fixes = get_option( 'rsseo_gsc_fixes', array() );
+        if ( empty( $fixes['block_attachments_robots'] ) ) {
+            return $output;
+        }
+        $block = (string) get_option( 'rsseo_gsc_robots_block', "\n# GSC Cleanup — attachment pages\nDisallow: /*/attachment/\n" );
+        return $output . $block;
     }
 
     public function add_menu() {
@@ -60,8 +74,15 @@ class RSSEO_Pro_GSC_Cleanup {
         }
 
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-        $tmp  = $_FILES['gsc_csv']['tmp_name'];
-        $ext  = strtolower( pathinfo( sanitize_file_name( wp_unslash( $_FILES['gsc_csv']['name'] ?? '' ) ), PATHINFO_EXTENSION ) );
+        $tmp = $_FILES['gsc_csv']['tmp_name'];
+
+        // Defence against direct path injection: only accept genuine HTTP-uploaded files.
+        if ( ! is_uploaded_file( $tmp ) ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=rsseo-gsc-cleanup&error=read_fail' ) );
+            exit;
+        }
+
+        $ext = strtolower( pathinfo( sanitize_file_name( wp_unslash( $_FILES['gsc_csv']['name'] ?? '' ) ), PATHINFO_EXTENSION ) );
 
         if ( 'csv' !== $ext ) {
             wp_safe_redirect( admin_url( 'admin.php?page=rsseo-gsc-cleanup&error=not_csv' ) );
@@ -145,13 +166,13 @@ class RSSEO_Pro_GSC_Cleanup {
             $qs   = $parsed['query'] ?? '';
 
             // Not found / 404.
-            if ( str_contains( $status, 'not found' ) || str_contains( $status, '404' ) ) {
+            if ( false !== strpos( $status, 'not found' ) || false !== strpos( $status, '404' ) ) {
                 $result['not_found_urls'][] = $url;
                 continue;
             }
 
             // Robots blocked.
-            if ( str_contains( $status, 'blocked by robots' ) ) {
+            if ( false !== strpos( $status, 'blocked by robots' ) ) {
                 $result['robots_blocked'][] = $url;
                 continue;
             }
@@ -272,21 +293,13 @@ class RSSEO_Pro_GSC_Cleanup {
     }
 
     /**
-     * Append attachment disallow block to robots.txt (WP virtual robots).
+     * Persist the robots.txt block snippet — filter_robots_txt applies it on every request.
      */
     private function append_robots_txt_block() {
-        $existing = get_option( 'rsseo_gsc_robots_block', '' );
-        if ( $existing ) {
-            return; // Already added.
+        if ( get_option( 'rsseo_gsc_robots_block', '' ) ) {
+            return;
         }
-
-        $block = "\n# GSC Cleanup — attachment pages\nDisallow: /*/attachment/\n";
-        update_option( 'rsseo_gsc_robots_block', $block );
-
-        // Hook into WP's virtual robots.txt.
-        add_filter( 'robots_txt', function( $output ) use ( $block ) {
-            return $output . $block;
-        } );
+        update_option( 'rsseo_gsc_robots_block', "\n# GSC Cleanup — attachment pages\nDisallow: /*/attachment/\n" );
     }
 
     public function render_page() {
