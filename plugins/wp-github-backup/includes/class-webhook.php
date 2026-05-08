@@ -58,11 +58,11 @@ class WGB_Webhook {
 		$expected = 'sha256=' . hash_hmac( 'sha256', $payload, $secret );
 
 		if ( ! hash_equals( $expected, $signature ) ) {
-			// Diagnostic: signature mismatches are almost always one of
-			// (a) different secret on each side, (b) trailing whitespace
-			// on the WP-side option, (c) a CDN/optimizer mutating the
-			// request body before we see it. Log enough to tell which
-			// without leaking the secret itself.
+			// Diagnostic is logged server-side ONLY. Returning it in the response
+			// body leaked secret length, a stable SHA-256 fingerprint of the
+			// secret, payload byte counts, and delivery IDs to anyone who could
+			// POST to the endpoint, which made offline correlation easy. The
+			// information is still in error_log for the admin to inspect.
 			$diag = array(
 				'wgb_webhook_diag' => true,
 				'secret_len'       => strlen( $secret ),
@@ -78,10 +78,7 @@ class WGB_Webhook {
 			error_log( 'WGB webhook signature mismatch: ' . wp_json_encode( $diag ) );
 
 			return new WP_REST_Response(
-				array(
-					'error' => __( 'Invalid signature.', 'wp-github-backup' ),
-					'diag'  => $diag,
-				),
+				array( 'error' => __( 'Invalid signature.', 'wp-github-backup' ) ),
 				403
 			);
 		}

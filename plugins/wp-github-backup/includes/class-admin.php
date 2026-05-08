@@ -1189,9 +1189,32 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 		// Allowed file extensions for plugin updates.
 		$allowed_ext = array( 'php', 'js', 'css', 'json', 'txt', 'md' );
 
+		// Resolve the local destination root once so we can sandbox every write.
+		// realpath() returns false for paths that don't exist yet — fall back to
+		// the raw $local_dir, which is built from WP_PLUGIN_DIR + the configured
+		// repo dir name and is admin-controlled, not webhook-controlled.
+		$local_dir_real = realpath( $local_dir );
+		if ( false === $local_dir_real ) {
+			$local_dir_real = rtrim( $local_dir, '/\\' );
+		}
+
 		foreach ( $files as $entry ) {
-			$name = $entry['name'] ?? '';
-			$type = $entry['type'] ?? '';
+			$name = isset( $entry['name'] ) ? (string) $entry['name'] : '';
+			$type = isset( $entry['type'] ) ? (string) $entry['type'] : '';
+
+			// Reject any GitHub entry whose name could escape the sync root.
+			// Tree entries from a hostile repo can be named "../wp-config.php"
+			// even though git itself usually rejects such paths — never trust
+			// the API response.
+			if ( '' === $name
+				|| false !== strpos( $name, '/' )
+				|| false !== strpos( $name, '\\' )
+				|| false !== strpos( $name, "\0" )
+				|| '..' === $name
+				|| '.' === $name ) {
+				$errors[] = 'Refused suspicious entry: ' . $repo_path . '/' . $name;
+				continue;
+			}
 
 			if ( 'dir' === $type ) {
 				// Recurse into subdirectory.
@@ -1222,12 +1245,18 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 				continue;
 			}
 
-			// Write to local filesystem.
-			$local_path = $local_dir . ( $subpath ? '/' . $subpath : '' ) . '/' . $name;
+			// Build the destination, then verify it stays inside $local_dir_real.
+			$local_path   = $local_dir . ( $subpath ? '/' . $subpath : '' ) . '/' . $name;
 			$local_subdir = dirname( $local_path );
 
 			if ( ! is_dir( $local_subdir ) ) {
 				wp_mkdir_p( $local_subdir );
+			}
+
+			$resolved_subdir = realpath( $local_subdir );
+			if ( false === $resolved_subdir || 0 !== strpos( $resolved_subdir, $local_dir_real ) ) {
+				$errors[] = 'Refused write outside sync root: ' . $file_repo_path;
+				continue;
 			}
 
 			$written = file_put_contents( $local_path, $content );
