@@ -400,6 +400,33 @@ class WGB_Backup_Runner {
 				}
 			}
 		}
+
+		// Prune the local log tables on the same retention window. Without this
+		// {prefix}github_backup_log and {prefix}github_deploy_log grow forever.
+		$this->prune_log_tables( $retention_days );
+	}
+
+	/**
+	 * Delete rows older than $retention_days from both log tables.
+	 *
+	 * @param int $retention_days Days to keep.
+	 */
+	private function prune_log_tables( $retention_days ) {
+		if ( $retention_days <= 0 ) {
+			return;
+		}
+		global $wpdb;
+
+		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( '-' . (int) $retention_days . ' days' ) );
+
+		$wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"DELETE FROM {$wpdb->prefix}github_backup_log WHERE backup_date < %s",
+			$cutoff
+		) );
+		$wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"DELETE FROM {$wpdb->prefix}github_deploy_log WHERE deploy_date < %s",
+			$cutoff
+		) );
 	}
 
 	/**
