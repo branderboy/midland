@@ -2,9 +2,11 @@
 /**
  * Smart Chat AI Handler
  *
- * Dispatches chat completions to the configured provider. Default is Anthropic
- * Claude (claude-haiku-4-5); OpenAI is kept as a legacy option so old installs
- * with OpenAI keys still work without flipping a setting.
+ * Default provider: Perplexity Sonar (one key for chat + AI Rank citation tracking).
+ * OpenAI is kept as a legacy option for installs that haven't migrated yet.
+ *
+ * Perplexity's API is drop-in compatible with the OpenAI /chat/completions shape,
+ * so the same call wrapper handles both — only endpoint and auth header differ.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,15 +15,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SCAI_AI_Handler {
 
-    const PROVIDER_ANTHROPIC = 'anthropic';
-    const PROVIDER_OPENAI    = 'openai';
+    const PROVIDER_PERPLEXITY = 'perplexity';
+    const PROVIDER_OPENAI     = 'openai';
+
+    const PERPLEXITY_ENDPOINT = 'https://api.perplexity.ai/chat/completions';
+    const OPENAI_ENDPOINT     = 'https://api.openai.com/v1/chat/completions';
 
     private $provider;
     private $model;
     private $temperature;
 
     public function __construct() {
-        $this->provider    = get_option( 'smart_chat_ai_provider', self::PROVIDER_ANTHROPIC );
+        $this->provider    = get_option( 'smart_chat_ai_provider', self::PROVIDER_PERPLEXITY );
         $this->temperature = floatval( get_option( 'smart_chat_ai_temperature', 0.7 ) );
         $this->model       = get_option( 'smart_chat_ai_model', $this->default_model() );
     }
@@ -30,19 +35,17 @@ class SCAI_AI_Handler {
         if ( self::PROVIDER_OPENAI === $this->provider ) {
             return 'gpt-4o-mini';
         }
-        return 'claude-haiku-4-5';
+        return 'sonar'; // cheapest Perplexity model with built-in web grounding.
     }
 
     /**
-     * Get AI response
+     * Get AI response.
      */
     public function get_response( $user_message, $session_id ) {
         $history       = $this->get_conversation_history( $session_id );
         $system_prompt = $this->build_system_prompt();
 
-        // Build a unified messages array (role/content). The provider-specific
-        // adapter pulls the system text out of $system_prompt before serializing.
-        $messages = array();
+        $messages = array( array( 'role' => 'system', 'content' => $system_prompt ) );
         foreach ( $history as $msg ) {
             $messages[] = array(
                 'role'    => $msg->sender === 'user' ? 'user' : 'assistant',
@@ -51,15 +54,12 @@ class SCAI_AI_Handler {
         }
         $messages[] = array( 'role' => 'user', 'content' => $user_message );
 
-        if ( self::PROVIDER_OPENAI === $this->provider ) {
-            return $this->call_openai( $system_prompt, $messages );
-        }
-        return $this->call_anthropic( $system_prompt, $messages );
+        return $this->call_chat_completions( $messages );
     }
 
     /**
-     * Build system prompt (unchanged — site context module adds to this via
-     * the scai_system_prompt filter).
+     * Build system prompt (Site Content module appends to this via the
+     * scai_system_prompt filter).
      */
     private function build_system_prompt() {
         $business_name = get_option( 'smart_chat_business_name', get_bloginfo( 'name' ) );
@@ -118,86 +118,28 @@ Never:
     }
 
     /**
-     * Anthropic Claude (Messages API).
-     * Docs: https://docs.anthropic.com/en/api/messages
+     * Single completions wrapper. Routes to Perplexity or OpenAI based on the
+     * configured provider. Both APIs share the OpenAI request/response shape so
+     * the only difference is endpoint + auth.
      */
-    private function call_anthropic( $system_prompt, $messages ) {
-        $api_key = (string) get_option( 'smart_chat_anthropic_api_key', '' );
+    private function call_chat_completions( $messages ) {
+        $api_key = $this->current_api_key();
         if ( '' === $api_key ) {
             return $this->unavailable_response();
         }
 
-        $response = wp_remote_post( 'https://api.anthropic.com/v1/messages', array(
-            'headers' => array(
-                'x-api-key'         => $api_key,
-                'anthropic-version' => '2023-06-01',
-                'content-type'      => 'application/json',
-            ),
-            'body'    => wp_json_encode( array(
-                'model'       => $this->model,
-                'max_tokens'  => 500,
-                'temperature' => $this->temperature,
-                'system'      => $system_prompt,
-                'messages'    => $messages,
-            ) ),
-            'timeout' => 30,
-        ) );
+        $endpoint = self::PROVIDER_OPENAI === $this->provider
+            ? self::OPENAI_ENDPOINT
+            : self::PERPLEXITY_ENDPOINT;
 
-        if ( is_wp_error( $response ) ) {
-            return $this->error_response( 'Sorry, I am having trouble connecting. Please try again.' );
-        }
-
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( isset( $body['error'] ) ) {
-            error_log( 'Smart Chat (Anthropic) error: ' . wp_json_encode( $body['error'] ) );
-            return $this->error_response( 'Sorry, I encountered an error. Please contact us directly.' );
-        }
-
-        // Anthropic returns content as an array of blocks. Concatenate the text blocks.
-        $text   = '';
-        $blocks = $body['content'] ?? array();
-        foreach ( (array) $blocks as $block ) {
-            if ( ( $block['type'] ?? '' ) === 'text' ) {
-                $text .= (string) ( $block['text'] ?? '' );
-            }
-        }
-        if ( '' === $text ) {
-            $text = 'Sorry, I do not have a response right now.';
-        }
-
-        $tokens = (int) ( $body['usage']['input_tokens'] ?? 0 ) + (int) ( $body['usage']['output_tokens'] ?? 0 );
-
-        return array(
-            'message' => $text,
-            'model'   => $this->model,
-            'tokens'  => $tokens,
-            'error'   => false,
-        );
-    }
-
-    /**
-     * OpenAI Chat Completions — kept for installs that haven't migrated keys.
-     */
-    private function call_openai( $system_prompt, $messages ) {
-        $api_key = (string) get_option( 'smart_chat_openai_api_key', '' );
-        if ( '' === $api_key ) {
-            return $this->unavailable_response();
-        }
-
-        $payload_messages = array_merge(
-            array( array( 'role' => 'system', 'content' => $system_prompt ) ),
-            $messages
-        );
-
-        $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', array(
+        $response = wp_remote_post( $endpoint, array(
             'headers' => array(
                 'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type'  => 'application/json',
             ),
             'body'    => wp_json_encode( array(
                 'model'       => $this->model,
-                'messages'    => $payload_messages,
+                'messages'    => $messages,
                 'temperature' => $this->temperature,
                 'max_tokens'  => 500,
             ) ),
@@ -211,7 +153,7 @@ Never:
         $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( isset( $body['error'] ) ) {
-            error_log( 'Smart Chat (OpenAI) error: ' . $body['error']['message'] );
+            error_log( 'Smart Chat (' . $this->provider . ') error: ' . wp_json_encode( $body['error'] ) );
             return $this->error_response( 'Sorry, I encountered an error. Please contact us directly.' );
         }
 
@@ -221,6 +163,19 @@ Never:
             'tokens'  => (int) ( $body['usage']['total_tokens'] ?? 0 ),
             'error'   => false,
         );
+    }
+
+    private function current_api_key() {
+        if ( self::PROVIDER_OPENAI === $this->provider ) {
+            return (string) get_option( 'smart_chat_openai_api_key', '' );
+        }
+        // Perplexity — first try the chat-specific key, then the AI Rank key
+        // already configured on the SEO plugin so admins don't paste twice.
+        $key = (string) get_option( 'smart_chat_perplexity_api_key', '' );
+        if ( '' === $key ) {
+            $key = (string) get_option( 'rsseo_pro_ai_perplexity_key', '' );
+        }
+        return $key;
     }
 
     private function unavailable_response() {
@@ -252,12 +207,18 @@ Never:
             $conversation .= $msg->sender . ': ' . $msg->message . "\n";
         }
 
-        $system   = 'Extract lead information from this conversation. Return JSON with fields: name, email, phone, service_type, budget, timeline. Return null for missing fields.';
-        $messages = array( array( 'role' => 'user', 'content' => $conversation ) );
+        $messages = array(
+            array(
+                'role'    => 'system',
+                'content' => 'Extract lead information from this conversation. Return JSON with fields: name, email, phone, service_type, budget, timeline. Return null for missing fields.',
+            ),
+            array(
+                'role'    => 'user',
+                'content' => $conversation,
+            ),
+        );
 
-        $response = self::PROVIDER_OPENAI === $this->provider
-            ? $this->call_openai( $system, $messages )
-            : $this->call_anthropic( $system, $messages );
+        $response = $this->call_chat_completions( $messages );
 
         if ( $response['error'] ) {
             return null;

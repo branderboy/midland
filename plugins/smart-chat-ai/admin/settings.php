@@ -38,8 +38,8 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
         </table>
 
         <?php
-        $provider = get_option( 'smart_chat_ai_provider', 'anthropic' );
-        $model    = get_option( 'smart_chat_ai_model', 'anthropic' === $provider ? 'claude-haiku-4-5' : 'gpt-4o-mini' );
+        $provider = get_option( 'smart_chat_ai_provider', 'perplexity' );
+        $model    = get_option( 'smart_chat_ai_model', 'perplexity' === $provider ? 'sonar' : 'gpt-4o-mini' );
         ?>
         <h2><?php esc_html_e( 'AI Configuration', 'smart-chat-ai' ); ?></h2>
         <table class="form-table">
@@ -47,15 +47,18 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                 <th><label for="smart_chat_ai_provider"><?php esc_html_e( 'Provider', 'smart-chat-ai' ); ?></label></th>
                 <td>
                     <select name="smart_chat_ai_provider" id="smart_chat_ai_provider">
-                        <option value="anthropic" <?php selected( $provider, 'anthropic' ); ?>>Anthropic Claude</option>
-                        <option value="openai" <?php selected( $provider, 'openai' ); ?>>OpenAI</option>
+                        <option value="perplexity" <?php selected( $provider, 'perplexity' ); ?>>Perplexity Sonar (recommended — built-in web search)</option>
+                        <option value="openai" <?php selected( $provider, 'openai' ); ?>>OpenAI (legacy)</option>
                     </select>
-                    <p class="description"><?php esc_html_e( 'Default is Anthropic. Switch to OpenAI only if you have a legacy key.', 'smart-chat-ai' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Perplexity\'s API is OpenAI-compatible. The same key powers both this chat AND the AI Rank citation tracker — no second account.', 'smart-chat-ai' ); ?></p>
                 </td>
             </tr>
             <tr>
-                <th><label for="smart_chat_anthropic_api_key"><?php esc_html_e( 'Anthropic API Key', 'smart-chat-ai' ); ?></label></th>
-                <td><input type="password" name="smart_chat_anthropic_api_key" id="smart_chat_anthropic_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_anthropic_api_key' ) ); ?>" placeholder="sk-ant-..."></td>
+                <th><label for="smart_chat_perplexity_api_key"><?php esc_html_e( 'Perplexity API Key', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <input type="password" name="smart_chat_perplexity_api_key" id="smart_chat_perplexity_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_perplexity_api_key' ) ); ?>" placeholder="pplx-...">
+                    <p class="description"><?php esc_html_e( 'If empty, the chat falls back to the AI Rank module\'s key (rsseo_pro_ai_perplexity_key) so you only have to paste it once.', 'smart-chat-ai' ); ?></p>
+                </td>
             </tr>
             <tr>
                 <th><label for="smart_chat_openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'smart-chat-ai' ); ?></label></th>
@@ -68,10 +71,10 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                 <th><label for="smart_chat_ai_model"><?php esc_html_e( 'Model', 'smart-chat-ai' ); ?></label></th>
                 <td>
                     <select name="smart_chat_ai_model" id="smart_chat_ai_model">
-                        <optgroup label="Anthropic">
-                            <option value="claude-haiku-4-5" <?php selected( $model, 'claude-haiku-4-5' ); ?>>Claude Haiku 4.5 (fast, cheap — recommended)</option>
-                            <option value="claude-sonnet-4-6" <?php selected( $model, 'claude-sonnet-4-6' ); ?>>Claude Sonnet 4.6</option>
-                            <option value="claude-opus-4-7" <?php selected( $model, 'claude-opus-4-7' ); ?>>Claude Opus 4.7</option>
+                        <optgroup label="Perplexity">
+                            <option value="sonar" <?php selected( $model, 'sonar' ); ?>>Sonar (cheapest)</option>
+                            <option value="sonar-pro" <?php selected( $model, 'sonar-pro' ); ?>>Sonar Pro (better grounding)</option>
+                            <option value="sonar-reasoning" <?php selected( $model, 'sonar-reasoning' ); ?>>Sonar Reasoning</option>
                         </optgroup>
                         <optgroup label="OpenAI (legacy)">
                             <option value="gpt-4o-mini" <?php selected( $model, 'gpt-4o-mini' ); ?>>GPT-4o Mini</option>

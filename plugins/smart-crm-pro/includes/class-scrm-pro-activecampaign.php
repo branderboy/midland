@@ -87,73 +87,119 @@ class SCRM_Pro_ActiveCampaign {
     }
 
     /**
-     * Categorize the lead so AC flows can branch on commercial / residential / emergency.
-     * Order of precedence:
-     *   1. explicit category field set by the form
-     *   2. timeline matches an emergency keyword
-     *   3. project_type matches a commercial keyword
-     *   4. default: residential
+     * Lead categorization is two independent axes — segment (commercial vs
+     * residential) and urgency (emergency vs normal). Treating them as one
+     * enum buried commercial-emergency leads under the "emergency" branch and
+     * stopped the Floor Care Plan flow from firing for them. The split below
+     * keeps each axis pure so AC tags can compose them.
      *
-     * Filters: rsseo_lead_category lets a 3rd party override the inferred result.
+     * Filters:
+     *   - scrm_pro_lead_segment( 'commercial'|'residential', $lead )
+     *   - scrm_pro_lead_emergency( bool, $lead )
+     *   - scrm_pro_lead_category( 'commercial'|'residential'|'emergency', $lead )
+     *     (kept for backward compat; returns 'emergency' if urgency=emergency,
+     *     else the segment)
      */
-    public function categorize_lead( $lead ) {
-        $explicit = strtolower( (string) $this->get_field( $lead, array( 'category', 'job_category', 'lead_category' ) ) );
-        if ( in_array( $explicit, array( 'commercial', 'residential', 'emergency' ), true ) ) {
-            return apply_filters( 'scrm_pro_lead_category', $explicit, $lead );
+    public function lead_segment( $lead ) {
+        $explicit = strtolower( (string) $this->get_field( $lead, array( 'segment', 'lead_segment' ) ) );
+        if ( in_array( $explicit, array( 'commercial', 'residential' ), true ) ) {
+            return apply_filters( 'scrm_pro_lead_segment', $explicit, $lead );
         }
 
-        $timeline     = strtolower( (string) $this->get_field( $lead, array( 'timeline' ) ) );
+        // Some forms reuse the legacy "category" field for segment.
+        $legacy = strtolower( (string) $this->get_field( $lead, array( 'category', 'job_category', 'lead_category' ) ) );
+        if ( in_array( $legacy, array( 'commercial', 'residential' ), true ) ) {
+            return apply_filters( 'scrm_pro_lead_segment', $legacy, $lead );
+        }
+
         $project_type = strtolower( (string) $this->get_field( $lead, array( 'project_type', 'service_type' ) ) );
         $message      = strtolower( (string) $this->get_field( $lead, array( 'message' ) ) );
 
-        $emergency_re = '/\b(emergency|urgent|asap|same[ -]?day|24[ -]?h(our)?s?|right[ -]now|today)\b/i';
-        if ( preg_match( $emergency_re, $timeline ) || preg_match( $emergency_re, $message ) ) {
-            return apply_filters( 'scrm_pro_lead_category', 'emergency', $lead );
-        }
-
         $commercial_re = '/\b(commercial|business|office|retail|warehouse|industrial|hoa|property[ -]?manag)/i';
         if ( preg_match( $commercial_re, $project_type ) || preg_match( $commercial_re, $message ) ) {
-            return apply_filters( 'scrm_pro_lead_category', 'commercial', $lead );
+            return apply_filters( 'scrm_pro_lead_segment', 'commercial', $lead );
         }
 
-        return apply_filters( 'scrm_pro_lead_category', 'residential', $lead );
+        return apply_filters( 'scrm_pro_lead_segment', 'residential', $lead );
+    }
+
+    public function is_emergency( $lead ) {
+        $explicit = strtolower( (string) $this->get_field( $lead, array( 'urgency', 'is_emergency' ) ) );
+        if ( in_array( $explicit, array( 'emergency', 'urgent', '1', 'true', 'yes' ), true ) ) {
+            return apply_filters( 'scrm_pro_lead_emergency', true, $lead );
+        }
+
+        // Legacy single-axis "category" of "emergency" still flips the flag.
+        $legacy = strtolower( (string) $this->get_field( $lead, array( 'category', 'job_category', 'lead_category' ) ) );
+        if ( 'emergency' === $legacy ) {
+            return apply_filters( 'scrm_pro_lead_emergency', true, $lead );
+        }
+
+        $timeline = strtolower( (string) $this->get_field( $lead, array( 'timeline' ) ) );
+        $message  = strtolower( (string) $this->get_field( $lead, array( 'message' ) ) );
+
+        $emergency_re = '/\b(emergency|urgent|asap|same[ -]?day|24[ -]?h(our)?s?|right[ -]now|today)\b/i';
+        if ( preg_match( $emergency_re, $timeline ) || preg_match( $emergency_re, $message ) ) {
+            return apply_filters( 'scrm_pro_lead_emergency', true, $lead );
+        }
+
+        return apply_filters( 'scrm_pro_lead_emergency', false, $lead );
     }
 
     /**
-     * Map (lifecycle, category) to the AC tags that should be applied.
-     * Operators fully control the actual flow on the AC side; this only emits
-     * the trigger-tag the flows listen for.
+     * Backward-compatible single-string category. New code should call
+     * lead_segment() and is_emergency() directly so a commercial-emergency lead
+     * isn't reduced to just "emergency".
      */
-    public function tags_for( $lifecycle, $category ) {
-        $base = (string) get_option( self::OPT_TAG, 'midland-job-completed' );
+    public function categorize_lead( $lead ) {
+        $category = $this->is_emergency( $lead ) ? 'emergency' : $this->lead_segment( $lead );
+        return apply_filters( 'scrm_pro_lead_category', $category, $lead );
+    }
+
+    /**
+     * Map (lifecycle, segment, emergency) to the AC tags that should be applied.
+     * Operators fully control the actual flow on the AC side; this only emits
+     * the trigger-tag the flows listen for. Floor Care Plan offer is COMMERCIAL
+     * only — residential completions don't get it.
+     */
+    public function tags_for( $lifecycle, $segment, $is_emergency ) {
+        $segment     = in_array( $segment, array( 'commercial', 'residential' ), true ) ? $segment : 'residential';
+        $is_emergency = (bool) $is_emergency;
 
         $tags = array();
         switch ( $lifecycle ) {
             case 'booked':
-                if ( 'commercial' === $category ) {
+                $tags[] = 'midland-job-booked-' . $segment;
+                if ( 'commercial' === $segment ) {
+                    // Commercial bookings double up: the on-site visit flow + the
+                    // base segment tag, so AC can run different automations off
+                    // each (multi-touch outreach vs. simple notification).
                     $tags[] = 'midland-onsite-booked-commercial';
-                } elseif ( 'residential' === $category ) {
-                    $tags[] = 'midland-job-booked-residential';
-                } elseif ( 'emergency' === $category ) {
+                }
+                if ( $is_emergency ) {
                     $tags[] = 'midland-job-booked-emergency';
+                    $tags[] = 'midland-job-booked-' . $segment . '-emergency';
                 }
                 break;
+
             case 'completed':
-                if ( 'emergency' === $category ) {
-                    // Emergency gets BOTH the post-job flow tag and the floor-care-plan tag
-                    // so AC can branch on whichever automation it wants to run first.
+                $tags[] = 'midland-job-completed-' . $segment;
+                if ( $is_emergency ) {
                     $tags[] = 'midland-job-completed-emergency';
+                    $tags[] = 'midland-job-completed-' . $segment . '-emergency';
+                }
+                // Floor Care Plan offer = commercial only (with extra weight on
+                // commercial-emergency since those benefit most from a recurring
+                // maintenance plan after a costly emergency call-out).
+                if ( 'commercial' === $segment ) {
                     $tags[] = 'midland-floor-care-plan-offer';
-                } elseif ( 'residential' === $category ) {
-                    $tags[] = 'midland-job-completed-residential';
-                } elseif ( 'commercial' === $category ) {
-                    $tags[] = 'midland-job-completed-commercial';
-                } else {
-                    $tags[] = $base;
+                    if ( $is_emergency ) {
+                        $tags[] = 'midland-floor-care-plan-offer-emergency';
+                    }
                 }
                 break;
         }
-        return apply_filters( 'scrm_pro_ac_tags', $tags, $lifecycle, $category );
+        return apply_filters( 'scrm_pro_ac_tags', $tags, $lifecycle, $segment, $is_emergency );
     }
 
     /**
@@ -180,7 +226,9 @@ class SCRM_Pro_ActiveCampaign {
         $name  = (string) $this->get_field( $lead, array( 'customer_name', 'name' ) );
         $phone = (string) $this->get_field( $lead, array( 'customer_phone', 'phone' ) );
 
-        $category = $this->categorize_lead( $lead );
+        $segment      = $this->lead_segment( $lead );
+        $is_emergency = $this->is_emergency( $lead );
+        $category     = $is_emergency ? 'emergency' : $segment; // legacy field for AC
 
         $name_parts = explode( ' ', trim( $name ), 2 );
 
@@ -198,12 +246,18 @@ class SCRM_Pro_ActiveCampaign {
             'frequency'            => array( 'frequency', 'cleaning_frequency' ),
             'job_id'               => array( 'job_id', 'id' ),
             'midland_category'     => array(),
+            'midland_segment'      => array(),
+            'midland_is_emergency' => array(),
             'floor_care_plan_url'  => array( 'floor_care_plan_url' ),
         );
 
         foreach ( $forward as $ac_field => $sources ) {
             if ( 'midland_category' === $ac_field ) {
                 $value = $category;
+            } elseif ( 'midland_segment' === $ac_field ) {
+                $value = $segment;
+            } elseif ( 'midland_is_emergency' === $ac_field ) {
+                $value = $is_emergency ? '1' : '0';
             } else {
                 $value = (string) $this->get_field( $lead, $sources );
             }
@@ -238,7 +292,7 @@ class SCRM_Pro_ActiveCampaign {
             $contact_id = isset( $body['contact']['id'] ) ? (int) $body['contact']['id'] : null;
         }
 
-        $tags = $this->tags_for( $lifecycle, $category );
+        $tags = $this->tags_for( $lifecycle, $segment, $is_emergency );
         if ( $contact_id ) {
             foreach ( $tags as $tag ) {
                 $this->apply_tag( $api_url, $api_key, $contact_id, $tag );
@@ -246,15 +300,17 @@ class SCRM_Pro_ActiveCampaign {
         }
 
         update_option( self::OPT_LAST_PUSH, array(
-            'at'        => time(),
-            'email'     => $email,
-            'lifecycle' => $lifecycle,
-            'category'  => $category,
-            'tags'      => $tags,
-            'ok'        => $contact_id ? 1 : 0,
+            'at'           => time(),
+            'email'        => $email,
+            'lifecycle'    => $lifecycle,
+            'segment'      => $segment,
+            'is_emergency' => $is_emergency ? 1 : 0,
+            'category'     => $category, // legacy, kept for the admin label
+            'tags'         => $tags,
+            'ok'           => $contact_id ? 1 : 0,
         ) );
 
-        do_action( 'scrm_pro_ac_pushed', $lead, $lifecycle, $category, $contact_id, $tags );
+        do_action( 'scrm_pro_ac_pushed', $lead, $lifecycle, $segment, $is_emergency, $contact_id, $tags );
     }
 
     private function apply_tag( $api_url, $api_key, $contact_id, $tag_name ) {
