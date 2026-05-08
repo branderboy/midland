@@ -89,6 +89,8 @@ class SCAI_Plugin {
         require_once SCAI_PLUGIN_DIR . 'includes/class-ai-handler.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-lead-manager.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-analytics.php';
+        require_once SCAI_PLUGIN_DIR . 'includes/class-handoff.php';
+        SCAI_Handoff::get_instance();
     }
     
     /**

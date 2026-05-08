@@ -23,18 +23,29 @@ class SCAI_Lead_Manager {
             'created_at'     => current_time( 'mysql' ),
         ) );
 
+        $lead_id = (int) $wpdb->insert_id;
+
         // Link to session if provided.
         if ( ! empty( $data['session_id'] ) ) {
             $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                 $wpdb->prefix . 'smart_chat_conversations',
-                array( 'lead_id' => $wpdb->insert_id ),
+                array( 'lead_id' => $lead_id ),
                 array( 'session_id' => sanitize_text_field( $data['session_id'] ) ),
                 array( '%d' ),
                 array( '%s' )
             );
         }
 
-        return $wpdb->insert_id;
+        /**
+         * Fires after a chat lead is created. Listeners (e.g. the WhatsApp handoff
+         * bridge) use this to notify owners or message customers in real time.
+         *
+         * @param int   $lead_id
+         * @param array $data
+         */
+        do_action( 'scai_lead_captured', $lead_id, $data );
+
+        return $lead_id;
     }
 
     public function get_leads( $args = array() ) {
