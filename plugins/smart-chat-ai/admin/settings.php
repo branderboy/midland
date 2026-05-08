@@ -37,20 +37,48 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
             </tr>
         </table>
 
+        <?php
+        $provider = get_option( 'smart_chat_ai_provider', 'anthropic' );
+        $model    = get_option( 'smart_chat_ai_model', 'anthropic' === $provider ? 'claude-haiku-4-5' : 'gpt-4o-mini' );
+        ?>
         <h2><?php esc_html_e( 'AI Configuration', 'smart-chat-ai' ); ?></h2>
         <table class="form-table">
             <tr>
+                <th><label for="smart_chat_ai_provider"><?php esc_html_e( 'Provider', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <select name="smart_chat_ai_provider" id="smart_chat_ai_provider">
+                        <option value="anthropic" <?php selected( $provider, 'anthropic' ); ?>>Anthropic Claude</option>
+                        <option value="openai" <?php selected( $provider, 'openai' ); ?>>OpenAI</option>
+                    </select>
+                    <p class="description"><?php esc_html_e( 'Default is Anthropic. Switch to OpenAI only if you have a legacy key.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="smart_chat_anthropic_api_key"><?php esc_html_e( 'Anthropic API Key', 'smart-chat-ai' ); ?></label></th>
+                <td><input type="password" name="smart_chat_anthropic_api_key" id="smart_chat_anthropic_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_anthropic_api_key' ) ); ?>" placeholder="sk-ant-..."></td>
+            </tr>
+            <tr>
                 <th><label for="smart_chat_openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'smart-chat-ai' ); ?></label></th>
-                <td><input type="password" name="smart_chat_openai_api_key" id="smart_chat_openai_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_openai_api_key' ) ); ?>"></td>
+                <td>
+                    <input type="password" name="smart_chat_openai_api_key" id="smart_chat_openai_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_openai_api_key' ) ); ?>" placeholder="sk-...">
+                    <p class="description"><?php esc_html_e( 'Only used when Provider = OpenAI.', 'smart-chat-ai' ); ?></p>
+                </td>
             </tr>
             <tr>
                 <th><label for="smart_chat_ai_model"><?php esc_html_e( 'Model', 'smart-chat-ai' ); ?></label></th>
                 <td>
                     <select name="smart_chat_ai_model" id="smart_chat_ai_model">
-                        <option value="gpt-4" <?php selected( get_option( 'smart_chat_ai_model' ), 'gpt-4' ); ?>>GPT-4</option>
-                        <option value="gpt-4o" <?php selected( get_option( 'smart_chat_ai_model' ), 'gpt-4o' ); ?>>GPT-4o</option>
-                        <option value="gpt-4o-mini" <?php selected( get_option( 'smart_chat_ai_model' ), 'gpt-4o-mini' ); ?>>GPT-4o Mini</option>
-                        <option value="gpt-3.5-turbo" <?php selected( get_option( 'smart_chat_ai_model' ), 'gpt-3.5-turbo' ); ?>>GPT-3.5 Turbo</option>
+                        <optgroup label="Anthropic">
+                            <option value="claude-haiku-4-5" <?php selected( $model, 'claude-haiku-4-5' ); ?>>Claude Haiku 4.5 (fast, cheap — recommended)</option>
+                            <option value="claude-sonnet-4-6" <?php selected( $model, 'claude-sonnet-4-6' ); ?>>Claude Sonnet 4.6</option>
+                            <option value="claude-opus-4-7" <?php selected( $model, 'claude-opus-4-7' ); ?>>Claude Opus 4.7</option>
+                        </optgroup>
+                        <optgroup label="OpenAI (legacy)">
+                            <option value="gpt-4o-mini" <?php selected( $model, 'gpt-4o-mini' ); ?>>GPT-4o Mini</option>
+                            <option value="gpt-4o" <?php selected( $model, 'gpt-4o' ); ?>>GPT-4o</option>
+                            <option value="gpt-4" <?php selected( $model, 'gpt-4' ); ?>>GPT-4</option>
+                            <option value="gpt-3.5-turbo" <?php selected( $model, 'gpt-3.5-turbo' ); ?>>GPT-3.5 Turbo</option>
+                        </optgroup>
                     </select>
                 </td>
             </tr>

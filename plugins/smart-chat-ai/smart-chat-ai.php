@@ -358,6 +358,7 @@ class SCAI_Plugin {
             'chat_title',
             'chat_subtitle',
             'ai_provider',
+            'anthropic_api_key',
             'openai_api_key',
             'ai_model',
             'ai_temperature',
