@@ -1,0 +1,303 @@
+/* WP GitHub Backup Admin Styles */
+
+.wgb-wrap {
+	max-width: 1200px;
+}
+
+.wgb-tabs {
+	margin-bottom: 20px;
+}
+
+.wgb-tab-content {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-top: none;
+	padding: 20px;
+}
+
+/* Dashboard Cards */
+.wgb-cards {
+	display: flex;
+	gap: 20px;
+	margin-bottom: 30px;
+	flex-wrap: wrap;
+}
+
+.wgb-card {
+	flex: 1;
+	min-width: 200px;
+	background: #f9f9f9;
+	border: 1px solid #e2e4e7;
+	border-radius: 4px;
+	padding: 20px;
+}
+
+.wgb-card h3 {
+	margin-top: 0;
+	margin-bottom: 10px;
+	color: #1d2327;
+}
+
+/* Status badges */
+.wgb-status {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 3px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.wgb-status-success {
+	background: #d4edda;
+	color: #155724;
+}
+
+.wgb-status-failed {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+.wgb-status-partial {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.wgb-status-pending {
+	background: #e2e3e5;
+	color: #383d41;
+}
+
+/* Backup Now button area */
+.wgb-actions {
+	margin-top: 20px;
+}
+
+.wgb-backup-progress {
+	margin-top: 15px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.wgb-backup-progress .spinner {
+	float: none;
+	margin: 0;
+}
+
+#wgb-backup-result {
+	margin-top: 15px;
+	padding: 12px 15px;
+	border-radius: 4px;
+}
+
+#wgb-backup-result.success {
+	background: #d4edda;
+	border: 1px solid #c3e6cb;
+	color: #155724;
+}
+
+#wgb-backup-result.error {
+	background: #f8d7da;
+	border: 1px solid #f5c6cb;
+	color: #721c24;
+}
+
+/* Settings form */
+.wgb-settings .form-table th {
+	width: 220px;
+}
+
+.wgb-token-set {
+	color: #46b450;
+	font-weight: 600;
+}
+
+#wgb-settings-status {
+	margin-left: 10px;
+	font-style: italic;
+}
+
+/* Restore page */
+.wgb-restore-instructions {
+	margin-top: 20px;
+}
+
+.wgb-restore-instructions ol li {
+	margin-bottom: 15px;
+}
+
+.wgb-restore-instructions code {
+	background: #f0f0f0;
+	padding: 2px 6px;
+	border-radius: 3px;
+}
+
+/* Backups table on restore page */
+.wgb-backups-list {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.wgb-backups-list th,
+.wgb-backups-list td {
+	padding: 8px 12px;
+	text-align: left;
+	border-bottom: 1px solid #e2e4e7;
+}
+
+.wgb-backups-list th {
+	background: #f9f9f9;
+	font-weight: 600;
+}
+
+/* History table tweaks */
+.wgb-tab-content .wp-list-table {
+	margin-top: 0;
+}
+
+/* Content Editor */
+.wgb-editor-toolbar {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin-bottom: 15px;
+	flex-wrap: wrap;
+}
+
+.wgb-editor-toolbar select {
+	min-width: 120px;
+}
+
+#wgb-editor-pagination {
+	padding: 10px 0;
+}
+
+#wgb-editor-pagination a {
+	display: inline-block;
+	padding: 4px 10px;
+	text-decoration: none;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	margin: 0 2px;
+}
+
+#wgb-editor-pagination a:hover {
+	background: #f0f0f0;
+}
+
+#wgb-editor-pagination strong {
+	display: inline-block;
+	padding: 4px 10px;
+	background: #0073aa;
+	color: #fff;
+	border-radius: 3px;
+	margin: 0 2px;
+}
+
+#wgb-editor-pagination .displaying-num {
+	margin-right: 10px;
+	color: #666;
+}
+
+#wgb-editor-form .form-table th {
+	width: 140px;
+}
+
+#wgb-editor-form h3 {
+	margin-top: 30px;
+	padding-top: 15px;
+	border-top: 1px solid #e2e4e7;
+}
+
+#wgb-meta-table .wgb-meta-key {
+	width: 100%;
+}
+
+#wgb-meta-table .wgb-meta-value {
+	width: 100%;
+}
+
+#wgb-edit-schema {
+	font-family: monospace;
+	font-size: 13px;
+}
+
+#wgb-editor-back {
+	font-size: 14px;
+	text-decoration: none;
+}
+
+#wgb-editor-status {
+	margin-left: 10px;
+	font-style: italic;
+}
+
+#wgb-editor-table code {
+	font-size: 12px;
+	background: #f0f0f0;
+	padding: 2px 5px;
+	border-radius: 3px;
+}
+
+/* Deploy Tab */
+.wgb-deploy .wgb-actions {
+	display: flex;
+	gap: 15px;
+	align-items: center;
+	margin: 20px 0;
+}
+
+.wgb-deploy-preview-box {
+	margin-top: 15px;
+	padding: 15px;
+	background: #f9f9f9;
+	border: 1px solid #e2e4e7;
+	border-radius: 4px;
+}
+
+.wgb-deploy-preview-box.error {
+	background: #f8d7da;
+	border-color: #f5c6cb;
+	color: #721c24;
+}
+
+.wgb-deploy-preview-box h4 {
+	margin-top: 0;
+}
+
+.wgb-deploy-file-list {
+	max-height: 400px;
+	overflow-y: auto;
+	margin-top: 10px;
+}
+
+.wgb-deploy-file-list code {
+	font-size: 12px;
+}
+
+#wgb-deploy-result {
+	margin-top: 15px;
+	padding: 12px 15px;
+	border-radius: 4px;
+}
+
+#wgb-deploy-result.success {
+	background: #d4edda;
+	border: 1px solid #c3e6cb;
+	color: #155724;
+}
+
+#wgb-deploy-result.error {
+	background: #f8d7da;
+	border: 1px solid #f5c6cb;
+	color: #721c24;
+}
+
+#wgb-deploy-settings-status {
+	margin-left: 10px;
+	font-style: italic;
+}
+
+.wgb-deploy .form-table th {
+	width: 220px;
+}
