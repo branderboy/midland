@@ -22,8 +22,8 @@ class SRP_Admin {
 
     public function add_menu() {
         add_menu_page(
-            esc_html__( 'Smart Reviews', 'smart-reviews-pro' ),
-            esc_html__( 'Smart Reviews', 'smart-reviews-pro' ),
+            esc_html__( 'Midland Smart Reviews', 'smart-reviews-pro' ),
+            esc_html__( 'Midland Reviews', 'smart-reviews-pro' ),
             'manage_options',
             'smart-reviews-pro',
             array( $this, 'render_dashboard' ),
@@ -151,7 +151,7 @@ class SRP_Admin {
                                         <span style="color:#999;font-size:12px;">Pending</span>
                                     <?php endif; ?>
                                 </td>
-                                <td style="font-size:12px;color:#555;"><?php echo esc_html( substr( $row->feedback ?? '', 0, 100 ) ); ?></td>
+                                <td style="font-size:12px;color:#555;"><?php echo esc_html( SRP_Survey::safe_truncate( $row->feedback ?? '', 100 ) ); ?></td>
                                 <td style="font-size:12px;color:#999;"><?php echo esc_html( substr( $row->created_at, 0, 10 ) ); ?></td>
                             </tr>
                         <?php endforeach; ?>

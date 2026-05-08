@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Smart Reviews Pro
+ * Plugin Name: Midland Smart Reviews Pro
  * Plugin URI: https://tagglefish.com/smart-reviews-pro
- * Description: Survey-gated review collection. NPS 0-10 survey fires after job completion. Score ≥9 → sends GMB review link + 2 follow-up reminders. Score <9 → private feedback, no public review request.
+ * Description: Midland-branded survey-gated review collection. NPS 0-10 survey fires after job completion. Score ≥9 → sends GMB review link + 2 follow-up reminders. Score <9 → private feedback, no public review request.
  * Version: 1.0.0
  * Author: TaggleFish
  * Author URI: https://tagglefish.com
