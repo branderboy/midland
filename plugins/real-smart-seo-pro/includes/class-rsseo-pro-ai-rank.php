@@ -14,6 +14,8 @@ class RSSEO_Pro_AI_Rank {
 
     const PERPLEXITY_ENDPOINT = 'https://api.perplexity.ai/chat/completions';
     const CRON_HOOK           = 'rsseo_ai_rank_weekly_scan';
+    const TICK_HOOK           = 'rsseo_ai_rank_process_one';
+    const TICK_DELAY          = 5; // seconds between API calls
 
     private static $instance = null;
 
@@ -29,6 +31,7 @@ class RSSEO_Pro_AI_Rank {
         add_action( 'admin_init', array( $this, 'handle_save' ) );
         add_action( 'admin_init', array( $this, 'handle_run_now' ) );
         add_action( self::CRON_HOOK, array( $this, 'run_scan' ) );
+        add_action( self::TICK_HOOK, array( $this, 'process_one' ), 10, 1 );
         add_action( 'init', array( $this, 'maybe_schedule_cron' ) );
     }
 
@@ -113,6 +116,10 @@ class RSSEO_Pro_AI_Rank {
         exit;
     }
 
+    /**
+     * Build the queue of (query, source) pairs and kick off the first tick.
+     * Each tick processes exactly one pair so a slow LLM call never blocks the scan.
+     */
     public function run_scan() {
         $queries = (array) get_option( 'rsseo_pro_ai_rank_queries', array() );
         $target  = (string) get_option( 'rsseo_pro_ai_rank_target_domain', '' );
@@ -124,22 +131,67 @@ class RSSEO_Pro_AI_Rank {
             'perplexity' => array( $this, 'check_perplexity' ),
         ) );
 
-        global $wpdb;
-
+        $queue = array();
         foreach ( $queries as $query ) {
             foreach ( $sources as $source_id => $callable ) {
                 if ( ! is_callable( $callable ) ) {
                     continue;
                 }
-                $row = call_user_func( $callable, $query, $target );
-                $wpdb->insert( $wpdb->prefix . 'rsseo_pro_ai_rank', array_merge( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-                    array(
-                        'query'  => $query,
-                        'source' => $source_id,
-                    ),
-                    $row
-                ) );
+                $queue[] = array( 'query' => $query, 'source' => $source_id );
             }
+        }
+        if ( empty( $queue ) ) {
+            return;
+        }
+
+        $batch_id = 'rsseo_ai_rank_batch_' . wp_generate_password( 12, false );
+        set_transient( $batch_id, $queue, HOUR_IN_SECONDS );
+
+        wp_schedule_single_event( time(), self::TICK_HOOK, array( $batch_id ) );
+        if ( function_exists( 'spawn_cron' ) ) {
+            spawn_cron();
+        }
+    }
+
+    /**
+     * Process the next pending pair from the batch transient.
+     */
+    public function process_one( $batch_id ) {
+        $batch_id = sanitize_key( (string) $batch_id );
+        if ( '' === $batch_id ) {
+            return;
+        }
+
+        $queue = get_transient( $batch_id );
+        if ( ! is_array( $queue ) || empty( $queue ) ) {
+            delete_transient( $batch_id );
+            return;
+        }
+
+        $sources = apply_filters( 'rsseo_ai_rank_sources', array(
+            'perplexity' => array( $this, 'check_perplexity' ),
+        ) );
+
+        $target = (string) get_option( 'rsseo_pro_ai_rank_target_domain', '' );
+        $item   = array_shift( $queue );
+
+        if ( '' !== $target && ! empty( $item['query'] ) && ! empty( $item['source'] ) && isset( $sources[ $item['source'] ] ) && is_callable( $sources[ $item['source'] ] ) ) {
+            $row = call_user_func( $sources[ $item['source'] ], $item['query'], $target );
+            global $wpdb;
+            $wpdb->insert( $wpdb->prefix . 'rsseo_pro_ai_rank', array_merge( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                array(
+                    'query'  => $item['query'],
+                    'source' => $item['source'],
+                ),
+                $row
+            ) );
+        }
+
+        if ( ! empty( $queue ) ) {
+            set_transient( $batch_id, $queue, HOUR_IN_SECONDS );
+            wp_schedule_single_event( time() + self::TICK_DELAY, self::TICK_HOOK, array( $batch_id ) );
+        } else {
+            delete_transient( $batch_id );
         }
     }
 
@@ -217,9 +269,17 @@ class RSSEO_Pro_AI_Rank {
             'cited'            => $cited,
             'citation_rank'    => $rank,
             'citation_url'     => $hit_url,
-            'response_excerpt' => mb_substr( wp_strip_all_tags( $content ), 0, 500 ),
+            'response_excerpt' => self::safe_truncate( wp_strip_all_tags( $content ), 500 ),
             'error_msg'        => null,
         );
+    }
+
+    private static function safe_truncate( $string, $length ) {
+        $string = (string) $string;
+        if ( function_exists( 'mb_substr' ) ) {
+            return mb_substr( $string, 0, $length );
+        }
+        return substr( $string, 0, $length );
     }
 
     private function url_matches_domain( $url, $domain ) {
@@ -356,7 +416,7 @@ class RSSEO_Pro_AI_Rank {
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo $r->citation_url ? '<a href="' . esc_url( $r->citation_url ) . '" target="_blank" rel="noopener">' . esc_html( wp_parse_url( $r->citation_url, PHP_URL_PATH ) ?: '/' ) . '</a>' : '—'; ?></td>
-                                <td><?php echo esc_html( $r->error_msg ?: ( $r->response_excerpt ? mb_substr( $r->response_excerpt, 0, 80 ) . '…' : '' ) ); ?></td>
+                                <td><?php echo esc_html( $r->error_msg ?: ( $r->response_excerpt ? self::safe_truncate( $r->response_excerpt, 80 ) . '…' : '' ) ); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

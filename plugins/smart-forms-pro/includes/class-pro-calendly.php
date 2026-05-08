@@ -33,11 +33,13 @@ class SFCO_Pro_Calendly {
         }
 
         $api_key      = isset( $_POST['calendly_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['calendly_api_key'] ) ) : '';
+        $signing_key  = isset( $_POST['calendly_signing_key'] ) ? sanitize_text_field( wp_unslash( $_POST['calendly_signing_key'] ) ) : '';
         $booking_url  = isset( $_POST['calendly_url'] ) ? esc_url_raw( wp_unslash( $_POST['calendly_url'] ) ) : '';
         $show_after   = isset( $_POST['calendly_show_after'] ) ? sanitize_key( $_POST['calendly_show_after'] ) : 'submission';
         $enabled      = isset( $_POST['calendly_enabled'] ) ? 1 : 0;
 
         update_option( 'sfco_pro_calendly_api_key', $api_key );
+        update_option( 'sfco_pro_calendly_signing_key', $signing_key );
         update_option( 'sfco_pro_calendly_url', $booking_url );
         update_option( 'sfco_pro_calendly_show_after', $show_after );
         update_option( 'sfco_pro_calendly_enabled', $enabled );
@@ -53,8 +55,57 @@ class SFCO_Pro_Calendly {
         register_rest_route( 'sfco-pro/v1', '/calendly/webhook', array(
             'methods'             => 'POST',
             'callback'            => array( $this, 'handle_webhook' ),
-            'permission_callback' => '__return_true',
+            'permission_callback' => array( $this, 'verify_webhook_signature' ),
         ) );
+    }
+
+    /**
+     * Verify Calendly's HMAC-SHA256 signature header.
+     * Header format: Calendly-Webhook-Signature: t=<timestamp>,v1=<hmac>
+     * Signature payload: "{timestamp}.{raw body}"
+     * Tolerance: 5 minutes against replay.
+     */
+    public function verify_webhook_signature( $request ) {
+        $signing_key = (string) get_option( 'sfco_pro_calendly_signing_key', '' );
+
+        // No key configured: refuse the request so attackers can't forge events.
+        if ( '' === $signing_key ) {
+            return new WP_Error( 'sfco_calendly_no_key', __( 'Calendly signing key is not configured.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+        }
+
+        $header = (string) $request->get_header( 'calendly_webhook_signature' );
+        if ( '' === $header ) {
+            return new WP_Error( 'sfco_calendly_missing_sig', __( 'Missing Calendly signature header.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+        }
+
+        $parts = array();
+        foreach ( explode( ',', $header ) as $piece ) {
+            $kv = explode( '=', trim( $piece ), 2 );
+            if ( 2 === count( $kv ) ) {
+                $parts[ $kv[0] ] = $kv[1];
+            }
+        }
+
+        $timestamp = isset( $parts['t'] ) ? (int) $parts['t'] : 0;
+        $signature = $parts['v1'] ?? '';
+
+        if ( ! $timestamp || ! $signature ) {
+            return new WP_Error( 'sfco_calendly_bad_sig', __( 'Malformed Calendly signature.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+        }
+
+        // Reject anything older than 5 minutes (replay protection).
+        if ( abs( time() - $timestamp ) > 300 ) {
+            return new WP_Error( 'sfco_calendly_stale', __( 'Calendly webhook timestamp out of tolerance.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+        }
+
+        $payload = $request->get_body();
+        $expected = hash_hmac( 'sha256', $timestamp . '.' . $payload, $signing_key );
+
+        if ( ! hash_equals( $expected, $signature ) ) {
+            return new WP_Error( 'sfco_calendly_invalid_sig', __( 'Calendly signature mismatch.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+        }
+
+        return true;
     }
 
     public function handle_webhook( $request ) {
@@ -116,6 +167,7 @@ class SFCO_Pro_Calendly {
         }
 
         $api_key     = get_option( 'sfco_pro_calendly_api_key', '' );
+        $signing_key = get_option( 'sfco_pro_calendly_signing_key', '' );
         $booking_url = get_option( 'sfco_pro_calendly_url', '' );
         $show_after  = get_option( 'sfco_pro_calendly_show_after', 'submission' );
         $enabled     = get_option( 'sfco_pro_calendly_enabled', 0 );
@@ -165,6 +217,13 @@ class SFCO_Pro_Calendly {
                         <td>
                             <code><?php echo esc_html( $webhook_url ); ?></code>
                             <p class="description"><?php esc_html_e( 'Add this URL in your Calendly webhook settings to auto-update lead status when appointments are booked.', 'smart-forms-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="calendly_signing_key"><?php esc_html_e( 'Webhook Signing Key', 'smart-forms-pro' ); ?></label></th>
+                        <td>
+                            <input type="password" name="calendly_signing_key" id="calendly_signing_key" class="regular-text" value="<?php echo esc_attr( $signing_key ); ?>">
+                            <p class="description"><?php esc_html_e( 'Required. Calendly returns this when you create the webhook subscription. Without it, the webhook endpoint rejects every request.', 'smart-forms-pro' ); ?></p>
                         </td>
                     </tr>
                 </table>

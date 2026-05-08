@@ -13,6 +13,8 @@ class RSSEO_Pro_Geogrid {
 
     const KM_PER_LAT_DEGREE = 111.32;
     const CRON_HOOK         = 'rsseo_geogrid_weekly_scan';
+    const TICK_HOOK         = 'rsseo_geogrid_process_cell';
+    const TICK_DELAY        = 5; // seconds between cell scans, lets WP-Cron breathe
 
     private static $instance = null;
 
@@ -28,8 +30,10 @@ class RSSEO_Pro_Geogrid {
         add_action( 'admin_init', array( $this, 'handle_save' ) );
         add_action( 'admin_init', array( $this, 'handle_run_scan' ) );
 
-        // Weekly cron.
+        // Weekly cron entry point.
         add_action( self::CRON_HOOK, array( $this, 'cron_scan' ) );
+        // Per-cell tick (one DataForSEO call per fire).
+        add_action( self::TICK_HOOK, array( $this, 'process_next_cell' ), 10, 1 );
         add_action( 'init', array( $this, 'maybe_schedule_cron' ) );
     }
 
@@ -128,6 +132,10 @@ class RSSEO_Pro_Geogrid {
         exit;
     }
 
+    /**
+     * Entry point: build a run row, queue every cell as pending, schedule the first tick.
+     * Each tick processes one cell so we never block on N×N synchronous SERP calls.
+     */
     public function cron_scan() {
         $settings = get_option( 'rsseo_pro_geogrid_settings', array() );
         if ( empty( $settings['keyword'] ) || empty( $settings['target_domain'] ) ) {
@@ -150,66 +158,107 @@ class RSSEO_Pro_Geogrid {
             'cells_total'   => count( $cells ),
         ) );
         $run_id = (int) $wpdb->insert_id;
-
-        $ranks_collected = array();
-        $top10           = 0;
-        $done            = 0;
-
-        foreach ( $cells as $cell ) {
-            $serp = RSSEO_Pro_DataForSEO::get_serp_at_coordinate(
-                $settings['keyword'],
-                $cell['lat'],
-                $cell['lng'],
-                max( 1, (int) round( $settings['spacing_km'] / 2 ) )
-            );
-
-            $rank       = null;
-            $target_url = null;
-            $error_msg  = null;
-
-            if ( is_wp_error( $serp ) ) {
-                $error_msg = substr( $serp->get_error_message(), 0, 250 );
-            } else {
-                foreach ( $serp as $row ) {
-                    if ( $this->domain_matches( $row['domain'] ?? '', $settings['target_domain'] ) ) {
-                        $rank       = (int) ( $row['rank'] ?? 0 );
-                        $target_url = $row['url'] ?? '';
-                        break;
-                    }
-                }
-                if ( null !== $rank ) {
-                    $ranks_collected[] = $rank;
-                    if ( $rank <= 10 ) {
-                        $top10++;
-                    }
-                }
-            }
-
-            $wpdb->insert( $wpdb->prefix . 'rsseo_pro_geogrid_cells', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-                'run_id'     => $run_id,
-                'row_idx'    => $cell['row'],
-                'col_idx'    => $cell['col'],
-                'lat'        => $cell['lat'],
-                'lng'        => $cell['lng'],
-                'rank'       => $rank,
-                'target_url' => $target_url,
-                'error_msg'  => $error_msg,
-                'scanned_at' => current_time( 'mysql' ),
-            ) );
-
-            $done++;
-            $wpdb->update( $wpdb->prefix . 'rsseo_pro_geogrid_runs', // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-                array( 'cells_done' => $done ),
-                array( 'id' => $run_id )
-            );
+        if ( ! $run_id ) {
+            return;
         }
 
-        $avg = ! empty( $ranks_collected ) ? round( array_sum( $ranks_collected ) / count( $ranks_collected ), 2 ) : null;
+        // Insert every cell up front with scanned_at = NULL so process_next_cell can pick them up FIFO.
+        foreach ( $cells as $cell ) {
+            $wpdb->insert( $wpdb->prefix . 'rsseo_pro_geogrid_cells', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                'run_id'  => $run_id,
+                'row_idx' => $cell['row'],
+                'col_idx' => $cell['col'],
+                'lat'     => $cell['lat'],
+                'lng'     => $cell['lng'],
+            ) );
+        }
+
+        // Kick off the first tick immediately — subsequent ticks self-schedule.
+        wp_schedule_single_event( time(), self::TICK_HOOK, array( $run_id ) );
+        if ( function_exists( 'spawn_cron' ) ) {
+            spawn_cron();
+        }
+    }
+
+    /**
+     * Process one pending cell for the given run. Re-schedules itself until done.
+     * Idempotent: if the cell is already scanned, skips it.
+     */
+    public function process_next_cell( $run_id ) {
+        global $wpdb;
+        $run_id = (int) $run_id;
+        if ( ! $run_id ) {
+            return;
+        }
+
+        $run = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}rsseo_pro_geogrid_runs WHERE id = %d", $run_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        if ( ! $run ) {
+            return;
+        }
+        if ( ! class_exists( 'RSSEO_Pro_DataForSEO' ) || ! RSSEO_Pro_DataForSEO::is_configured() ) {
+            return;
+        }
+
+        $cell = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            "SELECT * FROM {$wpdb->prefix}rsseo_pro_geogrid_cells WHERE run_id = %d AND scanned_at IS NULL ORDER BY id ASC LIMIT 1",
+            $run_id
+        ) );
+
+        if ( ! $cell ) {
+            $this->finalize_run( $run_id );
+            return;
+        }
+
+        $serp = RSSEO_Pro_DataForSEO::get_serp_at_coordinate(
+            $run->keyword,
+            (float) $cell->lat,
+            (float) $cell->lng,
+            max( 1, (int) round( ( (float) $run->spacing_km ) / 2 ) )
+        );
+
+        $rank       = null;
+        $target_url = null;
+        $error_msg  = null;
+
+        if ( is_wp_error( $serp ) ) {
+            $error_msg = substr( $serp->get_error_message(), 0, 250 );
+        } else {
+            foreach ( $serp as $row ) {
+                if ( $this->domain_matches( $row['domain'] ?? '', $run->target_domain ) ) {
+                    $rank       = (int) ( $row['rank'] ?? 0 );
+                    $target_url = $row['url'] ?? '';
+                    break;
+                }
+            }
+        }
+
+        $wpdb->update( $wpdb->prefix . 'rsseo_pro_geogrid_cells', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            'rank'       => $rank,
+            'target_url' => $target_url,
+            'error_msg'  => $error_msg,
+            'scanned_at' => current_time( 'mysql' ),
+        ), array( 'id' => (int) $cell->id ) );
+
+        $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "UPDATE {$wpdb->prefix}rsseo_pro_geogrid_runs SET cells_done = cells_done + 1 WHERE id = %d",
+            $run_id
+        ) );
+
+        // Schedule the next cell — small delay so we don't hammer the API.
+        wp_schedule_single_event( time() + self::TICK_DELAY, self::TICK_HOOK, array( $run_id ) );
+    }
+
+    private function finalize_run( $run_id ) {
+        global $wpdb;
+        $stats = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            "SELECT AVG(rank) AS avg_rank, SUM(CASE WHEN rank IS NOT NULL AND rank <= 10 THEN 1 ELSE 0 END) AS in_top10 FROM {$wpdb->prefix}rsseo_pro_geogrid_cells WHERE run_id = %d AND scanned_at IS NOT NULL",
+            $run_id
+        ) );
+
         $wpdb->update( $wpdb->prefix . 'rsseo_pro_geogrid_runs', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            'cells_done' => count( $cells ),
-            'avg_rank'   => $avg,
-            'in_top10'   => $top10,
-        ), array( 'id' => $run_id ) );
+            'avg_rank' => $stats && null !== $stats->avg_rank ? round( (float) $stats->avg_rank, 2 ) : null,
+            'in_top10' => $stats ? (int) $stats->in_top10 : 0,
+        ), array( 'id' => (int) $run_id ) );
     }
 
     private function enumerate_cells( $center_lat, $center_lng, $grid_size, $spacing_km ) {
