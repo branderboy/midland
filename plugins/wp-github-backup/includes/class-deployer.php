@@ -623,10 +623,23 @@ class WGB_Deployer {
 			$post_title = self::derive_title_from_slug( $filename );
 		}
 
+		// Preserve the existing post's status on update so a deploy never
+		// silently re-publishes a draft / scheduled / pending / trashed post.
+		// New posts default to "publish" (the historical behaviour) unless the
+		// admin opts out via wgb_deploy_force_publish=0 — in which case they
+		// land as drafts and are never auto-published.
+		$force_publish_new = (int) get_option( 'wgb_deploy_force_publish', 1 );
+
+		if ( $existing && ! empty( $existing->post_status ) ) {
+			$post_status = $existing->post_status;
+		} else {
+			$post_status = $force_publish_new ? 'publish' : 'draft';
+		}
+
 		$post_data = array(
 			'post_title'   => $post_title,
 			'post_content' => $parsed['content'],
-			'post_status'  => 'publish',
+			'post_status'  => $post_status,
 			'post_type'    => $post_type,
 			'post_name'    => $slug,
 		);
