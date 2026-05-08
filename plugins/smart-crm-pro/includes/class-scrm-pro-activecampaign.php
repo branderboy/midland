@@ -35,10 +35,33 @@ class SCRM_Pro_ActiveCampaign {
         add_action( 'admin_init',                array( $this, 'handle_save' ) );
         add_action( 'admin_init',                array( $this, 'handle_test' ) );
 
-        // React to status changes from ServiceM8 / smart-forms-pro / direct.
+        // Booking events fire when a new lead is captured from any source.
+        add_action( 'sfco_lead_created',         array( $this, 'on_lead_booked' ) );
+        add_action( 'scai_lead_captured',        array( $this, 'on_chat_lead_captured' ), 10, 2 );
+
+        // Lifecycle events when a job actually completes.
         add_action( 'sfco_lead_status_changed',  array( $this, 'on_status_changed' ), 10, 3 );
         add_action( 'sfco_lead_completed',       array( $this, 'on_lead_completed' ) );
         add_action( 'scrm_pro_job_completed',    array( $this, 'on_lead_completed' ) );
+    }
+
+    /**
+     * Booking from any source that fires sfco_lead_created with a lead row/array.
+     */
+    public function on_lead_booked( $lead ) {
+        $this->push_lead( $lead, 'booked' );
+    }
+
+    /**
+     * Booking from the chat plugin — different payload shape (associative array).
+     */
+    public function on_chat_lead_captured( $lead_id, $data ) {
+        // Reshape so push_lead's normalization picks it up.
+        $lead = (object) array_merge(
+            array( 'id' => (int) $lead_id ),
+            (array) $data
+        );
+        $this->push_lead( $lead, 'booked' );
     }
 
     public function add_menu() {
@@ -56,14 +79,91 @@ class SCRM_Pro_ActiveCampaign {
         if ( 'completed' !== strtolower( (string) $new_status ) ) {
             return;
         }
-        $this->push_lead( $lead );
+        $this->push_lead( $lead, 'completed' );
     }
 
     public function on_lead_completed( $lead ) {
-        $this->push_lead( $lead );
+        $this->push_lead( $lead, 'completed' );
     }
 
-    private function push_lead( $lead ) {
+    /**
+     * Categorize the lead so AC flows can branch on commercial / residential / emergency.
+     * Order of precedence:
+     *   1. explicit category field set by the form
+     *   2. timeline matches an emergency keyword
+     *   3. project_type matches a commercial keyword
+     *   4. default: residential
+     *
+     * Filters: rsseo_lead_category lets a 3rd party override the inferred result.
+     */
+    public function categorize_lead( $lead ) {
+        $explicit = strtolower( (string) $this->get_field( $lead, array( 'category', 'job_category', 'lead_category' ) ) );
+        if ( in_array( $explicit, array( 'commercial', 'residential', 'emergency' ), true ) ) {
+            return apply_filters( 'scrm_pro_lead_category', $explicit, $lead );
+        }
+
+        $timeline     = strtolower( (string) $this->get_field( $lead, array( 'timeline' ) ) );
+        $project_type = strtolower( (string) $this->get_field( $lead, array( 'project_type', 'service_type' ) ) );
+        $message      = strtolower( (string) $this->get_field( $lead, array( 'message' ) ) );
+
+        $emergency_re = '/\b(emergency|urgent|asap|same[ -]?day|24[ -]?h(our)?s?|right[ -]now|today)\b/i';
+        if ( preg_match( $emergency_re, $timeline ) || preg_match( $emergency_re, $message ) ) {
+            return apply_filters( 'scrm_pro_lead_category', 'emergency', $lead );
+        }
+
+        $commercial_re = '/\b(commercial|business|office|retail|warehouse|industrial|hoa|property[ -]?manag)/i';
+        if ( preg_match( $commercial_re, $project_type ) || preg_match( $commercial_re, $message ) ) {
+            return apply_filters( 'scrm_pro_lead_category', 'commercial', $lead );
+        }
+
+        return apply_filters( 'scrm_pro_lead_category', 'residential', $lead );
+    }
+
+    /**
+     * Map (lifecycle, category) to the AC tags that should be applied.
+     * Operators fully control the actual flow on the AC side; this only emits
+     * the trigger-tag the flows listen for.
+     */
+    public function tags_for( $lifecycle, $category ) {
+        $base = (string) get_option( self::OPT_TAG, 'midland-job-completed' );
+
+        $tags = array();
+        switch ( $lifecycle ) {
+            case 'booked':
+                if ( 'commercial' === $category ) {
+                    $tags[] = 'midland-onsite-booked-commercial';
+                } elseif ( 'residential' === $category ) {
+                    $tags[] = 'midland-job-booked-residential';
+                } elseif ( 'emergency' === $category ) {
+                    $tags[] = 'midland-job-booked-emergency';
+                }
+                break;
+            case 'completed':
+                if ( 'emergency' === $category ) {
+                    // Emergency gets BOTH the post-job flow tag and the floor-care-plan tag
+                    // so AC can branch on whichever automation it wants to run first.
+                    $tags[] = 'midland-job-completed-emergency';
+                    $tags[] = 'midland-floor-care-plan-offer';
+                } elseif ( 'residential' === $category ) {
+                    $tags[] = 'midland-job-completed-residential';
+                } elseif ( 'commercial' === $category ) {
+                    $tags[] = 'midland-job-completed-commercial';
+                } else {
+                    $tags[] = $base;
+                }
+                break;
+        }
+        return apply_filters( 'scrm_pro_ac_tags', $tags, $lifecycle, $category );
+    }
+
+    /**
+     * Push a lead to ActiveCampaign with category-aware tags + booking metadata
+     * as fieldValues so AC flows can personalize.
+     *
+     * @param mixed  $lead       Object or array.
+     * @param string $lifecycle  'booked' or 'completed'.
+     */
+    private function push_lead( $lead, $lifecycle = 'completed' ) {
         if ( ! get_option( self::OPT_ENABLED, 0 ) ) {
             return;
         }
@@ -80,16 +180,47 @@ class SCRM_Pro_ActiveCampaign {
         $name  = (string) $this->get_field( $lead, array( 'customer_name', 'name' ) );
         $phone = (string) $this->get_field( $lead, array( 'customer_phone', 'phone' ) );
 
+        $category = $this->categorize_lead( $lead );
+
         $name_parts = explode( ' ', trim( $name ), 2 );
 
-        $payload = array(
-            'contact' => array(
-                'email'     => $email,
-                'firstName' => $name_parts[0] ?? '',
-                'lastName'  => $name_parts[1] ?? '',
-                'phone'     => $phone,
-            ),
+        // Forward booking metadata as AC fieldValues so flows can render
+        // "you booked carpet cleaning at 1500 sqft on Tuesday" without us
+        // pre-templating it. AC just needs the contact field to exist with
+        // matching field name — which is operator-side setup.
+        $field_values = array();
+        $forward = array(
+            'project_type'         => array( 'project_type', 'service_type' ),
+            'timeline'             => array( 'timeline' ),
+            'zip_code'             => array( 'zip_code', 'zip' ),
+            'square_footage'       => array( 'square_footage', 'sqft', 'square_feet' ),
+            'floor_type'           => array( 'floor_type', 'flooring' ),
+            'frequency'            => array( 'frequency', 'cleaning_frequency' ),
+            'job_id'               => array( 'job_id', 'id' ),
+            'midland_category'     => array(),
+            'floor_care_plan_url'  => array( 'floor_care_plan_url' ),
         );
+
+        foreach ( $forward as $ac_field => $sources ) {
+            if ( 'midland_category' === $ac_field ) {
+                $value = $category;
+            } else {
+                $value = (string) $this->get_field( $lead, $sources );
+            }
+            if ( '' !== $value ) {
+                $field_values[] = array( 'field' => $ac_field, 'value' => $value );
+            }
+        }
+
+        $contact = array(
+            'email'     => $email,
+            'firstName' => $name_parts[0] ?? '',
+            'lastName'  => $name_parts[1] ?? '',
+            'phone'     => $phone,
+        );
+        if ( ! empty( $field_values ) ) {
+            $contact['fieldValues'] = $field_values;
+        }
 
         $response = wp_remote_post( untrailingslashit( $api_url ) . '/api/3/contact/sync', array(
             'headers' => array(
@@ -97,7 +228,7 @@ class SCRM_Pro_ActiveCampaign {
                 'Content-Type' => 'application/json',
                 'Accept'       => 'application/json',
             ),
-            'body'    => wp_json_encode( $payload ),
+            'body'    => wp_json_encode( array( 'contact' => $contact ) ),
             'timeout' => 15,
         ) );
 
@@ -107,18 +238,23 @@ class SCRM_Pro_ActiveCampaign {
             $contact_id = isset( $body['contact']['id'] ) ? (int) $body['contact']['id'] : null;
         }
 
-        // Apply the tag so AC flows can trigger off it.
-        $tag_name = (string) get_option( self::OPT_TAG, 'midland-job-completed' );
-        if ( $contact_id && $tag_name ) {
-            $this->apply_tag( $api_url, $api_key, $contact_id, $tag_name );
+        $tags = $this->tags_for( $lifecycle, $category );
+        if ( $contact_id ) {
+            foreach ( $tags as $tag ) {
+                $this->apply_tag( $api_url, $api_key, $contact_id, $tag );
+            }
         }
 
         update_option( self::OPT_LAST_PUSH, array(
-            'at'    => time(),
-            'email' => $email,
-            'tag'   => $tag_name,
-            'ok'    => $contact_id ? 1 : 0,
+            'at'        => time(),
+            'email'     => $email,
+            'lifecycle' => $lifecycle,
+            'category'  => $category,
+            'tags'      => $tags,
+            'ok'        => $contact_id ? 1 : 0,
         ) );
+
+        do_action( 'scrm_pro_ac_pushed', $lead, $lifecycle, $category, $contact_id, $tags );
     }
 
     private function apply_tag( $api_url, $api_key, $contact_id, $tag_name ) {
@@ -283,10 +419,19 @@ class SCRM_Pro_ActiveCampaign {
                 <h2><?php esc_html_e( 'Last Push', 'smart-crm-pro' ); ?></h2>
                 <p>
                     <strong><?php echo esc_html( $last['email'] ?? '—' ); ?></strong>
-                    — <?php echo esc_html( $last['tag'] ?? '' ); ?>
+                    — <?php echo esc_html( $last['lifecycle'] ?? ( $last['tag'] ?? '' ) ); ?>
+                    / <?php echo esc_html( $last['category'] ?? '' ); ?>
                     — <?php echo esc_html( ! empty( $last['ok'] ) ? __( 'OK', 'smart-crm-pro' ) : __( 'failed', 'smart-crm-pro' ) ); ?>
                     — <?php echo esc_html( ! empty( $last['at'] ) ? wp_date( 'Y-m-d H:i', (int) $last['at'] ) : '' ); ?>
                 </p>
+                <?php if ( ! empty( $last['tags'] ) ) : ?>
+                    <p style="margin:0 0 12px;color:#555;">
+                        <?php esc_html_e( 'Tags applied:', 'smart-crm-pro' ); ?>
+                        <?php foreach ( (array) $last['tags'] as $t ) : ?>
+                            <code style="margin-right:6px;"><?php echo esc_html( $t ); ?></code>
+                        <?php endforeach; ?>
+                    </p>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
         <?php
