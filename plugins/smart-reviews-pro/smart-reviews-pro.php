@@ -55,12 +55,14 @@ class Smart_Reviews_Pro {
         require_once SRP_PATH . 'includes/class-srp-survey.php';
         require_once SRP_PATH . 'includes/class-srp-review-router.php';
         require_once SRP_PATH . 'includes/class-srp-admin.php';
+        require_once SRP_PATH . 'includes/class-srp-crm-integration.php';
     }
 
     private function boot() {
         SRP_Survey::get_instance();
         SRP_Review_Router::get_instance();
         SRP_Admin::get_instance();
+        SRP_CRM_Integration::get_instance();
     }
 }
 
