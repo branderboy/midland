@@ -82,6 +82,7 @@ class RSSEO_Pro_Plugin {
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-gsc-cleanup.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-programmatic.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-indexnow.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-speed.php';
     }
 
     private function init_classes() {
