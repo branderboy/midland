@@ -352,13 +352,20 @@ class SCRM_Pro_ActiveCampaign {
             return;
         }
 
-        wp_remote_post( $api_url . '/api/3/contactTags', array(
+        $apply = wp_remote_post( $api_url . '/api/3/contactTags', array(
             'headers' => $headers,
             'timeout' => 10,
             'body'    => wp_json_encode( array(
                 'contactTag' => array( 'contact' => (int) $contact_id, 'tag' => (int) $tag_id ),
             ) ),
         ) );
+
+        // Surface AC outages in the WP error log instead of silently dropping
+        // tag applications — the operator needs to know if AC flows aren't
+        // firing because the bridge couldn't reach the API.
+        if ( is_wp_error( $apply ) && function_exists( 'error_log' ) ) {
+            error_log( sprintf( '[smart-crm-pro] AC tag apply failed for contact %d / tag %d: %s', (int) $contact_id, (int) $tag_id, $apply->get_error_message() ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+        }
     }
 
     private function get_field( $source, array $keys ) {

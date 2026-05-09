@@ -173,7 +173,11 @@ class RSSEO_Pro_IndexNow {
         ), self::INDEXNOW_ENDPOINT );
 
         $response = wp_remote_get( $endpoint, array( 'timeout' => 10 ) );
-        $code     = wp_remote_retrieve_response_code( $response );
+        if ( is_wp_error( $response ) ) {
+            $this->log( $url, 'indexnow', 'error: ' . $response->get_error_message() );
+            return false;
+        }
+        $code = wp_remote_retrieve_response_code( $response );
 
         $this->log( $url, 'indexnow', $code );
 

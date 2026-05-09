@@ -110,6 +110,7 @@ class SFCO_Pro_GCal {
         $redirect_uri = admin_url( 'admin.php?page=sfco-gcal' );
 
         $response = wp_remote_post( self::TOKEN_ENDPOINT, array(
+            'timeout' => 30,
             'body' => array(
                 'code'          => $code,
                 'client_id'     => $client_id,
@@ -250,6 +251,7 @@ class SFCO_Pro_GCal {
         }
 
         $response = wp_remote_post( self::EVENTS_ENDPOINT, array(
+            'timeout' => 30,
             'headers' => array(
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type'  => 'application/json',
