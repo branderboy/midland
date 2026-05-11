@@ -38,6 +38,7 @@ require_once JMP_DIR . 'includes/class-post-type.php';
 require_once JMP_DIR . 'includes/class-meta-fields.php';
 require_once JMP_DIR . 'includes/class-content.php';
 require_once JMP_DIR . 'includes/class-schema.php';
+require_once JMP_DIR . 'includes/class-indexing-api.php';
 require_once JMP_DIR . 'includes/class-facebook.php';
 require_once JMP_DIR . 'includes/class-indeed.php';
 require_once JMP_DIR . 'includes/class-admin.php';
@@ -50,6 +51,7 @@ add_action( 'init', function() {
     DPJP_Post_Type::register();
     DPJP_Meta_Fields::register();
     DPJP_Schema::register();
+    DPJP_Indexing_API::register();
     DPJP_Admin::register();
     DPJP_Facebook::register();
     DPJP_Indeed::register();
