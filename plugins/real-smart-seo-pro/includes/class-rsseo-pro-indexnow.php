@@ -37,7 +37,7 @@ class RSSEO_Pro_IndexNow {
 
     public function add_menu() {
         add_submenu_page(
-            'rsseo-pro',
+            null,
             esc_html__( 'IndexNow', 'real-smart-seo-pro' ),
             esc_html__( 'IndexNow', 'real-smart-seo-pro' ),
             'manage_options',

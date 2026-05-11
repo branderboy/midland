@@ -27,7 +27,7 @@ class RSSEO_Pro_SameAs {
 
     public function add_menu() {
         add_submenu_page(
-            'rsseo-pro',
+            null,
             esc_html__( 'Business Identity', 'real-smart-seo-pro' ),
             esc_html__( 'Business Identity', 'real-smart-seo-pro' ),
             'manage_options',
