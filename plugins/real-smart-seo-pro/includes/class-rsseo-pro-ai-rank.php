@@ -64,7 +64,7 @@ class RSSEO_Pro_AI_Rank {
 
     public function add_menu() {
         add_submenu_page(
-            'rsseo-pro',
+            null,
             esc_html__( 'AI Rank + GEO', 'real-smart-seo-pro' ),
             esc_html__( 'AI Rank + GEO', 'real-smart-seo-pro' ),
             'manage_options',

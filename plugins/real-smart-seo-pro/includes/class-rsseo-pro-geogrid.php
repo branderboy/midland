@@ -83,7 +83,7 @@ class RSSEO_Pro_Geogrid {
 
     public function add_menu() {
         add_submenu_page(
-            'rsseo-pro',
+            null,
             esc_html__( 'Geo-Grid Tracker', 'real-smart-seo-pro' ),
             esc_html__( 'Geo-Grid Tracker', 'real-smart-seo-pro' ),
             'manage_options',

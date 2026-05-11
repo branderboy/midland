@@ -47,8 +47,12 @@ class RSSEO_Pro_Admin {
     }
 
     public function add_pro_menu() {
+        // Pro pages are hidden from the sidebar (parent=null). The free plugin
+        // routes to them inline via its Basic | Pro Settings sub-tab and the
+        // Index / Insights tab cards, so users don't have to think about
+        // "where does this Pro feature live in the menu".
         add_submenu_page(
-            'real-smart-seo',
+            null,
             __( 'Pro Settings', 'real-smart-seo-pro' ),
             __( 'Pro Settings', 'real-smart-seo-pro' ),
             'manage_options',
@@ -56,13 +60,17 @@ class RSSEO_Pro_Admin {
             array( $this, 'page_pro_settings' )
         );
         add_submenu_page(
-            'real-smart-seo',
+            null,
             __( 'Pro License', 'real-smart-seo-pro' ),
             __( '⭐ Pro License', 'real-smart-seo-pro' ),
             'manage_options',
             'rsseo-pro-license',
             array( $this, 'page_license' )
         );
+
+        // Render the Pro settings panel inline when the free plugin's Settings
+        // tab is on the Pro sub-tab.
+        add_action( 'rsseo_render_pro_settings_panel', array( $this, 'page_pro_settings' ) );
     }
 
     public function page_pro_settings() {

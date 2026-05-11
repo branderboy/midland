@@ -46,7 +46,7 @@ class RSSEO_Pro_GSC_Cleanup {
 
     public function add_menu() {
         add_submenu_page(
-            'rsseo-pro',
+            null,
             esc_html__( 'GSC Cleanup', 'real-smart-seo-pro' ),
             esc_html__( 'GSC Cleanup', 'real-smart-seo-pro' ),
             'manage_options',

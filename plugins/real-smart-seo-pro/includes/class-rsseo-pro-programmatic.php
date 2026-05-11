@@ -67,7 +67,7 @@ class RSSEO_Pro_Programmatic {
 
     public function add_menu() {
         add_submenu_page(
-            'rsseo-pro',
+            null,
             esc_html__( 'Programmatic Pages', 'real-smart-seo-pro' ),
             esc_html__( 'Programmatic Pages', 'real-smart-seo-pro' ),
             'manage_options',
