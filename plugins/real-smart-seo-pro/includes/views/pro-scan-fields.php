@@ -6,13 +6,13 @@ $dfs_configured = RSSEO_Pro_DataForSEO::is_configured();
     <span><?php esc_html_e( 'Pro Data Sources', 'real-smart-seo-pro' ); ?></span>
 </div>
 
-<!-- Keywords + Location (feeds DataForSEO + Claude trends) -->
+<!-- Keywords + Location (feeds DataForSEO + Perplexity Sonar trends) -->
 <div class="rsseo-data-source rsseo-data-source--pro">
     <div class="rsseo-data-source__header">
         <span class="rsseo-data-source__icon">🎯</span>
         <div>
             <h3><?php esc_html_e( 'Target Keywords + Location', 'real-smart-seo-pro' ); ?> <span class="rsseo-pro-badge">PRO</span></h3>
-            <p><?php esc_html_e( 'Enter your target keywords and service location. Claude uses this for trend intelligence. If DataForSEO is connected, live volume, difficulty, and SERP data is pulled automatically.', 'real-smart-seo-pro' ); ?></p>
+            <p><?php esc_html_e( 'Enter your target keywords and service location. The AI uses this for trend intelligence. If DataForSEO is connected, live volume, difficulty, and SERP data is pulled automatically.', 'real-smart-seo-pro' ); ?></p>
             <?php if ( $dfs_configured ) : ?>
                 <span class="rsseo-dfs-connected">⚡ <?php esc_html_e( 'DataForSEO connected — live data will be pulled', 'real-smart-seo-pro' ); ?></span>
             <?php else : ?>
@@ -46,7 +46,7 @@ $dfs_configured = RSSEO_Pro_DataForSEO::is_configured();
         <span class="rsseo-data-source__icon">🕵️</span>
         <div>
             <h3><?php esc_html_e( 'Competitor Research', 'real-smart-seo-pro' ); ?> <span class="rsseo-pro-badge">PRO</span></h3>
-            <p><?php esc_html_e( 'Crawl a competitor\'s site in Screaming Frog (enter their URL instead of yours), export, and upload. Claude will analyze what they\'re doing right that you\'re not.', 'real-smart-seo-pro' ); ?></p>
+            <p><?php esc_html_e( 'Crawl a competitor\'s site in Screaming Frog (enter their URL instead of yours), export, and upload. The AI will analyze what they\'re doing right that you\'re not.', 'real-smart-seo-pro' ); ?></p>
             <?php if ( $dfs_configured ) : ?>
                 <span class="rsseo-dfs-connected">⚡ <?php esc_html_e( 'SERP data will also show who\'s ranking above you', 'real-smart-seo-pro' ); ?></span>
             <?php endif; ?>
