@@ -60,6 +60,7 @@ class SFCO_Database {
             area varchar(20) DEFAULT NULL,
             reminder_due_at datetime DEFAULT NULL,
             job_id varchar(100) DEFAULT NULL,
+            deal_id varchar(100) DEFAULT NULL,
             status varchar(50) DEFAULT 'new',
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
