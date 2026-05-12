@@ -15,6 +15,7 @@ class DPJP_Templates {
     public static function register(): void {
         add_action( 'admin_menu',                       [ __CLASS__, 'menu' ] );
         add_action( 'admin_post_dpjp_use_template',     [ __CLASS__, 'handle_create' ] );
+        add_action( 'admin_post_dpjp_seed_all',         [ __CLASS__, 'handle_seed_all' ] );
     }
 
     public static function menu(): void {
@@ -129,6 +130,42 @@ class DPJP_Templates {
             <h1><?php esc_html_e( 'Floor-Care Job Templates', 'job-manager-pro' ); ?></h1>
             <p><?php esc_html_e( 'Click "Use this template" to create a draft job post pre-filled with title, description, pay, and requirements. Edit before publishing.', 'job-manager-pro' ); ?></p>
 
+            <?php
+            // One-click "seed every Midland floor-care job" button — creates
+            // drafts of all templates that don't already exist so the operator
+            // doesn't have to click 8 times to bootstrap their job board.
+            $seed_url = wp_nonce_url(
+                add_query_arg( 'action', 'dpjp_seed_all', admin_url( 'admin-post.php' ) ),
+                'dpjp_seed_all'
+            );
+            ?>
+            <p style="margin:14px 0 6px;">
+                <a href="<?php echo esc_url( $seed_url ); ?>" class="button button-primary button-large">
+                    <?php esc_html_e( '✨ Add all Midland floor-care jobs as drafts', 'job-manager-pro' ); ?>
+                </a>
+                <span style="color:#475569;font-size:13px;margin-left:8px;">
+                    <?php esc_html_e( 'Creates one draft per template. Skips any that already exist by title.', 'job-manager-pro' ); ?>
+                </span>
+            </p>
+
+            <?php if ( isset( $_GET['seeded'] ) ) : ?>
+                <div class="notice notice-success is-dismissible">
+                    <p>
+                        <?php
+                        /* translators: 1: created count, 2: skipped count */
+                        printf(
+                            esc_html__( '✓ Seeded %1$d new draft jobs. Skipped %2$d that already existed.', 'job-manager-pro' ),
+                            (int) $_GET['seeded'],
+                            (int) ( $_GET['skipped'] ?? 0 )
+                        );
+                        ?>
+                        <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=dpjp_job&post_status=draft' ) ); ?>">
+                            <?php esc_html_e( 'Review drafts →', 'job-manager-pro' ); ?>
+                        </a>
+                    </p>
+                </div>
+            <?php endif; ?>
+
             <?php if ( isset( $_GET['template_created'] ) ) :
                 $post_id = (int) $_GET['template_created'];
                 $edit    = get_edit_post_link( $post_id );
@@ -177,6 +214,61 @@ class DPJP_Templates {
         .dpjp-template-desc { color: #1d2327; font-size: 13px; flex: 1; line-height: 1.5; }
         </style>
         <?php
+    }
+
+    /**
+     * Loop every template into a draft post. Idempotent — skips any title
+     * that already exists so the operator can re-click safely after editing
+     * a couple of drafts to add the rest.
+     */
+    public static function handle_seed_all(): void {
+        if ( ! current_user_can( 'edit_posts' ) ) wp_die( 'No.' );
+        check_admin_referer( 'dpjp_seed_all' );
+
+        $tpls    = self::templates();
+        $created = 0;
+        $skipped = 0;
+
+        foreach ( $tpls as $slug => $t ) {
+            // Skip if a job with this title already exists (any status).
+            $existing = get_page_by_title( $t['title'], OBJECT, 'dpjp_job' );
+            if ( $existing instanceof WP_Post ) {
+                $skipped++;
+                continue;
+            }
+
+            $post_id = wp_insert_post( [
+                'post_type'    => 'dpjp_job',
+                'post_status'  => 'draft',
+                'post_title'   => $t['title'],
+                'post_content' => $t['description'],
+            ], true );
+
+            if ( is_wp_error( $post_id ) || ! $post_id ) {
+                continue;
+            }
+
+            update_post_meta( $post_id, 'dpjp_trade',           $t['trade'] );
+            update_post_meta( $post_id, 'dpjp_location',        $t['location'] );
+            update_post_meta( $post_id, 'dpjp_pay',             $t['pay'] );
+            update_post_meta( $post_id, 'dpjp_employment_type', $t['employment_type'] );
+            update_post_meta( $post_id, 'dpjp_requirements',    $t['requirements'] );
+            update_post_meta( $post_id, 'dpjp_call_to_action',  'Call or text us today — we respond fast.' );
+            update_post_meta( $post_id, 'dpjp_valid_through',   gmdate( 'Y-m-d', strtotime( '+30 days' ) ) );
+
+            $created++;
+        }
+
+        wp_safe_redirect( add_query_arg(
+            [
+                'post_type' => 'dpjp_job',
+                'page'      => 'dpjp-templates',
+                'seeded'    => $created,
+                'skipped'   => $skipped,
+            ],
+            admin_url( 'edit.php' )
+        ) );
+        exit;
     }
 
     public static function handle_create(): void {
