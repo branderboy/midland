@@ -1,11 +1,8 @@
 <?php
 /**
- * Plugin Name: Smart Forms PRO for Contractors
- * Plugin URI: https://livableforms.com/smart-forms-pro.html
- * Description: PRO upgrade for Smart Forms. Resend email transport, Google Calendar integration, automated follow-ups, CRM (HubSpot, Salesforce, Pipedrive, ActiveCampaign), analytics dashboard, team management, and custom branding.
- * Version: 1.1.0
- * Author: TaggleFish
- * Author URI: https://tagglefish.com
+ * Plugin Name: Midland Smart Forms Pro
+ * Description: PRO upgrade for Midland Smart Forms. Resend email transport, Google Calendar integration, automated follow-ups, CRM (HubSpot, Salesforce, Pipedrive, ActiveCampaign), analytics dashboard, team management, and custom branding.
+ * Version: 1.2.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-forms-pro
