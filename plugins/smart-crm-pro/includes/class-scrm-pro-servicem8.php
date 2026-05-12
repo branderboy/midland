@@ -21,6 +21,12 @@ class SCRM_Pro_ServiceM8 {
     const OPT_SECRET           = 'scrm_pro_sm8_secret';
     const OPT_COMPLETION_KEY   = 'scrm_pro_sm8_completion_status';
     const OPT_LAST_HIT         = 'scrm_pro_sm8_last_hit';
+    // Outbound API (CRM → ServiceM8) credentials + defaults.
+    const OPT_API_KEY          = 'scrm_pro_sm8_api_key';      // ServiceM8 account API key
+    const OPT_COMPANY_UUID     = 'scrm_pro_sm8_company_uuid'; // default ServiceM8 company UUID
+    const OPT_AUTO_PUSH_HOT    = 'scrm_pro_sm8_auto_push_hot';// legacy: auto-create job for Hot leads only
+    const OPT_AUTO_PUSH_MODE   = 'scrm_pro_sm8_auto_push_mode';// '' off | 'hot' | 'all' (default 'all')
+    const SM8_API_BASE         = 'https://api.servicem8.com/api_1.0/';
 
     private static $instance = null;
 
@@ -219,6 +225,117 @@ class SCRM_Pro_ServiceM8 {
         return null;
     }
 
+    // ─── Outbound: CRM → ServiceM8 (create job from a lead) ──────────────────
+
+    /**
+     * Push a Smart Forms lead into ServiceM8 as a new job. Returns the SM8
+     * job UUID on success, WP_Error on failure. Stamps the returned job UUID
+     * back onto the sfco_leads row so subsequent webhooks (job_started,
+     * job_completed) match up.
+     *
+     * @param int $lead_id Smart Forms lead row ID.
+     * @return string|WP_Error
+     */
+    public static function push_lead_as_job( $lead_id ) {
+        $api_key      = (string) get_option( self::OPT_API_KEY, '' );
+        $company_uuid = (string) get_option( self::OPT_COMPANY_UUID, '' );
+        if ( '' === $api_key ) {
+            return new WP_Error( 'scrm_sm8_no_api_key', 'ServiceM8 API key not configured.' );
+        }
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'sfco_leads';
+        $lead  = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $lead_id ) ); // phpcs:ignore
+        if ( ! $lead ) {
+            return new WP_Error( 'scrm_sm8_no_lead', 'Lead not found.' );
+        }
+        if ( ! empty( $lead->job_id ) ) {
+            return $lead->job_id; // already pushed
+        }
+
+        // Build the SM8 Job payload. The required schema for ServiceM8's
+        // /api_1.0/job.json endpoint: company_uuid + status. We also send
+        // a description with the form input so the dispatcher has context.
+        $desc_lines = array();
+        foreach ( array(
+            'project_type'   => 'Service',
+            'square_footage' => 'Sq Ft',
+            'timeline'       => 'Timeline',
+            'priority'       => 'Priority',
+            'area'           => 'Area',
+            'additional_notes' => 'Notes',
+        ) as $col => $label ) {
+            if ( ! empty( $lead->$col ) ) {
+                $desc_lines[] = $label . ': ' . $lead->$col;
+            }
+        }
+
+        $job = array(
+            'status'                 => 'Quote', // SM8 status — starts as a quote, becomes a Job once accepted
+            'work_order_reference'   => 'midland-lead-' . (int) $lead_id,
+            'job_description'        => implode( "\n", $desc_lines ),
+            'job_address'            => $lead->zip_code ?? '',
+            'work_done_description'  => '',
+        );
+        if ( '' !== $company_uuid ) {
+            $job['company_uuid'] = $company_uuid;
+        }
+
+        $response = wp_remote_post( self::SM8_API_BASE . 'job.json', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
+                'Content-Type'  => 'application/json',
+                'Accept'        => 'application/json',
+            ),
+            'body'    => wp_json_encode( $job ),
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            return $response;
+        }
+        $code = (int) wp_remote_retrieve_response_code( $response );
+        if ( $code < 200 || $code >= 300 ) {
+            return new WP_Error( 'scrm_sm8_http', sprintf( 'ServiceM8 returned HTTP %d', $code ), array( 'body' => wp_remote_retrieve_body( $response ) ) );
+        }
+
+        // SM8 returns the UUID in a header (x-record-uuid) for POSTs.
+        $headers   = wp_remote_retrieve_headers( $response );
+        $job_uuid  = '';
+        if ( method_exists( $headers, 'offsetGet' ) ) {
+            $job_uuid = (string) $headers->offsetGet( 'x-record-uuid' );
+        } elseif ( is_array( $headers ) ) {
+            $job_uuid = $headers['x-record-uuid'] ?? $headers['X-Record-UUID'] ?? '';
+        }
+
+        if ( '' !== $job_uuid ) {
+            $wpdb->update( $table, array( 'job_id' => $job_uuid ), array( 'id' => (int) $lead_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore
+        }
+        return $job_uuid;
+    }
+
+    /**
+     * Hook target — fires when the bridge tags a lead as Hot priority. If
+     * auto-push is enabled in settings, this creates a SM8 quote-job in
+     * the background. Failure is logged silently; the operator can retry
+     * by clicking the per-lead "Push to ServiceM8" button.
+     */
+    public static function maybe_auto_push( $lead, $priority, $area ) {
+        if ( empty( $lead['id'] ) ) return;
+        // Default mode = 'all' (auto-push every lead). Legacy installs that
+        // set OPT_AUTO_PUSH_HOT=1 are migrated to mode='hot'. mode='' = off.
+        $mode = (string) get_option( self::OPT_AUTO_PUSH_MODE, '' );
+        if ( '' === $mode ) {
+            $mode = get_option( self::OPT_AUTO_PUSH_HOT, 0 ) ? 'hot' : 'all';
+        }
+        if ( '' === $mode || 'off' === $mode ) return;
+        if ( 'hot' === $mode && 'Hot' !== $priority ) return;
+        $result = self::push_lead_as_job( (int) $lead['id'] );
+        if ( is_wp_error( $result ) ) {
+            error_log( 'SCRM SM8 auto-push failed for lead ' . $lead['id'] . ': ' . $result->get_error_message() ); // phpcs:ignore
+        }
+    }
+
     public function handle_save() {
         if ( ! isset( $_POST['scrm_save_sm8'] ) || ! current_user_can( 'manage_options' ) ) {
             return;
@@ -230,16 +347,25 @@ class SCRM_Pro_ServiceM8 {
 
         update_option( self::OPT_SECRET, sanitize_text_field( wp_unslash( $_POST['sm8_secret'] ?? '' ) ) );
         update_option( self::OPT_COMPLETION_KEY, sanitize_key( wp_unslash( $_POST['sm8_completion_status'] ?? 'completed' ) ) );
+        update_option( self::OPT_API_KEY,        sanitize_text_field( wp_unslash( $_POST['sm8_api_key'] ?? '' ) ) );
+        update_option( self::OPT_COMPANY_UUID,   sanitize_text_field( wp_unslash( $_POST['sm8_company_uuid'] ?? '' ) ) );
+        update_option( self::OPT_AUTO_PUSH_HOT,  isset( $_POST['sm8_auto_push_hot'] ) ? 1 : 0 );
+        $mode = isset( $_POST['sm8_auto_push_mode'] ) ? sanitize_key( wp_unslash( $_POST['sm8_auto_push_mode'] ) ) : 'all';
+        if ( ! in_array( $mode, array( 'off', 'hot', 'all' ), true ) ) $mode = 'all';
+        update_option( self::OPT_AUTO_PUSH_MODE, $mode );
 
         wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-servicem8&saved=1' ) );
         exit;
     }
 
     public function render_page() {
-        $secret      = (string) get_option( self::OPT_SECRET, '' );
-        $key         = (string) get_option( self::OPT_COMPLETION_KEY, 'completed' );
-        $webhook_url = rest_url( 'smart-crm-pro/v1/servicem8' );
-        $last        = get_option( self::OPT_LAST_HIT, array() );
+        $secret       = (string) get_option( self::OPT_SECRET, '' );
+        $key          = (string) get_option( self::OPT_COMPLETION_KEY, 'completed' );
+        $api_key      = (string) get_option( self::OPT_API_KEY, '' );
+        $company_uuid = (string) get_option( self::OPT_COMPANY_UUID, '' );
+        $auto_push    = (int)    get_option( self::OPT_AUTO_PUSH_HOT, 0 );
+        $webhook_url  = rest_url( 'smart-crm-pro/v1/servicem8' );
+        $last         = get_option( self::OPT_LAST_HIT, array() );
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $saved = isset( $_GET['saved'] );
         ?>
@@ -273,6 +399,42 @@ class SCRM_Pro_ServiceM8 {
                         <td>
                             <input type="text" id="sm8_completion_status" name="sm8_completion_status" value="<?php echo esc_attr( $key ); ?>">
                             <p class="description"><?php esc_html_e( 'Status or event substring that means "this job is done" (default: completed).', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <h2 style="margin-top:24px;"><?php esc_html_e( 'Outbound (CRM → ServiceM8)', 'smart-crm-pro' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Lets the per-lead "Push to ServiceM8" button (and Hot-lead auto-push) create a Quote in ServiceM8 from a Smart Forms lead.', 'smart-crm-pro' ); ?></p>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="sm8_api_key"><?php esc_html_e( 'ServiceM8 API Key', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="password" id="sm8_api_key" name="sm8_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" autocomplete="off">
+                            <p class="description"><?php esc_html_e( 'ServiceM8 → Settings → Developer Tools → Generate API key. Premium Plus plan supports full API + webhooks.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="sm8_company_uuid"><?php esc_html_e( 'Default Company UUID', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="text" id="sm8_company_uuid" name="sm8_company_uuid" class="regular-text" value="<?php echo esc_attr( $company_uuid ); ?>" placeholder="00000000-0000-0000-0000-000000000000">
+                            <p class="description"><?php esc_html_e( 'Optional. ServiceM8 → Clients → click the master "house account" client → copy the UUID from the URL. Leave blank to let ServiceM8 create a contact-only job.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="sm8_auto_push_mode"><?php esc_html_e( 'Auto-push leads', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <?php
+                            $current_mode = (string) get_option( self::OPT_AUTO_PUSH_MODE, '' );
+                            if ( '' === $current_mode ) {
+                                $current_mode = get_option( self::OPT_AUTO_PUSH_HOT, 0 ) ? 'hot' : 'all';
+                            }
+                            ?>
+                            <select id="sm8_auto_push_mode" name="sm8_auto_push_mode">
+                                <option value="all" <?php selected( $current_mode, 'all' ); ?>><?php esc_html_e( 'Every lead — hands-off (recommended)', 'smart-crm-pro' ); ?></option>
+                                <option value="hot" <?php selected( $current_mode, 'hot' ); ?>><?php esc_html_e( 'Hot priority only', 'smart-crm-pro' ); ?></option>
+                                <option value="off" <?php selected( $current_mode, 'off' ); ?>><?php esc_html_e( 'Off — manual only (use the per-lead button)', 'smart-crm-pro' ); ?></option>
+                            </select>
+                            <p class="description"><?php esc_html_e( 'Default: every lead is auto-pushed to ServiceM8 as a Quote so you don\'t have to babysit the dispatcher. Switch to Hot-only if you want to keep low-intent leads out of SM8.', 'smart-crm-pro' ); ?></p>
                         </td>
                     </tr>
                 </table>

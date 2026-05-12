@@ -1,18 +1,14 @@
 <?php
 /**
- * Plugin Name: Midland Smart CRM Pro
- * Plugin URI: https://tagglefish.com/smart-crm-pro
- * Description: Midland-branded CRM. Lead reactivation engine + ServiceM8 webhook bridge that marks projects complete, fires the NPS survey, and feeds ActiveCampaign.
- * Version: 1.0.0
- * Author: TaggleFish
- * Author URI: https://tagglefish.com
+ * Plugin Name: Midland Smart CRM
+ * Description: Midland-branded CRM. Auto-formats incoming Smart Forms leads by priority + area, schedules follow-up reminders, syncs to ActiveCampaign + ServiceM8, runs the cold-lead reactivation engine and NPS surveys.
+ * Version: 1.1.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-crm-pro
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Requires Plugins: smart-forms-for-contractors
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,6 +38,7 @@ function smart_crm_pro_init() {
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-servicem8.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-activecampaign.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-floor-care-plan.php';
+    require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-smart-forms-bridge.php';
 
     new SCRM_Pro_Admin();
     new SCRM_Pro_License();

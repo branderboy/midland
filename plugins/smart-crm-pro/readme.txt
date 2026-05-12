@@ -1,5 +1,5 @@
 === Smart CRM PRO - Lead Reactivation ===
-Contributors: tagglefish
+Contributors: midland
 Tags: crm, lead reactivation, email campaigns, cold leads, contractor crm, win-back, database reactivation
 Requires at least: 5.8
 Tested up to: 6.9
