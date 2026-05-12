@@ -44,6 +44,7 @@ require_once JMP_DIR . 'includes/class-indeed.php';
 require_once JMP_DIR . 'includes/class-admin.php';
 require_once JMP_DIR . 'includes/class-elementor.php';
 require_once JMP_DIR . 'includes/class-importer.php';
+require_once JMP_DIR . 'includes/class-templates.php';
 require_once JMP_DIR . 'includes/class-shortcode.php';
 require_once JMP_DIR . 'includes/class-application.php';
 
@@ -57,6 +58,7 @@ add_action( 'init', function() {
     DPJP_Indeed::register();
     DPJP_Elementor::register();
     DPJP_Importer::register();
+    DPJP_Templates::register();
     DPJP_Shortcode::register();
     DPJP_Application::register();
 } );
