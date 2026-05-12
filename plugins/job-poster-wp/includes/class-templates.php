@@ -39,16 +39,6 @@ class DPJP_Templates {
         $location      = 'Washington DC Metro Area';
 
         return [
-            'residential-carpet-tech' => [
-                'title' => 'Residential Carpet Cleaning Technician',
-                'trade' => 'Residential Carpet Cleaning',
-                'location' => $location,
-                'pay' => '$20–$28/hr + tips',
-                'employment_type' => 'full-time',
-                'description' => "We're hiring a Residential Carpet Cleaning Technician to run in-home carpet jobs across DC, MD, and VA. Steady book of repeat homeowners and word-of-mouth referrals.\n\nWhat you'll do:\n- Operate truck-mounted hot water extraction units\n- Pre-treat, agitate, and rinse carpets\n- Spot treatment and stain removal (pet, red wine, grease)\n- Walk homeowners through what was cleaned and after-care\n- Maintain equipment and report issues\n\nWe pay weekly, provide the truck, equipment, and chemicals, and you get tips on top.",
-                'requirements' => "Valid driver's license + clean driving record\n1+ year carpet cleaning experience preferred (we'll train the right person)\nClean appearance, customer-facing demeanor\nAble to lift 50 lbs\nWeekend availability a plus",
-            ],
-
             'commercial-carpet-tech' => [
                 'title' => 'Commercial Carpet Care Technician',
                 'trade' => 'Commercial Carpet Care',

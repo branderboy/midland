@@ -69,9 +69,9 @@ class DPJP_Shortcode {
                 <p class="dpjp-sc-desc">Limit to the 4 most recent jobs.</p>
             </div>
             <div class="dpjp-sc-row">
-                <div class="dpjp-sc-code" id="sc5">[dpjp_jobs trade="Drywall"]</div>
+                <div class="dpjp-sc-code" id="sc5">[dpjp_jobs trade="Commercial Carpet Care"]</div>
                 <button class="dpjp-sc-copy" data-target="sc5">Copy</button>
-                <p class="dpjp-sc-desc">Show only jobs with a specific trade. Values: Drywall, Framing, Carpentry, Painting, HVAC, Plumbing, etc.</p>
+                <p class="dpjp-sc-desc">Show only jobs with a specific trade. Values: Commercial Carpet Care, Floor Stripping &amp; Waxing, Tile &amp; Grout Cleaning, Commercial Floor Care, Concrete Polishing, Water Damage Restoration, Sales / Estimating, Office / Dispatch.</p>
             </div>
             <div class="dpjp-sc-row">
                 <div class="dpjp-sc-code" id="sc6">[dpjp_jobs type="full-time"]</div>
