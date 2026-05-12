@@ -221,6 +221,24 @@ class SFCO_Database {
                 ),
             ),
             array(
+                'slug'   => 'homepage-form',
+                'title'  => 'Homepage Form',
+                'status' => 'active',
+                'fields' => array(
+                    array( 'type' => 'text',     'key' => 'customer_name',  'label' => 'Name',                            'required' => true ),
+                    array( 'type' => 'tel',      'key' => 'customer_phone', 'label' => 'Phone',                           'required' => true ),
+                    array( 'type' => 'checkbox', 'key' => 'project_type',   'label' => 'Choose a Service',                'required' => true,
+                           'options' => array( 'Floor Cleaning', 'Carpet Cleaning', 'Carpet Installation' ) ),
+                    array( 'type' => 'select',   'key' => 'emergency_service','label' => 'Do you require emergency service?',
+                           'options' => array( 'No', 'Yes' ) ),
+                    array( 'type' => 'text',     'key' => 'zip_code',       'label' => 'Zip Code',                        'required' => true ),
+                ),
+                'settings' => array(
+                    'confirmation' => "Got it! We'll be in touch within 15 minutes during business hours. (After hours? We'll call first thing tomorrow.)",
+                    'crm_push'     => true,
+                ),
+            ),
+            array(
                 'slug'   => 'residential-same-day-booking',
                 'title'  => 'Residential Same-Day Booking',
                 'status' => 'active',
