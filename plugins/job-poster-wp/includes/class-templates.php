@@ -127,7 +127,7 @@ class DPJP_Templates {
         $action    = admin_url( 'admin-post.php' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Floor-Care Job Templates', 'job-manager-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'Midland Floor Care Jobs', 'job-manager-pro' ); ?></h1>
             <p><?php esc_html_e( 'Click "Use this template" to create a draft job post pre-filled with title, description, pay, and requirements. Edit before publishing.', 'job-manager-pro' ); ?></p>
 
             <?php
