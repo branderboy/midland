@@ -39,14 +39,24 @@ class DPJP_Templates {
         $location      = 'Washington DC Metro Area';
 
         return [
-            'carpet-cleaning-tech' => [
-                'title' => 'Carpet Cleaning Technician',
-                'trade' => 'Carpet Cleaning',
+            'residential-carpet-tech' => [
+                'title' => 'Residential Carpet Cleaning Technician',
+                'trade' => 'Residential Carpet Cleaning',
                 'location' => $location,
                 'pay' => '$20–$28/hr + tips',
                 'employment_type' => 'full-time',
-                'description' => "We're hiring a Carpet Cleaning Technician to run residential and light commercial carpet jobs across DC, MD, and VA.\n\nWhat you'll do:\n- Operate truck-mounted hot water extraction units\n- Pre-treat, agitate, and rinse carpets\n- Handle spot treatment and stain removal\n- Communicate clearly with homeowners and property managers\n- Maintain equipment and report issues\n\nWe pay weekly, provide all equipment and a company vehicle, and have a steady book of repeat clients. Tips are common.",
-                'requirements' => "Valid driver's license\n1+ year carpet cleaning experience preferred\nClean appearance, customer-facing demeanor\nAble to lift 50 lbs\nWeekend availability a plus",
+                'description' => "We're hiring a Residential Carpet Cleaning Technician to run in-home carpet jobs across DC, MD, and VA. Steady book of repeat homeowners and word-of-mouth referrals.\n\nWhat you'll do:\n- Operate truck-mounted hot water extraction units\n- Pre-treat, agitate, and rinse carpets\n- Spot treatment and stain removal (pet, red wine, grease)\n- Walk homeowners through what was cleaned and after-care\n- Maintain equipment and report issues\n\nWe pay weekly, provide the truck, equipment, and chemicals, and you get tips on top.",
+                'requirements' => "Valid driver's license + clean driving record\n1+ year carpet cleaning experience preferred (we'll train the right person)\nClean appearance, customer-facing demeanor\nAble to lift 50 lbs\nWeekend availability a plus",
+            ],
+
+            'commercial-carpet-tech' => [
+                'title' => 'Commercial Carpet Care Technician',
+                'trade' => 'Commercial Carpet Care',
+                'location' => $location,
+                'pay' => '$22–$30/hr',
+                'employment_type' => 'full-time',
+                'description' => "Commercial Carpet Care Tech wanted for our office, medical, and retail accounts in DC/MD/VA. Mostly after-hours, mostly recurring contracts. Predictable schedule, consistent paychecks, no homeowner drama.\n\nWhat you'll do:\n- Hot water extraction + low-moisture encapsulation on commercial carpet\n- Spot + stain treatment on heavy traffic lanes\n- Carpet bonneting and interim maintenance\n- Operate truck-mount and portable extractors\n- Document before/after for property managers\n\nWe service offices, medical buildings, schools, and retail — recurring contracts mean recurring pay.",
+                'requirements' => "1+ year commercial carpet experience preferred\nFamiliar with extraction + encapsulation methods\nReliable transportation + clean driving record\nAvailable evenings/weekends\nMust pass background check (medical + government accounts require it)",
             ],
 
             'floor-stripping-tech' => [
@@ -59,44 +69,24 @@ class DPJP_Templates {
                 'requirements' => "2+ years floor stripping experience\nFamiliar with auto-scrubbers and burnishers\nReliable transportation\nAvailable evenings/weekends\nMust pass background check (some accounts require it)",
             ],
 
-            'hardwood-refinisher' => [
-                'title' => 'Hardwood Floor Refinisher',
-                'trade' => 'Hardwood Refinishing',
-                'location' => $location,
-                'pay' => '$25–$40/hr based on experience',
-                'employment_type' => 'full-time',
-                'description' => "Skilled Hardwood Floor Refinisher wanted. Residential focus — sand, stain, and refinish hardwood floors to a high standard.\n\nWhat you'll do:\n- Edge and field sanding with drum + edger machines\n- Stain application, water-based and oil-based finishes\n- Dustless containment setup\n- Customer walkthroughs and final inspection\n\nWe carry the equipment and the leads. You bring craftsmanship.",
-                'requirements' => "3+ years hardwood refinishing experience\nProficient with drum sander, edger, and buffer\nKnow the difference between water-pop and standard stain\nDriver's license + reliable transportation\nWilling to do dust-containment work",
-            ],
-
             'tile-grout-tech' => [
                 'title' => 'Tile & Grout Cleaning Specialist',
                 'trade' => 'Tile & Grout Cleaning',
                 'location' => $location,
                 'pay' => '$22–$30/hr',
                 'employment_type' => 'full-time',
-                'description' => "Hiring a Tile & Grout Cleaning Specialist for residential and commercial restoration jobs.\n\nWhat you'll do:\n- High-pressure tile and grout cleaning with truck-mount units\n- Grout color sealing and repair\n- Stone polishing (limited)\n- Residential bathroom and kitchen jobs\n- Commercial restroom and lobby restoration\n\nGreat fit if you've done carpet cleaning and want to expand into harder surfaces.",
+                'description' => "Hiring a Tile & Grout Cleaning Specialist for commercial restroom + lobby restoration and residential bathroom + kitchen jobs.\n\nWhat you'll do:\n- High-pressure tile and grout cleaning with truck-mount units\n- Grout color sealing and repair\n- Stone polishing (limited)\n- Residential bathroom and kitchen jobs\n- Commercial restroom and lobby restoration\n\nGreat fit if you've done carpet cleaning and want to expand into harder surfaces — same trucks, same crews, more billable hours.",
                 'requirements' => "1+ year tile/grout cleaning experience\nFamiliarity with high-pressure rotary tools\nClean appearance, professional demeanor\nValid driver's license",
             ],
 
             'commercial-floor-crew' => [
                 'title' => 'Commercial Floor Care Crew Member (Nights/Weekends)',
-                'trade' => 'Commercial Cleaning',
+                'trade' => 'Commercial Floor Care',
                 'location' => $location,
                 'pay' => '$18–$22/hr',
                 'employment_type' => 'part-time',
-                'description' => "We're growing our commercial floor care crew. Night and weekend shifts servicing offices, medical facilities, and retail spaces in DC/MD/VA.\n\nWhat you'll do:\n- Operate floor scrubbers, burnishers, and carpet extractors\n- Empty trash, vacuum, dust, and high-touch sanitize\n- Spot-clean carpets and hard floors\n- Lock up and arm alarms at end of shift\n\nReliable hours, weekly pay, and overtime when available.",
+                'description' => "We're growing our commercial floor care crew. Night and weekend shifts servicing offices, medical facilities, and retail spaces in DC/MD/VA.\n\nWhat you'll do:\n- Operate floor scrubbers, burnishers, and carpet extractors\n- Strip + wax hard floors, extract commercial carpet\n- Empty trash, vacuum, dust, high-touch sanitize\n- Lock up and arm alarms at end of shift\n\nReliable hours, weekly pay, and overtime when available. No experience needed — we train.",
                 'requirements' => "Reliable transportation\nAble to pass a background check\nAvailable evenings + weekends\nNo experience necessary — we train\nMust be 18+",
-            ],
-
-            'upholstery-cleaning' => [
-                'title' => 'Upholstery Cleaning Specialist',
-                'trade' => 'Upholstery Cleaning',
-                'location' => $location,
-                'pay' => '$20–$28/hr + tips',
-                'employment_type' => 'full-time',
-                'description' => "Hiring an Upholstery Cleaning Specialist to run residential furniture and area rug jobs alongside our carpet team.\n\nWhat you'll do:\n- Hot water extraction on sofas, sectionals, dining chairs\n- Fabric identification (cotton, polyester, microfiber, leather)\n- Hand-cleaning of delicate pieces\n- Area rug pickup, in-plant cleaning, return\n- Pet stain and odor treatment\n\nA carpet cleaning background is a strong plus.",
-                'requirements' => "Customer-facing demeanor\nAbility to identify fabric types and read care tags\nReliable transportation\nWilling to do residential homes (in-home work)",
             ],
 
             'concrete-polishing-tech' => [
