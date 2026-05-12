@@ -32,6 +32,11 @@ class SCRM_Pro_Smart_Forms_Bridge {
     public static function register() {
         add_action( 'sfco_lead_submitted',                   array( __CLASS__, 'on_lead_submitted' ), 10, 3 );
         add_action( 'scrm_pro_follow_up_reminder',           array( __CLASS__, 'fire_reminder' ),    10, 1 );
+
+        // Auto-push Hot leads into ServiceM8 as a quote-job (settings-gated).
+        if ( class_exists( 'SCRM_Pro_ServiceM8' ) ) {
+            add_action( 'scrm_pro_smart_forms_lead',         array( 'SCRM_Pro_ServiceM8', 'maybe_auto_push' ), 10, 3 );
+        }
     }
 
     /**
