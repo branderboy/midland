@@ -11,7 +11,7 @@
  * Text Domain: smart-forms-pro
  * Requires at least: 5.5
  * Requires PHP: 7.4
- * Requires Plugins: smart-forms-for-contractors
+ * Requires Plugins: smart-forms-for-midland
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
