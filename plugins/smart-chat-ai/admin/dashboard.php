@@ -4,17 +4,9 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
 
 $analytics = new SCAI_Analytics();
 $stats     = $analytics->get_stats( 30 );
-$license   = new SCAI_License_Manager();
-$is_active = $license->is_active();
 ?>
 <div class="wrap">
-    <h1><?php esc_html_e( 'Smart Chat AI Dashboard', 'smart-chat-ai' ); ?></h1>
-
-    <?php if ( ! $is_active ) : ?>
-        <div class="notice notice-warning">
-            <p><strong><?php esc_html_e( 'License not active.', 'smart-chat-ai' ); ?></strong> <a href="<?php echo esc_url( admin_url( 'admin.php?page=smart-chat-license' ) ); ?>"><?php esc_html_e( 'Activate your license', 'smart-chat-ai' ); ?></a> <?php esc_html_e( 'to enable the chat widget on your site.', 'smart-chat-ai' ); ?></p>
-        </div>
-    <?php endif; ?>
+    <h1><?php esc_html_e( 'Midland Chat Dashboard', 'smart-chat-ai' ); ?></h1>
 
     <div class="smart-chat-stats-grid">
         <div class="smart-chat-stat-card">
