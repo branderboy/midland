@@ -340,16 +340,22 @@ class SCRM_Pro_ServiceM8 {
 
         update_option( self::OPT_SECRET, sanitize_text_field( wp_unslash( $_POST['sm8_secret'] ?? '' ) ) );
         update_option( self::OPT_COMPLETION_KEY, sanitize_key( wp_unslash( $_POST['sm8_completion_status'] ?? 'completed' ) ) );
+        update_option( self::OPT_API_KEY,        sanitize_text_field( wp_unslash( $_POST['sm8_api_key'] ?? '' ) ) );
+        update_option( self::OPT_COMPANY_UUID,   sanitize_text_field( wp_unslash( $_POST['sm8_company_uuid'] ?? '' ) ) );
+        update_option( self::OPT_AUTO_PUSH_HOT,  isset( $_POST['sm8_auto_push_hot'] ) ? 1 : 0 );
 
         wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-servicem8&saved=1' ) );
         exit;
     }
 
     public function render_page() {
-        $secret      = (string) get_option( self::OPT_SECRET, '' );
-        $key         = (string) get_option( self::OPT_COMPLETION_KEY, 'completed' );
-        $webhook_url = rest_url( 'smart-crm-pro/v1/servicem8' );
-        $last        = get_option( self::OPT_LAST_HIT, array() );
+        $secret       = (string) get_option( self::OPT_SECRET, '' );
+        $key          = (string) get_option( self::OPT_COMPLETION_KEY, 'completed' );
+        $api_key      = (string) get_option( self::OPT_API_KEY, '' );
+        $company_uuid = (string) get_option( self::OPT_COMPANY_UUID, '' );
+        $auto_push    = (int)    get_option( self::OPT_AUTO_PUSH_HOT, 0 );
+        $webhook_url  = rest_url( 'smart-crm-pro/v1/servicem8' );
+        $last         = get_option( self::OPT_LAST_HIT, array() );
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $saved = isset( $_GET['saved'] );
         ?>
@@ -383,6 +389,34 @@ class SCRM_Pro_ServiceM8 {
                         <td>
                             <input type="text" id="sm8_completion_status" name="sm8_completion_status" value="<?php echo esc_attr( $key ); ?>">
                             <p class="description"><?php esc_html_e( 'Status or event substring that means "this job is done" (default: completed).', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <h2 style="margin-top:24px;"><?php esc_html_e( 'Outbound (CRM → ServiceM8)', 'smart-crm-pro' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Lets the per-lead "Push to ServiceM8" button (and Hot-lead auto-push) create a Quote in ServiceM8 from a Smart Forms lead.', 'smart-crm-pro' ); ?></p>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="sm8_api_key"><?php esc_html_e( 'ServiceM8 API Key', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="password" id="sm8_api_key" name="sm8_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" autocomplete="off">
+                            <p class="description"><?php esc_html_e( 'ServiceM8 → Settings → Developer Tools → Generate API key. Premium Plus plan supports full API + webhooks.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="sm8_company_uuid"><?php esc_html_e( 'Default Company UUID', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="text" id="sm8_company_uuid" name="sm8_company_uuid" class="regular-text" value="<?php echo esc_attr( $company_uuid ); ?>" placeholder="00000000-0000-0000-0000-000000000000">
+                            <p class="description"><?php esc_html_e( 'Optional. ServiceM8 → Clients → click the master "house account" client → copy the UUID from the URL. Leave blank to let ServiceM8 create a contact-only job.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php esc_html_e( 'Auto-push Hot leads', 'smart-crm-pro' ); ?></th>
+                        <td>
+                            <label><input type="checkbox" id="sm8_auto_push_hot" name="sm8_auto_push_hot" value="1" <?php checked( $auto_push, 1 ); ?>>
+                                <?php esc_html_e( 'When Smart Forms scores a lead as Priority: Hot, automatically create a Quote in ServiceM8.', 'smart-crm-pro' ); ?>
+                            </label>
+                            <p class="description"><?php esc_html_e( 'Off by default. Hot = emergency / ASAP / large commercial. Tune the scoring in SCRM_Pro_Smart_Forms_Bridge::score_priority().', 'smart-crm-pro' ); ?></p>
                         </td>
                     </tr>
                 </table>

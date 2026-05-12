@@ -202,11 +202,20 @@ class SFCO_Admin {
                             <th><?php esc_html_e( 'Customer', 'smart-forms-for-midland' ); ?></th>
                             <th><?php esc_html_e( 'Contact', 'smart-forms-for-midland' ); ?></th>
                             <th><?php esc_html_e( 'Project', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:80px;"><?php esc_html_e( 'Priority', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:70px;"><?php esc_html_e( 'Area', 'smart-forms-for-midland' ); ?></th>
                             <th><?php esc_html_e( 'When', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:220px;"><?php esc_html_e( 'Actions', 'smart-forms-for-midland' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ( $leads as $lead ) : ?>
+                    <?php foreach ( $leads as $lead ) :
+                        $pri = $lead->priority ?? '';
+                        $pri_color = 'Hot' === $pri ? 'background:#fee2e2;color:#991b1b;'
+                                  : ( 'Warm' === $pri ? 'background:#fef3c7;color:#92400e;'
+                                  : ( 'Cool' === $pri ? 'background:#dbeafe;color:#1e40af;' : 'background:#f3f4f6;color:#6b7280;' ) );
+                        $sm8_pushed = ! empty( $lead->job_id );
+                        ?>
                         <tr>
                             <td><?php echo (int) $lead->id; ?></td>
                             <td><strong><?php echo esc_html( $lead->customer_name ?? '' ); ?></strong></td>
@@ -215,7 +224,28 @@ class SFCO_Admin {
                                 <a href="tel:<?php echo esc_attr( $lead->customer_phone ?? '' ); ?>"><?php echo esc_html( $lead->customer_phone ?? '' ); ?></a>
                             </td>
                             <td><?php echo esc_html( $lead->project_type ?? '' ); ?></td>
+                            <td>
+                                <?php if ( $pri ) : ?>
+                                    <span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;<?php echo esc_attr( $pri_color ); ?>"><?php echo esc_html( $pri ); ?></span>
+                                <?php else : ?>
+                                    <span style="color:#9ca3af;">—</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo esc_html( $lead->area ?? '—' ); ?></td>
                             <td><?php echo esc_html( date_i18n( 'M j, Y g:i a', strtotime( $lead->created_at ?? 'now' ) ) ); ?></td>
+                            <td>
+                                <?php
+                                /**
+                                 * Action-button injection point. Smart CRM hooks this to render
+                                 * "Push to ServiceM8" + "Resend Reminder" + "Mark Won/Lost"
+                                 * per-lead. Anything else can hook the same action too.
+                                 */
+                                do_action( 'sfco_render_entry_actions', $lead );
+                                if ( $sm8_pushed ) {
+                                    echo '<div style="font-size:11px;color:#1e7e34;margin-top:4px;">SM8: ' . esc_html( substr( $lead->job_id, 0, 8 ) ) . '…</div>';
+                                }
+                                ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

@@ -37,6 +37,76 @@ class SCRM_Pro_Smart_Forms_Bridge {
         if ( class_exists( 'SCRM_Pro_ServiceM8' ) ) {
             add_action( 'scrm_pro_smart_forms_lead',         array( 'SCRM_Pro_ServiceM8', 'maybe_auto_push' ), 10, 3 );
         }
+
+        // Per-lead action buttons rendered inside the Smart Forms entries view.
+        add_action( 'sfco_render_entry_actions',             array( __CLASS__, 'render_entry_actions' ), 10, 1 );
+        add_action( 'admin_post_scrm_push_to_sm8',           array( __CLASS__, 'handle_push_to_sm8' ) );
+        add_action( 'admin_post_scrm_resend_reminder',       array( __CLASS__, 'handle_resend_reminder' ) );
+    }
+
+    /**
+     * Render the per-lead action buttons in the Smart Forms Entries table.
+     */
+    public static function render_entry_actions( $lead ) {
+        if ( ! is_object( $lead ) || empty( $lead->id ) ) return;
+        $base    = admin_url( 'admin-post.php' );
+        $push_url     = wp_nonce_url( add_query_arg( array( 'action' => 'scrm_push_to_sm8',     'lead_id' => (int) $lead->id ), $base ), 'scrm_push_to_sm8_'     . (int) $lead->id );
+        $reminder_url = wp_nonce_url( add_query_arg( array( 'action' => 'scrm_resend_reminder', 'lead_id' => (int) $lead->id ), $base ), 'scrm_resend_reminder_' . (int) $lead->id );
+        $pushed = ! empty( $lead->job_id );
+        ?>
+        <?php if ( ! $pushed ) : ?>
+            <a class="button button-small" href="<?php echo esc_url( $push_url ); ?>" title="<?php esc_attr_e( 'Create a ServiceM8 quote-job from this lead', 'smart-crm-pro' ); ?>">
+                ⚡ <?php esc_html_e( 'Push to SM8', 'smart-crm-pro' ); ?>
+            </a>
+        <?php else : ?>
+            <span style="display:inline-block;padding:3px 8px;background:#dcfce7;color:#166534;border-radius:3px;font-size:11px;">✓ <?php esc_html_e( 'In SM8', 'smart-crm-pro' ); ?></span>
+        <?php endif; ?>
+        <a class="button button-small" href="<?php echo esc_url( $reminder_url ); ?>" title="<?php esc_attr_e( 'Reschedule the follow-up reminder', 'smart-crm-pro' ); ?>">
+            🔔 <?php esc_html_e( 'Reset reminder', 'smart-crm-pro' ); ?>
+        </a>
+        <?php
+    }
+
+    public static function handle_push_to_sm8() {
+        if ( ! current_user_can( 'manage_options' ) ) wp_die( 'No.' );
+        $lead_id = isset( $_GET['lead_id'] ) ? (int) $_GET['lead_id'] : 0;
+        check_admin_referer( 'scrm_push_to_sm8_' . $lead_id );
+
+        if ( ! class_exists( 'SCRM_Pro_ServiceM8' ) ) {
+            wp_die( 'ServiceM8 module not loaded.' );
+        }
+        $result = SCRM_Pro_ServiceM8::push_lead_as_job( $lead_id );
+        $back_url = wp_get_referer() ?: admin_url( 'admin.php?page=smart-forms' );
+        $back_url = add_query_arg(
+            is_wp_error( $result )
+                ? array( 'scrm_msg' => 'sm8_fail', 'scrm_err' => urlencode( $result->get_error_message() ) )
+                : array( 'scrm_msg' => 'sm8_ok',   'scrm_uuid' => urlencode( (string) $result ) ),
+            $back_url
+        );
+        wp_safe_redirect( $back_url );
+        exit;
+    }
+
+    public static function handle_resend_reminder() {
+        if ( ! current_user_can( 'manage_options' ) ) wp_die( 'No.' );
+        $lead_id = isset( $_GET['lead_id'] ) ? (int) $_GET['lead_id'] : 0;
+        check_admin_referer( 'scrm_resend_reminder_' . $lead_id );
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'sfco_leads';
+        $lead  = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $lead_id ) ); // phpcs:ignore
+        if ( $lead ) {
+            // Clear the previous scheduled hook, then schedule a fresh one.
+            wp_clear_scheduled_hook( 'scrm_pro_follow_up_reminder', array( $lead_id ) );
+            $new_due = self::reminder_due_at( $lead->priority ?: self::PRIORITY_COOL );
+            $wpdb->update( $table, array( 'reminder_due_at' => $new_due ), array( 'id' => $lead_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore
+            $ts = strtotime( $new_due );
+            if ( $ts && $ts > time() ) {
+                wp_schedule_single_event( $ts, 'scrm_pro_follow_up_reminder', array( $lead_id ) );
+            }
+        }
+        wp_safe_redirect( add_query_arg( 'scrm_msg', 'reminder_reset', wp_get_referer() ?: admin_url( 'admin.php?page=smart-forms' ) ) );
+        exit;
     }
 
     /**
