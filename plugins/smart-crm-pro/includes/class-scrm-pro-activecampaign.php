@@ -32,6 +32,12 @@ class SCRM_Pro_ActiveCampaign {
     const OPT_STAGE_BOOKED   = 'scrm_pro_ac_stage_booked';
     const OPT_STAGE_WON      = 'scrm_pro_ac_stage_won';
     const OPT_STAGE_LOST     = 'scrm_pro_ac_stage_lost';
+    // Task types created by the one-click setup. Each is a "dealTaskType" in AC.
+    const OPT_TASK_NEW       = 'scrm_pro_ac_task_new';      // call-within-24h
+    const OPT_TASK_QUOTED    = 'scrm_pro_ac_task_quoted';   // follow-up-on-quote
+    const OPT_TASK_BOOKED    = 'scrm_pro_ac_task_booked';   // confirm-appointment
+    const OPT_TASK_WON       = 'scrm_pro_ac_task_won';      // send-nps-and-thanks
+    const OPT_TASK_LOST      = 'scrm_pro_ac_task_lost';     // schedule-reactivation
 
     private static $instance = null;
 
@@ -46,6 +52,8 @@ class SCRM_Pro_ActiveCampaign {
         add_action( 'admin_menu',                array( $this, 'add_menu' ), 22 );
         add_action( 'admin_init',                array( $this, 'handle_save' ) );
         add_action( 'admin_init',                array( $this, 'handle_test' ) );
+        add_action( 'admin_init',                array( $this, 'handle_setup_pipeline' ) );
+        add_action( 'admin_init',                array( $this, 'handle_export_blueprint' ) );
 
         // Booking events fire when a new lead is captured from any source.
         add_action( 'sfco_lead_created',         array( $this, 'on_lead_booked' ) );
@@ -504,6 +512,196 @@ class SCRM_Pro_ActiveCampaign {
         return '';
     }
 
+    /**
+     * One-click "Set up Midland pipeline" — creates the deal pipeline + 5
+     * stages in ActiveCampaign via the API and auto-fills all the IDs into
+     * our settings. Only fires when the operator clicks the button on the
+     * AC settings page (admin_init form post).
+     */
+    public function handle_setup_pipeline() {
+        if ( ! isset( $_POST['scrm_setup_ac_pipeline'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $nonce = isset( $_POST['_scrm_ac_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_scrm_ac_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'scrm_save_ac' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-crm-pro' ) );
+        }
+
+        $api_url = (string) get_option( self::OPT_API_URL, '' );
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+        if ( '' === $api_url || '' === $api_key ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&pipeline=fail&err=' . urlencode( 'Save your AC API URL + key first.' ) ) );
+            exit;
+        }
+
+        $base = untrailingslashit( $api_url );
+        $headers = array(
+            'Api-Token'    => $api_key,
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+        );
+
+        // 1. Discover the current user — that's the deal owner default.
+        $owner_id = 0;
+        $me = wp_remote_get( $base . '/api/3/users/me', array( 'headers' => $headers, 'timeout' => 15 ) );
+        if ( ! is_wp_error( $me ) ) {
+            $body = json_decode( wp_remote_retrieve_body( $me ), true );
+            $owner_id = isset( $body['user']['id'] ) ? (int) $body['user']['id'] : 0;
+        }
+
+        // 2. Create the pipeline ("dealGroup" in AC's API).
+        $currency = strtolower( (string) get_option( self::OPT_DEAL_CURRENCY, 'usd' ) );
+        $pipe_resp = wp_remote_post( $base . '/api/3/dealGroups', array(
+            'headers' => $headers,
+            'timeout' => 15,
+            'body'    => wp_json_encode( array( 'dealGroup' => array(
+                'title'    => 'Midland Sales Pipeline',
+                'currency' => $currency,
+            ) ) ),
+        ) );
+        if ( is_wp_error( $pipe_resp ) ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&pipeline=fail&err=' . urlencode( $pipe_resp->get_error_message() ) ) );
+            exit;
+        }
+        $pipe_body = json_decode( wp_remote_retrieve_body( $pipe_resp ), true );
+        $pipeline_id = isset( $pipe_body['dealGroup']['id'] ) ? (int) $pipe_body['dealGroup']['id'] : 0;
+        if ( ! $pipeline_id ) {
+            $msg = isset( $pipe_body['errors'][0]['title'] ) ? $pipe_body['errors'][0]['title'] : 'Pipeline create failed.';
+            wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&pipeline=fail&err=' . urlencode( $msg ) ) );
+            exit;
+        }
+
+        // 3. Create the 5 stages, in order. Capture each returned ID and
+        //    persist it into the matching OPT_STAGE_* option.
+        $stages = array(
+            array( 'opt' => self::OPT_STAGE_NEW,    'title' => 'New Lead',   'order' => 1, 'color' => '#6b7280' ),
+            array( 'opt' => self::OPT_STAGE_QUOTED, 'title' => 'Quote Sent', 'order' => 2, 'color' => '#3b82f6' ),
+            array( 'opt' => self::OPT_STAGE_BOOKED, 'title' => 'Booked',     'order' => 3, 'color' => '#f59e0b' ),
+            array( 'opt' => self::OPT_STAGE_WON,    'title' => 'Won',        'order' => 4, 'color' => '#10b981' ),
+            array( 'opt' => self::OPT_STAGE_LOST,   'title' => 'Lost',       'order' => 5, 'color' => '#ef4444' ),
+        );
+        $created = 0;
+        foreach ( $stages as $s ) {
+            $resp = wp_remote_post( $base . '/api/3/dealStages', array(
+                'headers' => $headers,
+                'timeout' => 15,
+                'body'    => wp_json_encode( array( 'dealStage' => array(
+                    'title'        => $s['title'],
+                    'group'        => (string) $pipeline_id,
+                    'order'        => $s['order'],
+                    'color'        => $s['color'],
+                    'card_region1' => 'contact-name',
+                    'card_region2' => 'deal-title',
+                    'card_region3' => 'deal-value',
+                    'card_region4' => 'deal-owner-avatar',
+                    'card_region5' => 'next-action',
+                ) ) ),
+            ) );
+            if ( ! is_wp_error( $resp ) ) {
+                $body = json_decode( wp_remote_retrieve_body( $resp ), true );
+                $stage_id = isset( $body['dealStage']['id'] ) ? (int) $body['dealStage']['id'] : 0;
+                if ( $stage_id > 0 ) {
+                    update_option( $s['opt'], $stage_id );
+                    $created++;
+                }
+            }
+        }
+
+        // 4. Create deal task types — one per stage. Operator can build
+        //    AC automations that auto-create a task of the matching type
+        //    when a deal lands at that stage. We persist the IDs so the
+        //    plugin can also fire the task creation directly later.
+        $tasks = array(
+            array( 'opt' => self::OPT_TASK_NEW,    'title' => 'Call new lead within 24 hours', 'days' => 1 ),
+            array( 'opt' => self::OPT_TASK_QUOTED, 'title' => 'Follow up on quote',            'days' => 3 ),
+            array( 'opt' => self::OPT_TASK_BOOKED, 'title' => 'Confirm appointment 24h before','days' => 1 ),
+            array( 'opt' => self::OPT_TASK_WON,    'title' => 'Send NPS + thank-you',          'days' => 1 ),
+            array( 'opt' => self::OPT_TASK_LOST,   'title' => 'Schedule reactivation in 90 days','days' => 90 ),
+        );
+        $tasks_created = 0;
+        foreach ( $tasks as $t ) {
+            $resp = wp_remote_post( $base . '/api/3/dealTaskTypes', array(
+                'headers' => $headers,
+                'timeout' => 15,
+                'body'    => wp_json_encode( array( 'dealTasktype' => array(
+                    'title'           => $t['title'],
+                    'description'     => 'Auto-created by Smart CRM for the Midland pipeline.',
+                    'duedate_setting' => 'Days',
+                    'duedate_after'   => $t['days'],
+                ) ) ),
+            ) );
+            if ( ! is_wp_error( $resp ) ) {
+                $body = json_decode( wp_remote_retrieve_body( $resp ), true );
+                $task_id = isset( $body['dealTasktype']['id'] ) ? (int) $body['dealTasktype']['id'] : 0;
+                if ( $task_id > 0 ) {
+                    update_option( $t['opt'], $task_id );
+                    $tasks_created++;
+                }
+            }
+        }
+
+        // 5. Persist pipeline + owner + flip the deal-pipeline toggle on.
+        update_option( self::OPT_PIPELINE_ID,   $pipeline_id );
+        if ( $owner_id ) update_option( self::OPT_DEAL_OWNER, $owner_id );
+        update_option( self::OPT_DEAL_ENABLED,  1 );
+
+        $args = array(
+            'page'        => 'scrm-pro-activecampaign',
+            'pipeline'    => 'ok',
+            'pipeline_id' => $pipeline_id,
+            'stages'      => $created,
+            'tasks'       => $tasks_created,
+        );
+        wp_safe_redirect( admin_url( 'admin.php?' . http_build_query( $args ) ) );
+        exit;
+    }
+
+    /**
+     * Download a JSON blueprint of the current AC pipeline configuration.
+     * Not natively importable into ActiveCampaign (AC doesn't ship a
+     * pipeline-import UI), but useful as backup, audit log, or for
+     * re-running setup on another install. Reads only the IDs we
+     * stored after handle_setup_pipeline; doesn't touch AC's API.
+     */
+    public function handle_export_blueprint() {
+        if ( ! isset( $_POST['scrm_export_ac_blueprint'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $nonce = isset( $_POST['_scrm_ac_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_scrm_ac_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'scrm_save_ac' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-crm-pro' ) );
+        }
+        $blueprint = array(
+            'name'         => 'Midland Sales Pipeline',
+            'currency'     => (string) get_option( self::OPT_DEAL_CURRENCY, 'usd' ),
+            'pipeline_id'  => (int) get_option( self::OPT_PIPELINE_ID, 0 ),
+            'owner_id'     => (int) get_option( self::OPT_DEAL_OWNER, 0 ),
+            'exported_at'  => gmdate( 'c' ),
+            'site_url'     => home_url(),
+            'stages'       => array(
+                'new'    => (int) get_option( self::OPT_STAGE_NEW, 0 ),
+                'quoted' => (int) get_option( self::OPT_STAGE_QUOTED, 0 ),
+                'booked' => (int) get_option( self::OPT_STAGE_BOOKED, 0 ),
+                'won'    => (int) get_option( self::OPT_STAGE_WON, 0 ),
+                'lost'   => (int) get_option( self::OPT_STAGE_LOST, 0 ),
+            ),
+            'task_types'   => array(
+                'new'    => (int) get_option( self::OPT_TASK_NEW, 0 ),
+                'quoted' => (int) get_option( self::OPT_TASK_QUOTED, 0 ),
+                'booked' => (int) get_option( self::OPT_TASK_BOOKED, 0 ),
+                'won'    => (int) get_option( self::OPT_TASK_WON, 0 ),
+                'lost'   => (int) get_option( self::OPT_TASK_LOST, 0 ),
+            ),
+            'note' => 'Generated by Midland Smart CRM. Re-importing into a different AC account requires running the "Set up Midland pipeline" button on that install (this file is for documentation + restore).',
+        );
+        $filename = 'midland-ac-pipeline-' . gmdate( 'Y-m-d' ) . '.json';
+        nocache_headers();
+        header( 'Content-Type: application/json' );
+        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+        echo wp_json_encode( $blueprint, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+        exit;
+    }
+
     public function handle_save() {
         if ( ! isset( $_POST['scrm_save_ac'] ) || ! current_user_can( 'manage_options' ) ) {
             return;
@@ -667,9 +865,30 @@ class SCRM_Pro_ActiveCampaign {
                     </tr>
                 </table>
 
+                <?php
+                // Result banner from the one-click setup (?pipeline=ok|fail).
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $pl_status = isset( $_GET['pipeline'] ) ? sanitize_key( $_GET['pipeline'] ) : '';
+                if ( 'ok' === $pl_status ) {
+                    $pid = isset( $_GET['pipeline_id'] ) ? (int) $_GET['pipeline_id'] : 0;
+                    $stg = isset( $_GET['stages'] ) ? (int) $_GET['stages'] : 0;
+                    $tsk = isset( $_GET['tasks'] ) ? (int) $_GET['tasks'] : 0;
+                    echo '<div class="notice notice-success" style="margin:14px 0;"><p><strong>✓ Midland pipeline created in ActiveCampaign.</strong> Pipeline ID: <code>' . (int) $pid . '</code> · ' . (int) $stg . ' stages · ' . (int) $tsk . ' task types. All IDs auto-saved below.</p></div>';
+                } elseif ( 'fail' === $pl_status ) {
+                    $err = isset( $_GET['err'] ) ? sanitize_text_field( wp_unslash( $_GET['err'] ) ) : 'Unknown error.';
+                    echo '<div class="notice notice-error"><p><strong>✗ Pipeline setup failed.</strong> ' . esc_html( $err ) . '</p></div>';
+                }
+                ?>
+
                 <p class="submit">
                     <button type="submit" name="scrm_save_ac" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-crm-pro' ); ?></button>
                     <button type="submit" name="scrm_test_ac" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Test Connection', 'smart-crm-pro' ); ?></button>
+                    <button type="submit" name="scrm_setup_ac_pipeline" value="1" class="button button-secondary" style="margin-left:18px;background:#10b981;color:#fff;border-color:#059669;" onclick="return confirm('This will create a new pipeline + 5 stages + 5 task types in your ActiveCampaign account. Continue?');">
+                        🚀 <?php esc_html_e( 'Set up Midland pipeline in AC', 'smart-crm-pro' ); ?>
+                    </button>
+                    <button type="submit" name="scrm_export_ac_blueprint" value="1" class="button" style="margin-left:8px;">
+                        ⬇ <?php esc_html_e( 'Download blueprint JSON', 'smart-crm-pro' ); ?>
+                    </button>
                 </p>
             </form>
 
