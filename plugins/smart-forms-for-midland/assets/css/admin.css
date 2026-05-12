@@ -1,0 +1,31 @@
+.smart-forms-filters {
+    margin: 20px 0;
+}
+
+.smart-forms-filters select {
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.timeline-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.timeline-urgent {
+    background: #d63638;
+    color: #fff;
+}
+
+.timeline-soon {
+    background: #f0b849;
+    color: #000;
+}
+
+.timeline-normal {
+    background: #00a32a;
+    color: #fff;
+}
