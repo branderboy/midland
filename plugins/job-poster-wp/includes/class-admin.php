@@ -176,6 +176,7 @@ class DPJP_Admin {
             </ol>
             <h2>Nextdoor &amp; Craigslist</h2>
             <p>Neither platform has a public API that allows automated posting. The plugin generates your post content and opens the site — you paste and submit. Takes about 60 seconds each.</p>
+            <?php do_action( 'dpjp_render_settings_extra' ); ?>
         </div>
         <?php
     }

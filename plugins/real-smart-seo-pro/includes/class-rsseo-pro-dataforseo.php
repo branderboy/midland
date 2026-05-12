@@ -234,6 +234,88 @@ class RSSEO_Pro_DataForSEO {
      *
      * @return true|WP_Error
      */
+    /**
+     * Backlinks summary: total backlinks, referring domains, lost / gained,
+     * anchor distribution. Cached in a transient because DataForSEO charges
+     * per call.
+     *
+     * @param string $target Domain (no protocol). Default = home_url host.
+     * @return array|WP_Error
+     */
+    public static function get_backlinks_summary( $target = '' ) {
+        if ( '' === $target ) {
+            $target = preg_replace( '#^https?://#', '', rtrim( home_url(), '/' ) );
+        }
+        $cache_key = 'rsseo_pro_backlinks_summary_' . md5( $target );
+        $cached    = get_transient( $cache_key );
+        if ( is_array( $cached ) ) return $cached;
+
+        $payload = array( array(
+            'target'                => $target,
+            'internal_list_limit'   => 10,
+            'backlinks_status_type' => 'live',
+        ) );
+        $result = self::post( 'backlinks/summary/live', $payload );
+        if ( is_wp_error( $result ) ) return $result;
+
+        $row = $result['tasks'][0]['result'][0] ?? null;
+        if ( ! is_array( $row ) ) {
+            return new WP_Error( 'dfs_empty', 'DataForSEO returned no backlinks data for ' . $target );
+        }
+        $summary = array(
+            'target'              => $target,
+            'rank'                => (int) ( $row['rank'] ?? 0 ),
+            'backlinks'           => (int) ( $row['backlinks'] ?? 0 ),
+            'referring_domains'   => (int) ( $row['referring_domains'] ?? 0 ),
+            'referring_main'      => (int) ( $row['referring_main_domains'] ?? 0 ),
+            'broken_backlinks'    => (int) ( $row['broken_backlinks'] ?? 0 ),
+            'lost_backlinks_30d'  => (int) ( $row['referring_domains_lost_60_days'] ?? 0 ),
+            'new_backlinks_30d'   => (int) ( $row['referring_domains_new_60_days'] ?? 0 ),
+            'anchors'             => (int) ( $row['anchors'] ?? 0 ),
+            'crawled_at'          => time(),
+        );
+        set_transient( $cache_key, $summary, HOUR_IN_SECONDS * 6 );
+        return $summary;
+    }
+
+    /**
+     * Top referring domains for a target. Cached.
+     *
+     * @return array|WP_Error
+     */
+    public static function get_referring_domains( $target = '', $limit = 25 ) {
+        if ( '' === $target ) {
+            $target = preg_replace( '#^https?://#', '', rtrim( home_url(), '/' ) );
+        }
+        $cache_key = 'rsseo_pro_referring_' . md5( $target . '|' . $limit );
+        $cached    = get_transient( $cache_key );
+        if ( is_array( $cached ) ) return $cached;
+
+        $payload = array( array(
+            'target'              => $target,
+            'limit'               => (int) $limit,
+            'order_by'            => array( 'rank,desc' ),
+            'backlinks_status_type' => 'live',
+        ) );
+        $result = self::post( 'backlinks/referring_domains/live', $payload );
+        if ( is_wp_error( $result ) ) return $result;
+
+        $items = $result['tasks'][0]['result'][0]['items'] ?? array();
+        $out = array();
+        foreach ( $items as $row ) {
+            $out[] = array(
+                'domain'        => $row['domain'] ?? '',
+                'rank'          => (int) ( $row['rank'] ?? 0 ),
+                'backlinks'     => (int) ( $row['backlinks'] ?? 0 ),
+                'first_seen'    => $row['first_seen'] ?? null,
+                'lost'          => ! empty( $row['is_lost'] ),
+                'broken'        => ! empty( $row['is_broken'] ),
+            );
+        }
+        set_transient( $cache_key, $out, HOUR_IN_SECONDS * 6 );
+        return $out;
+    }
+
     public static function test_connection() {
         $result = self::post( 'keywords_data/google_ads/search_volume/live', array(
             array(
