@@ -1,11 +1,8 @@
 <?php
 /**
  * Plugin Name:       Midland GitHub Vault & Deploy
- * Plugin URI:        https://github.com/branderboy/midland
  * Description:       Midland-branded GitHub backup + deploy. Backs up WordPress content, DB, themes, plugins, and uploads to a GitHub repository; deploys page/post content from GitHub back into WordPress with automatic cache-purge and live-render verification.
- * Version:           3.4.7
- * Author:            Drywall Pros DC
- * Author URI:        https://drywallprosdc.com
+ * Version:           3.5.0
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-github-backup

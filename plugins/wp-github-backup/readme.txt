@@ -1,5 +1,5 @@
 === WP GitHub Backup ===
-Contributors: drywallprosdc
+Contributors: midland
 Tags: backup, github, deploy, git, sync
 Requires at least: 5.6
 Tested up to: 6.6
