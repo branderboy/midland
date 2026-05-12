@@ -24,7 +24,8 @@ class SCRM_Pro_ServiceM8 {
     // Outbound API (CRM → ServiceM8) credentials + defaults.
     const OPT_API_KEY          = 'scrm_pro_sm8_api_key';      // ServiceM8 account API key
     const OPT_COMPANY_UUID     = 'scrm_pro_sm8_company_uuid'; // default ServiceM8 company UUID
-    const OPT_AUTO_PUSH_HOT    = 'scrm_pro_sm8_auto_push_hot';// auto-create job for Hot leads
+    const OPT_AUTO_PUSH_HOT    = 'scrm_pro_sm8_auto_push_hot';// legacy: auto-create job for Hot leads only
+    const OPT_AUTO_PUSH_MODE   = 'scrm_pro_sm8_auto_push_mode';// '' off | 'hot' | 'all' (default 'all')
     const SM8_API_BASE         = 'https://api.servicem8.com/api_1.0/';
 
     private static $instance = null;
@@ -320,9 +321,15 @@ class SCRM_Pro_ServiceM8 {
      * by clicking the per-lead "Push to ServiceM8" button.
      */
     public static function maybe_auto_push( $lead, $priority, $area ) {
-        if ( ! get_option( self::OPT_AUTO_PUSH_HOT, 0 ) ) return;
-        if ( 'Hot' !== $priority ) return;
         if ( empty( $lead['id'] ) ) return;
+        // Default mode = 'all' (auto-push every lead). Legacy installs that
+        // set OPT_AUTO_PUSH_HOT=1 are migrated to mode='hot'. mode='' = off.
+        $mode = (string) get_option( self::OPT_AUTO_PUSH_MODE, '' );
+        if ( '' === $mode ) {
+            $mode = get_option( self::OPT_AUTO_PUSH_HOT, 0 ) ? 'hot' : 'all';
+        }
+        if ( '' === $mode || 'off' === $mode ) return;
+        if ( 'hot' === $mode && 'Hot' !== $priority ) return;
         $result = self::push_lead_as_job( (int) $lead['id'] );
         if ( is_wp_error( $result ) ) {
             error_log( 'SCRM SM8 auto-push failed for lead ' . $lead['id'] . ': ' . $result->get_error_message() ); // phpcs:ignore
@@ -343,6 +350,9 @@ class SCRM_Pro_ServiceM8 {
         update_option( self::OPT_API_KEY,        sanitize_text_field( wp_unslash( $_POST['sm8_api_key'] ?? '' ) ) );
         update_option( self::OPT_COMPANY_UUID,   sanitize_text_field( wp_unslash( $_POST['sm8_company_uuid'] ?? '' ) ) );
         update_option( self::OPT_AUTO_PUSH_HOT,  isset( $_POST['sm8_auto_push_hot'] ) ? 1 : 0 );
+        $mode = isset( $_POST['sm8_auto_push_mode'] ) ? sanitize_key( wp_unslash( $_POST['sm8_auto_push_mode'] ) ) : 'all';
+        if ( ! in_array( $mode, array( 'off', 'hot', 'all' ), true ) ) $mode = 'all';
+        update_option( self::OPT_AUTO_PUSH_MODE, $mode );
 
         wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-servicem8&saved=1' ) );
         exit;
@@ -411,12 +421,20 @@ class SCRM_Pro_ServiceM8 {
                         </td>
                     </tr>
                     <tr>
-                        <th><?php esc_html_e( 'Auto-push Hot leads', 'smart-crm-pro' ); ?></th>
+                        <th><label for="sm8_auto_push_mode"><?php esc_html_e( 'Auto-push leads', 'smart-crm-pro' ); ?></label></th>
                         <td>
-                            <label><input type="checkbox" id="sm8_auto_push_hot" name="sm8_auto_push_hot" value="1" <?php checked( $auto_push, 1 ); ?>>
-                                <?php esc_html_e( 'When Smart Forms scores a lead as Priority: Hot, automatically create a Quote in ServiceM8.', 'smart-crm-pro' ); ?>
-                            </label>
-                            <p class="description"><?php esc_html_e( 'Off by default. Hot = emergency / ASAP / large commercial. Tune the scoring in SCRM_Pro_Smart_Forms_Bridge::score_priority().', 'smart-crm-pro' ); ?></p>
+                            <?php
+                            $current_mode = (string) get_option( self::OPT_AUTO_PUSH_MODE, '' );
+                            if ( '' === $current_mode ) {
+                                $current_mode = get_option( self::OPT_AUTO_PUSH_HOT, 0 ) ? 'hot' : 'all';
+                            }
+                            ?>
+                            <select id="sm8_auto_push_mode" name="sm8_auto_push_mode">
+                                <option value="all" <?php selected( $current_mode, 'all' ); ?>><?php esc_html_e( 'Every lead — hands-off (recommended)', 'smart-crm-pro' ); ?></option>
+                                <option value="hot" <?php selected( $current_mode, 'hot' ); ?>><?php esc_html_e( 'Hot priority only', 'smart-crm-pro' ); ?></option>
+                                <option value="off" <?php selected( $current_mode, 'off' ); ?>><?php esc_html_e( 'Off — manual only (use the per-lead button)', 'smart-crm-pro' ); ?></option>
+                            </select>
+                            <p class="description"><?php esc_html_e( 'Default: every lead is auto-pushed to ServiceM8 as a Quote so you don\'t have to babysit the dispatcher. Switch to Hot-only if you want to keep low-intent leads out of SM8.', 'smart-crm-pro' ); ?></p>
                         </td>
                     </tr>
                 </table>
