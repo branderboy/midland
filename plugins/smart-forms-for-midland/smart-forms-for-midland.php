@@ -93,10 +93,26 @@ class SFCO_Plugin {
     public function enqueue_frontend_assets() {
         wp_enqueue_style( 'sfco-frontend', SFCO_PLUGIN_URL . 'assets/css/frontend.css', array(), SFCO_VERSION );
         wp_enqueue_script( 'sfco-frontend', SFCO_PLUGIN_URL . 'assets/js/frontend.js', array( 'jquery' ), SFCO_VERSION, true );
-        
+
+        // Ad-platform conversion pixels (configured at Smart Forms → Tracking).
+        // Frontend JS fires gtag conversion, fbq('track','Lead'), and
+        // ttq.track('SubmitForm') on every successful submit when each pixel
+        // ID is set AND the matching tag script is on the page.
+        $tracking = get_option( 'sfco_tracking', array() );
+        if ( ! is_array( $tracking ) ) $tracking = array();
+
         wp_localize_script( 'sfco-frontend', 'sfcoData', array(
-            'ajaxurl' => admin_url( 'admin-ajax.php' ),
-            'nonce' => wp_create_nonce( 'sfco_submit' ),
+            'ajaxurl'  => admin_url( 'admin-ajax.php' ),
+            'nonce'    => wp_create_nonce( 'sfco_submit' ),
+            'tracking' => array(
+                'google_ads_send_to'  => $tracking['google_ads_send_to']  ?? '', // AW-1234567/abcDEFgh
+                'google_ads_value'    => $tracking['google_ads_value']    ?? '',
+                'google_ads_currency' => $tracking['google_ads_currency'] ?? 'USD',
+                'facebook_pixel_id'   => $tracking['facebook_pixel_id']   ?? '',
+                'facebook_event'      => $tracking['facebook_event']      ?? 'Lead',
+                'tiktok_pixel_id'     => $tracking['tiktok_pixel_id']     ?? '',
+                'tiktok_event'        => $tracking['tiktok_event']        ?? 'SubmitForm',
+            ),
         ) );
     }
     

@@ -49,6 +49,14 @@ class SFCO_Admin {
             array( $this, 'render_shortcodes_page' )
         );
         add_submenu_page(
+            'smart-forms',
+            esc_html__( 'Tracking (Ad Pixels)', 'smart-forms-for-midland' ),
+            esc_html__( 'Tracking', 'smart-forms-for-midland' ),
+            'manage_options',
+            'smart-forms-tracking',
+            array( $this, 'render_tracking_page' )
+        );
+        add_submenu_page(
             null, // hidden — accessed by clicking a form row
             esc_html__( 'Form Entries', 'smart-forms-for-midland' ),
             '',
@@ -304,6 +312,113 @@ class SFCO_Admin {
 
             <h2><?php esc_html_e( 'Shortcode', 'smart-forms-for-midland' ); ?></h2>
             <p><code style="background:#f6f7f7;padding:6px 12px;border-radius:3px;display:inline-block;">[sfco_form id="<?php echo (int) $form->id; ?>"]</code></p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Tracking / Ad-pixel settings page. Three platforms, all client-side
+     * (server-side Conversions API can come later). The frontend JS fires
+     * the matching event on every successful AJAX submit — gtag conversion
+     * for Google Ads, fbq for Meta, ttq for TikTok — but only when both
+     * the ID is set here AND the platform's base tag script is already on
+     * the page (we don't inject them; the operator manages that via
+     * GTM / theme / Site Kit).
+     */
+    public function render_tracking_page() {
+        if ( ! current_user_can( 'manage_options' ) ) return;
+        $tracking = get_option( 'sfco_tracking', array() );
+        if ( ! is_array( $tracking ) ) $tracking = array();
+
+        if ( isset( $_POST['sfco_save_tracking'] ) && check_admin_referer( 'sfco_save_tracking' ) ) {
+            $tracking = array(
+                'google_ads_send_to'  => sanitize_text_field( wp_unslash( $_POST['google_ads_send_to']  ?? '' ) ),
+                'google_ads_value'    => sanitize_text_field( wp_unslash( $_POST['google_ads_value']    ?? '' ) ),
+                'google_ads_currency' => sanitize_text_field( wp_unslash( $_POST['google_ads_currency'] ?? 'USD' ) ),
+                'facebook_pixel_id'   => sanitize_text_field( wp_unslash( $_POST['facebook_pixel_id']   ?? '' ) ),
+                'facebook_event'      => sanitize_text_field( wp_unslash( $_POST['facebook_event']      ?? 'Lead' ) ),
+                'tiktok_pixel_id'     => sanitize_text_field( wp_unslash( $_POST['tiktok_pixel_id']     ?? '' ) ),
+                'tiktok_event'        => sanitize_text_field( wp_unslash( $_POST['tiktok_event']        ?? 'SubmitForm' ) ),
+            );
+            update_option( 'sfco_tracking', $tracking );
+            echo '<div class="notice notice-success is-dismissible"><p>✓ Tracking settings saved.</p></div>';
+        }
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Tracking — Ad Conversion Pixels', 'smart-forms-for-midland' ); ?></h1>
+            <p><?php esc_html_e( 'Fire a conversion event into each ad platform every time a Smart Forms form is submitted. Each pixel is enabled by entering its ID below — leave blank to skip.', 'smart-forms-for-midland' ); ?></p>
+            <p style="color:#475569;font-size:13px;">
+                <?php esc_html_e( 'Note: this only fires the conversion EVENT. The platform\'s base tag script (gtag.js / fbevents.js / ttq) must already be loaded on the page via your theme, GTM, Site Kit, etc. We don\'t inject the base tags to avoid duplicate-firing if you already have them.', 'smart-forms-for-midland' ); ?>
+            </p>
+
+            <form method="post">
+                <?php wp_nonce_field( 'sfco_save_tracking' ); ?>
+
+                <h2 style="margin-top:24px;">🔵 Google Ads</h2>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="google_ads_send_to"><?php esc_html_e( 'Conversion send_to', 'smart-forms-for-midland' ); ?></label></th>
+                        <td>
+                            <input type="text" id="google_ads_send_to" name="google_ads_send_to" value="<?php echo esc_attr( $tracking['google_ads_send_to'] ?? '' ); ?>" class="regular-text" placeholder="AW-1234567890/abcDEFghi">
+                            <p class="description"><?php esc_html_e( 'Google Ads → Tools → Conversions → click your conversion → Tag setup → "Use Google tag" → copy the send_to value (looks like AW-XXX/labelXXX).', 'smart-forms-for-midland' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="google_ads_value"><?php esc_html_e( 'Conversion value', 'smart-forms-for-midland' ); ?></label></th>
+                        <td>
+                            <input type="number" step="0.01" id="google_ads_value" name="google_ads_value" value="<?php echo esc_attr( $tracking['google_ads_value'] ?? '' ); ?>" class="small-text">
+                            <input type="text" id="google_ads_currency" name="google_ads_currency" value="<?php echo esc_attr( $tracking['google_ads_currency'] ?? 'USD' ); ?>" class="small-text" maxlength="3" style="width:80px;">
+                            <p class="description"><?php esc_html_e( 'Optional. Estimated revenue per lead — used for Google Ads bid optimization. Leave 0 if you score conversions equally.', 'smart-forms-for-midland' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <h2>🟦 Facebook / Meta</h2>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="facebook_pixel_id"><?php esc_html_e( 'Pixel ID', 'smart-forms-for-midland' ); ?></label></th>
+                        <td>
+                            <input type="text" id="facebook_pixel_id" name="facebook_pixel_id" value="<?php echo esc_attr( $tracking['facebook_pixel_id'] ?? '' ); ?>" class="regular-text" placeholder="1234567890123456">
+                            <p class="description"><?php esc_html_e( 'Setting this flips on the fbq("track","...") call. We don\'t inject the base pixel.', 'smart-forms-for-midland' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="facebook_event"><?php esc_html_e( 'Event name', 'smart-forms-for-midland' ); ?></label></th>
+                        <td>
+                            <select id="facebook_event" name="facebook_event">
+                                <?php foreach ( array( 'Lead', 'CompleteRegistration', 'Schedule', 'SubmitApplication', 'Contact' ) as $ev ) : ?>
+                                    <option value="<?php echo esc_attr( $ev ); ?>" <?php selected( $tracking['facebook_event'] ?? 'Lead', $ev ); ?>><?php echo esc_html( $ev ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <p class="description"><?php esc_html_e( '"Lead" is the standard for form submissions in Meta Events Manager.', 'smart-forms-for-midland' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <h2>⬛ TikTok</h2>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="tiktok_pixel_id"><?php esc_html_e( 'Pixel ID', 'smart-forms-for-midland' ); ?></label></th>
+                        <td>
+                            <input type="text" id="tiktok_pixel_id" name="tiktok_pixel_id" value="<?php echo esc_attr( $tracking['tiktok_pixel_id'] ?? '' ); ?>" class="regular-text" placeholder="CXXXXXXXXXXXXX">
+                            <p class="description"><?php esc_html_e( 'TikTok Ads Manager → Events → Web Events. We call ttq.track() on submit when this is set.', 'smart-forms-for-midland' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="tiktok_event"><?php esc_html_e( 'Event name', 'smart-forms-for-midland' ); ?></label></th>
+                        <td>
+                            <select id="tiktok_event" name="tiktok_event">
+                                <?php foreach ( array( 'SubmitForm', 'CompleteRegistration', 'Contact', 'Subscribe' ) as $ev ) : ?>
+                                    <option value="<?php echo esc_attr( $ev ); ?>" <?php selected( $tracking['tiktok_event'] ?? 'SubmitForm', $ev ); ?>><?php echo esc_html( $ev ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <p class="description"><?php esc_html_e( '"SubmitForm" maps to TikTok\'s lead optimization objective.', 'smart-forms-for-midland' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <p><button type="submit" name="sfco_save_tracking" class="button button-primary"><?php esc_html_e( 'Save Tracking Settings', 'smart-forms-for-midland' ); ?></button></p>
+            </form>
         </div>
         <?php
     }
