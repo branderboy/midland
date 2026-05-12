@@ -38,6 +38,9 @@ class SCRM_Pro_ActiveCampaign {
     const OPT_TASK_BOOKED    = 'scrm_pro_ac_task_booked';   // confirm-appointment
     const OPT_TASK_WON       = 'scrm_pro_ac_task_won';      // send-nps-and-thanks
     const OPT_TASK_LOST      = 'scrm_pro_ac_task_lost';     // schedule-reactivation
+    // Auto-create a deal task on every stage transition (fallback so tasks
+    // always appear even if the operator hasn't built AC automations yet).
+    const OPT_AUTO_TASKS     = 'scrm_pro_ac_auto_tasks';
 
     private static $instance = null;
 
@@ -323,10 +326,14 @@ class SCRM_Pro_ActiveCampaign {
                     global $wpdb;
                     $wpdb->update( $wpdb->prefix . 'sfco_leads', array( 'deal_id' => $deal_id ), array( 'id' => (int) $lead['id'] ), array( '%s' ), array( '%d' ) ); // phpcs:ignore
                 }
+                // Fire the matching task on first deal creation.
+                if ( $deal_id ) {
+                    $this->maybe_create_deal_task( $api_url, $api_key, $deal_id, $lifecycle );
+                }
             } else {
                 $stage_id = $this->stage_id_for_lifecycle( $lifecycle );
                 if ( $stage_id ) {
-                    $this->update_deal_stage( $api_url, $api_key, $existing_deal, $stage_id );
+                    $this->update_deal_stage( $api_url, $api_key, $existing_deal, $stage_id, $lifecycle );
                 }
             }
         }
@@ -483,8 +490,9 @@ class SCRM_Pro_ActiveCampaign {
 
     /**
      * Advance an existing deal to a new stage. No-op if stage_id is 0.
+     * Also creates the matching task on the deal when auto-tasks is enabled.
      */
-    private function update_deal_stage( $api_url, $api_key, $deal_id, $stage_id ) {
+    private function update_deal_stage( $api_url, $api_key, $deal_id, $stage_id, $lifecycle = '' ) {
         $deal_id  = (string) $deal_id;
         $stage_id = (int) $stage_id;
         if ( '' === $deal_id || $stage_id <= 0 ) return;
@@ -496,6 +504,54 @@ class SCRM_Pro_ActiveCampaign {
                 'Accept'       => 'application/json',
             ),
             'body'    => wp_json_encode( array( 'deal' => array( 'stage' => $stage_id ) ) ),
+            'timeout' => 15,
+        ) );
+        if ( '' !== $lifecycle ) {
+            $this->maybe_create_deal_task( $api_url, $api_key, $deal_id, $lifecycle );
+        }
+    }
+
+    /**
+     * Map our lifecycle → configured task-type ID (mirror of stage map).
+     */
+    private function task_type_for_lifecycle( $lifecycle ) {
+        switch ( $lifecycle ) {
+            case 'completed': return (int) get_option( self::OPT_TASK_WON,    0 );
+            case 'booked':    return (int) get_option( self::OPT_TASK_BOOKED, 0 );
+            case 'quoted':    return (int) get_option( self::OPT_TASK_QUOTED, 0 );
+            case 'lost':      return (int) get_option( self::OPT_TASK_LOST,   0 );
+            case 'new':
+            default:          return (int) get_option( self::OPT_TASK_NEW,    0 );
+        }
+    }
+
+    /**
+     * Create a task on the deal via /api/3/dealTasks. Runs only when
+     * OPT_AUTO_TASKS is enabled (default on). Operator can turn this off
+     * if their AC automations are creating the tasks themselves.
+     *
+     * Tasks land with note "(auto-created by Smart CRM)" so an AC
+     * automation can de-dupe by checking task note text if needed.
+     */
+    private function maybe_create_deal_task( $api_url, $api_key, $deal_id, $lifecycle ) {
+        if ( ! get_option( self::OPT_AUTO_TASKS, 1 ) ) return;
+        $task_type_id = $this->task_type_for_lifecycle( $lifecycle );
+        if ( $task_type_id <= 0 ) return;
+        $owner = (int) get_option( self::OPT_DEAL_OWNER, 0 );
+        $task = array(
+            'dealtasktype' => $task_type_id,
+            'relid'        => (string) $deal_id,
+            'reltype'      => 'Deal',
+            'note'         => '(auto-created by Smart CRM on ' . $lifecycle . ' stage transition)',
+        );
+        if ( $owner > 0 ) $task['user'] = $owner;
+        wp_remote_post( untrailingslashit( $api_url ) . '/api/3/dealTasks', array(
+            'headers' => array(
+                'Api-Token'    => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
+            ),
+            'body'    => wp_json_encode( array( 'dealTask' => $task ) ),
             'timeout' => 15,
         ) );
     }
@@ -726,6 +782,7 @@ class SCRM_Pro_ActiveCampaign {
         update_option( self::OPT_STAGE_BOOKED, absint( $_POST['ac_stage_booked'] ?? 0 ) );
         update_option( self::OPT_STAGE_WON,    absint( $_POST['ac_stage_won']    ?? 0 ) );
         update_option( self::OPT_STAGE_LOST,   absint( $_POST['ac_stage_lost']   ?? 0 ) );
+        update_option( self::OPT_AUTO_TASKS,   isset( $_POST['ac_auto_tasks'] ) ? 1 : 0 );
 
         wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&saved=1' ) );
         exit;
@@ -819,6 +876,7 @@ class SCRM_Pro_ActiveCampaign {
                 $stage_booked   = (int) get_option( self::OPT_STAGE_BOOKED, 0 );
                 $stage_won      = (int) get_option( self::OPT_STAGE_WON, 0 );
                 $stage_lost     = (int) get_option( self::OPT_STAGE_LOST, 0 );
+                $auto_tasks     = (int) get_option( self::OPT_AUTO_TASKS, 1 );
                 ?>
                 <table class="form-table">
                     <tr>
@@ -848,6 +906,15 @@ class SCRM_Pro_ActiveCampaign {
                         <td>
                             <input type="text" id="ac_deal_currency" name="ac_deal_currency" class="small-text" value="<?php echo esc_attr( $deal_currency ); ?>" maxlength="3" style="width:80px;">
                             <p class="description"><?php esc_html_e( 'Three-letter ISO code, lowercase (usd, cad, gbp, eur).', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php esc_html_e( 'Auto-create tasks', 'smart-crm-pro' ); ?></th>
+                        <td>
+                            <label><input type="checkbox" id="ac_auto_tasks" name="ac_auto_tasks" value="1" <?php checked( $auto_tasks, 1 ); ?>>
+                                <?php esc_html_e( 'Plugin auto-creates the matching deal task on every stage transition.', 'smart-crm-pro' ); ?>
+                            </label>
+                            <p class="description"><?php esc_html_e( 'Each task lands with note "(auto-created by Smart CRM)" so AC automations can de-dupe by note text. Turn off if your AC automations create the tasks themselves.', 'smart-crm-pro' ); ?></p>
                         </td>
                     </tr>
                     <tr>
