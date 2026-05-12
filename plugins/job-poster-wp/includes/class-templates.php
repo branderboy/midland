@@ -21,7 +21,7 @@ class DPJP_Templates {
     public static function menu(): void {
         add_submenu_page(
             'edit.php?post_type=dpjp_job',
-            __( 'Job Templates', 'job-manager-pro' ),
+            __( 'Midland Floor Care Jobs', 'job-manager-pro' ),
             __( 'Templates', 'job-manager-pro' ),
             'edit_posts',
             'dpjp-templates',
