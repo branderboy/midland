@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Midland GitHub Vault & Deploy
  * Description:       Midland-branded GitHub backup + deploy. Backs up WordPress content, DB, themes, plugins, and uploads to a GitHub repository; deploys page/post content from GitHub back into WordPress with automatic cache-purge and live-render verification.
- * Version:           3.5.0
+ * Version:           3.5.1
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-github-backup
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WGB_VERSION', '3.4.7' );
+define( 'WGB_VERSION', '3.5.1' );
 define( 'WGB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WGB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WGB_PLUGIN_FILE', __FILE__ );

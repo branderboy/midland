@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="wrap rsseo-wrap">
-    <h1><?php esc_html_e( 'Real Smart SEO for Local Pro — License', 'real-smart-seo-pro' ); ?></h1>
+    <h1><?php esc_html_e( 'Midland Smart SEO Pro — License', 'real-smart-seo-pro' ); ?></h1>
 
     <div id="rsseo-pro-license-msg" class="rsseo-notice" style="display:none;"></div>
 
@@ -34,8 +34,8 @@
             </div>
             <p class="description">
                 <?php esc_html_e( "Don't have a license?", 'real-smart-seo-pro' ); ?>
-                <a href="https://tagglefish.com/real-smart-seo-pro" target="_blank" rel="noopener noreferrer">
-                    <?php esc_html_e( 'Get Real Smart SEO for Local Pro →', 'real-smart-seo-pro' ); ?>
+                <a href="https://midlandfloors.com/smart-seo-pro" target="_blank" rel="noopener noreferrer">
+                    <?php esc_html_e( 'Get Midland Smart SEO Pro →', 'real-smart-seo-pro' ); ?>
                 </a>
             </p>
         <?php endif; ?>

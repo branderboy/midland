@@ -245,8 +245,8 @@ class WGB_Admin {
 	 */
 	public function add_menu_page() {
 		add_management_page(
-			'GitHub Backup',
-			'GitHub Backup',
+			'Midland GitHub Vault',
+			'Midland GitHub Vault',
 			'manage_options',
 			'wp-github-backup',
 			array( $this, 'render_page' )
@@ -342,9 +342,9 @@ class WGB_Admin {
 
 		if ( empty( $token ) || empty( $username ) || empty( $repo ) ) {
 			echo '<div class="notice notice-warning"><p>';
-			echo '<strong>WP GitHub Backup:</strong> ';
+			echo '<strong>Midland GitHub Vault:</strong> ';
 			echo 'Please configure your GitHub settings under ';
-			echo '<a href="' . esc_url( admin_url( 'tools.php?page=wp-github-backup&tab=settings' ) ) . '">Tools &rarr; GitHub Backup</a>.';
+			echo '<a href="' . esc_url( admin_url( 'tools.php?page=wp-github-backup&tab=settings' ) ) . '">Tools &rarr; Midland GitHub Vault</a>.';
 			echo '</p></div>';
 		}
 
@@ -352,7 +352,7 @@ class WGB_Admin {
 		$last = WGB_Backup_Runner::get_last_backup();
 		if ( $last && 'failed' === $last->status ) {
 			echo '<div class="notice notice-error"><p>';
-			echo '<strong>WP GitHub Backup:</strong> ';
+			echo '<strong>Midland GitHub Vault:</strong> ';
 			echo 'The last backup failed. ';
 			echo '<a href="' . esc_url( admin_url( 'tools.php?page=wp-github-backup&tab=history' ) ) . '">View details</a>.';
 			echo '</p></div>';
@@ -387,7 +387,7 @@ class WGB_Admin {
 		$next_cron  = wp_next_scheduled( 'wp_github_backup_cron' );
 		?>
 		<div class="wrap wgb-wrap">
-			<h1>WP GitHub Backup</h1>
+			<h1>Midland GitHub Vault</h1>
 
 			<nav class="nav-tab-wrapper wgb-tabs">
 				<a href="?page=wp-github-backup&tab=dashboard" class="nav-tab <?php echo 'dashboard' === $active_tab ? 'nav-tab-active' : ''; ?>">Dashboard</a>

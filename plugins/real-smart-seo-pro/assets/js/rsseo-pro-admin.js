@@ -1,4 +1,4 @@
-/* Real Smart SEO Pro — Admin JS */
+/* Midland Smart SEO Pro — Admin JS */
 (function($) {
     'use strict';
 

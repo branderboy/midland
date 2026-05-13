@@ -105,7 +105,7 @@ class RSSEO_Pro_Admin {
 
     public function check_license_gate( $can_run ) {
         if ( ! RSSEO_Pro_License::is_active() ) {
-            return new WP_Error( 'no_license', __( 'Real Smart SEO for Local Pro requires an active license. Go to Real Smart SEO → Pro License to activate.', 'real-smart-seo-pro' ) );
+            return new WP_Error( 'no_license', __( 'Midland Smart SEO Pro requires an active license. Go to Real Smart SEO → Pro License to activate.', 'real-smart-seo-pro' ) );
         }
         return $can_run;
     }

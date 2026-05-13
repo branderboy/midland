@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Geo-Grid Rank Tracker.
  * Local Falcon-style NxN keyword rank scan around a center lat/lng.
  * Runs weekly via cron + on-demand via admin button.
- * Settings: Real Smart SEO Pro > Geo-Grid
+ * Settings: Midland Smart SEO Pro > Geo-Grid
  */
 class RSSEO_Pro_Geogrid {
 
@@ -334,7 +334,7 @@ class RSSEO_Pro_Geogrid {
             <?php endif; ?>
 
             <?php if ( ! class_exists( 'RSSEO_Pro_DataForSEO' ) || ! RSSEO_Pro_DataForSEO::is_configured() ) : ?>
-                <div class="notice notice-warning"><p><?php esc_html_e( 'DataForSEO credentials not configured. Add them under Real Smart SEO Pro > Settings.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-warning"><p><?php esc_html_e( 'DataForSEO credentials not configured. Add them under Midland Smart SEO Pro > Settings.', 'real-smart-seo-pro' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">

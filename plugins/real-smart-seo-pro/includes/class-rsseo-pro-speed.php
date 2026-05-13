@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Site Speed Overhaul.
  * Front-end performance toggles + PageSpeed Insights score check.
- * Settings: Real Smart SEO Pro > Site Speed
+ * Settings: Midland Smart SEO Pro > Site Speed
  */
 class RSSEO_Pro_Speed {
 

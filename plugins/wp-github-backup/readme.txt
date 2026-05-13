@@ -1,4 +1,4 @@
-=== WP GitHub Backup ===
+=== Midland GitHub Vault & Deploy ===
 Contributors: midland
 Tags: backup, github, deploy, git, sync
 Requires at least: 5.6
@@ -12,7 +12,7 @@ Back up WordPress content, database, themes, plugins, and uploads to a GitHub re
 
 == Description ==
 
-WP GitHub Backup treats a GitHub repository as a bidirectional source of truth for a WordPress site. The plugin can:
+Midland GitHub Vault & Deploy treats a GitHub repository as a bidirectional source of truth for a WordPress site. The plugin can:
 
 * **Back up** posts, pages, database, themes, plugins, and uploads to a configured GitHub repo on a schedule or on demand.
 * **Deploy** page/post HTML from the repo back into WordPress, including Yoast SEO meta and JSON-LD structured data.
@@ -60,7 +60,7 @@ No data is sent to the plugin author.
 
 1. Upload the plugin ZIP via Plugins → Add New → Upload.
 2. Activate through the Plugins menu in WordPress.
-3. Go to Tools → WP GitHub Backup → Settings and provide a GitHub personal access token (scopes: `repo`).
+3. Go to Tools → Midland GitHub Vault → Settings and provide a GitHub personal access token (scopes: `repo`).
 4. Configure your target repo, schedule, and deploy branch.
 
 == Frequently Asked Questions ==
