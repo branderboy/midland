@@ -60,6 +60,10 @@ function scrm_pro_activate() {
     if ( ! defined( 'SFCO_VERSION' ) ) {
         return;
     }
+    // smart_crm_pro_init() runs on plugins_loaded, which already fired for
+    // other plugins by the time WP gets to this hook — so the class file
+    // hasn't been required yet. Pull it in directly before the static call.
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-reactivation-engine.php';
     SCRM_Pro_Reactivation_Engine::create_tables();
 }
 
