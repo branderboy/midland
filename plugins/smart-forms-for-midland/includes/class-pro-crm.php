@@ -10,6 +10,30 @@ class SFCO_Pro_CRM {
         add_action( 'admin_init', array( $this, 'handle_save' ) );
         add_action( 'wp_ajax_sfco_pro_test_crm', array( $this, 'ajax_test_connection' ) );
         add_action( 'wp_ajax_sfco_pro_sync_lead', array( $this, 'ajax_sync_lead' ) );
+
+        // Auto-push every lead-capture form submission into ActiveCampaign
+        // (priority 20 so Smart CRM Pro's internal bridge at 10 finishes first).
+        add_action( 'sfco_lead_submitted', array( $this, 'on_lead_submitted' ), 20, 3 );
+    }
+
+    /**
+     * Bridge from the lead-capture form to ActiveCampaign. Fires on every
+     * submission saved by SFCO_Database::create_lead(). `sync_lead()` itself
+     * decides whether to push based on CRM mode + auto-sync flag.
+     */
+    public function on_lead_submitted( $lead_id, $row, $form ) {
+        unset( $form ); // form row not needed for the AC contact sync.
+
+        if ( empty( $row ) || ! is_array( $row ) ) {
+            return;
+        }
+
+        $lead = (object) $row;
+        if ( ! isset( $lead->id ) ) {
+            $lead->id = absint( $lead_id );
+        }
+
+        $this->sync_lead( $lead );
     }
 
     public function add_menu() {
@@ -136,7 +160,12 @@ class SFCO_Pro_CRM {
             'project_type' => $lead->project_type ?? '',
             'timeline'     => $lead->timeline ?? '',
             'zip_code'     => $lead->zip_code ?? '',
+            'notes'        => $lead->additional_notes ?? '',
         );
+
+        if ( empty( $contact['email'] ) ) {
+            return;
+        }
 
         $this->push_to_activecampaign( $api_url, $api_key, $contact );
     }
@@ -153,6 +182,9 @@ class SFCO_Pro_CRM {
         }
         if ( ! empty( $contact['zip_code'] ) ) {
             $field_values[] = array( 'field' => 'zip_code', 'value' => $contact['zip_code'] );
+        }
+        if ( ! empty( $contact['notes'] ) ) {
+            $field_values[] = array( 'field' => 'notes', 'value' => $contact['notes'] );
         }
 
         $payload = array(
