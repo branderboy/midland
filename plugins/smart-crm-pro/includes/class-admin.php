@@ -88,6 +88,10 @@ class SCRM_Pro_Admin {
 
     public function render_reactivation_page() {
         if ( ! current_user_can( 'manage_options' ) ) { return; }
+        if ( ! SCRM_Pro_License::is_valid() ) {
+            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Activate your license to use Lead Reactivation.', 'smart-crm-pro' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=scrm-license' ) ) . '">' . esc_html__( 'Enter License', 'smart-crm-pro' ) . '</a></p></div></div>';
+            return;
+        }
 
         $overview  = SCRM_Pro_Analytics::get_overview();
         $segments  = SCRM_Pro_Analytics::get_segment_breakdown();
@@ -163,6 +167,10 @@ class SCRM_Pro_Admin {
 
     public function render_campaigns_page() {
         if ( ! current_user_can( 'manage_options' ) ) { return; }
+        if ( ! SCRM_Pro_License::is_valid() ) {
+            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Activate your license.', 'smart-crm-pro' ) . '</p></div></div>';
+            return;
+        }
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $action = isset( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : 'list';

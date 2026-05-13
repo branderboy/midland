@@ -16,7 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants at file scope so they're available during the activation
-// hook (which fires before our plugins_loaded init callback runs).
+// hook. plugins_loaded fires for already-active plugins before the activating
+// plugin's own init runs, so anything the activation hook touches (including
+// SCRM_PRO_VERSION inside create_tables()) must exist by file include time.
 define( 'SCRM_PRO_VERSION', '1.2.0' );
 define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
@@ -62,9 +64,9 @@ function scrm_pro_activate() {
     if ( ! defined( 'SFCO_VERSION' ) ) {
         return;
     }
-    // smart_crm_pro_init() runs on plugins_loaded, which already fired for
-    // other plugins by the time WP gets to this hook — so the class file
-    // hasn't been required yet. Pull it in directly before the static call.
+    // smart_crm_pro_init() runs on plugins_loaded which has already fired
+    // for active plugins by the time WP gets here, so the class file hasn't
+    // been required yet — pull it in directly before the static call.
     require_once SCRM_PRO_DIR . 'includes/class-reactivation-engine.php';
     SCRM_Pro_Reactivation_Engine::create_tables();
 }
