@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart CRM
  * Description: Midland-branded CRM. Auto-formats incoming Smart Forms leads by priority + area, schedules follow-up reminders, syncs to ActiveCampaign + ServiceM8, runs the cold-lead reactivation engine and NPS surveys.
- * Version: 1.1.0
+ * Version: 1.2.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-crm-pro
@@ -15,6 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// Define constants at file scope so they're available during the activation
+// hook. plugins_loaded fires for already-active plugins before the activating
+// plugin's own init runs, so anything the activation hook touches (including
+// SCRM_PRO_VERSION inside create_tables()) must exist by file include time.
+define( 'SCRM_PRO_VERSION', '1.2.0' );
+define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
+define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
+
 add_action( 'plugins_loaded', 'smart_crm_pro_init', 25 );
 
 function smart_crm_pro_init() {
@@ -25,10 +33,6 @@ function smart_crm_pro_init() {
         });
         return;
     }
-
-    define( 'SCRM_PRO_VERSION', '1.0.0' );
-    define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
-    define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
 
     require_once SCRM_PRO_DIR . 'includes/class-reactivation-engine.php';
     require_once SCRM_PRO_DIR . 'includes/class-campaign-manager.php';
@@ -60,6 +64,10 @@ function scrm_pro_activate() {
     if ( ! defined( 'SFCO_VERSION' ) ) {
         return;
     }
+    // smart_crm_pro_init() runs on plugins_loaded which has already fired
+    // for active plugins by the time WP gets here, so the class file hasn't
+    // been required yet — pull it in directly before the static call.
+    require_once SCRM_PRO_DIR . 'includes/class-reactivation-engine.php';
     SCRM_Pro_Reactivation_Engine::create_tables();
 }
 
