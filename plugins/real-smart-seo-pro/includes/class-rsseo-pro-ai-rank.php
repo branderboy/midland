@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Tracks whether your domain appears in citations from Perplexity (and other LLM
  * providers via filter), so you know how often you're being surfaced in AI answers.
  *
- * Settings: Real Smart SEO Pro > AI Rank
+ * Settings: Midland Smart SEO Pro > AI Rank
  */
 class RSSEO_Pro_AI_Rank {
 

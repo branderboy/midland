@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: Real Smart SEO for Local Pro
- * Plugin URI: https://tagglefish.com/real-smart-seo-pro
+ * Plugin Name: Midland Smart SEO Pro
+ * Plugin URI: https://midlandfloors.com/smart-seo-pro
  * Description: Full local SEO offense — sameAs entity identity, GSC cleanup, programmatic city × service pages, IndexNow + Rapid URL Indexer, schema, Google Trends, GMB, and AI-powered fixes.
- * Version: 1.1.0
- * Author: TaggleFish
- * Author URI: https://tagglefish.com
+ * Version: 1.2.0
+ * Author: Midland Floor Care
+ * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: real-smart-seo-pro
@@ -18,11 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'RSSEO_PRO_VERSION',        '1.1.0' );
+define( 'RSSEO_PRO_VERSION',        '1.2.0' );
 define( 'RSSEO_PRO_PATH',           plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_PRO_URL',            plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_PRO_FILE',           __FILE__ );
-define( 'RSSEO_PRO_LICENSE_SERVER', 'https://tagglefish.com' );
 
 class RSSEO_Pro_Plugin {
 
@@ -65,7 +64,7 @@ class RSSEO_Pro_Plugin {
 
     public function missing_base_notice() {
         echo '<div class="notice notice-error"><p>';
-        esc_html_e( 'Real Smart SEO for Local Pro requires the free Real Smart SEO plugin to be installed and active.', 'real-smart-seo-pro' );
+        esc_html_e( 'Midland Smart SEO Pro requires the free Real Smart SEO plugin to be installed and active.', 'real-smart-seo-pro' );
         echo '</p></div>';
     }
 

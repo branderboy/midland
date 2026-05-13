@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Forms
  * Description: Multi-form lead capture for Midland Floor Care — floor-care templates, per-form shortcodes, file uploads, automation, Smart CRM Pro sync, Resend email, Google Calendar, branding, analytics, team management. (Formerly Smart Forms Basic + Smart Forms PRO, combined into one.)
- * Version: 2.0.0
+ * Version: 2.1.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-forms-for-midland
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Plugin constants. Internal SFCO_/SFCO_PRO_ prefixes preserved so all
 // existing class code keeps working with zero changes when we merged the
 // Pro plugin into this folder.
-define( 'SFCO_VERSION', '2.0.0' );
+define( 'SFCO_VERSION', '2.1.0' );
 define( 'SFCO_PLUGIN_FILE', __FILE__ );
 define( 'SFCO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SFCO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

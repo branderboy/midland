@@ -104,11 +104,6 @@ class SFCO_Pro_Team {
     }
 
     public function render_page() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Please activate your PRO license.', 'smart-forms-pro' ) . '</p></div></div>';
-            return;
-        }
-
         global $wpdb;
         $members = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}sfco_team_members ORDER BY created_at DESC" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 

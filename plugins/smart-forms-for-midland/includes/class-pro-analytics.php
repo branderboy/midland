@@ -67,10 +67,6 @@ class SFCO_Pro_Analytics {
     }
 
     public function render_page() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Please activate your PRO license.', 'smart-forms-pro' ) . '</p></div></div>';
-            return;
-        }
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $period = isset( $_GET['period'] ) ? absint( $_GET['period'] ) : 30;

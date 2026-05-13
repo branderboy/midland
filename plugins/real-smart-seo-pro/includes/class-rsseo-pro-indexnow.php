@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * IndexNow + Rapid URL Indexer.
  * Dual indexing layer: pings IndexNow (Bing/Yandex/others) + Rapid URL Indexer API on every publish.
- * Settings: Real Smart SEO Pro > IndexNow
+ * Settings: Midland Smart SEO Pro > IndexNow
  */
 class RSSEO_Pro_IndexNow {
 

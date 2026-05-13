@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="wrap rsseo-wrap">
-    <h1><?php esc_html_e( 'Real Smart SEO for Local Pro — Settings', 'real-smart-seo-pro' ); ?></h1>
+    <h1><?php esc_html_e( 'Midland Smart SEO Pro — Settings', 'real-smart-seo-pro' ); ?></h1>
 
     <div id="rsseo-pro-settings-msg" class="rsseo-notice" style="display:none;"></div>
 

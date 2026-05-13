@@ -50,10 +50,6 @@ class SFCO_Pro_Branding {
      * Inject custom brand colors into frontend forms.
      */
     public function inject_custom_css() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            return;
-        }
-
         $branding = get_option( 'sfco_pro_branding', array() );
         if ( empty( $branding ) ) {
             return;
@@ -81,11 +77,6 @@ class SFCO_Pro_Branding {
     }
 
     public function render_page() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Please activate your PRO license.', 'smart-forms-pro' ) . '</p></div></div>';
-            return;
-        }
-
         $branding = get_option( 'sfco_pro_branding', array() );
         $primary  = $branding['primary_color'] ?? '#0073aa';
         $button   = $branding['button_color'] ?? '#0073aa';

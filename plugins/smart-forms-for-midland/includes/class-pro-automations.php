@@ -86,10 +86,6 @@ class SFCO_Pro_Automations {
      * Fire "new_lead" automations after a lead is saved by the free plugin.
      */
     public function after_lead_created() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            return;
-        }
-
         // The free plugin already handled the response. We just trigger automations.
         // Hook into the lead creation from the free plugin's AJAX handler.
         global $wpdb;
@@ -173,10 +169,6 @@ class SFCO_Pro_Automations {
      * Cron: process time-based triggers (no_response_3_days, no_response_7_days).
      */
     public function process_scheduled() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            return;
-        }
-
         global $wpdb;
         $leads_table = $wpdb->prefix . 'sfco_leads';
 
@@ -198,11 +190,6 @@ class SFCO_Pro_Automations {
     }
 
     public function render_page() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Please activate your PRO license to use automations.', 'smart-forms-pro' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=sfco-license' ) ) . '">' . esc_html__( 'Enter License Key', 'smart-forms-pro' ) . '</a></p></div></div>';
-            return;
-        }
-
         global $wpdb;
         $table = $wpdb->prefix . 'sfco_automations';
 

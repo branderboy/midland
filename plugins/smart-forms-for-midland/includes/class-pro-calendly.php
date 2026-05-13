@@ -161,11 +161,6 @@ class SFCO_Pro_Calendly {
     }
 
     public function render_page() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Please activate your PRO license.', 'smart-forms-pro' ) . '</p></div></div>';
-            return;
-        }
-
         $api_key     = get_option( 'sfco_pro_calendly_api_key', '' );
         $signing_key = get_option( 'sfco_pro_calendly_signing_key', '' );
         $booking_url = get_option( 'sfco_pro_calendly_url', '' );
