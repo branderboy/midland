@@ -1,55 +1,39 @@
 <?php
+/**
+ * Compatibility shim — the Midland Smart SEO Pro license system has been removed.
+ *
+ * Historical: this class validated a license key against tagglefish.com / lmfwc
+ * and gated every Pro feature behind it. For the Midland in-house build we don't
+ * sell access, so the entire enforcement layer is gone. The class is kept as a
+ * no-op so other modules that call RSSEO_Pro_License::is_active() keep compiling
+ * and just see Pro as always-active.
+ */
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 class RSSEO_Pro_License {
 
-    const OPTION_KEY    = 'rsseo_pro_license_key';
-    const OPTION_STATUS = 'rsseo_pro_license_status';
-    const OPTION_EXPIRY = 'rsseo_pro_license_expiry';
-
     public static function get_key() {
-        return get_option( self::OPTION_KEY, '' );
+        return '';
     }
 
+    /**
+     * Always returns true so every Pro feature is unlocked. No phone-home.
+     */
     public static function is_active() {
-        return 'active' === get_option( self::OPTION_STATUS, '' );
+        return true;
     }
 
     public static function activate( $key ) {
-        $key = sanitize_text_field( $key );
-
-        $response = wp_remote_post( RSSEO_PRO_LICENSE_SERVER . '/wp-json/lmfwc/v2/licenses/activate/' . rawurlencode( $key ), array(
-            'timeout' => 15,
-            'headers' => array( 'Content-Type' => 'application/json' ),
-        ) );
-
-        if ( is_wp_error( $response ) ) {
-            return array( 'success' => false, 'error' => $response->get_error_message() );
-        }
-
-        $data = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        if ( ! empty( $data['data']['licenseKey']['status'] ) && 'active' === strtolower( $data['data']['licenseKey']['status'] ) ) {
-            update_option( self::OPTION_KEY,    $key );
-            update_option( self::OPTION_STATUS, 'active' );
-            update_option( self::OPTION_EXPIRY, $data['data']['licenseKey']['expiresAt'] ?? '' );
-            return array( 'success' => true );
-        }
-
-        return array( 'success' => false, 'error' => $data['message'] ?? __( 'Invalid license key.', 'real-smart-seo-pro' ) );
+        return array( 'success' => true );
     }
 
     public static function deactivate() {
-        $key = self::get_key();
-        if ( $key ) {
-            wp_remote_post( RSSEO_PRO_LICENSE_SERVER . '/wp-json/lmfwc/v2/licenses/deactivate/' . rawurlencode( $key ), array( 'timeout' => 10 ) );
-        }
-        update_option( self::OPTION_STATUS, 'inactive' );
+        // no-op
     }
 
     public static function get_expiry() {
-        return get_option( self::OPTION_EXPIRY, '' );
+        return '';
     }
 }

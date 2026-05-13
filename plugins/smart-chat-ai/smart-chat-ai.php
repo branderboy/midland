@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget + live messaging. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and hands off to live customer service via the bundled WhatsApp + SMS layer during business hours.
- * Version: 1.1.0
+ * Version: 1.2.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.1.0');
+define('SCAI_VERSION', '1.2.0');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 

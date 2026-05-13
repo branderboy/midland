@@ -12,5 +12,3 @@ $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'smart_
 // Delete options.
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'smart\_chat\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 
-// Clear cron.
-wp_clear_scheduled_hook( 'scai_daily_license_check' );

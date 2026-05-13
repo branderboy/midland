@@ -22,7 +22,6 @@ define( 'RSSEO_PRO_VERSION',        '1.2.0' );
 define( 'RSSEO_PRO_PATH',           plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_PRO_URL',            plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_PRO_FILE',           __FILE__ );
-define( 'RSSEO_PRO_LICENSE_SERVER', 'https://tagglefish.com' );
 
 class RSSEO_Pro_Plugin {
 

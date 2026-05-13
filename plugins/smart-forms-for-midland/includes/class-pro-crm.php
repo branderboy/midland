@@ -135,10 +135,6 @@ class SFCO_Pro_CRM {
      * Push a lead to the connected CRM.
      */
     public function sync_lead( $lead ) {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            return;
-        }
-
         $crm_mode = get_option( 'sfco_pro_crm_mode', 'none' );
         if ( 'external' !== $crm_mode ) {
             // Internal (Smart CRM Pro) reads wp_sfco_leads directly; "none" skips push.
@@ -234,11 +230,6 @@ class SFCO_Pro_CRM {
     }
 
     public function render_page() {
-        if ( ! SFCO_Pro_License::is_valid() ) {
-            echo '<div class="wrap"><div class="notice notice-warning"><p>' . esc_html__( 'Please activate your PRO license.', 'smart-forms-pro' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=sfco-license' ) ) . '">' . esc_html__( 'Enter License Key', 'smart-forms-pro' ) . '</a></p></div></div>';
-            return;
-        }
-
         $crm_mode = get_option( 'sfco_pro_crm_mode', 'none' );
         $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
         $api_url  = get_option( 'sfco_pro_crm_api_url', '' );

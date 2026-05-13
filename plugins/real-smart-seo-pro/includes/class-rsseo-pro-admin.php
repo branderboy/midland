@@ -35,15 +35,11 @@ class RSSEO_Pro_Admin {
         add_action( 'wp_ajax_rsseo_pro_apply_schema',       array( $this, 'ajax_apply_schema' ) );
         add_action( 'wp_ajax_rsseo_pro_apply_all_schemas',  array( $this, 'ajax_apply_all_schemas' ) );
         add_action( 'wp_ajax_rsseo_pro_update_backlink',    array( $this, 'ajax_update_backlink' ) );
-        add_action( 'wp_ajax_rsseo_pro_save_license',       array( $this, 'ajax_save_license' ) );
         add_action( 'wp_ajax_rsseo_pro_save_settings',      array( $this, 'ajax_save_pro_settings' ) );
         add_action( 'wp_ajax_rsseo_pro_test_dfs',           array( $this, 'ajax_test_dfs' ) );
 
         // Output schema on front end.
         add_action( 'wp_head', array( 'RSSEO_Pro_Schema', 'output_schema' ), 5 );
-
-        // License gate on scan.
-        add_filter( 'rsseo_can_run_scan', array( $this, 'check_license_gate' ) );
     }
 
     public function add_pro_menu() {
@@ -58,14 +54,6 @@ class RSSEO_Pro_Admin {
             'manage_options',
             'rsseo-pro-settings',
             array( $this, 'page_pro_settings' )
-        );
-        add_submenu_page(
-            null,
-            __( 'Pro License', 'real-smart-seo-pro' ),
-            __( '⭐ Pro License', 'real-smart-seo-pro' ),
-            'manage_options',
-            'rsseo-pro-license',
-            array( $this, 'page_license' )
         );
 
         // Render the Pro settings panel inline when the free plugin's Settings
@@ -99,15 +87,6 @@ class RSSEO_Pro_Admin {
                 'confirm_all'=> __( 'Apply all schema blocks to your site?', 'real-smart-seo-pro' ),
             ),
         ) );
-    }
-
-    // ── License gate ──────────────────────────────────────────────────────────
-
-    public function check_license_gate( $can_run ) {
-        if ( ! RSSEO_Pro_License::is_active() ) {
-            return new WP_Error( 'no_license', __( 'Midland Smart SEO Pro requires an active license. Go to Real Smart SEO → Pro License to activate.', 'real-smart-seo-pro' ) );
-        }
-        return $can_run;
     }
 
     // ── Pro scan fields (hooks into free plugin's new-scan form) ──────────────
@@ -192,18 +171,6 @@ class RSSEO_Pro_Admin {
         require RSSEO_PRO_PATH . 'includes/views/pro-report-sections.php';
     }
 
-    // ── Page: License ─────────────────────────────────────────────────────────
-
-    public function page_license() {
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
-        }
-        $is_active  = RSSEO_Pro_License::is_active();
-        $license_key = RSSEO_Pro_License::get_key();
-        $expiry      = RSSEO_Pro_License::get_expiry();
-        require RSSEO_PRO_PATH . 'includes/views/license.php';
-    }
-
     // ── AJAX: Apply schema ────────────────────────────────────────────────────
 
     public function ajax_apply_schema() {
@@ -259,35 +226,6 @@ class RSSEO_Pro_Admin {
 
         RSSEO_Pro_Fixer::update_backlink( $backlink_id, $status );
         wp_send_json_success();
-    }
-
-    // ── AJAX: Save license ────────────────────────────────────────────────────
-
-    public function ajax_save_license() {
-        check_ajax_referer( 'rsseo_pro_nonce', 'nonce' );
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
-        }
-
-        $action_type = isset( $_POST['license_action'] ) ? sanitize_text_field( wp_unslash( $_POST['license_action'] ) ) : '';
-        $key         = isset( $_POST['license_key'] ) ? sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) : '';
-
-        if ( 'activate' === $action_type ) {
-            if ( empty( $key ) ) {
-                wp_send_json_error( __( 'Please enter a license key.', 'real-smart-seo-pro' ) );
-            }
-            $result = RSSEO_Pro_License::activate( $key );
-            if ( $result['success'] ) {
-                wp_send_json_success( array( 'message' => __( 'License activated successfully!', 'real-smart-seo-pro' ) ) );
-            } else {
-                wp_send_json_error( $result['error'] );
-            }
-        } elseif ( 'deactivate' === $action_type ) {
-            RSSEO_Pro_License::deactivate();
-            wp_send_json_success( array( 'message' => __( 'License deactivated.', 'real-smart-seo-pro' ) ) );
-        } else {
-            wp_send_json_error( __( 'Invalid action.', 'real-smart-seo-pro' ) );
-        }
     }
 
     // ── AJAX: Save Pro Settings ───────────────────────────────────────────────

@@ -70,28 +70,6 @@
         });
     });
 
-    // License activate / deactivate
-    $(document).on('click', '.rsseo-pro-license-btn', function() {
-        var $btn   = $(this);
-        var action = $btn.data('action');
-        var key    = action === 'activate' ? $('#rsseo-pro-license-key').val().trim() : '';
-
-        $btn.prop('disabled', true).text(action === 'activate' ? 'Activating...' : 'Deactivating...');
-
-        $.post(ajaxUrl, {
-            action:         'rsseo_pro_save_license',
-            nonce:          nonce,
-            license_action: action,
-            license_key:    key
-        }, function(res) {
-            showMsg(res.success ? 'success' : 'error', res.data ? (res.data.message || res.data) : 'Error');
-            $btn.prop('disabled', false);
-            if (res.success) {
-                setTimeout(function() { location.reload(); }, 1200);
-            }
-        });
-    });
-
     // Save DataForSEO credentials
     $('#rsseo-save-dfs').on('click', function() {
         var $btn = $(this);
@@ -119,7 +97,7 @@
     });
 
     function showMsg(type, msg) {
-        var $el = $('#rsseo-pro-license-msg');
+        var $el = $('#rsseo-pro-settings-msg');
         $el.removeClass('rsseo-notice--success rsseo-notice--error')
            .addClass('rsseo-notice rsseo-notice--' + type)
            .text(msg)
