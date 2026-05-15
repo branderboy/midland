@@ -13,8 +13,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Royal Header",
@@ -25,8 +27,10 @@
             "category": "section",
             "metadata": {
                 "template_type": "section",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Royal Footer",
@@ -37,8 +41,10 @@
             "category": "section",
             "metadata": {
                 "template_type": "section",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Process",
@@ -49,8 +55,10 @@
             "category": "section",
             "metadata": {
                 "template_type": "section",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Residential Services",
@@ -61,8 +69,10 @@
             "category": "section",
             "metadata": {
                 "template_type": "section",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Commercial Services",
@@ -73,8 +83,10 @@
             "category": "section",
             "metadata": {
                 "template_type": "section",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Reviews",
@@ -85,8 +97,10 @@
             "category": "section",
             "metadata": {
                 "template_type": "section",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Long-Term & Recurring Commercial Floor Care Services",
@@ -97,8 +111,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Customized Commercial Floor Care Solutions",
@@ -109,8 +125,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Janitorial & Housekeeping Facility Services",
@@ -121,8 +139,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Commercial Upholstery",
@@ -133,8 +153,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Commercial Tile & Grout Cleaning",
@@ -145,8 +167,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Commercial Carpet Cleaning Services",
@@ -157,8 +181,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Commercial Hard Surface Floor Restoration",
@@ -169,8 +195,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 About Midland",
@@ -181,8 +209,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Reach Us",
@@ -193,8 +223,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Frequently Asked Questions",
@@ -205,8 +237,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Services",
@@ -217,8 +251,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Our Work",
@@ -229,8 +265,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Schedule Your Visit & Quote",
@@ -241,8 +279,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Jobs",
@@ -253,8 +293,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Instant Quote",
@@ -265,8 +307,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 COVID19 Protected",
@@ -277,8 +321,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Staff Training",
@@ -289,8 +335,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Ultimate Guide to Floor Care for Retail",
@@ -301,8 +349,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Capability Statement",
@@ -313,8 +363,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Last-Minute Commercial Floor Care Services",
@@ -325,8 +377,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Commercial Polished Concrete",
@@ -337,8 +391,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Service Area: Washington DC, Maryland, and Virginia (DMV)",
@@ -349,8 +405,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Industries",
@@ -361,8 +419,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Clients",
@@ -373,8 +433,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 7 Essential Tips for Impeccable Commercial Floor Care Services",
@@ -385,8 +447,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 Eco-Friendly Floor Solutions for Retail Stores",
@@ -397,8 +461,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 The Secret to Floor Care for Various Materials",
@@ -409,8 +475,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 The Top Methods for Cost-Effective Floor Maintenance",
@@ -421,8 +489,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland \u2014 The Latest in Commercial Floor Tech: Innovations for 2024",
@@ -433,8 +503,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         },
         {
             "name": "Midland Scenarios: Revolutionizing Floor Care for Tech Companies in Herndon, VA",
@@ -445,8 +517,10 @@
             "category": "page",
             "metadata": {
                 "template_type": "single-page",
-                "include_in_zip": "1"
-            }
+                "include_in_zip": "1",
+                "elementor_pro_required": "1"
+            },
+            "elementor_pro_required": true
         }
     ]
 }
