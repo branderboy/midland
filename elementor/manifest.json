@@ -23,8 +23,8 @@
             "screenshot": "screenshots/header.jpg",
             "source": "templates/header.json",
             "preview_url": "",
-            "type": "header",
-            "category": "header",
+            "type": "section",
+            "category": "section",
             "metadata": {
                 "template_type": "header",
                 "include_in_zip": "1",
@@ -37,8 +37,8 @@
             "screenshot": "screenshots/footer.jpg",
             "source": "templates/footer.json",
             "preview_url": "",
-            "type": "footer",
-            "category": "footer",
+            "type": "section",
+            "category": "section",
             "metadata": {
                 "template_type": "footer",
                 "include_in_zip": "1",

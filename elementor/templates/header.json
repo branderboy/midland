@@ -1,7 +1,7 @@
 {
   "version": "0.4",
   "title": "Royal Header",
-  "type": "header",
+  "type": "section",
   "metadata": {},
   "content": [
     {
