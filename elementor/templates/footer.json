@@ -154,9 +154,11 @@
                         "current_menu_shape": "no",
                         "menu_position": "vertical",
                         "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "layout": "vertical",
+                        "nav_menu": "footer-copyright"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 },
@@ -192,38 +194,6 @@
                   },
                   "elements": [
                     {
-                      "id": "61176614",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "Footer Menu 1",
-                        "header_size": "h5",
-                        "title_color": "#FFFFFF",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "800",
-                        "typography_text_transform": "uppercase",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "_margin": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "6",
-                          "left": "0",
-                          "isLinked": false
-                        }
-                      },
-                      "elements": []
-                    },
-                    {
                       "id": "99e2a5c2",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
@@ -236,9 +206,11 @@
                         "current_menu_shape": "no",
                         "menu_position": "vertical",
                         "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "layout": "vertical",
+                        "nav_menu": "footer-menu-1"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 },
@@ -274,38 +246,6 @@
                   },
                   "elements": [
                     {
-                      "id": "9d6b75c8",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "Footer Menu 2",
-                        "header_size": "h5",
-                        "title_color": "#FFFFFF",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "800",
-                        "typography_text_transform": "uppercase",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "_margin": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "6",
-                          "left": "0",
-                          "isLinked": false
-                        }
-                      },
-                      "elements": []
-                    },
-                    {
                       "id": "d971f8cf",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
@@ -318,9 +258,11 @@
                         "current_menu_shape": "no",
                         "menu_position": "vertical",
                         "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "layout": "vertical",
+                        "nav_menu": "footer-menu-2"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 },
@@ -356,38 +298,6 @@
                   },
                   "elements": [
                     {
-                      "id": "7ce895a8",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "Footer 3",
-                        "header_size": "h5",
-                        "title_color": "#FFFFFF",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "800",
-                        "typography_text_transform": "uppercase",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "_margin": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "6",
-                          "left": "0",
-                          "isLinked": false
-                        }
-                      },
-                      "elements": []
-                    },
-                    {
                       "id": "98a6cc26",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
@@ -400,9 +310,11 @@
                         "current_menu_shape": "no",
                         "menu_position": "vertical",
                         "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "layout": "vertical",
+                        "nav_menu": "footer-3"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 }
