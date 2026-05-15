@@ -195,34 +195,15 @@
                       "isInner": false
                     },
                     {
-                      "id": "d124d4ca",
+                      "id": "b19fcc62",
                       "elType": "widget",
-                      "widgetType": "wpr-nav-menu",
+                      "widgetType": "text-editor",
                       "settings": {
-                        "menu_select": "footer-about",
-                        "last_menu_item": "default",
-                        "select_separator": "default",
-                        "select_arrow": "default",
-                        "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "nav_menu_alignment": "left",
-                        "nav_menu_layout": "vertical",
-                        "nav_menu_typography_typography": "custom",
-                        "nav_menu_typography_font_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "nav_menu_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.9,
-                          "sizes": []
-                        },
-                        "nav_menu_item_color": "#B7BCB8",
-                        "nav_menu_item_color_hover": "#FFFFFF",
-                        "nav_menu_item_color_active": "#FFFFFF"
+                        "editor": "<p style=\"color:#B7BCB8;font-size:14px;line-height:1.9;margin:0\"><a href=\"#about\" style=\"color:#B7BCB8;text-decoration:none\">About Midland</a><br><a href=\"#services\" style=\"color:#B7BCB8;text-decoration:none\">Services</a><br><a href=\"#schedule\" style=\"color:#B7BCB8;text-decoration:none\">Schedule a Visit</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Blog</a></p>",
+                        "align": "left"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ],
                   "isInner": true
@@ -279,34 +260,15 @@
                       "isInner": false
                     },
                     {
-                      "id": "85ded771",
+                      "id": "22a55c2e",
                       "elType": "widget",
-                      "widgetType": "wpr-nav-menu",
+                      "widgetType": "text-editor",
                       "settings": {
-                        "menu_select": "footer-services",
-                        "last_menu_item": "default",
-                        "select_separator": "default",
-                        "select_arrow": "default",
-                        "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "nav_menu_alignment": "left",
-                        "nav_menu_layout": "vertical",
-                        "nav_menu_typography_typography": "custom",
-                        "nav_menu_typography_font_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "nav_menu_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.9,
-                          "sizes": []
-                        },
-                        "nav_menu_item_color": "#B7BCB8",
-                        "nav_menu_item_color_hover": "#FFFFFF",
-                        "nav_menu_item_color_active": "#FFFFFF"
+                        "editor": "<p style=\"color:#B7BCB8;font-size:14px;line-height:1.9;margin:0\"><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Carpet Cleaning</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Tile &amp; Grout</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Hardwood Refinishing</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Concrete Polishing</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Janitorial</a></p>",
+                        "align": "left"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ],
                   "isInner": true
@@ -363,34 +325,15 @@
                       "isInner": false
                     },
                     {
-                      "id": "4d76b157",
+                      "id": "ffbf5c3a",
                       "elType": "widget",
-                      "widgetType": "wpr-nav-menu",
+                      "widgetType": "text-editor",
                       "settings": {
-                        "menu_select": "footer-reach",
-                        "last_menu_item": "default",
-                        "select_separator": "default",
-                        "select_arrow": "default",
-                        "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "nav_menu_alignment": "left",
-                        "nav_menu_layout": "vertical",
-                        "nav_menu_typography_typography": "custom",
-                        "nav_menu_typography_font_size": {
-                          "unit": "px",
-                          "size": 14,
-                          "sizes": []
-                        },
-                        "nav_menu_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.9,
-                          "sizes": []
-                        },
-                        "nav_menu_item_color": "#B7BCB8",
-                        "nav_menu_item_color_hover": "#FFFFFF",
-                        "nav_menu_item_color_active": "#FFFFFF"
+                        "editor": "<p style=\"color:#B7BCB8;font-size:14px;line-height:1.9;margin:0\"><a href=\"tel:2405329097\" style=\"color:#B7BCB8;text-decoration:none\">(240) 532-9097</a><br><a href=\"#schedule\" style=\"color:#B7BCB8;text-decoration:none\">Free Quote</a><br><a href=\"#faq\" style=\"color:#B7BCB8;text-decoration:none\">FAQ</a><br><a href=\"#testimonials\" style=\"color:#B7BCB8;text-decoration:none\">Clients</a></p>",
+                        "align": "left"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ],
                   "isInner": true
