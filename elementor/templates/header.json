@@ -1,6 +1,6 @@
 {
   "version": "0.4",
-  "title": "Midland \u2014 Header",
+  "title": "Royal Header",
   "type": "section",
   "metadata": {},
   "content": [
@@ -193,7 +193,7 @@
               "isInner": true
             },
             {
-              "id": "8f9c9cac",
+              "id": "11d0aa20",
               "elType": "container",
               "settings": {
                 "flex_direction": "column",
@@ -215,28 +215,51 @@
                 },
                 "flex_align_items": "center",
                 "flex_justify_content": "center",
-                "_flex_size": "none",
-                "_element_width": "initial",
-                "width": {
-                  "unit": "%",
-                  "size": 58,
-                  "sizes": []
-                }
+                "_flex_size": "grow",
+                "_title": "Nav (inherits WP menu)"
               },
               "elements": [
                 {
-                  "id": "0f76b54f",
+                  "id": "64556607",
                   "elType": "widget",
-                  "widgetType": "text-editor",
+                  "widgetType": "wpr-nav-menu",
                   "settings": {
-                    "editor": "<p style=\"text-align:center;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin:0\"><a href=\"#about\" style=\"color:#0F1411;text-decoration:none;margin:0 12px\">About</a><a href=\"#schedule\" style=\"color:#0F1411;text-decoration:none;margin:0 12px\">Quote</a><a href=\"#services\" style=\"color:#0F1411;text-decoration:none;margin:0 12px\">Services</a><a href=\"#faq\" style=\"color:#0F1411;text-decoration:none;margin:0 12px\">FAQ</a><a href=\"#footer\" style=\"color:#0F1411;text-decoration:none;margin:0 12px\">Reach Us</a></p>",
-                    "align": "center"
+                    "menu_select": "",
+                    "last_menu_item": "default",
+                    "select_separator": "default",
+                    "select_arrow": "default",
+                    "select_circle": "default",
+                    "current_menu_shape": "no",
+                    "nav_menu_alignment": "center",
+                    "nav_menu_typography_typography": "custom",
+                    "nav_menu_typography_font_size": {
+                      "unit": "px",
+                      "size": 15,
+                      "sizes": []
+                    },
+                    "nav_menu_typography_font_weight": "700",
+                    "nav_menu_typography_text_transform": "uppercase",
+                    "nav_menu_typography_letter_spacing": {
+                      "unit": "px",
+                      "size": 1,
+                      "sizes": []
+                    },
+                    "nav_menu_item_color": "#0F1411",
+                    "nav_menu_item_color_hover": "#2F8137",
+                    "nav_menu_item_color_active": "#2F8137",
+                    "menu_item_padding": {
+                      "unit": "px",
+                      "top": "10",
+                      "right": "14",
+                      "bottom": "10",
+                      "left": "14",
+                      "isLinked": false
+                    },
+                    "nav_menu": ""
                   },
-                  "elements": [],
-                  "isInner": false
+                  "elements": []
                 }
-              ],
-              "isInner": true
+              ]
             },
             {
               "id": "573318b1",

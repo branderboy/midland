@@ -17,7 +17,7 @@
             }
         },
         {
-            "name": "Midland \u2014 Header",
+            "name": "Royal Header",
             "screenshot": "screenshots/header.jpg",
             "source": "templates/header.json",
             "preview_url": "",
@@ -29,7 +29,7 @@
             }
         },
         {
-            "name": "Midland \u2014 Footer",
+            "name": "Royal Footer",
             "screenshot": "screenshots/footer.jpg",
             "source": "templates/footer.json",
             "preview_url": "",

@@ -1,6 +1,6 @@
 {
   "version": "0.4",
-  "title": "Midland \u2014 Footer",
+  "title": "Royal Footer",
   "type": "section",
   "metadata": {},
   "content": [
@@ -144,17 +144,17 @@
                   "isInner": true
                 },
                 {
-                  "id": "b13d6cb8",
+                  "id": "3773897c",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
                     "flex_gap": {
-                      "column": "8",
-                      "row": "8",
+                      "column": "20",
+                      "row": "20",
                       "isLinked": true,
                       "unit": "px",
-                      "size": 8
+                      "size": 20
                     },
                     "padding": {
                       "unit": "px",
@@ -164,114 +164,75 @@
                       "left": "0",
                       "isLinked": true
                     },
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 22,
-                      "sizes": []
-                    }
+                    "flex_align_items": "flex-start",
+                    "_flex_size": "grow",
+                    "_title": "Menu (WP nav)"
                   },
                   "elements": [
                     {
-                      "id": "50550963",
+                      "id": "efc2f187",
                       "elType": "widget",
                       "widgetType": "heading",
                       "settings": {
-                        "title": "About",
+                        "title": "Menu",
                         "header_size": "h5",
-                        "align": "left",
-                        "size": "default",
-                        "title_color": "#43A94B",
+                        "title_color": "#FFFFFF",
                         "typography_typography": "custom",
                         "typography_font_size": {
                           "unit": "px",
-                          "size": 13,
+                          "size": 16,
                           "sizes": []
                         },
-                        "typography_font_weight": "800"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "b19fcc62",
-                      "elType": "widget",
-                      "widgetType": "text-editor",
-                      "settings": {
-                        "editor": "<p style=\"color:#B7BCB8;font-size:14px;line-height:1.9;margin:0\"><a href=\"#about\" style=\"color:#B7BCB8;text-decoration:none\">About Midland</a><br><a href=\"#services\" style=\"color:#B7BCB8;text-decoration:none\">Services</a><br><a href=\"#schedule\" style=\"color:#B7BCB8;text-decoration:none\">Schedule a Visit</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Blog</a></p>",
-                        "align": "left"
-                      },
-                      "elements": [],
-                      "isInner": false
-                    }
-                  ],
-                  "isInner": true
-                },
-                {
-                  "id": "dfb3c4f9",
-                  "elType": "container",
-                  "settings": {
-                    "flex_direction": "column",
-                    "content_width": "full",
-                    "flex_gap": {
-                      "column": "8",
-                      "row": "8",
-                      "isLinked": true,
-                      "unit": "px",
-                      "size": 8
-                    },
-                    "padding": {
-                      "unit": "px",
-                      "top": "0",
-                      "right": "0",
-                      "bottom": "0",
-                      "left": "0",
-                      "isLinked": true
-                    },
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 22,
-                      "sizes": []
-                    }
-                  },
-                  "elements": [
-                    {
-                      "id": "5ee8f96f",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "Services",
-                        "header_size": "h5",
-                        "align": "left",
-                        "size": "default",
-                        "title_color": "#43A94B",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
+                        "typography_font_weight": "800",
+                        "typography_text_transform": "uppercase",
+                        "typography_letter_spacing": {
                           "unit": "px",
-                          "size": 13,
+                          "size": 1,
                           "sizes": []
                         },
-                        "typography_font_weight": "800"
+                        "_margin": {
+                          "unit": "px",
+                          "top": "0",
+                          "right": "0",
+                          "bottom": "10",
+                          "left": "0",
+                          "isLinked": false
+                        }
                       },
-                      "elements": [],
-                      "isInner": false
+                      "elements": []
                     },
                     {
-                      "id": "22a55c2e",
+                      "id": "17ef6e5f",
                       "elType": "widget",
-                      "widgetType": "text-editor",
+                      "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "editor": "<p style=\"color:#B7BCB8;font-size:14px;line-height:1.9;margin:0\"><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Carpet Cleaning</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Tile &amp; Grout</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Hardwood Refinishing</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Concrete Polishing</a><br><a href=\"#\" style=\"color:#B7BCB8;text-decoration:none\">Janitorial</a></p>",
-                        "align": "left"
+                        "menu_select": "",
+                        "last_menu_item": "default",
+                        "select_separator": "default",
+                        "select_arrow": "default",
+                        "select_circle": "default",
+                        "current_menu_shape": "no",
+                        "nav_menu_alignment": "left",
+                        "nav_menu_layout": "vertical",
+                        "nav_menu_typography_typography": "custom",
+                        "nav_menu_typography_font_size": {
+                          "unit": "px",
+                          "size": 14,
+                          "sizes": []
+                        },
+                        "nav_menu_typography_line_height": {
+                          "unit": "em",
+                          "size": 1.9,
+                          "sizes": []
+                        },
+                        "nav_menu_item_color": "#B7BCB8",
+                        "nav_menu_item_color_hover": "#FFFFFF",
+                        "nav_menu_item_color_active": "#FFFFFF",
+                        "nav_menu": ""
                       },
-                      "elements": [],
-                      "isInner": false
+                      "elements": []
                     }
-                  ],
-                  "isInner": true
+                  ]
                 },
                 {
                   "id": "bb62ed5f",
