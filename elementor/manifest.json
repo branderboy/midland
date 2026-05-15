@@ -23,10 +23,10 @@
             "screenshot": "screenshots/header.jpg",
             "source": "templates/header.json",
             "preview_url": "",
-            "type": "section",
-            "category": "section",
+            "type": "header",
+            "category": "header",
             "metadata": {
-                "template_type": "section",
+                "template_type": "header",
                 "include_in_zip": "1",
                 "elementor_pro_required": "1"
             },
@@ -37,10 +37,10 @@
             "screenshot": "screenshots/footer.jpg",
             "source": "templates/footer.json",
             "preview_url": "",
-            "type": "section",
-            "category": "section",
+            "type": "footer",
+            "category": "footer",
             "metadata": {
-                "template_type": "section",
+                "template_type": "footer",
                 "include_in_zip": "1",
                 "elementor_pro_required": "1"
             },
