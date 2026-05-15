@@ -222,40 +222,39 @@
                 {
                   "id": "64556607",
                   "elType": "widget",
-                  "widgetType": "nav-menu",
+                  "widgetType": "wpr-nav-menu",
                   "settings": {
-                    "menu": "primary",
-                    "layout": "horizontal",
-                    "align": "center",
-                    "pointer": "underline",
-                    "submenu_typography_typography": "custom",
-                    "color_menu_item": "#0F1411",
-                    "color_menu_item_hover": "#2F8137",
-                    "color_menu_item_active": "#2F8137",
-                    "typography_typography": "custom",
-                    "typography_font_size": {
+                    "menu_select": "main-menu",
+                    "last_menu_item": "default",
+                    "select_separator": "default",
+                    "select_arrow": "default",
+                    "select_circle": "default",
+                    "current_menu_shape": "no",
+                    "nav_menu_alignment": "center",
+                    "nav_menu_typography_typography": "custom",
+                    "nav_menu_typography_font_size": {
                       "unit": "px",
                       "size": 15,
                       "sizes": []
                     },
-                    "typography_font_weight": "700",
-                    "typography_text_transform": "uppercase",
-                    "typography_letter_spacing": {
+                    "nav_menu_typography_font_weight": "700",
+                    "nav_menu_typography_text_transform": "uppercase",
+                    "nav_menu_typography_letter_spacing": {
                       "unit": "px",
                       "size": 1,
                       "sizes": []
                     },
-                    "indicator_color": "#2F8137",
-                    "indicator_color_hover": "#2F8137",
-                    "indicator_color_active": "#2F8137",
-                    "menu_space_between": {
+                    "nav_menu_item_color": "#0F1411",
+                    "nav_menu_item_color_hover": "#2F8137",
+                    "nav_menu_item_color_active": "#2F8137",
+                    "menu_item_padding": {
                       "unit": "px",
-                      "size": 24,
-                      "sizes": []
-                    },
-                    "mobile_layout": "dropdown",
-                    "menu_toggle_color": "#0F1411",
-                    "menu_toggle_color_hover": "#2F8137"
+                      "top": "10",
+                      "right": "14",
+                      "bottom": "10",
+                      "left": "14",
+                      "isLinked": false
+                    }
                   },
                   "elements": []
                 }
