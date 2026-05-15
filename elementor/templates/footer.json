@@ -146,17 +146,15 @@
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "menu_select": "footer-copyright",
+                        "menu_select": "",
                         "last_menu_item": "default",
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "current_menu_shape": "no"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 },
@@ -196,17 +194,15 @@
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "menu_select": "footer-menu-1",
+                        "menu_select": "",
                         "last_menu_item": "default",
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "current_menu_shape": "no"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 },
@@ -246,17 +242,15 @@
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "menu_select": "footer-menu-2",
+                        "menu_select": "",
                         "last_menu_item": "default",
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "current_menu_shape": "no"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 },
@@ -296,17 +290,15 @@
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "menu_select": "footer-3",
+                        "menu_select": "",
                         "last_menu_item": "default",
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical"
+                        "current_menu_shape": "no"
                       },
-                      "elements": []
+                      "elements": [],
+                      "isInner": false
                     }
                   ]
                 }
