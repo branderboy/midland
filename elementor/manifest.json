@@ -26,7 +26,7 @@
             "type": "section",
             "category": "section",
             "metadata": {
-                "template_type": "section",
+                "template_type": "header",
                 "include_in_zip": "1",
                 "elementor_pro_required": "1"
             },
@@ -40,7 +40,7 @@
             "type": "section",
             "category": "section",
             "metadata": {
-                "template_type": "section",
+                "template_type": "footer",
                 "include_in_zip": "1",
                 "elementor_pro_required": "1"
             },
