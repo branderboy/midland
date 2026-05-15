@@ -151,7 +151,10 @@
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no"
+                        "current_menu_shape": "no",
+                        "menu_position": "vertical",
+                        "nav_menu_layout": "vertical",
+                        "layout": "vertical"
                       },
                       "elements": [],
                       "isInner": false
@@ -199,7 +202,10 @@
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no"
+                        "current_menu_shape": "no",
+                        "menu_position": "vertical",
+                        "nav_menu_layout": "vertical",
+                        "layout": "vertical"
                       },
                       "elements": [],
                       "isInner": false
@@ -247,7 +253,10 @@
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no"
+                        "current_menu_shape": "no",
+                        "menu_position": "vertical",
+                        "nav_menu_layout": "vertical",
+                        "layout": "vertical"
                       },
                       "elements": [],
                       "isInner": false
@@ -295,7 +304,10 @@
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
-                        "current_menu_shape": "no"
+                        "current_menu_shape": "no",
+                        "menu_position": "vertical",
+                        "nav_menu_layout": "vertical",
+                        "layout": "vertical"
                       },
                       "elements": [],
                       "isInner": false
