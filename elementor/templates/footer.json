@@ -83,7 +83,7 @@
               },
               "elements": [
                 {
-                  "id": "983ed73e",
+                  "id": "73bcc662",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -139,12 +139,36 @@
                       },
                       "elements": [],
                       "isInner": false
+                    },
+                    {
+                      "id": "0113ad1c",
+                      "elType": "widget",
+                      "widgetType": "wpr-nav-menu",
+                      "settings": {
+                        "menu_select": "footer-copyright",
+                        "last_menu_item": "default",
+                        "select_separator": "default",
+                        "select_arrow": "default",
+                        "select_circle": "default",
+                        "current_menu_shape": "no",
+                        "nav_menu_alignment": "left",
+                        "nav_menu_typography_typography": "custom",
+                        "nav_menu_typography_font_size": {
+                          "unit": "px",
+                          "size": 12,
+                          "sizes": []
+                        },
+                        "nav_menu_item_color": "#6B7280",
+                        "nav_menu_item_color_hover": "#FFFFFF",
+                        "nav_menu_item_color_active": "#FFFFFF",
+                        "nav_menu": ""
+                      },
+                      "elements": []
                     }
-                  ],
-                  "isInner": true
+                  ]
                 },
                 {
-                  "id": "3773897c",
+                  "id": "7b191335",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -165,64 +189,25 @@
                       "isLinked": true
                     },
                     "flex_align_items": "flex-start",
-                    "_flex_size": "grow",
-                    "_title": "Menu (WP nav)"
+                    "_flex_size": "grow"
                   },
                   "elements": [
                     {
-                      "id": "efc2f187",
-                      "elType": "widget",
-                      "widgetType": "heading",
-                      "settings": {
-                        "title": "Menu",
-                        "header_size": "h5",
-                        "title_color": "#FFFFFF",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
-                          "unit": "px",
-                          "size": 16,
-                          "sizes": []
-                        },
-                        "typography_font_weight": "800",
-                        "typography_text_transform": "uppercase",
-                        "typography_letter_spacing": {
-                          "unit": "px",
-                          "size": 1,
-                          "sizes": []
-                        },
-                        "_margin": {
-                          "unit": "px",
-                          "top": "0",
-                          "right": "0",
-                          "bottom": "10",
-                          "left": "0",
-                          "isLinked": false
-                        }
-                      },
-                      "elements": []
-                    },
-                    {
-                      "id": "17ef6e5f",
+                      "id": "62ffaac2",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "menu_select": "",
+                        "menu_select": "footer-menu-1",
                         "last_menu_item": "default",
                         "select_separator": "default",
                         "select_arrow": "default",
                         "select_circle": "default",
                         "current_menu_shape": "no",
                         "nav_menu_alignment": "left",
-                        "nav_menu_layout": "vertical",
                         "nav_menu_typography_typography": "custom",
                         "nav_menu_typography_font_size": {
                           "unit": "px",
                           "size": 14,
-                          "sizes": []
-                        },
-                        "nav_menu_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.9,
                           "sizes": []
                         },
                         "nav_menu_item_color": "#B7BCB8",
@@ -235,17 +220,17 @@
                   ]
                 },
                 {
-                  "id": "bb62ed5f",
+                  "id": "0573c7d3",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
                     "content_width": "full",
                     "flex_gap": {
-                      "column": "8",
-                      "row": "8",
+                      "column": "20",
+                      "row": "20",
                       "isLinked": true,
                       "unit": "px",
-                      "size": 8
+                      "size": 20
                     },
                     "padding": {
                       "unit": "px",
@@ -255,63 +240,91 @@
                       "left": "0",
                       "isLinked": true
                     },
-                    "_flex_size": "none",
-                    "_element_width": "initial",
-                    "width": {
-                      "unit": "%",
-                      "size": 22,
-                      "sizes": []
-                    }
+                    "flex_align_items": "flex-start",
+                    "_flex_size": "grow"
                   },
                   "elements": [
                     {
-                      "id": "8854382f",
+                      "id": "de9e9299",
                       "elType": "widget",
-                      "widgetType": "heading",
+                      "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "title": "Reach Us",
-                        "header_size": "h5",
-                        "align": "left",
-                        "size": "default",
-                        "title_color": "#43A94B",
-                        "typography_typography": "custom",
-                        "typography_font_size": {
+                        "menu_select": "footer-menu-2",
+                        "last_menu_item": "default",
+                        "select_separator": "default",
+                        "select_arrow": "default",
+                        "select_circle": "default",
+                        "current_menu_shape": "no",
+                        "nav_menu_alignment": "left",
+                        "nav_menu_typography_typography": "custom",
+                        "nav_menu_typography_font_size": {
                           "unit": "px",
-                          "size": 13,
+                          "size": 14,
                           "sizes": []
                         },
-                        "typography_font_weight": "800"
+                        "nav_menu_item_color": "#B7BCB8",
+                        "nav_menu_item_color_hover": "#FFFFFF",
+                        "nav_menu_item_color_active": "#FFFFFF",
+                        "nav_menu": ""
                       },
-                      "elements": [],
-                      "isInner": false
-                    },
-                    {
-                      "id": "ffbf5c3a",
-                      "elType": "widget",
-                      "widgetType": "text-editor",
-                      "settings": {
-                        "editor": "<p style=\"color:#B7BCB8;font-size:14px;line-height:1.9;margin:0\"><a href=\"tel:2405329097\" style=\"color:#B7BCB8;text-decoration:none\">(240) 532-9097</a><br><a href=\"#schedule\" style=\"color:#B7BCB8;text-decoration:none\">Free Quote</a><br><a href=\"#faq\" style=\"color:#B7BCB8;text-decoration:none\">FAQ</a><br><a href=\"#testimonials\" style=\"color:#B7BCB8;text-decoration:none\">Clients</a></p>",
-                        "align": "left"
-                      },
-                      "elements": [],
-                      "isInner": false
+                      "elements": []
                     }
-                  ],
-                  "isInner": true
+                  ]
+                },
+                {
+                  "id": "ef62998e",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "20",
+                      "row": "20",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 20
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "0",
+                      "right": "0",
+                      "bottom": "0",
+                      "left": "0",
+                      "isLinked": true
+                    },
+                    "flex_align_items": "flex-start",
+                    "_flex_size": "grow"
+                  },
+                  "elements": [
+                    {
+                      "id": "3e3fbd12",
+                      "elType": "widget",
+                      "widgetType": "wpr-nav-menu",
+                      "settings": {
+                        "menu_select": "footer-3",
+                        "last_menu_item": "default",
+                        "select_separator": "default",
+                        "select_arrow": "default",
+                        "select_circle": "default",
+                        "current_menu_shape": "no",
+                        "nav_menu_alignment": "left",
+                        "nav_menu_typography_typography": "custom",
+                        "nav_menu_typography_font_size": {
+                          "unit": "px",
+                          "size": 14,
+                          "sizes": []
+                        },
+                        "nav_menu_item_color": "#B7BCB8",
+                        "nav_menu_item_color_hover": "#FFFFFF",
+                        "nav_menu_item_color_active": "#FFFFFF",
+                        "nav_menu": ""
+                      },
+                      "elements": []
+                    }
+                  ]
                 }
               ],
               "isInner": true
-            },
-            {
-              "id": "f5553e01",
-              "elType": "widget",
-              "widgetType": "text-editor",
-              "settings": {
-                "editor": "<p style=\"color:#6B7280;font-size:12px;padding-top:24px;margin-top:28px;border-top:1px solid #1F2A22\">\u00a9 2026 Midland Floor Care \u00b7 Serving DC, MD, VA \u00b7 Terms \u00b7 Privacy Policy</p>",
-                "align": "center"
-              },
-              "elements": [],
-              "isInner": false
             }
           ],
           "isInner": true
