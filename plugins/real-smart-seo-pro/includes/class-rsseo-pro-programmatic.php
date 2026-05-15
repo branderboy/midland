@@ -299,7 +299,11 @@ class RSSEO_Pro_Programmatic {
         update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );
         update_post_meta( $post_id, '_elementor_template_type', 'wp-page' );
         update_post_meta( $post_id, '_elementor_version', '3.21.0' );
-        update_post_meta( $post_id, '_wp_page_template', 'elementor_canvas' );
+        // elementor_header_footer keeps the theme/Elementor Pro Theme Builder
+        // header + footer wrapped around the page (the kit ships header.json
+        // and footer.json as section templates). elementor_canvas would strip
+        // both, which is wrong for these location landing pages.
+        update_post_meta( $post_id, '_wp_page_template', 'elementor_header_footer' );
     }
 
     /**
