@@ -213,16 +213,10 @@
                         "select_circle": "default",
                         "current_menu_shape": "no",
                         "nav_menu_alignment": "left",
-                        "nav_menu_layout": "vertical",
                         "nav_menu_typography_typography": "custom",
                         "nav_menu_typography_font_size": {
                           "unit": "px",
                           "size": 14,
-                          "sizes": []
-                        },
-                        "nav_menu_typography_line_height": {
-                          "unit": "em",
-                          "size": 1.9,
                           "sizes": []
                         },
                         "nav_menu_item_color": "#B7BCB8",
