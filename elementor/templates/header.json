@@ -224,7 +224,7 @@
                   "elType": "widget",
                   "widgetType": "wpr-nav-menu",
                   "settings": {
-                    "menu_select": "main-menu",
+                    "menu_select": "",
                     "last_menu_item": "default",
                     "select_separator": "default",
                     "select_arrow": "default",
@@ -254,7 +254,8 @@
                       "bottom": "10",
                       "left": "14",
                       "isLinked": false
-                    }
+                    },
+                    "nav_menu": ""
                   },
                   "elements": []
                 }

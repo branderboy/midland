@@ -206,7 +206,7 @@
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
-                        "menu_select": "main-menu",
+                        "menu_select": "",
                         "last_menu_item": "default",
                         "select_separator": "default",
                         "select_arrow": "default",
@@ -227,7 +227,8 @@
                         },
                         "nav_menu_item_color": "#B7BCB8",
                         "nav_menu_item_color_hover": "#FFFFFF",
-                        "nav_menu_item_color_active": "#FFFFFF"
+                        "nav_menu_item_color_active": "#FFFFFF",
+                        "nav_menu": ""
                       },
                       "elements": []
                     }
