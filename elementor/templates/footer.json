@@ -83,7 +83,92 @@
               },
               "elements": [
                 {
-                  "id": "5c77f5a7",
+                  "id": "73bcc662",
+                  "elType": "container",
+                  "settings": {
+                    "flex_direction": "column",
+                    "content_width": "full",
+                    "flex_gap": {
+                      "column": "14",
+                      "row": "14",
+                      "isLinked": true,
+                      "unit": "px",
+                      "size": 14
+                    },
+                    "padding": {
+                      "unit": "px",
+                      "top": "0",
+                      "right": "0",
+                      "bottom": "0",
+                      "left": "0",
+                      "isLinked": true
+                    },
+                    "_flex_size": "none",
+                    "_element_width": "initial",
+                    "width": {
+                      "unit": "%",
+                      "size": 33,
+                      "sizes": []
+                    }
+                  },
+                  "elements": [
+                    {
+                      "id": "f07fbbb8",
+                      "elType": "widget",
+                      "widgetType": "image",
+                      "settings": {
+                        "image": {
+                          "url": "https://raw.githubusercontent.com/branderboy/midland/main/images/midland-logo-white.png",
+                          "id": "",
+                          "size": "",
+                          "alt": "Midland Floor Care",
+                          "source": "library"
+                        },
+                        "_css_classes": ""
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "61b86c22",
+                      "elType": "widget",
+                      "widgetType": "text-editor",
+                      "settings": {
+                        "editor": "<p style=\"color:#B7BCB8;font-size:14px;line-height:1.6;margin:0\">We serve the DMV metro with commercial floor care, hardwood floor cleaning, tile &amp; grout cleaning, floor maintenance, wood floor refinishing, and EPA-approved disinfecting.</p>",
+                        "align": "left"
+                      },
+                      "elements": [],
+                      "isInner": false
+                    },
+                    {
+                      "id": "0113ad1c",
+                      "elType": "widget",
+                      "widgetType": "wpr-nav-menu",
+                      "settings": {
+                        "menu_select": "footer-copyright",
+                        "last_menu_item": "default",
+                        "select_separator": "default",
+                        "select_arrow": "default",
+                        "select_circle": "default",
+                        "current_menu_shape": "no",
+                        "nav_menu_alignment": "left",
+                        "nav_menu_typography_typography": "custom",
+                        "nav_menu_typography_font_size": {
+                          "unit": "px",
+                          "size": 12,
+                          "sizes": []
+                        },
+                        "nav_menu_item_color": "#6B7280",
+                        "nav_menu_item_color_hover": "#FFFFFF",
+                        "nav_menu_item_color_active": "#FFFFFF",
+                        "nav_menu": ""
+                      },
+                      "elements": []
+                    }
+                  ]
+                },
+                {
+                  "id": "7b191335",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -108,7 +193,7 @@
                   },
                   "elements": [
                     {
-                      "id": "25a89544",
+                      "id": "62ffaac2",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
@@ -135,7 +220,7 @@
                   ]
                 },
                 {
-                  "id": "10c28ee8",
+                  "id": "0573c7d3",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -160,7 +245,7 @@
                   },
                   "elements": [
                     {
-                      "id": "4ff44e76",
+                      "id": "de9e9299",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
@@ -187,7 +272,7 @@
                   ]
                 },
                 {
-                  "id": "99c37084",
+                  "id": "ef62998e",
                   "elType": "container",
                   "settings": {
                     "flex_direction": "column",
@@ -212,7 +297,7 @@
                   },
                   "elements": [
                     {
-                      "id": "940aae5e",
+                      "id": "3e3fbd12",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
                       "settings": {
@@ -240,31 +325,6 @@
                 }
               ],
               "isInner": true
-            },
-            {
-              "id": "0acb4fbd",
-              "elType": "widget",
-              "widgetType": "wpr-nav-menu",
-              "settings": {
-                "menu_select": "footer-copyright",
-                "last_menu_item": "default",
-                "select_separator": "default",
-                "select_arrow": "default",
-                "select_circle": "default",
-                "current_menu_shape": "no",
-                "nav_menu_alignment": "center",
-                "nav_menu_typography_typography": "custom",
-                "nav_menu_typography_font_size": {
-                  "unit": "px",
-                  "size": 12,
-                  "sizes": []
-                },
-                "nav_menu_item_color": "#6B7280",
-                "nav_menu_item_color_hover": "#FFFFFF",
-                "nav_menu_item_color_active": "#FFFFFF",
-                "nav_menu": ""
-              },
-              "elements": []
             }
           ],
           "isInner": true
