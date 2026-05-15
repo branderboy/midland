@@ -129,6 +129,8 @@ class RSSEO_Pro_Programmatic {
         update_post_meta( $post_id, '_mfc_wiki_url', $wiki_url );
         update_post_meta( $post_id, '_mfc_services', $services );
 
+        $this->apply_elementor_template( $post_id, $city, $state, $services );
+
         // Assign service terms.
         $term_ids = array();
         foreach ( $services as $service ) {
@@ -226,6 +228,8 @@ class RSSEO_Pro_Programmatic {
             }
             update_post_meta( $post_id, '_mfc_services', $bulk_services );
 
+            $this->apply_elementor_template( $post_id, $city, $state, $bulk_services );
+
             $term_ids = array();
             foreach ( $bulk_services as $service ) {
                 $term = get_term_by( 'name', $service, self::TAXONOMY );
@@ -280,6 +284,324 @@ class RSSEO_Pro_Programmatic {
 <li>Free estimates with upfront, transparent pricing</li>
 </ul>
 <p>Ready to get started? <a href=\"/contact/\">Request a free quote</a> or call us today. We serve {$city} and all surrounding neighborhoods in {$state}.</p>";
+    }
+
+    /**
+     * Write Elementor builder data so location pages render with the same
+     * Hero / Content / CTA layout used by the Midland Elementor Kit service pages.
+     */
+    private function apply_elementor_template( $post_id, $city, $state, $services ) {
+        $data = $this->generate_elementor_data( $city, $state, $services );
+
+        // wp_slash because update_post_meta runs through wp_unslash on read,
+        // and Elementor expects the JSON to survive that round-trip intact.
+        update_post_meta( $post_id, '_elementor_data', wp_slash( wp_json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) ) );
+        update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );
+        update_post_meta( $post_id, '_elementor_template_type', 'wp-page' );
+        update_post_meta( $post_id, '_elementor_version', '3.21.0' );
+        // elementor_header_footer keeps the theme/Elementor Pro Theme Builder
+        // header + footer wrapped around the page (the kit ships header.json
+        // and footer.json as section templates). elementor_canvas would strip
+        // both, which is wrong for these location landing pages.
+        update_post_meta( $post_id, '_wp_page_template', 'elementor_header_footer' );
+    }
+
+    /**
+     * Build the three-section Elementor structure (Hero, Content, CTA) that
+     * mirrors templates/commercial-carpet-cleaning-services.json from the kit.
+     */
+    private function generate_elementor_data( $city, $state, $services ) {
+        $business = get_bloginfo( 'name' );
+        $identity = get_option( 'rsseo_sameas_identity', array() );
+        $phone    = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '(240) 532-9097';
+        $tel_href = 'tel:' . preg_replace( '/[^0-9+]/', '', $phone );
+
+        $primary       = ! empty( $services ) ? $services[0] : 'Floor Care';
+        $hero_title    = $primary . ' in ' . $city . ', ' . $state;
+        $services_list = ! empty( $services ) ? implode( ', ', $services ) : 'floor care services';
+        $intro         = "Professional {$services_list} for businesses and property managers in {$city}, {$state}. Same-day quotes, after-hours service, and the Midland Shine Standard on every visit.";
+
+        $body_html  = "<h2><strong>{$primary} in {$city}, {$state} That Protects Your Brand Image and Investment</strong></h2>";
+        $body_html .= "<p>{$business} serves {$city} and the surrounding {$state} area with commercial-grade floor care. From high-traffic lobbies to back-of-house corridors, we keep your facility looking sharp and operating safely.</p>";
+
+        if ( ! empty( $services ) ) {
+            $body_html .= '<p><strong>Services available in ' . esc_html( $city ) . ', ' . esc_html( $state ) . '</strong></p><ul>';
+            foreach ( $services as $svc ) {
+                $body_html .= '<li><p>' . esc_html( $svc ) . ' &mdash; tailored to ' . esc_html( $city ) . ' facilities</p></li>';
+            }
+            $body_html .= '</ul>';
+        }
+
+        $body_html .= '<p><strong>Why ' . esc_html( $city ) . ' businesses choose ' . esc_html( $business ) . '</strong></p><ul>'
+            . '<li><p>Licensed and insured &mdash; serving the DMV metro area</p></li>'
+            . '<li><p>Same-day and next-day appointments available</p></li>'
+            . '<li><p>Commercial-grade equipment for deeper, longer-lasting results</p></li>'
+            . '<li><p>Flexible scheduling: after-hours and weekends available</p></li>'
+            . '<li><p>Satisfaction guaranteed: backed by our Midland Shine Standard</p></li>'
+            . '</ul>';
+
+        $body_html .= '<p><a href="/schedule-a-visit/"><strong>Ready to schedule an on-site visit in ' . esc_html( $city ) . '?</strong></a><br />Call us or request a visit online and we&rsquo;ll build a plan around your facility.</p>';
+
+        $flex_gap_20 = array( 'column' => '20', 'row' => '20', 'isLinked' => true, 'unit' => 'px', 'size' => 20 );
+        $pad_zero    = array( 'unit' => 'px', 'top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0', 'isLinked' => true );
+
+        return array(
+            // SECTION 1 — Hero
+            array(
+                'id'       => $this->elementor_id(),
+                'elType'   => 'container',
+                'settings' => array(
+                    '_title'                => 'Hero - ' . $hero_title,
+                    'background_background' => 'classic',
+                    'background_color'      => '#F3FCF4',
+                    'content_width'         => 'full',
+                    'flex_direction'        => 'column',
+                    'flex_gap'              => $flex_gap_20,
+                    'padding'               => $pad_zero,
+                ),
+                'elements' => array(
+                    array(
+                        'id'       => $this->elementor_id(),
+                        'elType'   => 'container',
+                        'settings' => array(
+                            'flex_direction'    => 'column',
+                            'content_width'     => 'boxed',
+                            'flex_gap'          => $flex_gap_20,
+                            'boxed_width'       => array( 'unit' => 'px', 'size' => 920, 'sizes' => array() ),
+                            'padding'           => array( 'unit' => 'em', 'top' => '3', 'right' => '1.5', 'bottom' => '2', 'left' => '1.5', 'isLinked' => false ),
+                            'flex_align_items'  => 'center',
+                        ),
+                        'elements' => array(
+                            array(
+                                'id'         => $this->elementor_id(),
+                                'elType'     => 'widget',
+                                'widgetType' => 'heading',
+                                'settings'   => array(
+                                    'title'                  => 'Service Area',
+                                    'header_size'            => 'h6',
+                                    'align'                  => 'center',
+                                    'title_color'            => '#2F8137',
+                                    'typography_typography'  => 'custom',
+                                    'typography_font_size'   => array( 'unit' => 'px', 'size' => 13, 'sizes' => array() ),
+                                    'typography_font_weight' => '800',
+                                    '_margin'                => array( 'unit' => 'px', 'top' => '0', 'right' => '0', 'bottom' => '10', 'left' => '0', 'isLinked' => false ),
+                                ),
+                                'elements' => array(),
+                            ),
+                            array(
+                                'id'         => $this->elementor_id(),
+                                'elType'     => 'widget',
+                                'widgetType' => 'heading',
+                                'settings'   => array(
+                                    'title'                   => $hero_title,
+                                    'header_size'             => 'h1',
+                                    'align'                   => 'center',
+                                    'title_color'             => '#0F1411',
+                                    'typography_typography'   => 'custom',
+                                    'typography_font_size'    => array( 'unit' => 'px', 'size' => 44, 'sizes' => array() ),
+                                    'typography_font_weight'  => '800',
+                                    'typography_line_height'  => array( 'unit' => 'em', 'size' => 1.05, 'sizes' => array() ),
+                                ),
+                                'elements' => array(),
+                            ),
+                            array(
+                                'id'         => $this->elementor_id(),
+                                'elType'     => 'widget',
+                                'widgetType' => 'text-editor',
+                                'settings'   => array(
+                                    'editor'                  => '<p>' . esc_html( $intro ) . '</p>',
+                                    'align'                   => 'center',
+                                    'text_color'              => '#4B5563',
+                                    'typography_typography'   => 'custom',
+                                    'typography_font_size'    => array( 'unit' => 'px', 'size' => 17, 'sizes' => array() ),
+                                    'typography_line_height'  => array( 'unit' => 'em', 'size' => 1.6, 'sizes' => array() ),
+                                ),
+                                'elements' => array(),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+
+            // SECTION 2 — Content
+            array(
+                'id'       => $this->elementor_id(),
+                'elType'   => 'container',
+                'settings' => array(
+                    '_title'                => 'Content',
+                    'background_background' => 'classic',
+                    'background_color'      => '#FFFFFF',
+                    'content_width'         => 'full',
+                    'flex_direction'        => 'column',
+                    'flex_gap'              => $flex_gap_20,
+                    'padding'               => $pad_zero,
+                ),
+                'elements' => array(
+                    array(
+                        'id'       => $this->elementor_id(),
+                        'elType'   => 'container',
+                        'settings' => array(
+                            'flex_direction' => 'column',
+                            'content_width'  => 'boxed',
+                            'flex_gap'       => $flex_gap_20,
+                            'boxed_width'    => array( 'unit' => 'px', 'size' => 820, 'sizes' => array() ),
+                            'padding'        => array( 'unit' => 'em', 'top' => '2', 'right' => '1.5', 'bottom' => '3', 'left' => '1.5', 'isLinked' => false ),
+                        ),
+                        'elements' => array(
+                            array(
+                                'id'         => $this->elementor_id(),
+                                'elType'     => 'widget',
+                                'widgetType' => 'text-editor',
+                                'settings'   => array(
+                                    'editor'                  => $body_html,
+                                    'align'                   => 'left',
+                                    'text_color'              => '#0F1411',
+                                    'typography_typography'   => 'custom',
+                                    'typography_font_size'    => array( 'unit' => 'px', 'size' => 17, 'sizes' => array() ),
+                                    'typography_line_height'  => array( 'unit' => 'em', 'size' => 1.7, 'sizes' => array() ),
+                                ),
+                                'elements' => array(),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+
+            // SECTION 3 — CTA
+            array(
+                'id'       => $this->elementor_id(),
+                'elType'   => 'container',
+                'settings' => array(
+                    '_title'                => 'CTA',
+                    'background_background' => 'classic',
+                    'background_color'      => '#0E2F14',
+                    'content_width'         => 'full',
+                    'flex_direction'        => 'column',
+                    'flex_gap'              => $flex_gap_20,
+                    'padding'               => $pad_zero,
+                ),
+                'elements' => array(
+                    array(
+                        'id'       => $this->elementor_id(),
+                        'elType'   => 'container',
+                        'settings' => array(
+                            'flex_direction'   => 'column',
+                            'content_width'    => 'boxed',
+                            'flex_gap'         => $flex_gap_20,
+                            'boxed_width'      => array( 'unit' => 'px', 'size' => 920, 'sizes' => array() ),
+                            'padding'          => array( 'unit' => 'em', 'top' => '3', 'right' => '1.5', 'bottom' => '3', 'left' => '1.5', 'isLinked' => false ),
+                            'flex_align_items' => 'center',
+                        ),
+                        'elements' => array(
+                            array(
+                                'id'         => $this->elementor_id(),
+                                'elType'     => 'widget',
+                                'widgetType' => 'heading',
+                                'settings'   => array(
+                                    'title'                  => 'Ready for floors that sell for you?',
+                                    'header_size'            => 'h2',
+                                    'align'                  => 'center',
+                                    'title_color'            => '#FFFFFF',
+                                    'typography_typography'  => 'custom',
+                                    'typography_font_size'   => array( 'unit' => 'px', 'size' => 36, 'sizes' => array() ),
+                                    'typography_font_weight' => '800',
+                                ),
+                                'elements' => array(),
+                            ),
+                            array(
+                                'id'         => $this->elementor_id(),
+                                'elType'     => 'widget',
+                                'widgetType' => 'text-editor',
+                                'settings'   => array(
+                                    'editor'                 => '<p>Free on-site evaluation and Facility Score in 48 hours for ' . esc_html( $city ) . ', ' . esc_html( $state ) . '.</p>',
+                                    'align'                  => 'center',
+                                    'text_color'             => '#B7E5BD',
+                                    'typography_typography'  => 'custom',
+                                    'typography_font_size'   => array( 'unit' => 'px', 'size' => 17, 'sizes' => array() ),
+                                ),
+                                'elements' => array(),
+                            ),
+                            array(
+                                'id'       => $this->elementor_id(),
+                                'elType'   => 'container',
+                                'settings' => array(
+                                    'flex_direction'       => 'row',
+                                    'content_width'        => 'full',
+                                    'flex_gap'             => array( 'column' => '12', 'row' => '12', 'isLinked' => true, 'unit' => 'px', 'size' => 12 ),
+                                    'padding'              => $pad_zero,
+                                    'flex_align_items'     => 'center',
+                                    'flex_justify_content' => 'center',
+                                ),
+                                'elements' => array(
+                                    array(
+                                        'id'         => $this->elementor_id(),
+                                        'elType'     => 'widget',
+                                        'widgetType' => 'button',
+                                        'settings'   => array(
+                                            'text'                          => $phone,
+                                            'link'                          => array( 'url' => $tel_href, 'is_external' => '', 'nofollow' => '' ),
+                                            'size'                          => 'lg',
+                                            'align'                         => 'center',
+                                            'background_color'              => '#43A94B',
+                                            'button_text_color'             => '#FFFFFF',
+                                            'border_border'                 => 'solid',
+                                            'border_color'                  => '#43A94B',
+                                            'border_width'                  => array( 'unit' => 'px', 'top' => '2', 'right' => '2', 'bottom' => '2', 'left' => '2', 'isLinked' => true ),
+                                            'border_radius'                 => array( 'unit' => 'px', 'top' => '4', 'right' => '4', 'bottom' => '4', 'left' => '4', 'isLinked' => true ),
+                                            'typography_typography'         => 'custom',
+                                            'typography_font_weight'        => '800',
+                                            'typography_text_transform'     => 'uppercase',
+                                            'typography_letter_spacing'     => array( 'unit' => 'px', 'size' => 1, 'sizes' => array() ),
+                                            'typography_font_size'          => array( 'unit' => 'px', 'size' => 17, 'sizes' => array() ),
+                                            'text_padding'                  => array( 'unit' => 'px', 'top' => '20', 'right' => '32', 'bottom' => '20', 'left' => '32', 'isLinked' => false ),
+                                            'hover_color'                   => '#FFFFFF',
+                                            'button_background_hover_color' => '#2F8137',
+                                            'border_hover_color'            => '#2F8137',
+                                        ),
+                                        'elements' => array(),
+                                    ),
+                                    array(
+                                        'id'         => $this->elementor_id(),
+                                        'elType'     => 'widget',
+                                        'widgetType' => 'button',
+                                        'settings'   => array(
+                                            'text'                          => 'Schedule a Visit',
+                                            'link'                          => array( 'url' => '/schedule-a-visit/', 'is_external' => '', 'nofollow' => '' ),
+                                            'size'                          => 'lg',
+                                            'align'                         => 'center',
+                                            'background_color'              => '#FFFFFF',
+                                            'button_text_color'             => '#2F8137',
+                                            'border_border'                 => 'solid',
+                                            'border_color'                  => '#FFFFFF',
+                                            'border_width'                  => array( 'unit' => 'px', 'top' => '2', 'right' => '2', 'bottom' => '2', 'left' => '2', 'isLinked' => true ),
+                                            'border_radius'                 => array( 'unit' => 'px', 'top' => '4', 'right' => '4', 'bottom' => '4', 'left' => '4', 'isLinked' => true ),
+                                            'typography_typography'         => 'custom',
+                                            'typography_font_weight'        => '800',
+                                            'typography_text_transform'     => 'uppercase',
+                                            'typography_letter_spacing'     => array( 'unit' => 'px', 'size' => 1, 'sizes' => array() ),
+                                            'typography_font_size'          => array( 'unit' => 'px', 'size' => 17, 'sizes' => array() ),
+                                            'text_padding'                  => array( 'unit' => 'px', 'top' => '20', 'right' => '32', 'bottom' => '20', 'left' => '32', 'isLinked' => false ),
+                                            'hover_color'                   => '#FFFFFF',
+                                            'button_background_hover_color' => '#43A94B',
+                                            'border_hover_color'            => '#43A94B',
+                                        ),
+                                        'elements' => array(),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Elementor element IDs are 7-char lowercase hex in the kit; matching that
+     * format keeps the editor happy.
+     */
+    private function elementor_id() {
+        return substr( md5( uniqid( '', true ) . wp_rand() ), 0, 7 );
     }
 
     /**
