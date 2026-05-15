@@ -223,41 +223,9 @@
                   "id": "64556607",
                   "elType": "widget",
                   "widgetType": "wpr-nav-menu",
-                  "settings": {
-                    "menu_select": "main-menu",
-                    "last_menu_item": "default",
-                    "select_separator": "default",
-                    "select_arrow": "default",
-                    "select_circle": "default",
-                    "current_menu_shape": "no",
-                    "nav_menu_alignment": "center",
-                    "nav_menu_typography_typography": "custom",
-                    "nav_menu_typography_font_size": {
-                      "unit": "px",
-                      "size": 15,
-                      "sizes": []
-                    },
-                    "nav_menu_typography_font_weight": "700",
-                    "nav_menu_typography_text_transform": "uppercase",
-                    "nav_menu_typography_letter_spacing": {
-                      "unit": "px",
-                      "size": 1,
-                      "sizes": []
-                    },
-                    "nav_menu_item_color": "#0F1411",
-                    "nav_menu_item_color_hover": "#2F8137",
-                    "nav_menu_item_color_active": "#2F8137",
-                    "menu_item_padding": {
-                      "unit": "px",
-                      "top": "10",
-                      "right": "14",
-                      "bottom": "10",
-                      "left": "14",
-                      "isLinked": false
-                    },
-                    "nav_menu": "main-menu"
-                  },
-                  "elements": []
+                  "settings": {},
+                  "elements": [],
+                  "isInner": false
                 }
               ]
             },

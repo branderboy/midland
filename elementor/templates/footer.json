@@ -145,18 +145,7 @@
                       "id": "7c53c889",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
-                      "settings": {
-                        "menu_select": "footer-copyright",
-                        "last_menu_item": "default",
-                        "select_separator": "default",
-                        "select_arrow": "default",
-                        "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical",
-                        "nav_menu": "footer-copyright"
-                      },
+                      "settings": {},
                       "elements": [],
                       "isInner": false
                     }
@@ -197,18 +186,7 @@
                       "id": "99e2a5c2",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
-                      "settings": {
-                        "menu_select": "footer-menu-1",
-                        "last_menu_item": "default",
-                        "select_separator": "default",
-                        "select_arrow": "default",
-                        "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical",
-                        "nav_menu": "footer-menu-1"
-                      },
+                      "settings": {},
                       "elements": [],
                       "isInner": false
                     }
@@ -249,18 +227,7 @@
                       "id": "d971f8cf",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
-                      "settings": {
-                        "menu_select": "footer-menu-2",
-                        "last_menu_item": "default",
-                        "select_separator": "default",
-                        "select_arrow": "default",
-                        "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical",
-                        "nav_menu": "footer-menu-2"
-                      },
+                      "settings": {},
                       "elements": [],
                       "isInner": false
                     }
@@ -301,18 +268,7 @@
                       "id": "98a6cc26",
                       "elType": "widget",
                       "widgetType": "wpr-nav-menu",
-                      "settings": {
-                        "menu_select": "footer-3",
-                        "last_menu_item": "default",
-                        "select_separator": "default",
-                        "select_arrow": "default",
-                        "select_circle": "default",
-                        "current_menu_shape": "no",
-                        "menu_position": "vertical",
-                        "nav_menu_layout": "vertical",
-                        "layout": "vertical",
-                        "nav_menu": "footer-3"
-                      },
+                      "settings": {},
                       "elements": [],
                       "isInner": false
                     }
