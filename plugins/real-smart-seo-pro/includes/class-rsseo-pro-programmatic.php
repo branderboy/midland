@@ -32,6 +32,68 @@ class RSSEO_Pro_Programmatic {
         add_action( 'wp_head',          array( $this, 'output_location_schema' ) );
         add_filter( 'document_title_parts', array( $this, 'filter_location_title' ) );
         add_action( 'wp_head',          array( $this, 'output_location_meta' ), 2 );
+        add_filter( 'the_content',      array( $this, 'append_nearby_locations' ), 999 );
+    }
+
+    /**
+     * Append a "Nearby Service Areas" interlink block to every location page.
+     * Runs at the_content priority 999 so it lands after Elementor's rendered
+     * output. Pulls live data each page load so older pages automatically link
+     * to newer ones without regeneration.
+     */
+    public function append_nearby_locations( $content ) {
+        if ( ! is_singular( self::CPT ) || ! in_the_loop() || ! is_main_query() ) {
+            return $content;
+        }
+
+        $block = $this->build_nearby_locations_html( get_the_ID() );
+        return $block ? $content . $block : $content;
+    }
+
+    private function build_nearby_locations_html( $current_id, $limit = 6 ) {
+        $posts = get_posts( array(
+            'post_type'      => self::CPT,
+            'post_status'    => 'publish',
+            'posts_per_page' => $limit,
+            'post__not_in'   => array( $current_id ),
+            'orderby'        => 'rand',
+            'no_found_rows'  => true,
+        ) );
+
+        if ( empty( $posts ) ) {
+            return '';
+        }
+
+        $items = '';
+        foreach ( $posts as $p ) {
+            $city     = get_post_meta( $p->ID, '_mfc_city', true );
+            $state    = get_post_meta( $p->ID, '_mfc_state', true );
+            $services = get_post_meta( $p->ID, '_mfc_services', true );
+            $primary  = is_array( $services ) && ! empty( $services ) ? $services[0] : 'Floor Care';
+
+            if ( ! $city || ! $state ) {
+                continue;
+            }
+
+            $anchor = sprintf( '%s in %s, %s', $primary, $city, $state );
+            $items .= sprintf(
+                '<li style="margin:0 0 6px;"><a href="%s" style="color:#2F8137;text-decoration:none;font-weight:600;">%s</a></li>',
+                esc_url( get_permalink( $p->ID ) ),
+                esc_html( $anchor )
+            );
+        }
+
+        if ( '' === $items ) {
+            return '';
+        }
+
+        return sprintf(
+            '<section class="rsseo-nearby-locations" style="max-width:820px;margin:2em auto;padding:1.75em 1.5em;background:#F3FCF4;border-radius:8px;">'
+            . '<h3 style="margin:0 0 .75em;color:#0F1411;font-size:22px;font-weight:800;">Nearby Service Areas</h3>'
+            . '<ul style="list-style:none;padding:0;margin:0;columns:2;column-gap:1.5em;">%s</ul>'
+            . '</section>',
+            $items
+        );
     }
 
     public function register_cpt() {
