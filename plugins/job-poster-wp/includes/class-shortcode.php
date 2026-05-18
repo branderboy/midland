@@ -196,7 +196,7 @@ class DPJP_Shortcode {
         $title = esc_attr( get_the_title( $job ) );
         if ( $mode === 'popup' && class_exists( 'DPJP_Application' ) ) {
             return sprintf(
-                '<a href="#" class="dpjp-apply-trigger" data-job-id="%d" data-job-title="%s" style="display:inline-block;background:#1a4632;color:#fff;padding:12px 24px;border-radius:4px;text-decoration:none;font-weight:600;text-align:center;letter-spacing:.3px;">Apply Now</a>',
+                '<a href="#" class="dpjp-apply-trigger" data-job-id="%d" data-job-title="%s" style="display:inline-block;background:#43A94B;color:#fff;padding:12px 24px;border-radius:4px;text-decoration:none;font-weight:700;text-align:center;letter-spacing:.3px;">Apply Now</a>',
                 $job->ID, $title
             );
         }
@@ -207,7 +207,7 @@ class DPJP_Shortcode {
             $url = class_exists( 'DPJP_Application' ) ? DPJP_Application::apply_url( $job->ID ) : get_permalink( $job );
         }
         return sprintf(
-            '<a href="%s" style="display:inline-block;background:#1a4632;color:#fff;padding:12px 24px;border-radius:4px;text-decoration:none;font-weight:600;text-align:center;letter-spacing:.3px;">Apply Now</a>',
+            '<a href="%s" style="display:inline-block;background:#43A94B;color:#fff;padding:12px 24px;border-radius:4px;text-decoration:none;font-weight:700;text-align:center;letter-spacing:.3px;">Apply Now</a>',
             esc_url( $url )
         );
     }
@@ -220,10 +220,10 @@ class DPJP_Shortcode {
                 $meta = DPJP_Meta_Fields::get( $job->ID );
                 $type_label = self::employment_label( $meta['dpjp_employment_type'] ?? 'full-time' );
                 ?>
-                <div class="dpjp-job-card" style="border:1px solid #d6e6dc;border-top:4px solid #1a4632;border-radius:8px;padding:28px;background:#fff;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(26,70,50,.06);">
-                    <div style="font-size:11px;color:#6b8278;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;font-weight:600;"><?php echo esc_html( $type_label ); ?> &bull; <?php echo esc_html( $meta['dpjp_location'] ?? '' ); ?></div>
-                    <h3 style="margin:0 0 12px;color:#1a4632;font-size:22px;line-height:1.25;"><?php echo esc_html( $job->post_title ); ?></h3>
-                    <p style="color:#2eb463;font-size:18px;font-weight:700;margin:0 0 14px;"><?php echo esc_html( $meta['dpjp_pay'] ?? '' ); ?></p>
+                <div class="dpjp-job-card" style="border:1px solid #d6e6dc;border-top:4px solid #2F8137;border-radius:8px;padding:28px;background:#fff;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,20,17,.06);">
+                    <div style="font-size:11px;color:#2F8137;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;font-weight:800;"><?php echo esc_html( $type_label ); ?> &bull; <?php echo esc_html( $meta['dpjp_location'] ?? '' ); ?></div>
+                    <h3 style="margin:0 0 12px;color:#0F1411;font-size:22px;line-height:1.25;font-weight:800;"><?php echo esc_html( $job->post_title ); ?></h3>
+                    <p style="color:#2F8137;font-size:18px;font-weight:700;margin:0 0 14px;"><?php echo esc_html( $meta['dpjp_pay'] ?? '' ); ?></p>
                     <p style="flex-grow:1;margin:0 0 20px;font-size:14px;color:#46554f;line-height:1.55;"><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $job->post_content ), 22 ) ); ?></p>
                     <?php echo self::apply_button( $job, $apply_mode ); ?>
                 </div>
@@ -240,10 +240,10 @@ class DPJP_Shortcode {
                 ?>
                 <li style="border-bottom:1px solid #d6e6dc;padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;">
                     <div style="flex:1;min-width:250px;">
-                        <h3 style="margin:0 0 6px;color:#1a4632;font-size:20px;"><?php echo esc_html( $job->post_title ); ?></h3>
-                        <p style="margin:0;color:#6b8278;font-size:13px;text-transform:uppercase;letter-spacing:.5px;"><?php echo esc_html( self::employment_label( $meta['dpjp_employment_type'] ?? 'full-time' ) ); ?> &bull; <?php echo esc_html( $meta['dpjp_location'] ?? '' ); ?></p>
+                        <h3 style="margin:0 0 6px;color:#0F1411;font-size:20px;font-weight:800;"><?php echo esc_html( $job->post_title ); ?></h3>
+                        <p style="margin:0;color:#2F8137;font-size:13px;text-transform:uppercase;letter-spacing:.5px;font-weight:800;"><?php echo esc_html( self::employment_label( $meta['dpjp_employment_type'] ?? 'full-time' ) ); ?> &bull; <?php echo esc_html( $meta['dpjp_location'] ?? '' ); ?></p>
                     </div>
-                    <div style="color:#2eb463;font-size:18px;font-weight:700;"><?php echo esc_html( $meta['dpjp_pay'] ?? '' ); ?></div>
+                    <div style="color:#2F8137;font-size:18px;font-weight:700;"><?php echo esc_html( $meta['dpjp_pay'] ?? '' ); ?></div>
                     <?php echo self::apply_button( $job, $apply_mode ); ?>
                 </li>
             <?php endforeach; ?>

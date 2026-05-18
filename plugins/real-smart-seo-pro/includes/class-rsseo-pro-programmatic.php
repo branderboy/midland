@@ -278,9 +278,9 @@ class RSSEO_Pro_Programmatic {
 <ul>{$services_html}</ul>
 <h3>Why Choose {$business} in {$city}?</h3>
 <ul>
-<li>Licensed and insured — serving the DMV metro area</li>
+<li>Licensed and insured for serving the DMV metro area</li>
 <li>Same-day and next-day appointments available</li>
-<li>Residential and commercial — no job too large or small</li>
+<li>Residential and commercial for no job too large or small</li>
 <li>Free estimates with upfront, transparent pricing</li>
 </ul>
 <p>Ready to get started? <a href=\"/contact/\">Request a free quote</a> or call us today. We serve {$city} and all surrounding neighborhoods in {$state}.</p>";
@@ -327,13 +327,13 @@ class RSSEO_Pro_Programmatic {
         if ( ! empty( $services ) ) {
             $body_html .= '<p><strong>Services available in ' . esc_html( $city ) . ', ' . esc_html( $state ) . '</strong></p><ul>';
             foreach ( $services as $svc ) {
-                $body_html .= '<li><p>' . esc_html( $svc ) . ' &mdash; tailored to ' . esc_html( $city ) . ' facilities</p></li>';
+                $body_html .= '<li><p>' . esc_html( $svc ) . ' for tailored to ' . esc_html( $city ) . ' facilities</p></li>';
             }
             $body_html .= '</ul>';
         }
 
         $body_html .= '<p><strong>Why ' . esc_html( $city ) . ' businesses choose ' . esc_html( $business ) . '</strong></p><ul>'
-            . '<li><p>Licensed and insured &mdash; serving the DMV metro area</p></li>'
+            . '<li><p>Licensed and insured for serving the DMV metro area</p></li>'
             . '<li><p>Same-day and next-day appointments available</p></li>'
             . '<li><p>Commercial-grade equipment for deeper, longer-lasting results</p></li>'
             . '<li><p>Flexible scheduling: after-hours and weekends available</p></li>'
@@ -346,7 +346,7 @@ class RSSEO_Pro_Programmatic {
         $pad_zero    = array( 'unit' => 'px', 'top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0', 'isLinked' => true );
 
         return array(
-            // SECTION 1 — Hero
+            // SECTION 1 for Hero
             array(
                 'id'       => $this->elementor_id(),
                 'elType'   => 'container',
@@ -423,7 +423,7 @@ class RSSEO_Pro_Programmatic {
                 ),
             ),
 
-            // SECTION 2 — Content
+            // SECTION 2 for Content
             array(
                 'id'       => $this->elementor_id(),
                 'elType'   => 'container',
@@ -467,7 +467,7 @@ class RSSEO_Pro_Programmatic {
                 ),
             ),
 
-            // SECTION 3 — CTA
+            // SECTION 3 for CTA
             array(
                 'id'       => $this->elementor_id(),
                 'elType'   => 'container',
@@ -702,7 +702,7 @@ class RSSEO_Pro_Programmatic {
         $business = get_option( 'rsseo_sameas_identity', array() )['business_name'] ?? get_bloginfo( 'name' );
 
         $svc_str = ! empty( $services ) ? implode( ', ', array_slice( $services, 0, 3 ) ) : 'floor care';
-        $desc    = "Expert {$svc_str} in {$city}, {$state}. {$business} serves the DMV area — licensed, insured, same-day available. Free quote.";
+        $desc    = "Expert {$svc_str} in {$city}, {$state}. {$business} serves the DMV area for licensed, insured, same-day available. Free quote.";
 
         // Multibyte-safe truncate so a Spanish/French character at the boundary doesn't get half-chopped.
         $truncated = function_exists( 'mb_substr' ) ? mb_substr( $desc, 0, 160 ) : substr( $desc, 0, 160 );

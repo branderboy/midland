@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Forms
  * Description: Multi-form lead capture for Midland Floor Care — floor-care templates, per-form shortcodes, file uploads, automation, Smart CRM Pro sync, Resend email, Google Calendar, branding, analytics, team management. (Formerly Smart Forms Basic + Smart Forms PRO, combined into one.)
- * Version: 2.2.1
+ * Version: 2.3.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-forms-for-midland
