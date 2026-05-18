@@ -16,37 +16,6 @@ class DPJP_Shortcode {
         add_shortcode( 'dpjp_jobs',  [ __CLASS__, 'render_jobs' ] );
         add_shortcode( 'dpjp_job',   [ __CLASS__, 'render_single' ] );
         add_action( 'admin_menu',    [ __CLASS__, 'menu' ] );
-        add_filter( 'the_content',   [ __CLASS__, 'append_apply_form' ], 20 );
-    }
-
-    /**
-     * Embed the Midland Smart Forms job application form at the bottom of
-     * every single job listing page so applicants don't have to navigate
-     * to a separate /apply/ page. The shortcode auto detects the current
-     * dpjp_job post and pre fills the "Position applying for" field, so
-     * one form template serves every role.
-     *
-     * Skipped when:
-     *   - Not viewing a single dpjp_job (other post types and listings).
-     *   - The operator already pasted [sfco_apply] into the post body
-     *     manually (avoids duplicate forms after a content edit).
-     *   - The Smart Forms plugin isn't active (shortcode would render as
-     *     literal text, ugly).
-     */
-    public static function append_apply_form( $content ) {
-        if ( ! is_singular( 'dpjp_job' ) || ! in_the_loop() || ! is_main_query() ) {
-            return $content;
-        }
-        if ( false !== strpos( $content, '[sfco_apply' ) ) {
-            return $content;
-        }
-        if ( ! shortcode_exists( 'sfco_apply' ) ) {
-            return $content;
-        }
-        $apply = do_shortcode( '[sfco_apply title="Apply for this Position"]' );
-        return $content
-            . '<hr style="margin:40px 0;border:none;border-top:1px solid #e0e0e0;">'
-            . $apply;
     }
 
     public static function menu(): void {

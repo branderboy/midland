@@ -167,7 +167,39 @@ class SFCO_Shortcode {
 
                 <div class="form-row">
                     <label for="project_type"><?php esc_html_e( 'Position Applying For', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
-                    <input type="text" name="project_type" id="project_type" value="<?php echo esc_attr( $position ); ?>" placeholder="<?php esc_attr_e( 'e.g., Commercial Carpet Care Technician', 'smart-forms-for-midland' ); ?>" required>
+                    <select name="project_type" id="project_type" required>
+                        <option value=""><?php esc_html_e( 'Select a position...', 'smart-forms-for-midland' ); ?></option>
+                        <?php
+                        // Dropdown is the source of truth: list every currently
+                        // published dpjp_job. If the visitor came from a single
+                        // job page (or /apply/?job=<slug>), $position above
+                        // already holds the title, so we pre select it here.
+                        $job_posts = function_exists( 'get_posts' )
+                            ? get_posts( array(
+                                'post_type'      => 'dpjp_job',
+                                'post_status'    => 'publish',
+                                'posts_per_page' => -1,
+                                'orderby'        => 'title',
+                                'order'          => 'ASC',
+                            ) )
+                            : array();
+                        $found = false;
+                        foreach ( $job_posts as $jp ) {
+                            $sel = ( $position === $jp->post_title ) ? ' selected' : '';
+                            if ( $sel ) {
+                                $found = true;
+                            }
+                            echo '<option value="' . esc_attr( $jp->post_title ) . '"' . $sel . '>' . esc_html( $jp->post_title ) . '</option>';
+                        }
+                        // If we have a pre fill that didn't match any current
+                        // job (rare, e.g. position was removed), still surface
+                        // it as an option so the form doesn't lose the value.
+                        if ( '' !== $position && ! $found ) {
+                            echo '<option value="' . esc_attr( $position ) . '" selected>' . esc_html( $position ) . '</option>';
+                        }
+                        ?>
+                        <option value="Other / General Inquiry"<?php echo ( 'Other / General Inquiry' === $position ) ? ' selected' : ''; ?>><?php esc_html_e( 'Other / General Inquiry', 'smart-forms-for-midland' ); ?></option>
+                    </select>
                 </div>
 
                 <div class="form-row">

@@ -350,16 +350,30 @@ class DPJP_Templates {
         $already   = 0;
 
         foreach ( $tpls as $slug => $t ) {
+            // Every published job carries the application form inline at the
+            // bottom of its post_content. Storing the shortcode as part of
+            // post_content (instead of relying on a the_content filter) means
+            // the form survives custom theme templates that bypass filters,
+            // and gets rendered by the standard do_shortcode pass during
+            // the_content. Idempotent — we only append once per job, even
+            // across re-clicks of the publish-all button.
+            $body = $t['description'];
+            if ( false === strpos( $body, '[sfco_apply' ) ) {
+                $body .= "\n\n[sfco_apply]";
+            }
+
             $existing = get_page_by_title( $t['title'], OBJECT, 'dpjp_job' );
 
             if ( $existing instanceof WP_Post ) {
-                if ( 'publish' === $existing->post_status ) {
+                $needs_form = false === strpos( (string) $existing->post_content, '[sfco_apply' );
+                $update     = [ 'ID' => $existing->ID, 'post_status' => 'publish' ];
+                if ( $needs_form ) {
+                    $update['post_content'] = rtrim( (string) $existing->post_content ) . "\n\n[sfco_apply]";
+                }
+                if ( 'publish' === $existing->post_status && ! $needs_form ) {
                     $already++;
                 } else {
-                    wp_update_post( [
-                        'ID'          => $existing->ID,
-                        'post_status' => 'publish',
-                    ] );
+                    wp_update_post( $update );
                     $published++;
                 }
                 $post_id = $existing->ID;
@@ -368,7 +382,7 @@ class DPJP_Templates {
                     'post_type'    => 'dpjp_job',
                     'post_status'  => 'publish',
                     'post_title'   => $t['title'],
-                    'post_content' => $t['description'],
+                    'post_content' => $body,
                 ], true );
 
                 if ( is_wp_error( $post_id ) || ! $post_id ) {
@@ -412,20 +426,40 @@ class DPJP_Templates {
      * @return int Page ID.
      */
     private static function ensure_careers_page(): int {
+        // Careers page is a directory only. It lists every open role via
+        // [dpjp_jobs]; each card's Apply Now button routes the visitor to
+        // that role's dedicated page where the [sfco_apply] form lives.
+        // No application form on the directory itself — applicants must
+        // pick a role first.
         $intro = "<h2>Join the Midland Floors Team</h2>\n"
-               . "<p>We're hiring across DC, Maryland, and Northern Virginia. Browse open positions below. Every role has its own page with full details and a button to apply.</p>\n"
+               . "<p>We're hiring across DC, Maryland, and Northern Virginia. Browse open positions below. Each role has its own page with full details and the application form.</p>\n"
                . '[dpjp_jobs]';
 
         $existing = get_page_by_title( 'Careers', OBJECT, 'page' );
 
         if ( $existing instanceof WP_Post ) {
-            $needs_shortcode = false === strpos( (string) $existing->post_content, '[dpjp_jobs' );
-            $needs_publish   = 'publish' !== $existing->post_status;
-            if ( $needs_shortcode || $needs_publish ) {
+            // Strip any [sfco_apply] previously added to this page by an
+            // earlier build (one shipped briefly with the form embedded
+            // here, which conflicts with the per-role apply flow).
+            $current  = (string) $existing->post_content;
+            $cleaned  = preg_replace( '/\s*\[sfco_apply[^\]]*\]\s*/', '', $current );
+            $cleaned  = preg_replace( '/<h2>Apply Now<\/h2>\s*<p>[^<]*<\/p>\s*/', '', (string) $cleaned );
+
+            $has_jobs      = false !== strpos( (string) $cleaned, '[dpjp_jobs' );
+            $needs_publish = 'publish' !== $existing->post_status;
+            $changed       = $cleaned !== $current;
+
+            if ( ! $has_jobs ) {
                 wp_update_post( [
                     'ID'           => $existing->ID,
                     'post_status'  => 'publish',
-                    'post_content' => $needs_shortcode ? $intro : $existing->post_content,
+                    'post_content' => $intro,
+                ] );
+            } elseif ( $changed || $needs_publish ) {
+                wp_update_post( [
+                    'ID'           => $existing->ID,
+                    'post_status'  => 'publish',
+                    'post_content' => $cleaned,
                 ] );
             }
             return (int) $existing->ID;
