@@ -28,7 +28,7 @@ class SFCO_Pro_Resend {
 
     public function add_menu() {
         add_submenu_page(
-            'sfco-forms',
+            'smart-forms',
             esc_html__( 'Email Transport', 'smart-forms-pro' ),
             esc_html__( 'Email Transport', 'smart-forms-pro' ),
             'manage_options',

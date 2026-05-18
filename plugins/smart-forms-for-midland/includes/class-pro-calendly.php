@@ -13,7 +13,7 @@ class SFCO_Pro_Calendly {
 
     public function add_menu() {
         add_submenu_page(
-            'sfco-forms',
+            'smart-forms',
             esc_html__( 'Calendar', 'smart-forms-pro' ),
             esc_html__( 'Calendar', 'smart-forms-pro' ),
             'manage_options',

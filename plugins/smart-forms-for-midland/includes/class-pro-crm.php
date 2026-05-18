@@ -38,7 +38,7 @@ class SFCO_Pro_CRM {
 
     public function add_menu() {
         add_submenu_page(
-            'sfco-forms',
+            'smart-forms',
             esc_html__( 'CRM Integration', 'smart-forms-pro' ),
             esc_html__( 'CRM Integration', 'smart-forms-pro' ),
             'manage_options',
