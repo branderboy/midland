@@ -628,14 +628,14 @@ class WGB_Admin {
 				<tr>
 					<th><label for="wgb-username">GitHub Username</label></th>
 					<td>
-						<input type="text" id="wgb-username" name="github_username" class="regular-text" value="<?php echo esc_attr( $settings['github_username'] ); ?>" placeholder="your-username" />
+						<input type="text" id="wgb-username" name="github_username" class="regular-text" value="<?php echo esc_attr( $settings['github_username'] ); ?>" placeholder="branderboy" />
 						<p class="description">Your GitHub account username, not your email.</p>
 					</td>
 				</tr>
 				<tr>
 					<th><label for="wgb-repo">Repository Name</label></th>
 					<td>
-						<input type="text" id="wgb-repo" name="repo_name" class="regular-text" value="<?php echo esc_attr( $settings['repo_name'] ); ?>" placeholder="my-repo" />
+						<input type="text" id="wgb-repo" name="repo_name" class="regular-text" value="<?php echo esc_attr( $settings['repo_name'] ); ?>" placeholder="midland" />
 						<p class="description">Just the repo name, not the full URL.</p>
 					</td>
 				</tr>
@@ -680,8 +680,8 @@ class WGB_Admin {
 				<tr>
 					<th><label for="wgb-email">Notification Email</label></th>
 					<td>
-						<input type="email" id="wgb-email" name="notification_email" class="regular-text" value="<?php echo esc_attr( $settings['notification_email'] ); ?>" placeholder="you@example.com" />
-						<p class="description">(e.g., you@example.com) — Gets notified when backups succeed or fail. Optional.</p>
+						<input type="email" id="wgb-email" name="notification_email" class="regular-text" value="<?php echo esc_attr( $settings['notification_email'] ); ?>" placeholder="quote@midlandfloors.com" />
+						<p class="description">Gets notified when backups succeed or fail. Optional.</p>
 					</td>
 				</tr>
 			</table>

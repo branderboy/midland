@@ -745,14 +745,23 @@ class WGB_Deployer {
 	private static function derive_title_from_slug( $slug ) {
 		$s = strtolower( $slug );
 
+		// Midland Floors slugs follow a "commercial-<service>-..." or
+		// "...-cleaning-services" shape. Stripping the boilerplate yields
+		// readable admin titles ("Tile Grout Cleaning, DC" rather than
+		// "Commercial Tile Grout Cleaning Services, DC").
 		$noise = array(
-			'drywall-repair-',
-			'-drywall-repair',
-			'drywall-services-in-',
-			'drywall-contractors-in-',
-			'-drywall-services',
-			'-drywall-installation',
-			'-drywall',
+			'commercial-floor-care-',
+			'commercial-floor-cleaning-',
+			'commercial-',
+			'-cleaning-services',
+			'-cleaning-service',
+			'-floor-care-services',
+			'-floor-care',
+			'-floor-cleaning',
+			'-restoration-services',
+			'-restoration',
+			'-services',
+			'floor-care-',
 		);
 		$stripped = $s;
 		foreach ( $noise as $n ) {
