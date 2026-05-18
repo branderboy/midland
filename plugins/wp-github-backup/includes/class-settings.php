@@ -124,6 +124,46 @@ class WGB_Settings {
 	}
 
 	/**
+	 * Decrypt a value that may be either an encrypted payload (wgbaes:/b64:)
+	 * or a pre-3.6 plain-text legacy value. Used for secrets that don't have
+	 * a recognisable prefix like the GitHub PAT does (e.g. webhook secrets,
+	 * which are arbitrary random strings).
+	 *
+	 * @param string $value Stored payload.
+	 * @return string Plain text.
+	 */
+	private static function decrypt_generic( $value ) {
+		if ( '' === (string) $value ) {
+			return '';
+		}
+		if ( 0 === strpos( $value, self::AES_PREFIX ) || 0 === strpos( $value, self::B64_PREFIX ) ) {
+			return self::decrypt( $value );
+		}
+		return $value;
+	}
+
+	/**
+	 * Return the decrypted GitHub webhook secret, or an empty string.
+	 * Reads pre-3.6 plain-text values transparently so existing installs
+	 * keep working until they next save the setting.
+	 *
+	 * @return string
+	 */
+	public static function get_webhook_secret() {
+		$raw = get_option( 'wgb_webhook_secret', '' );
+		return self::decrypt_generic( is_string( $raw ) ? trim( $raw ) : '' );
+	}
+
+	/**
+	 * Persist the webhook secret encrypted. Pass empty string to clear.
+	 *
+	 * @param string $secret Plain text secret.
+	 */
+	public static function save_webhook_secret( $secret ) {
+		update_option( 'wgb_webhook_secret', self::encrypt( $secret ), false );
+	}
+
+	/**
 	 * Generic option getter with 'wgb_' prefix.
 	 *
 	 * @param string $key     Key without prefix.

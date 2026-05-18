@@ -37,6 +37,8 @@ class WGB_Admin {
 		add_action( 'wp_ajax_wgb_rollback_deploy', array( $this, 'ajax_rollback_deploy' ) );
 		add_action( 'wp_ajax_wgb_run_deploy_incremental', array( $this, 'ajax_run_deploy_incremental' ) );
 		add_action( 'wp_ajax_wgb_clean_redirects', array( $this, 'ajax_clean_redirects' ) );
+		add_action( 'wp_ajax_wgb_send_test_ping', array( $this, 'ajax_send_test_ping' ) );
+		add_action( 'wp_ajax_wgb_register_webhook', array( $this, 'ajax_register_webhook' ) );
 	}
 
 	/**
@@ -563,12 +565,53 @@ class WGB_Admin {
 	 * @param array $settings Current settings.
 	 */
 	private function render_settings_tab( $settings ) {
-		$token_set = ! empty( WGB_Settings::get_token() );
+		$token_set    = ! empty( WGB_Settings::get_token() );
+		$secret_set   = '' !== WGB_Settings::get_webhook_secret();
+		$webhook_url  = rest_url( 'gitdeploy/v1/webhook' );
+		$repo_full    = trim( (string) $settings['github_username'] ) . '/' . trim( (string) $settings['repo_name'] );
+		$repo_ready   = $token_set && '' !== trim( (string) $settings['github_username'] ) && '' !== trim( (string) $settings['repo_name'] );
 
 		if ( isset( $_GET['saved'] ) ) {
 			echo '<div class="notice notice-success is-dismissible"><p><strong>Settings saved successfully!</strong></p></div>';
 		}
 		?>
+		<div class="wgb-card" style="margin-bottom:20px;padding:16px;background:#fff;border:1px solid #c3c4c7;border-left-width:4px;border-left-color:#2271b1;">
+			<h2 style="margin-top:0;">Connect to GitHub</h2>
+			<p class="description" style="margin-top:0;">Wire this site to your GitHub repo so pushes auto-deploy here.</p>
+			<table class="form-table">
+				<tr>
+					<th>Webhook URL</th>
+					<td>
+						<input type="text" id="wgb-webhook-url" class="regular-text code" readonly value="<?php echo esc_attr( $webhook_url ); ?>" onclick="this.select();" style="width:100%;max-width:520px;" />
+						<button type="button" class="button" id="wgb-copy-webhook-url">Copy</button>
+						<p class="description">GitHub posts push events here.</p>
+					</td>
+				</tr>
+				<tr>
+					<th>Webhook Secret</th>
+					<td>
+						<?php if ( $secret_set ) : ?>
+							<span style="color:#46b450;font-weight:bold;">Secret is saved.</span>
+						<?php else : ?>
+							<span style="color:#dc3232;font-weight:bold;">No secret set.</span>
+						<?php endif; ?>
+						<p class="description">Set or change the secret on the <strong>Deploy</strong> tab.</p>
+					</td>
+				</tr>
+				<tr>
+					<th>Connect</th>
+					<td>
+						<button type="button" class="button button-primary" id="wgb-register-webhook" <?php disabled( ! $repo_ready || ! $secret_set ); ?>>Register webhook on GitHub</button>
+						<button type="button" class="button" id="wgb-send-test-ping" <?php disabled( ! $secret_set ); ?>>Send test ping</button>
+						<span id="wgb-connect-status" style="margin-left:10px;"></span>
+						<p class="description">
+							<strong>Register</strong> uses your saved PAT to create or update a <code>push</code> webhook on <code><?php echo esc_html( $repo_ready ? $repo_full : '&lt;owner&gt;/&lt;repo&gt;' ); ?></code> pointing at the URL above.<br />
+							<strong>Test ping</strong> fires a synthetic ping at the local endpoint to verify HMAC + routing without hitting GitHub.
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
 		<form id="wgb-settings-form" class="wgb-settings" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<?php wp_nonce_field( 'wgb_save_settings_action', 'wgb_settings_nonce' ); ?>
 			<input type="hidden" name="action" value="wgb_save_settings" />
@@ -777,10 +820,10 @@ class WGB_Admin {
 		$repo_owner      = WGB_Settings::get( 'github_username' );
 		$repo_name       = WGB_Settings::get( 'repo_name' );
 		$deploy_settings = array(
-			'deploy_branch'    => WGB_Settings::get( 'deploy_branch', '' ),
-			'deploy_repo_path' => WGB_Settings::get( 'deploy_repo_path', '' ),
-			'deploy_target'    => WGB_Settings::get( 'deploy_target', 'content' ),
-			'webhook_secret'   => WGB_Settings::get( 'webhook_secret', '' ),
+			'deploy_branch'      => WGB_Settings::get( 'deploy_branch', '' ),
+			'deploy_repo_path'   => WGB_Settings::get( 'deploy_repo_path', '' ),
+			'deploy_target'      => WGB_Settings::get( 'deploy_target', 'content' ),
+			'webhook_secret_set' => '' !== WGB_Settings::get_webhook_secret(),
 		);
 		$last_deploy = WGB_Deployer::get_last_deploy();
 		?>
@@ -842,9 +885,17 @@ class WGB_Admin {
 					<tr>
 						<th><label for="wgb-webhook-secret">GitHub Webhook Secret</label></th>
 						<td>
-							<input type="text" id="wgb-webhook-secret" name="webhook_secret" class="regular-text" value="<?php echo esc_attr( $deploy_settings['webhook_secret'] ); ?>" placeholder="generate a strong random string" autocomplete="off" />
+							<input type="password" id="wgb-webhook-secret" name="webhook_secret" class="regular-text"
+								value=""
+								placeholder="<?php echo $deploy_settings['webhook_secret_set'] ? '••••••••••••••••' : 'generate a strong random string'; ?>"
+								autocomplete="off" />
 							<button type="button" class="button" id="wgb-generate-webhook-secret">Generate</button>
-							<p class="description">Required to authenticate auto-deploys triggered by GitHub pushes. Paste the same value into your repo's webhook <strong>Secret</strong> field at <code>github.com/&lt;owner&gt;/&lt;repo&gt;/settings/hooks</code>. Webhook URL: <code><?php echo esc_html( rest_url( 'gitdeploy/v1/webhook' ) ); ?></code></p>
+							<?php if ( $deploy_settings['webhook_secret_set'] ) : ?>
+								<span class="wgb-secret-set" style="color:#46b450;font-weight:bold;margin-left:8px;">Secret is saved.</span>
+							<?php else : ?>
+								<span style="color:#dc3232;font-weight:bold;margin-left:8px;">No secret set!</span>
+							<?php endif; ?>
+							<p class="description">Required to authenticate auto-deploys triggered by GitHub pushes. Leave blank to keep current secret. Paste the same value into your repo's webhook <strong>Secret</strong> field at <code>github.com/&lt;owner&gt;/&lt;repo&gt;/settings/hooks</code>, or use the <strong>Register webhook on GitHub</strong> button on the Settings tab. Webhook URL: <code><?php echo esc_html( rest_url( 'gitdeploy/v1/webhook' ) ); ?></code></p>
 						</td>
 					</tr>
 				</table>
@@ -1047,7 +1098,6 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 			'deploy_branch',
 			'deploy_repo_path',
 			'deploy_target',
-			'webhook_secret',
 		);
 
 		foreach ( $fields as $field ) {
@@ -1056,7 +1106,121 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 			}
 		}
 
+		// Webhook secret stays encrypted at rest and follows the same
+		// "leave blank to keep current" UX as the PAT field, so we only
+		// overwrite it when the admin actually typed a new value.
+		if ( isset( $_POST['webhook_secret'] ) ) {
+			$new_secret = trim( (string) wp_unslash( $_POST['webhook_secret'] ) );
+			if ( '' !== $new_secret ) {
+				WGB_Settings::save_webhook_secret( sanitize_text_field( $new_secret ) );
+			}
+		}
+
 		wp_send_json_success( __( 'Deploy settings saved.', 'wp-github-backup' ) );
+	}
+
+	/**
+	 * AJAX: Fire a synthetic GitHub-style ping at the local webhook URL
+	 * with a valid HMAC, so the admin can verify the secret + REST route
+	 * round-trip without setting anything up on GitHub first.
+	 */
+	public function ajax_send_test_ping() {
+		check_ajax_referer( 'wgb_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+		}
+
+		$secret = WGB_Settings::get_webhook_secret();
+		if ( '' === $secret ) {
+			wp_send_json_error( __( 'Webhook secret is not configured. Set one on the Deploy tab first.', 'wp-github-backup' ) );
+		}
+
+		$url     = rest_url( 'gitdeploy/v1/webhook' );
+		$payload = wp_json_encode(
+			array(
+				'zen'     => 'Test ping from WP GitHub Backup.',
+				'hook_id' => 0,
+			)
+		);
+		$sig = 'sha256=' . hash_hmac( 'sha256', $payload, $secret );
+
+		$response = wp_remote_post(
+			$url,
+			array(
+				'timeout'   => 15,
+				'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
+				'headers'   => array(
+					'Content-Type'        => 'application/json',
+					'X-GitHub-Event'      => 'ping',
+					'X-Hub-Signature-256' => $sig,
+					'X-GitHub-Delivery'   => function_exists( 'wp_generate_uuid4' ) ? wp_generate_uuid4() : md5( uniqid( '', true ) ),
+				),
+				'body'      => $payload,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			wp_send_json_error( sprintf(
+				/* translators: %s: transport error message */
+				__( 'Could not reach webhook URL: %s', 'wp-github-backup' ),
+				$response->get_error_message()
+			) );
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		$body = wp_remote_retrieve_body( $response );
+
+		if ( 200 === $code ) {
+			wp_send_json_success( __( 'Pong! Webhook endpoint is reachable and HMAC verified.', 'wp-github-backup' ) );
+		}
+
+		wp_send_json_error( sprintf(
+			/* translators: 1: HTTP status, 2: response body */
+			__( 'Webhook returned HTTP %1$d: %2$s', 'wp-github-backup' ),
+			$code,
+			wp_strip_all_tags( (string) $body )
+		) );
+	}
+
+	/**
+	 * AJAX: Create or update the push webhook on the configured GitHub repo
+	 * via the saved PAT, pointing at this site's REST endpoint. Idempotent.
+	 */
+	public function ajax_register_webhook() {
+		check_ajax_referer( 'wgb_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+		}
+
+		$token  = WGB_Settings::get_token();
+		$owner  = trim( (string) WGB_Settings::get( 'github_username' ) );
+		$repo   = trim( (string) WGB_Settings::get( 'repo_name' ) );
+		$secret = WGB_Settings::get_webhook_secret();
+
+		if ( '' === $token || '' === $owner || '' === $repo ) {
+			wp_send_json_error( __( 'Save your GitHub token, username, and repo name first.', 'wp-github-backup' ) );
+		}
+		if ( '' === $secret ) {
+			wp_send_json_error( __( 'Generate a webhook secret on the Deploy tab first.', 'wp-github-backup' ) );
+		}
+
+		$github   = new WGB_GitHub_API( $token, $owner, $repo );
+		$hook_url = rest_url( 'gitdeploy/v1/webhook' );
+		$result   = $github->create_or_update_webhook( $hook_url, $secret );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result->get_error_message() );
+		}
+
+		$action = isset( $result['_wgb_action'] ) ? $result['_wgb_action'] : 'created';
+		wp_send_json_success( sprintf(
+			/* translators: 1: created|updated, 2: owner/repo */
+			__( 'Webhook %1$s on %2$s. GitHub pushes will deploy here.', 'wp-github-backup' ),
+			$action,
+			$owner . '/' . $repo
+		) );
 	}
 
 	/**

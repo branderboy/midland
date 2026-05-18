@@ -883,4 +883,96 @@ class WGB_GitHub_API {
 			'errors'       => array(),
 		);
 	}
+
+	/**
+	 * Create or update the push webhook on the configured repo so GitHub
+	 * pings the plugin's REST endpoint whenever the deploy branch advances.
+	 *
+	 * Idempotent: if a hook with the same delivery URL already exists, its
+	 * secret/events/active flag are PATCHed in place rather than creating
+	 * a duplicate. Requires a PAT with the `admin:repo_hook` scope (granted
+	 * by `repo` on classic tokens).
+	 *
+	 * @param string   $hook_url Delivery URL (the plugin's REST endpoint).
+	 * @param string   $secret   Shared HMAC secret.
+	 * @param string[] $events   GitHub event names to subscribe to.
+	 * @return array|WP_Error Hook payload on success, with extra '_wgb_action' = created|updated.
+	 */
+	public function create_or_update_webhook( $hook_url, $secret, $events = array( 'push' ) ) {
+		$list_url = sprintf(
+			'%s/repos/%s/%s/hooks',
+			$this->api_base,
+			rawurlencode( $this->owner ),
+			rawurlencode( $this->repo )
+		);
+
+		$response = $this->request( $list_url, array( 'method' => 'GET' ) );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( $code < 200 || $code >= 300 ) {
+			$message = isset( $body['message'] ) ? $body['message'] : 'Could not list webhooks';
+			return new WP_Error( 'github_api_error', $message, array( 'status' => $code ) );
+		}
+
+		$existing_id = null;
+		if ( is_array( $body ) ) {
+			foreach ( $body as $hook ) {
+				if ( isset( $hook['config']['url'] ) && $hook['config']['url'] === $hook_url ) {
+					$existing_id = isset( $hook['id'] ) ? (int) $hook['id'] : null;
+					break;
+				}
+			}
+		}
+
+		$payload = array(
+			'name'   => 'web',
+			'active' => true,
+			'events' => array_values( $events ),
+			'config' => array(
+				'url'          => $hook_url,
+				'content_type' => 'json',
+				'secret'       => $secret,
+				'insecure_ssl' => '0',
+			),
+		);
+
+		if ( $existing_id ) {
+			$target = sprintf( '%s/%d', $list_url, $existing_id );
+			$method = 'PATCH';
+			$action = 'updated';
+		} else {
+			$target = $list_url;
+			$method = 'POST';
+			$action = 'created';
+		}
+
+		$response = $this->request(
+			$target,
+			array(
+				'method' => $method,
+				'body'   => wp_json_encode( $payload ),
+			)
+		);
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$code = wp_remote_retrieve_response_code( $response );
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( $code >= 200 && $code < 300 ) {
+			if ( is_array( $data ) ) {
+				$data['_wgb_action'] = $action;
+			}
+			return $data;
+		}
+
+		$message = isset( $data['message'] ) ? $data['message'] : 'Unknown GitHub API error';
+		return new WP_Error( 'github_api_error', $message, array( 'status' => $code ) );
+	}
 }
