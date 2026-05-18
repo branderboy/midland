@@ -6,7 +6,7 @@
  *   [dpjp_jobs]                    — Grid of all active job listings
  *   [dpjp_jobs layout="list"]      — Simple list layout
  *   [dpjp_jobs count="4"]          — Limit to 4 jobs
- *   [dpjp_jobs trade="Drywall"]    — Filter by trade
+ *   [dpjp_jobs trade="Commercial Carpet Care"]    Filter by trade
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
