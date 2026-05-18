@@ -680,7 +680,7 @@ class WGB_Admin {
 				<tr>
 					<th><label for="wgb-email">Notification Email</label></th>
 					<td>
-						<input type="email" id="wgb-email" name="notification_email" class="regular-text" value="<?php echo esc_attr( $settings['notification_email'] ); ?>" placeholder="quote@midlandfloors.com" />
+						<input type="email" id="wgb-email" name="notification_email" class="regular-text" value="<?php echo esc_attr( $settings['notification_email'] ); ?>" placeholder="support@midlandfloors.com" />
 						<p class="description">Gets notified when backups succeed or fail. Optional.</p>
 					</td>
 				</tr>
