@@ -45,7 +45,7 @@ class SFCO_Pro_Notifications {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-forms',
+            null,
             __( 'Notifications', 'smart-forms-for-midland' ),
             __( 'Notifications', 'smart-forms-for-midland' ),
             'manage_options',
