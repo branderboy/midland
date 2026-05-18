@@ -16,6 +16,7 @@ class DPJP_Templates {
         add_action( 'admin_menu',                       [ __CLASS__, 'menu' ] );
         add_action( 'admin_post_dpjp_use_template',     [ __CLASS__, 'handle_create' ] );
         add_action( 'admin_post_dpjp_seed_all',         [ __CLASS__, 'handle_seed_all' ] );
+        add_action( 'admin_post_dpjp_publish_all',      [ __CLASS__, 'handle_publish_all' ] );
     }
 
     public static function menu(): void {
@@ -131,22 +132,35 @@ class DPJP_Templates {
             <p><?php esc_html_e( 'Click "Use this template" to create a draft job post pre-filled with title, description, pay, and requirements. Edit before publishing.', 'job-manager-pro' ); ?></p>
 
             <?php
-            // One-click "seed every Midland floor-care job" button — creates
-            // drafts of all templates that don't already exist so the operator
-            // doesn't have to click 8 times to bootstrap their job board.
+            // One-click flows. Two flavors:
+            //   - "publish all" → publishes every template + creates a Careers
+            //     page with the [dpjp_jobs] shortcode so the operator can ship
+            //     the entire careers section in a single click.
+            //   - "seed all" → creates drafts only (safer for review-first
+            //     workflows). Kept for back-compat.
+            $publish_url = wp_nonce_url(
+                add_query_arg( 'action', 'dpjp_publish_all', admin_url( 'admin-post.php' ) ),
+                'dpjp_publish_all'
+            );
             $seed_url = wp_nonce_url(
                 add_query_arg( 'action', 'dpjp_seed_all', admin_url( 'admin-post.php' ) ),
                 'dpjp_seed_all'
             );
             ?>
-            <p style="margin:14px 0 6px;">
-                <a href="<?php echo esc_url( $seed_url ); ?>" class="button button-primary button-large">
-                    <?php esc_html_e( '✨ Add all Midland floor-care jobs as drafts', 'job-manager-pro' ); ?>
-                </a>
-                <span style="color:#475569;font-size:13px;margin-left:8px;">
-                    <?php esc_html_e( 'Creates one draft per template. Skips any that already exist by title.', 'job-manager-pro' ); ?>
-                </span>
-            </p>
+            <div style="background:#f0f6fc;border:1px solid #c3d4e7;border-left:4px solid #2271b1;padding:16px 18px;margin:14px 0;border-radius:4px;">
+                <h2 style="margin:0 0 8px;">🚀 <?php esc_html_e( 'One-click careers section', 'job-manager-pro' ); ?></h2>
+                <p style="margin:0 0 12px;color:#1d2327;">
+                    <?php esc_html_e( 'Publishes every Midland floor-care job template, creates a "Careers" page with the job list shortcode embedded, and links every individual job page. Idempotent — re-clicking only adds what\'s new.', 'job-manager-pro' ); ?>
+                </p>
+                <p style="margin:0;">
+                    <a href="<?php echo esc_url( $publish_url ); ?>" class="button button-primary button-large">
+                        <?php esc_html_e( '✨ Publish all jobs + create Careers page', 'job-manager-pro' ); ?>
+                    </a>
+                    <a href="<?php echo esc_url( $seed_url ); ?>" class="button" style="margin-left:8px;">
+                        <?php esc_html_e( 'Or: add as drafts only (review before publish)', 'job-manager-pro' ); ?>
+                    </a>
+                </p>
+            </div>
 
             <?php if ( isset( $_GET['seeded'] ) ) : ?>
                 <div class="notice notice-success is-dismissible">
@@ -161,6 +175,37 @@ class DPJP_Templates {
                         ?>
                         <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=dpjp_job&post_status=draft' ) ); ?>">
                             <?php esc_html_e( 'Review drafts →', 'job-manager-pro' ); ?>
+                        </a>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <?php if ( isset( $_GET['published_all'] ) ) :
+                $careers_id  = isset( $_GET['careers_id'] ) ? (int) $_GET['careers_id'] : 0;
+                $careers_url = $careers_id ? get_permalink( $careers_id ) : '';
+                ?>
+                <div class="notice notice-success is-dismissible">
+                    <p>
+                        <?php
+                        /* translators: 1: jobs published, 2: jobs already live */
+                        printf(
+                            esc_html__( '✓ %1$d jobs published, %2$d already live. Careers page is ready.', 'job-manager-pro' ),
+                            (int) $_GET['published_all'],
+                            (int) ( $_GET['already'] ?? 0 )
+                        );
+                        ?>
+                        <?php if ( $careers_url ) : ?>
+                            <a href="<?php echo esc_url( $careers_url ); ?>" target="_blank" rel="noopener">
+                                <?php esc_html_e( 'View Careers page →', 'job-manager-pro' ); ?>
+                            </a>
+                            &nbsp;
+                            <a href="<?php echo esc_url( get_edit_post_link( $careers_id ) ); ?>">
+                                <?php esc_html_e( 'Edit Careers page', 'job-manager-pro' ); ?>
+                            </a>
+                        <?php endif; ?>
+                        &nbsp;
+                        <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=dpjp_job&post_status=publish' ) ); ?>">
+                            <?php esc_html_e( 'View all published jobs →', 'job-manager-pro' ); ?>
                         </a>
                     </p>
                 </div>
@@ -269,6 +314,126 @@ class DPJP_Templates {
             admin_url( 'edit.php' )
         ) );
         exit;
+    }
+
+    /**
+     * One-click "publish everything + build the Careers page" flow.
+     *
+     * Steps:
+     *   1. Loop every template. If a job with the template's title already
+     *      exists in any status, transition it to publish (so a re-click of
+     *      the button promotes existing drafts). If it doesn't exist,
+     *      create + publish it with the full template payload.
+     *   2. Find or create a top-level page titled "Careers" whose content
+     *      is the [dpjp_jobs] shortcode. The shortcode auto-renders all
+     *      published jobs as a 2-column grid with Apply buttons, and each
+     *      job card already links to the canonical /jobs/{slug}/ permalink.
+     *   3. Redirect back to the templates screen with success counts so
+     *      the operator gets a single "view careers page / view jobs"
+     *      confirmation instead of hunting through Pages and Job Listings.
+     *
+     * Idempotent: safe to re-click after editing a template — only adds
+     * what's new and promotes whatever was sitting in drafts.
+     */
+    public static function handle_publish_all(): void {
+        if ( ! current_user_can( 'publish_posts' ) ) {
+            wp_die( 'No.' );
+        }
+        check_admin_referer( 'dpjp_publish_all' );
+
+        $tpls      = self::templates();
+        $published = 0;
+        $already   = 0;
+
+        foreach ( $tpls as $slug => $t ) {
+            $existing = get_page_by_title( $t['title'], OBJECT, 'dpjp_job' );
+
+            if ( $existing instanceof WP_Post ) {
+                if ( 'publish' === $existing->post_status ) {
+                    $already++;
+                } else {
+                    wp_update_post( [
+                        'ID'          => $existing->ID,
+                        'post_status' => 'publish',
+                    ] );
+                    $published++;
+                }
+                $post_id = $existing->ID;
+            } else {
+                $post_id = wp_insert_post( [
+                    'post_type'    => 'dpjp_job',
+                    'post_status'  => 'publish',
+                    'post_title'   => $t['title'],
+                    'post_content' => $t['description'],
+                ], true );
+
+                if ( is_wp_error( $post_id ) || ! $post_id ) {
+                    continue;
+                }
+                $published++;
+            }
+
+            update_post_meta( $post_id, 'dpjp_trade',           $t['trade'] );
+            update_post_meta( $post_id, 'dpjp_location',        $t['location'] );
+            update_post_meta( $post_id, 'dpjp_pay',             $t['pay'] );
+            update_post_meta( $post_id, 'dpjp_employment_type', $t['employment_type'] );
+            update_post_meta( $post_id, 'dpjp_requirements',    $t['requirements'] );
+            update_post_meta( $post_id, 'dpjp_call_to_action',  'Call or text us today — we respond fast.' );
+            update_post_meta( $post_id, 'dpjp_valid_through',   gmdate( 'Y-m-d', strtotime( '+30 days' ) ) );
+        }
+
+        $careers_id = self::ensure_careers_page();
+
+        wp_safe_redirect( add_query_arg(
+            [
+                'post_type'     => 'dpjp_job',
+                'page'          => 'dpjp-templates',
+                'published_all' => $published,
+                'already'       => $already,
+                'careers_id'    => $careers_id,
+            ],
+            admin_url( 'edit.php' )
+        ) );
+        exit;
+    }
+
+    /**
+     * Find an existing "Careers" page or create one. Always ensures the
+     * page content contains the [dpjp_jobs] shortcode so the operator's
+     * Careers page is never silently empty even if it was created without
+     * the shortcode in a prior version.
+     *
+     * @return int Page ID.
+     */
+    private static function ensure_careers_page(): int {
+        $intro = "<h2>Join the Midland Floors Team</h2>\n"
+               . "<p>We're hiring across DC, Maryland, and Northern Virginia. Browse open positions below — every role links to a dedicated page with full details and an application form.</p>\n"
+               . '[dpjp_jobs]';
+
+        $existing = get_page_by_title( 'Careers', OBJECT, 'page' );
+
+        if ( $existing instanceof WP_Post ) {
+            $needs_shortcode = false === strpos( (string) $existing->post_content, '[dpjp_jobs' );
+            $needs_publish   = 'publish' !== $existing->post_status;
+            if ( $needs_shortcode || $needs_publish ) {
+                wp_update_post( [
+                    'ID'           => $existing->ID,
+                    'post_status'  => 'publish',
+                    'post_content' => $needs_shortcode ? $intro : $existing->post_content,
+                ] );
+            }
+            return (int) $existing->ID;
+        }
+
+        $page_id = wp_insert_post( [
+            'post_type'    => 'page',
+            'post_status'  => 'publish',
+            'post_title'   => 'Careers',
+            'post_name'    => 'careers',
+            'post_content' => $intro,
+        ], true );
+
+        return is_wp_error( $page_id ) ? 0 : (int) $page_id;
     }
 
     public static function handle_create(): void {
