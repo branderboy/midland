@@ -699,7 +699,7 @@ class DPJP_Templates {
                 'flex_direction'        => 'column',
                 'content_width'         => 'full',
                 'background_background' => 'classic',
-                'background_color'      => '#0F1411',
+                'background_color'      => '#0E2F14',
                 'padding'               => array( 'unit' => 'em', 'top' => '2.5', 'right' => '1.5', 'bottom' => '2.5', 'left' => '1.5', 'isLinked' => false ),
                 '_title'                => 'CTA - Phone',
             ),
@@ -861,7 +861,7 @@ class DPJP_Templates {
                      . wpautop( esc_html( (string) ( $t['requirements'] ?? '' ) ) )
                      . '</div>';
 
-        $cta = '<div style="background:#0F1411;color:#fff;margin:32px 0;padding:36px 1.5em;text-align:center;">'
+        $cta = '<div style="background:#0E2F14;color:#fff;margin:32px 0;padding:36px 1.5em;text-align:center;">'
              . '<div style="color:#7CCE8E;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin:0 0 8px;">Ready to apply?</div>'
              . '<h2 style="color:#fff;font-size:30px;font-weight:800;margin:0 0 8px;">Call or text us today</h2>'
              . '<p style="color:#cfe4d6;font-size:16px;margin:0 0 14px;">We respond fast, usually within one business day.</p>'
