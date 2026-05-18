@@ -4,15 +4,15 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class DPJP_Meta_Fields {
 
     const FIELDS = [
-        'dpjp_trade'             => [ 'label' => 'Trade / Skill',         'type' => 'text',     'placeholder' => 'e.g. Drywall, Framing' ],
+        'dpjp_trade'             => [ 'label' => 'Trade / Skill',         'type' => 'text',     'placeholder' => 'e.g. Commercial Carpet Care, Floor Stripping' ],
         'dpjp_location'          => [ 'label' => 'Job Location',           'type' => 'text',     'placeholder' => 'e.g. Washington DC Metro Area' ],
-        'dpjp_pay'               => [ 'label' => 'Pay',                    'type' => 'text',     'placeholder' => 'e.g. $25–$35/hr' ],
+        'dpjp_pay'               => [ 'label' => 'Pay',                    'type' => 'text',     'placeholder' => 'e.g. $22 to $30/hr' ],
         'dpjp_employment_type'   => [ 'label' => 'Employment Type',        'type' => 'select',   'options' => [ 'full-time', 'part-time', 'contract', 'seasonal' ] ],
-        'dpjp_requirements'      => [ 'label' => 'Requirements',           'type' => 'textarea', 'placeholder' => "One per line:\n2+ years experience\nReliable transportation" ],
-        'dpjp_contact_name'      => [ 'label' => 'Contact Name',           'type' => 'text',     'placeholder' => 'e.g. Mike' ],
-        'dpjp_contact_phone'     => [ 'label' => 'Contact Phone',          'type' => 'tel',      'placeholder' => '240-555-0100' ],
-        'dpjp_contact_email'     => [ 'label' => 'Contact Email',          'type' => 'email',    'placeholder' => 'hr@example.com' ],
-        'dpjp_call_to_action'    => [ 'label' => 'Call to Action',         'type' => 'text',     'placeholder' => 'Call or text us today — we respond fast.' ],
+        'dpjp_requirements'      => [ 'label' => 'Requirements',           'type' => 'textarea', 'placeholder' => "One per line:\nTwo or more years of experience\nReliable transportation" ],
+        'dpjp_contact_name'      => [ 'label' => 'Contact Name',           'type' => 'text',     'placeholder' => 'e.g. Midland Floors Hiring' ],
+        'dpjp_contact_phone'     => [ 'label' => 'Contact Phone',          'type' => 'tel',      'placeholder' => '(240) 532-9097' ],
+        'dpjp_contact_email'     => [ 'label' => 'Contact Email',          'type' => 'email',    'placeholder' => 'support@midlandfloors.com' ],
+        'dpjp_call_to_action'    => [ 'label' => 'Call to Action',         'type' => 'text',     'placeholder' => 'Call or text us today. We respond fast.' ],
         'dpjp_valid_through'     => [ 'label' => 'Listing Expires',        'type' => 'date',     'placeholder' => '' ],
         'dpjp_craigslist_region' => [ 'label' => 'Craigslist Region',      'type' => 'text',     'placeholder' => 'washingtondc' ],
     ];
