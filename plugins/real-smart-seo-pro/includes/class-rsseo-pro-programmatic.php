@@ -444,8 +444,8 @@ class RSSEO_Pro_Programmatic {
                             'flex_direction' => 'column',
                             'content_width'  => 'boxed',
                             'flex_gap'       => $flex_gap_20,
-                            'boxed_width'    => array( 'unit' => 'px', 'size' => 820, 'sizes' => array() ),
-                            'padding'        => array( 'unit' => 'em', 'top' => '2', 'right' => '1.5', 'bottom' => '3', 'left' => '1.5', 'isLinked' => false ),
+                            'boxed_width'    => array( 'unit' => 'px', 'size' => 920, 'sizes' => array() ),
+                            'padding'        => array( 'unit' => 'em', 'top' => '3', 'right' => '1.5', 'bottom' => '2', 'left' => '1.5', 'isLinked' => false ),
                         ),
                         'elements' => array(
                             array(

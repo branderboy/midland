@@ -3,7 +3,7 @@
  * Plugin Name: Midland Smart SEO Pro
  * Plugin URI: https://midlandfloors.com/smart-seo-pro
  * Description: Full local SEO offense — sameAs entity identity, GSC cleanup, programmatic city × service pages, IndexNow + Rapid URL Indexer, schema, Google Trends, GMB, and AI-powered fixes.
- * Version: 1.3.0
+ * Version: 1.4.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'RSSEO_PRO_VERSION',        '1.3.0' );
+define( 'RSSEO_PRO_VERSION',        '1.4.0' );
 define( 'RSSEO_PRO_PATH',           plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_PRO_URL',            plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_PRO_FILE',           __FILE__ );
@@ -82,6 +82,23 @@ class RSSEO_Pro_Plugin {
         load_plugin_textdomain( 'real-smart-seo-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
         $this->includes();
         $this->init_classes();
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_brand_layout' ) );
+    }
+
+    /**
+     * Enqueue the brand layout CSS site wide so every Elementor boxed
+     * container snaps to 920px max width with the About Midland hero's
+     * vertical rhythm (3em / 1.5em / 2em). Loaded on every frontend
+     * page so hand built Elementor pages and programmatic pages share
+     * one rhythm without per page edits.
+     */
+    public function enqueue_brand_layout() {
+        wp_enqueue_style(
+            'midland-brand-layout',
+            RSSEO_PRO_URL . 'assets/css/brand-layout.css',
+            array(),
+            RSSEO_PRO_VERSION
+        );
     }
 
     private function includes() {
