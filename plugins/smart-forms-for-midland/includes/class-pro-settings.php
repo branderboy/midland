@@ -90,12 +90,11 @@ class SFCO_Pro_Settings {
             update_option( 'sfco_gcal_client_secret', $gcal_secret );
         }
 
-        // Calendly.
-        $cal_key = sanitize_text_field( wp_unslash( $_POST['calendly_api_key'] ?? '' ) );
-        if ( '' !== $cal_key ) {
-            update_option( 'sfco_pro_calendly_api_key', $cal_key );
-        }
-        update_option( 'sfco_pro_calendly_signing_key', sanitize_text_field( wp_unslash( $_POST['calendly_signing_key'] ?? '' ) ) );
+        // Calendly — URL is the only required field; widget rendering and
+        // the post-submission booking link both read sfco_pro_calendly_url.
+        $cal_url = esc_url_raw( wp_unslash( $_POST['calendly_url'] ?? '' ) );
+        update_option( 'sfco_pro_calendly_url', $cal_url );
+        update_option( 'sfco_pro_calendly_enabled', '' !== $cal_url ? 1 : 0 );
 
         // Branding (stored as a single array, matching class-pro-branding).
         $branding = array(
@@ -246,12 +245,8 @@ class SFCO_Pro_Settings {
                 <h2><?php esc_html_e( 'Calendly', 'smart-forms-for-midland' ); ?></h2>
                 <table class="form-table" role="presentation">
                     <tr>
-                        <th scope="row"><label for="calendly_api_key"><?php esc_html_e( 'API key', 'smart-forms-for-midland' ); ?></label></th>
-                        <td><input type="password" id="calendly_api_key" name="calendly_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_calendly_api_key', '' ) ); ?>" autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="calendly_signing_key"><?php esc_html_e( 'Webhook signing key', 'smart-forms-for-midland' ); ?></label></th>
-                        <td><input type="text" id="calendly_signing_key" name="calendly_signing_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_calendly_signing_key', '' ) ); ?>"></td>
+                        <th scope="row"><label for="calendly_url"><?php esc_html_e( 'Calendly URL', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="url" id="calendly_url" name="calendly_url" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_calendly_url', '' ) ); ?>" placeholder="https://calendly.com/midlandfloors/30min"><p class="description"><?php esc_html_e( 'Paste your public Calendly scheduling URL. After a form submits, the submitter is offered this booking link.', 'smart-forms-for-midland' ); ?></p></td>
                     </tr>
                 </table>
 
