@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Forms
  * Description: Multi-form lead capture for Midland Floor Care — floor-care templates, per-form shortcodes, file uploads, automation, Smart CRM Pro sync, Resend email, Google Calendar, branding, analytics, team management. (Formerly Smart Forms Basic + Smart Forms PRO, combined into one.)
- * Version: 2.5.0
+ * Version: 2.5.1
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-forms-for-midland
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Plugin constants. Internal SFCO_/SFCO_PRO_ prefixes preserved so all
 // existing class code keeps working with zero changes when we merged the
 // Pro plugin into this folder.
-define( 'SFCO_VERSION', '2.5.0' );
+define( 'SFCO_VERSION', '2.5.1' );
 define( 'SFCO_PLUGIN_FILE', __FILE__ );
 define( 'SFCO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SFCO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -80,6 +80,24 @@ class SFCO_Plugin {
         register_uninstall_hook(  __FILE__, array( 'SFCO_Plugin', 'uninstall' ) );
 
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
+        // Defensive: run table creation on every load if the DB version
+        // tag is missing or stale, so a plugin upgraded via the GitHub
+        // Vault deploy (which does not fire register_activation_hook)
+        // still has every Pro table. dbDelta is idempotent — if the
+        // table already exists at the current schema this is a no-op.
+        add_action( 'plugins_loaded', array( $this, 'maybe_install_tables' ), 20 );
+    }
+
+    public function maybe_install_tables() {
+        $current = get_option( 'sfco_db_version', '0' );
+        if ( version_compare( $current, SFCO_VERSION, '>=' ) ) {
+            return;
+        }
+        SFCO_Database::create_tables();
+        if ( class_exists( 'SFCO_Pro_DB' ) && method_exists( 'SFCO_Pro_DB', 'create_tables' ) ) {
+            SFCO_Pro_DB::create_tables();
+        }
+        update_option( 'sfco_db_version', SFCO_VERSION );
     }
 
     /**

@@ -41,36 +41,35 @@ class SFCO_Pro_Settings {
                 'description'   => __( 'The two automations every form needs: auto-reply to the submitter confirming the message went through, and an admin notification to your team. Lightweight by design. Heavier flows (segmenting, tagging, sequencing) belong in Smart CRM.', 'smart-forms-for-midland' ),
                 'status_check'  => function () {
                     $s = get_option( 'sfco_pro_notifications', array() );
-                    return ! empty( $s['admin_enabled'] ) || ! empty( $s['autoreply_enabled'] );
+                    return is_array( $s ) && ( ! empty( $s['admin_enabled'] ) || ! empty( $s['autoreply_enabled'] ) );
                 },
             ),
             'sfco-resend' => array(
                 'label'         => __( 'Resend Email', 'smart-forms-for-midland' ),
                 'description'   => __( 'Route every WordPress email (form notifications, password resets, system messages) through Resend SMTP so leads do not vanish into spam. Paste your Resend API key once.', 'smart-forms-for-midland' ),
                 'status_check'  => function () {
-                    $opts = get_option( 'sfco_pro_resend', array() );
-                    return ! empty( $opts['api_key'] ?? ( is_array( $opts ) ? '' : '' ) ) || ! empty( get_option( 'sfco_pro_resend_api_key' ) );
+                    return (bool) get_option( 'sfco_resend_enabled' ) && (string) get_option( 'sfco_resend_api_key', '' ) !== '';
                 },
             ),
             'sfco-crm' => array(
                 'label'         => __( 'CRM (ActiveCampaign)', 'smart-forms-for-midland' ),
                 'description'   => __( 'Every form submission pushes the contact into ActiveCampaign with tags and form context, so a lead is in your sales pipeline within seconds. Needs the API URL and key from ActiveCampaign Settings.', 'smart-forms-for-midland' ),
                 'status_check'  => function () {
-                    return ! empty( get_option( 'sfco_pro_crm_api_url' ) ) && ! empty( get_option( 'sfco_pro_crm_api_key' ) );
+                    return (string) get_option( 'sfco_pro_crm_api_url', '' ) !== '' && (string) get_option( 'sfco_pro_crm_api_key', '' ) !== '';
                 },
             ),
             'sfco-gcal' => array(
                 'label'         => __( 'Google Calendar', 'smart-forms-for-midland' ),
                 'description'   => __( 'When an appointment is confirmed (via Calendly or a booking form), a calendar event is created on your Google Calendar with the lead, time, and notes. OAuth handshake required once.', 'smart-forms-for-midland' ),
                 'status_check'  => function () {
-                    return ! empty( get_option( 'sfco_gcal_refresh_token' ) );
+                    return (string) get_option( 'sfco_gcal_refresh_token', '' ) !== '';
                 },
             ),
             'sfco-calendar' => array(
                 'label'         => __( 'Calendly', 'smart-forms-for-midland' ),
                 'description'   => __( 'Drop a Calendly booking widget on any page and tie confirmations into Google Calendar + CRM via the appointment-confirmed hook.', 'smart-forms-for-midland' ),
                 'status_check'  => function () {
-                    return ! empty( get_option( 'sfco_pro_calendly_api_key' ) );
+                    return (string) get_option( 'sfco_pro_calendly_api_key', '' ) !== '';
                 },
             ),
             'sfco-automations' => array(
@@ -79,21 +78,35 @@ class SFCO_Pro_Settings {
                 'status_check'  => function () {
                     global $wpdb;
                     $table = $wpdb->prefix . 'sfco_automations';
-                    return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) > 0;
+                    // Defensive — the table may not exist yet on a fresh
+                    // install / pre-table-creation upgrade. Suppress
+                    // errors so the Settings hub never breaks the page.
+                    $exists = (bool) $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+                    if ( ! $exists ) {
+                        return false;
+                    }
+                    return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) > 0; // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
                 },
             ),
             'sfco-branding' => array(
                 'label'         => __( 'Branding', 'smart-forms-for-midland' ),
                 'description'   => __( 'Match the form to the Midland Floors brand: logo on confirmation emails, accent color overrides, custom thank-you copy.', 'smart-forms-for-midland' ),
                 'status_check'  => function () {
-                    return ! empty( get_option( 'sfco_pro_branding_primary_color' ) ) || ! empty( get_option( 'sfco_pro_branding_logo_url' ) );
+                    $b = get_option( 'sfco_pro_branding', array() );
+                    return is_array( $b ) && ( ! empty( $b['primary_color'] ) || ! empty( $b['logo_url'] ) );
                 },
             ),
             'sfco-team' => array(
                 'label'         => __( 'Team', 'smart-forms-for-midland' ),
                 'description'   => __( 'Route lead notifications to specific team members by form type, service requested, or geography. Multiple recipients, with reply-to set to the lead.', 'smart-forms-for-midland' ),
                 'status_check'  => function () {
-                    return ! empty( get_option( 'sfco_pro_team_routing_rules' ) );
+                    global $wpdb;
+                    $table  = $wpdb->prefix . 'sfco_team_members';
+                    $exists = (bool) $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+                    if ( ! $exists ) {
+                        return false;
+                    }
+                    return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) > 0; // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
                 },
             ),
             'sfco-analytics' => array(
