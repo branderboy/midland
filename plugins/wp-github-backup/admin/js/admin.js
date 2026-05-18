@@ -78,64 +78,18 @@
 			});
 		});
 
-		// Settings form — save via AJAX for reliability (no page redirect).
+		// Settings form — saves natively via admin-post.php → handle_post_save
+		// → process_settings_save() and redirects back with ?saved=1. The
+		// previous AJAX intercept silently lost saves on hosts where a
+		// security/caching plugin (Wordfence, WP Engine, etc.) injected HTML
+		// into admin-ajax responses, breaking the JSON parser. Let the
+		// browser submit the form; the success notice renders from the
+		// ?saved=1 query param on reload.
 		$('#wgb-settings-form').on('submit', function (e) {
-			e.preventDefault();
-
 			var $form = $(this);
-			var $statusEl = $('#wgb-settings-status');
 			var $submitBtn = $form.find('button[type="submit"]');
-
 			$submitBtn.prop('disabled', true).text( __( 'Saving...', 'wp-github-backup' ) );
-			$statusEl.text('').css('color', '');
-
-			// Build form data manually so unchecked checkboxes are included as '0'.
-			var formData = {};
-			formData['action'] = 'wgb_save_settings';
-			formData['nonce'] = wgbAdmin.nonce;
-
-			// Text/select fields.
-			$form.find('input[type="text"], input[type="password"], input[type="email"], input[type="number"], select').each(function () {
-				var name = $(this).attr('name');
-				if (name) {
-					formData[name] = $(this).val();
-				}
-			});
-
-			// Checkboxes — send '1' if checked, '0' if not.
-			$form.find('input[type="checkbox"]').each(function () {
-				var name = $(this).attr('name');
-				if (name) {
-					formData[name] = $(this).is(':checked') ? '1' : '0';
-				}
-			});
-
-			$.ajax({
-				url: wgbAdmin.ajaxUrl,
-				type: 'POST',
-				data: formData,
-				success: function (response) {
-					$submitBtn.prop('disabled', false).text( __( 'Save Settings', 'wp-github-backup' ) );
-
-					if (response.success) {
-						$statusEl.text( __( 'Settings saved!', 'wp-github-backup' ) ).css('color', '#46b450');
-
-						// Update the token indicator on the page.
-						var $tokenSpan = $form.find('.wgb-token-set, span[style*="color:#dc3232"]');
-						if (formData['github_token'] && formData['github_token'].length > 0) {
-							$tokenSpan.text( __( 'Token is saved.', 'wp-github-backup' ) ).css({'color': '#46b450', 'font-weight': 'bold'}).removeClass().addClass('wgb-token-set');
-							$form.find('#wgb-token').attr('placeholder', '••••••••••••••••').val('');
-						}
-					} else {
-						$statusEl.text('Error: ' + (response.data || wgbAdmin.i18n.saveFailed)).css('color', '#dc3232');
-					}
-					setTimeout(function () { $statusEl.text(''); }, 5000);
-				},
-				error: function (xhr, status, error) {
-					$submitBtn.prop('disabled', false).text( __( 'Save Settings', 'wp-github-backup' ) );
-					$statusEl.text(wgbAdmin.i18n.error + ' ' + error).css('color', '#dc3232');
-				}
-			});
+			// Do not preventDefault — let the browser POST to admin-post.php.
 		});
 
 		// Test Connection.
