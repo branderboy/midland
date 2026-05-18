@@ -35,7 +35,7 @@ class SFCO_Pro_GCal {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-forms',
+            null,
             esc_html__( 'Google Calendar', 'smart-forms-pro' ),
             esc_html__( 'Google Calendar', 'smart-forms-pro' ),
             'manage_options',

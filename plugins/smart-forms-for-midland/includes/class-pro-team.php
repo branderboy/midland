@@ -13,7 +13,7 @@ class SFCO_Pro_Team {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-forms',
+            null,
             esc_html__( 'Team', 'smart-forms-pro' ),
             esc_html__( 'Team', 'smart-forms-pro' ),
             'manage_options',

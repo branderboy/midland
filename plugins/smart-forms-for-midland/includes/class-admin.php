@@ -49,7 +49,7 @@ class SFCO_Admin {
             array( $this, 'render_shortcodes_page' )
         );
         add_submenu_page(
-            'smart-forms',
+            null, // Tracking has its own fields in Smart Forms → Settings now; the page stays alive at ?page=smart-forms-tracking for the old bookmark.
             esc_html__( 'Tracking (Ad Pixels)', 'smart-forms-for-midland' ),
             esc_html__( 'Tracking', 'smart-forms-for-midland' ),
             'manage_options',
