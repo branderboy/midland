@@ -351,26 +351,30 @@ class DPJP_Templates {
 
         foreach ( $tpls as $slug => $t ) {
             // Every published job carries the application form inline at the
-            // bottom of its post_content. Storing the shortcode as part of
-            // post_content (instead of relying on a the_content filter) means
-            // the form survives custom theme templates that bypass filters,
-            // and gets rendered by the standard do_shortcode pass during
-            // the_content. Idempotent — we only append once per job, even
-            // across re-clicks of the publish-all button.
-            $body = $t['description'];
-            if ( false === strpos( $body, '[sfco_apply' ) ) {
-                $body .= "\n\n[sfco_apply]";
-            }
+            // bottom of its post_content (no the_content filter dependency,
+            // so it survives themes that bypass filters for CPTs). The whole
+            // body is wrapped in a brand themed hero + body + phone CTA
+            // block above the form so the page matches the look of the
+            // About / homepage hero.
+            $body = self::build_branded_job_body( $t );
 
             $existing = get_page_by_title( $t['title'], OBJECT, 'dpjp_job' );
 
             if ( $existing instanceof WP_Post ) {
-                $needs_form = false === strpos( (string) $existing->post_content, '[sfco_apply' );
-                $update     = [ 'ID' => $existing->ID, 'post_status' => 'publish' ];
-                if ( $needs_form ) {
-                    $update['post_content'] = rtrim( (string) $existing->post_content ) . "\n\n[sfco_apply]";
-                }
-                if ( 'publish' === $existing->post_status && ! $needs_form ) {
+                // Force the branded body on every re-click so a previously
+                // published job from a pre-1.6.3 release picks up the new
+                // theme on the next publish-all. Operator edits to the
+                // template's description string still flow through; manual
+                // edits inside the WP post editor will be overwritten by
+                // design (this button is the source of truth).
+                $update = [
+                    'ID'           => $existing->ID,
+                    'post_status'  => 'publish',
+                    'post_content' => $body,
+                ];
+                $was_publish      = 'publish' === $existing->post_status;
+                $was_same_content = trim( (string) $existing->post_content ) === trim( $body );
+                if ( $was_publish && $was_same_content ) {
                     $already++;
                 } else {
                     wp_update_post( $update );
@@ -431,37 +435,31 @@ class DPJP_Templates {
         // that role's dedicated page where the [sfco_apply] form lives.
         // No application form on the directory itself — applicants must
         // pick a role first.
-        $intro = "<h2>Join the Midland Floors Team</h2>\n"
-               . "<p>We're hiring across DC, Maryland, and Northern Virginia. Browse open positions below. Each role has its own page with full details and the application form.</p>\n"
+        //
+        // Hero block matches the brand look from the About page (light
+        // mint background, dark green title and copy, centered).
+        $intro = '<div style="background:#F3FCF4;margin:0 0 32px;">'
+               . '<div style="max-width:920px;margin:0 auto;padding:3em 1.5em 2em;text-align:center;">'
+               . '<div style="color:#2F8137;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin:0 0 10px;">Now Hiring</div>'
+               . '<h1 style="color:#0F1411;font-size:44px;font-weight:800;line-height:1.05;margin:0 0 18px;">Join the Midland Floors Team</h1>'
+               . '<p style="color:#4B5563;font-size:17px;line-height:1.6;margin:0;"><strong>Commercial floor care jobs across DC, Maryland, and Northern Virginia.</strong> Predictable schedules, weekly pay, mostly recurring contracts. Browse open positions below, then click any role for full details and to apply.</p>'
+               . '</div>'
+               . '</div>' . "\n\n"
                . '[dpjp_jobs]';
 
         $existing = get_page_by_title( 'Careers', OBJECT, 'page' );
 
         if ( $existing instanceof WP_Post ) {
-            // Strip any [sfco_apply] previously added to this page by an
-            // earlier build (one shipped briefly with the form embedded
-            // here, which conflicts with the per-role apply flow).
-            $current  = (string) $existing->post_content;
-            $cleaned  = preg_replace( '/\s*\[sfco_apply[^\]]*\]\s*/', '', $current );
-            $cleaned  = preg_replace( '/<h2>Apply Now<\/h2>\s*<p>[^<]*<\/p>\s*/', '', (string) $cleaned );
-
-            $has_jobs      = false !== strpos( (string) $cleaned, '[dpjp_jobs' );
-            $needs_publish = 'publish' !== $existing->post_status;
-            $changed       = $cleaned !== $current;
-
-            if ( ! $has_jobs ) {
-                wp_update_post( [
-                    'ID'           => $existing->ID,
-                    'post_status'  => 'publish',
-                    'post_content' => $intro,
-                ] );
-            } elseif ( $changed || $needs_publish ) {
-                wp_update_post( [
-                    'ID'           => $existing->ID,
-                    'post_status'  => 'publish',
-                    'post_content' => $cleaned,
-                ] );
-            }
+            // The publish-all button is the source of truth for the Careers
+            // page — always rewrite content so brand updates (hero colors,
+            // copy, shortcode order) propagate on every click. Operators
+            // who want a custom Careers page should build it elsewhere and
+            // rename this one out of the way.
+            wp_update_post( [
+                'ID'           => $existing->ID,
+                'post_status'  => 'publish',
+                'post_content' => $intro,
+            ] );
             return (int) $existing->ID;
         }
 
@@ -484,6 +482,56 @@ class DPJP_Templates {
      *
      * @return int Page ID.
      */
+    /**
+     * Build the full post_content for a single job. Matches the brand hero
+     * spec from the About page (light mint #F3FCF4 background, small green
+     * eyebrow #2F8137, big black title #0F1411 at 44px/800, gray body
+     * #4B5563 at 17px/1.6, centered in a 920px column), then the regular
+     * description body, then the application form shortcode.
+     *
+     * @param array $t Template entry from self::templates().
+     * @return string Full HTML post_content.
+     */
+    private static function build_branded_job_body( array $t ): string {
+        $type_label = ( 'part-time' === ( $t['employment_type'] ?? '' ) ) ? 'Part Time'
+            : ( ( 'contract' === ( $t['employment_type'] ?? '' ) ) ? 'Contract'
+            : ( ( 'seasonal' === ( $t['employment_type'] ?? '' ) ) ? 'Seasonal' : 'Full Time' ) );
+
+        $eyebrow  = strtoupper( (string) ( $t['trade'] ?? 'Now Hiring' ) );
+        $title    = (string) ( $t['title'] ?? '' );
+        $subtitle = sprintf(
+            '%s &middot; %s &middot; %s',
+            esc_html( (string) ( $t['location'] ?? '' ) ),
+            esc_html( (string) ( $t['pay'] ?? '' ) ),
+            esc_html( $type_label )
+        );
+
+        $hero = '<div style="background:#F3FCF4;margin:0 0 32px;">'
+              . '<div style="max-width:920px;margin:0 auto;padding:3em 1.5em 2em;text-align:center;">'
+              . '<div style="color:#2F8137;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin:0 0 10px;">' . esc_html( $eyebrow ) . '</div>'
+              . '<h1 style="color:#0F1411;font-size:44px;font-weight:800;line-height:1.05;margin:0 0 18px;">' . esc_html( $title ) . '</h1>'
+              . '<p style="color:#4B5563;font-size:17px;line-height:1.6;margin:0;">' . $subtitle . '</p>'
+              . '</div>'
+              . '</div>';
+
+        $description = '<div style="max-width:920px;margin:0 auto;padding:0 1.5em;font-size:16px;line-height:1.65;color:#1d2933;">'
+                     . wpautop( esc_html( (string) ( $t['description'] ?? '' ) ) )
+                     . '<h3 style="color:#0F1411;margin:28px 0 12px;font-size:22px;">What we need from you</h3>'
+                     . wpautop( esc_html( (string) ( $t['requirements'] ?? '' ) ) )
+                     . '</div>';
+
+        $cta = '<div style="background:#0F1411;color:#fff;margin:32px 0;padding:36px 1.5em;text-align:center;">'
+             . '<div style="color:#7CCE8E;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin:0 0 8px;">Ready to apply?</div>'
+             . '<h2 style="color:#fff;font-size:30px;font-weight:800;margin:0 0 8px;">Call or text us today</h2>'
+             . '<p style="color:#cfe4d6;font-size:16px;margin:0 0 14px;">We respond fast, usually within one business day.</p>'
+             . '<a href="tel:2405329097" style="color:#fff;font-size:26px;font-weight:800;text-decoration:none;border-bottom:2px solid #7CCE8E;padding-bottom:2px;">(240) 532-9097</a>'
+             . '</div>';
+
+        $form = '<div style="max-width:920px;margin:0 auto;padding:0 1.5em;">[sfco_apply]</div>';
+
+        return $hero . "\n\n" . $description . "\n\n" . $cta . "\n\n" . $form;
+    }
+
     private static function ensure_apply_page(): int {
         $intro = "<h2>Apply to Join Midland Floors</h2>\n"
                . "<p>Fill out the form below. We respond fast, usually within one business day.</p>\n"
