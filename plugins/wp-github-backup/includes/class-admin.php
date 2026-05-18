@@ -781,12 +781,36 @@ class WGB_Admin {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
 		}
 
-		$token    = WGB_Settings::get_token();
-		$username = WGB_Settings::get( 'github_username' );
-		$repo     = WGB_Settings::get( 'repo_name' );
+		$token        = WGB_Settings::get_token();
+		$token_raw    = get_option( 'wgb_github_token', '' );
+		$username     = WGB_Settings::get( 'github_username' );
+		$repo         = WGB_Settings::get( 'repo_name' );
 
-		if ( empty( $token ) || empty( $username ) || empty( $repo ) ) {
-			wp_send_json_error( __( 'Please save your GitHub settings first.', 'wp-github-backup' ) );
+		// Report exactly which field is missing rather than a generic
+		// "save first" message that swallows the real cause. If a token
+		// is stored in the DB but decrypt() returns empty, that's an
+		// encryption-key mismatch (most often: wp-config salts changed
+		// after the token was first saved) — surface that distinctly so
+		// the admin knows to re-paste the token, not to "save again".
+		$missing = array();
+		if ( empty( $token ) ) {
+			$missing[] = empty( $token_raw )
+				? 'GitHub token (none saved)'
+				: 'GitHub token (saved value could not be decrypted — re-paste the token and Save)';
+		}
+		if ( empty( $username ) ) {
+			$missing[] = 'GitHub username';
+		}
+		if ( empty( $repo ) ) {
+			$missing[] = 'repository name';
+		}
+
+		if ( ! empty( $missing ) ) {
+			wp_send_json_error( sprintf(
+				/* translators: %s: comma-separated list of missing or unreadable settings fields */
+				__( 'Missing or unreadable: %s. Re-paste those fields and click Save Settings.', 'wp-github-backup' ),
+				implode( ', ', $missing )
+			) );
 		}
 
 		$github = new WGB_GitHub_API( $token, $username, $repo );
@@ -1194,16 +1218,33 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
 		}
 
-		$token  = WGB_Settings::get_token();
-		$owner  = trim( (string) WGB_Settings::get( 'github_username' ) );
-		$repo   = trim( (string) WGB_Settings::get( 'repo_name' ) );
-		$secret = WGB_Settings::get_webhook_secret();
+		$token     = WGB_Settings::get_token();
+		$token_raw = get_option( 'wgb_github_token', '' );
+		$owner     = trim( (string) WGB_Settings::get( 'github_username' ) );
+		$repo      = trim( (string) WGB_Settings::get( 'repo_name' ) );
+		$secret    = WGB_Settings::get_webhook_secret();
 
-		if ( '' === $token || '' === $owner || '' === $repo ) {
-			wp_send_json_error( __( 'Save your GitHub token, username, and repo name first.', 'wp-github-backup' ) );
+		$missing = array();
+		if ( '' === $token ) {
+			$missing[] = '' === $token_raw
+				? 'GitHub token (none saved)'
+				: 'GitHub token (saved but could not be decrypted — re-paste the token and Save)';
+		}
+		if ( '' === $owner ) {
+			$missing[] = 'GitHub username';
+		}
+		if ( '' === $repo ) {
+			$missing[] = 'repository name';
 		}
 		if ( '' === $secret ) {
-			wp_send_json_error( __( 'Generate a webhook secret on the Deploy tab first.', 'wp-github-backup' ) );
+			$missing[] = 'webhook secret (set on the Deploy tab)';
+		}
+		if ( ! empty( $missing ) ) {
+			wp_send_json_error( sprintf(
+				/* translators: %s: comma-separated list of missing fields */
+				__( 'Cannot register webhook — missing: %s.', 'wp-github-backup' ),
+				implode( ', ', $missing )
+			) );
 		}
 
 		$github   = new WGB_GitHub_API( $token, $owner, $repo );
