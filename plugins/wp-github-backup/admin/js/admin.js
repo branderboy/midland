@@ -166,6 +166,77 @@
 			});
 		});
 
+		// Copy webhook URL.
+		$('#wgb-copy-webhook-url').on('click', function () {
+			var input = document.getElementById('wgb-webhook-url');
+			if (!input) return;
+			input.select();
+			input.setSelectionRange(0, 9999);
+			try {
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(input.value);
+				} else {
+					document.execCommand('copy');
+				}
+				var $btn = $(this);
+				var orig = $btn.text();
+				$btn.text('Copied!');
+				setTimeout(function(){ $btn.text(orig); }, 1500);
+			} catch (e) {}
+		});
+
+		// Register webhook on GitHub.
+		$('#wgb-register-webhook').on('click', function () {
+			var $btn = $(this);
+			var $statusEl = $('#wgb-connect-status');
+			$btn.prop('disabled', true);
+			$statusEl.text('Registering on GitHub...').css('color', '#666');
+
+			$.ajax({
+				url: wgbAdmin.ajaxUrl,
+				type: 'POST',
+				data: { action: 'wgb_register_webhook', nonce: wgbAdmin.nonce },
+				success: function (response) {
+					$btn.prop('disabled', false);
+					if (response.success) {
+						$statusEl.text(response.data).css('color', '#46b450');
+					} else {
+						$statusEl.text(response.data || 'Failed to register webhook.').css('color', '#dc3232');
+					}
+				},
+				error: function () {
+					$btn.prop('disabled', false);
+					$statusEl.text('Request failed.').css('color', '#dc3232');
+				}
+			});
+		});
+
+		// Send synthetic test ping at local endpoint.
+		$('#wgb-send-test-ping').on('click', function () {
+			var $btn = $(this);
+			var $statusEl = $('#wgb-connect-status');
+			$btn.prop('disabled', true);
+			$statusEl.text('Sending test ping...').css('color', '#666');
+
+			$.ajax({
+				url: wgbAdmin.ajaxUrl,
+				type: 'POST',
+				data: { action: 'wgb_send_test_ping', nonce: wgbAdmin.nonce },
+				success: function (response) {
+					$btn.prop('disabled', false);
+					if (response.success) {
+						$statusEl.text(response.data).css('color', '#46b450');
+					} else {
+						$statusEl.text(response.data || 'Test ping failed.').css('color', '#dc3232');
+					}
+				},
+				error: function () {
+					$btn.prop('disabled', false);
+					$statusEl.text('Request failed.').css('color', '#dc3232');
+				}
+			});
+		});
+
 		// =============================================
 		// Content Editor Tab
 		// =============================================

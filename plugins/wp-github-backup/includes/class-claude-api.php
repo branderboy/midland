@@ -200,11 +200,11 @@ class WGB_Claude_API {
 	public static function generate_deploy_seo( $title, $content ) {
 		$content = mb_substr( wp_strip_all_tags( $content ), 0, 5000 );
 
-		$prompt = "Generate SEO metadata for this drywall company page.\n\n"
+		$prompt = "Generate SEO metadata for this Midland Floors page. Midland is a commercial floor care company serving Washington DC, Maryland, and Northern Virginia (the DMV) — services include commercial carpet cleaning, tile & grout restoration, hardwood floor cleaning, polished concrete, and janitorial floor care.\n\n"
 			. "Title: {$title}\nContent: {$content}\n\n"
 			. "Return JSON with:\n"
-			. "- seo_title: under 60 chars, include relevant drywall/location keywords\n"
-			. "- meta_description: 120-155 chars, include a call to action with (240) 300-0555\n"
+			. "- seo_title: under 60 chars, include relevant commercial floor care / DMV location keywords\n"
+			. "- meta_description: 120-155 chars, include a call to action with (240) 532-9097\n"
 			. "- focus_keyword: primary keyword for this page\n\n"
 			. "Return ONLY valid JSON.";
 

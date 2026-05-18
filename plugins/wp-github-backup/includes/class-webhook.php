@@ -37,7 +37,7 @@ class WGB_Webhook {
 		// reject every request until the admin sets one. This closes the
 		// pre-3.2 behaviour where an empty secret silently made the webhook
 		// unauthenticated.
-		$secret = WGB_Settings::get( 'webhook_secret', '' );
+		$secret = WGB_Settings::get_webhook_secret();
 
 		if ( empty( $secret ) ) {
 			return new WP_REST_Response(
@@ -63,19 +63,19 @@ class WGB_Webhook {
 			// secret, payload byte counts, and delivery IDs to anyone who could
 			// POST to the endpoint, which made offline correlation easy. The
 			// information is still in error_log for the admin to inspect.
-			$diag = array(
-				'wgb_webhook_diag' => true,
-				'secret_len'       => strlen( $secret ),
-				'secret_trimmed'   => strlen( trim( $secret ) ) !== strlen( $secret ),
-				'secret_sha8'      => substr( hash( 'sha256', $secret ), 0, 8 ),
-				'payload_bytes'    => strlen( $payload ),
-				'payload_sha8'     => substr( hash( 'sha256', $payload ), 0, 8 ),
-				'expected_tail'    => substr( $expected, -12 ),
-				'received_tail'    => substr( (string) $signature, -12 ),
-				'delivery'         => $request->get_header( 'X-GitHub-Delivery' ),
-				'event'            => $request->get_header( 'X-GitHub-Event' ),
-			);
-			error_log( 'WGB webhook signature mismatch: ' . wp_json_encode( $diag ) );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				$diag = array(
+					'wgb_webhook_diag' => true,
+					'secret_len'       => strlen( $secret ),
+					'secret_trimmed'   => strlen( trim( $secret ) ) !== strlen( $secret ),
+					'payload_bytes'    => strlen( $payload ),
+					'expected_tail'    => substr( $expected, -12 ),
+					'received_tail'    => substr( (string) $signature, -12 ),
+					'delivery'         => $request->get_header( 'X-GitHub-Delivery' ),
+					'event'            => $request->get_header( 'X-GitHub-Event' ),
+				);
+				error_log( 'WGB webhook signature mismatch: ' . wp_json_encode( $diag ) );
+			}
 
 			return new WP_REST_Response(
 				array( 'error' => __( 'Invalid signature.', 'wp-github-backup' ) ),
