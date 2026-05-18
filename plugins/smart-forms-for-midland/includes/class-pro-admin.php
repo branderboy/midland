@@ -11,7 +11,7 @@ class SFCO_Pro_Admin {
     }
 
     public function modify_menu() {
-        remove_submenu_page( 'sfco-forms', 'sfco-upgrade' );
+        remove_submenu_page( 'smart-forms', 'sfco-upgrade' );
     }
 }
 

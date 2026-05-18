@@ -11,7 +11,7 @@ class SFCO_Pro_Analytics {
 
     public function add_menu() {
         add_submenu_page(
-            'sfco-forms',
+            'smart-forms',
             esc_html__( 'Analytics', 'smart-forms-pro' ),
             esc_html__( 'Analytics', 'smart-forms-pro' ),
             'manage_options',

@@ -19,7 +19,7 @@ class SFCO_Pro_Automations {
 
     public function add_menu() {
         add_submenu_page(
-            'sfco-forms',
+            'smart-forms',
             esc_html__( 'Automations', 'smart-forms-pro' ),
             esc_html__( 'Automations', 'smart-forms-pro' ),
             'manage_options',

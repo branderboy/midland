@@ -13,7 +13,7 @@ class SFCO_Pro_Branding {
 
     public function add_menu() {
         add_submenu_page(
-            'sfco-forms',
+            'smart-forms',
             esc_html__( 'Branding', 'smart-forms-pro' ),
             esc_html__( 'Branding', 'smart-forms-pro' ),
             'manage_options',

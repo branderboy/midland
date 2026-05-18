@@ -1,0 +1,53 @@
+/*
+ * Midland Floors brand layout enforcement
+ *
+ * Locks every boxed Elementor container on the site to the same
+ * inner width (920px) and the same vertical rhythm padding
+ * (3em top / 1.5em sides / 2em bottom) the About Midland hero
+ * uses. This keeps job pages, programmatic city pages, the
+ * Careers and Apply pages, and any hand-built Elementor pages
+ * visually consistent without the operator having to set the
+ * width manually on every container.
+ *
+ * Scope: ONLY .e-con-boxed containers. Full-width containers
+ * (headers, footers, hero backgrounds, full-bleed images) are
+ * untouched because they explicitly opt out of the boxed system.
+ *
+ * To temporarily override on a single container, set a wider
+ * "Boxed Width" inside Elementor — the !important is intentional
+ * to override Elementor's per-element defaults (which reset on
+ * publish), but a per-container width set in the editor still
+ * wins via Elementor's inline data-width attribute.
+ */
+
+:root {
+    --midland-boxed-width: 920px;
+    --midland-pad-top: 3em;
+    --midland-pad-x: 1.5em;
+    --midland-pad-bottom: 2em;
+}
+
+.elementor .e-con.e-con-boxed > .e-con-inner {
+    max-width: var(--midland-boxed-width);
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Default vertical rhythm — applied to every boxed inner container
+ * unless the container already declares its own padding via the
+ * Elementor editor (those land as inline style attributes which
+ * win against this rule). */
+.elementor .e-con.e-con-boxed > .e-con-inner:not([style*="padding"]) {
+    padding: var(--midland-pad-top) var(--midland-pad-x) var(--midland-pad-bottom);
+}
+
+/* Mobile: keep horizontal breathing room but pull vertical padding
+ * in so we don't waste a full viewport on top/bottom whitespace. */
+@media (max-width: 767px) {
+    :root {
+        --midland-pad-top: 2em;
+        --midland-pad-bottom: 1.5em;
+        --midland-pad-x: 1.25em;
+    }
+}
