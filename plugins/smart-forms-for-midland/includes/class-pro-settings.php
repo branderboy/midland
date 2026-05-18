@@ -1,23 +1,17 @@
 <?php
 /**
- * Settings hub.
+ * Unified Smart Forms settings page.
  *
- * Before this class, every Pro integration (Resend, CRM, Google Calendar,
- * Calendly, Automations, Branding, Team, Analytics) registered its own
- * top-level submenu under Smart Forms. The operator saw eight items in
- * the sidebar with no shared landing page, which read as "all over the
- * place" and made it unclear which integrations were active.
+ * One WP-admin settings page with every integration's fields inline,
+ * one Save button at the bottom, traditional form-table layout. No
+ * cards, no Configure buttons, no separate sub-pages to hunt through.
  *
- * This class adds a single "Settings" entry under Smart Forms that
- * lists every integration as a card with name, description, the
- * connection status (configured / not configured), and a Configure
- * button that deep-links to the integration's existing settings page.
- * It then hides the individual Pro submenus from the sidebar so the
- * sidebar collapses from nine entries down to five.
- *
- * The individual pages still exist at their original slugs — the
- * Configure buttons link to them, OAuth callbacks still work, and
- * direct URLs continue to resolve.
+ * The individual Pro module pages (Resend, CRM, GCal, Calendly,
+ * Notifications) still exist as their own submenus because OAuth
+ * callbacks and test-email flows need a real page to land on, but
+ * the unified form here writes to the same wp_options keys, so the
+ * operator can configure everything from one screen and the Pro
+ * modules pick those values up automatically.
  */
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -27,103 +21,9 @@ class SFCO_Pro_Settings {
 
     const PAGE_SLUG = 'smart-forms-settings';
 
-    /**
-     * The eight integration cards rendered on the Settings hub. Keyed by
-     * page slug so hide_individual_submenus() can iterate the same list
-     * to strip them from the sidebar.
-     *
-     * @return array<string, array{label:string, description:string, status_option:string, status_check:?callable}>
-     */
-    private function integrations(): array {
-        return array(
-            'sfco-notifications' => array(
-                'label'         => __( 'Form Notifications', 'smart-forms-for-midland' ),
-                'description'   => __( 'The two automations every form needs: auto-reply to the submitter confirming the message went through, and an admin notification to your team. Lightweight by design. Heavier flows (segmenting, tagging, sequencing) belong in Smart CRM.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    $s = get_option( 'sfco_pro_notifications', array() );
-                    return is_array( $s ) && ( ! empty( $s['admin_enabled'] ) || ! empty( $s['autoreply_enabled'] ) );
-                },
-            ),
-            'sfco-resend' => array(
-                'label'         => __( 'Resend Email', 'smart-forms-for-midland' ),
-                'description'   => __( 'Route every WordPress email (form notifications, password resets, system messages) through Resend SMTP so leads do not vanish into spam. Paste your Resend API key once.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    return (bool) get_option( 'sfco_resend_enabled' ) && (string) get_option( 'sfco_resend_api_key', '' ) !== '';
-                },
-            ),
-            'sfco-crm' => array(
-                'label'         => __( 'CRM (ActiveCampaign)', 'smart-forms-for-midland' ),
-                'description'   => __( 'Every form submission pushes the contact into ActiveCampaign with tags and form context, so a lead is in your sales pipeline within seconds. Needs the API URL and key from ActiveCampaign Settings.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    return (string) get_option( 'sfco_pro_crm_api_url', '' ) !== '' && (string) get_option( 'sfco_pro_crm_api_key', '' ) !== '';
-                },
-            ),
-            'sfco-gcal' => array(
-                'label'         => __( 'Google Calendar', 'smart-forms-for-midland' ),
-                'description'   => __( 'When an appointment is confirmed (via Calendly or a booking form), a calendar event is created on your Google Calendar with the lead, time, and notes. OAuth handshake required once.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    return (string) get_option( 'sfco_gcal_refresh_token', '' ) !== '';
-                },
-            ),
-            'sfco-calendar' => array(
-                'label'         => __( 'Calendly', 'smart-forms-for-midland' ),
-                'description'   => __( 'Drop a Calendly booking widget on any page and tie confirmations into Google Calendar + CRM via the appointment-confirmed hook.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    return (string) get_option( 'sfco_pro_calendly_api_key', '' ) !== '';
-                },
-            ),
-            'sfco-automations' => array(
-                'label'         => __( 'Automations', 'smart-forms-for-midland' ),
-                'description'   => __( 'Build trigger-action rules: when a form is submitted with certain values, send an email, fire a webhook, tag the lead, or schedule a task.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    global $wpdb;
-                    $table = $wpdb->prefix . 'sfco_automations';
-                    // Defensive — the table may not exist yet on a fresh
-                    // install / pre-table-creation upgrade. Suppress
-                    // errors so the Settings hub never breaks the page.
-                    $exists = (bool) $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
-                    if ( ! $exists ) {
-                        return false;
-                    }
-                    return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) > 0; // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                },
-            ),
-            'sfco-branding' => array(
-                'label'         => __( 'Branding', 'smart-forms-for-midland' ),
-                'description'   => __( 'Match the form to the Midland Floors brand: logo on confirmation emails, accent color overrides, custom thank-you copy.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    $b = get_option( 'sfco_pro_branding', array() );
-                    return is_array( $b ) && ( ! empty( $b['primary_color'] ) || ! empty( $b['logo_url'] ) );
-                },
-            ),
-            'sfco-team' => array(
-                'label'         => __( 'Team', 'smart-forms-for-midland' ),
-                'description'   => __( 'Route lead notifications to specific team members by form type, service requested, or geography. Multiple recipients, with reply-to set to the lead.', 'smart-forms-for-midland' ),
-                'status_check'  => function () {
-                    global $wpdb;
-                    $table  = $wpdb->prefix . 'sfco_team_members';
-                    $exists = (bool) $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
-                    if ( ! $exists ) {
-                        return false;
-                    }
-                    return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) > 0; // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                },
-            ),
-            'sfco-analytics' => array(
-                'label'         => __( 'Analytics', 'smart-forms-for-midland' ),
-                'description'   => __( 'Per-form view, submission, and conversion counts plus top-converting pages. Lives in WP admin, no third-party script needed.', 'smart-forms-for-midland' ),
-                'status_check'  => null,
-            ),
-        );
-    }
-
     public function __construct() {
-        // Register the Settings landing page right after the free Tracking
-        // page in the sidebar (free admin runs at default priority 10).
         add_action( 'admin_menu', array( $this, 'register' ), 25 );
-        // Strip the individual Pro submenus from the sidebar after every
-        // Pro module has finished registering (Pro modules use 30-36).
-        add_action( 'admin_menu', array( $this, 'hide_individual_submenus' ), 999 );
+        add_action( 'admin_init', array( $this, 'handle_save' ) );
     }
 
     public function register() {
@@ -138,54 +38,265 @@ class SFCO_Pro_Settings {
     }
 
     /**
-     * Remove every Pro integration submenu so the sidebar shows only the
-     * free entries plus our consolidated Settings link. The submenu
-     * removal does not unregister the underlying page — direct URLs
-     * (?page=sfco-resend, etc.) still load.
+     * Save handler for the unified form. Writes each section straight
+     * to the option keys the underlying Pro modules already read, so
+     * no module-level refactor is needed and per-module pages keep
+     * working too.
      */
-    public function hide_individual_submenus() {
-        foreach ( array_keys( $this->integrations() ) as $slug ) {
-            remove_submenu_page( 'smart-forms', $slug );
+    public function handle_save() {
+        if ( empty( $_POST['sfco_unified_save'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
         }
+        if ( ! check_admin_referer( 'sfco_unified_save', '_sfco_unified_nonce' ) ) {
+            return;
+        }
+
+        // Form Notifications.
+        $notif_defaults = class_exists( 'SFCO_Pro_Notifications' ) ? SFCO_Pro_Notifications::defaults() : array();
+        $notif = wp_parse_args(
+            array(
+                'admin_enabled'        => isset( $_POST['admin_enabled'] ) ? 1 : 0,
+                'admin_to'             => sanitize_text_field( wp_unslash( $_POST['admin_to'] ?? '' ) ),
+                'admin_subject'        => sanitize_text_field( wp_unslash( $_POST['admin_subject'] ?? '' ) ),
+                'admin_body'           => wp_kses_post( wp_unslash( $_POST['admin_body'] ?? '' ) ),
+                'autoreply_enabled'    => isset( $_POST['autoreply_enabled'] ) ? 1 : 0,
+                'autoreply_from_name'  => sanitize_text_field( wp_unslash( $_POST['autoreply_from_name'] ?? '' ) ),
+                'autoreply_from_email' => sanitize_email( wp_unslash( $_POST['autoreply_from_email'] ?? '' ) ),
+                'autoreply_subject'    => sanitize_text_field( wp_unslash( $_POST['autoreply_subject'] ?? '' ) ),
+                'autoreply_body'       => wp_kses_post( wp_unslash( $_POST['autoreply_body'] ?? '' ) ),
+            ),
+            $notif_defaults
+        );
+        update_option( 'sfco_pro_notifications', $notif, false );
+
+        // Resend.
+        update_option( 'sfco_resend_enabled',    isset( $_POST['resend_enabled'] ) ? 1 : 0 );
+        update_option( 'sfco_resend_api_key',    sanitize_text_field( wp_unslash( $_POST['resend_api_key'] ?? '' ) ) );
+        update_option( 'sfco_resend_from_name',  sanitize_text_field( wp_unslash( $_POST['resend_from_name'] ?? '' ) ) );
+        update_option( 'sfco_resend_from_email', sanitize_email( wp_unslash( $_POST['resend_from_email'] ?? '' ) ) );
+
+        // ActiveCampaign CRM.
+        update_option( 'sfco_pro_crm_api_url', untrailingslashit( esc_url_raw( wp_unslash( $_POST['crm_api_url'] ?? '' ) ) ) );
+        $crm_key = sanitize_text_field( wp_unslash( $_POST['crm_api_key'] ?? '' ) );
+        if ( '' !== $crm_key ) {
+            update_option( 'sfco_pro_crm_api_key', $crm_key );
+        }
+
+        // Google Calendar OAuth credentials (refresh token is set by the
+        // OAuth handshake, not this form).
+        update_option( 'sfco_gcal_client_id',     sanitize_text_field( wp_unslash( $_POST['gcal_client_id'] ?? '' ) ) );
+        $gcal_secret = sanitize_text_field( wp_unslash( $_POST['gcal_client_secret'] ?? '' ) );
+        if ( '' !== $gcal_secret ) {
+            update_option( 'sfco_gcal_client_secret', $gcal_secret );
+        }
+
+        // Calendly.
+        $cal_key = sanitize_text_field( wp_unslash( $_POST['calendly_api_key'] ?? '' ) );
+        if ( '' !== $cal_key ) {
+            update_option( 'sfco_pro_calendly_api_key', $cal_key );
+        }
+        update_option( 'sfco_pro_calendly_signing_key', sanitize_text_field( wp_unslash( $_POST['calendly_signing_key'] ?? '' ) ) );
+
+        // Branding (stored as a single array, matching class-pro-branding).
+        $branding = array(
+            'primary_color' => sanitize_hex_color( wp_unslash( $_POST['branding_primary_color'] ?? '' ) ),
+            'logo_url'      => esc_url_raw( wp_unslash( $_POST['branding_logo_url'] ?? '' ) ),
+            'thank_you'     => wp_kses_post( wp_unslash( $_POST['branding_thank_you'] ?? '' ) ),
+        );
+        update_option( 'sfco_pro_branding', $branding, false );
+
+        // Tracking pixels (Ad platforms).
+        $tracking = array(
+            'google_ads_send_to'  => sanitize_text_field( wp_unslash( $_POST['google_ads_send_to'] ?? '' ) ),
+            'google_ads_value'    => sanitize_text_field( wp_unslash( $_POST['google_ads_value'] ?? '' ) ),
+            'google_ads_currency' => sanitize_text_field( wp_unslash( $_POST['google_ads_currency'] ?? 'USD' ) ),
+            'facebook_pixel_id'   => sanitize_text_field( wp_unslash( $_POST['facebook_pixel_id'] ?? '' ) ),
+            'facebook_event'      => sanitize_text_field( wp_unslash( $_POST['facebook_event'] ?? 'Lead' ) ),
+            'tiktok_pixel_id'     => sanitize_text_field( wp_unslash( $_POST['tiktok_pixel_id'] ?? '' ) ),
+            'tiktok_event'        => sanitize_text_field( wp_unslash( $_POST['tiktok_event'] ?? 'SubmitForm' ) ),
+        );
+        update_option( 'sfco_tracking', $tracking, false );
+
+        wp_safe_redirect( add_query_arg( array( 'page' => self::PAGE_SLUG, 'saved' => 1 ), admin_url( 'admin.php' ) ) );
+        exit;
     }
 
     public function render() {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
         }
-        $integrations = $this->integrations();
+
+        $notif    = class_exists( 'SFCO_Pro_Notifications' ) ? SFCO_Pro_Notifications::get_settings() : array();
+        $branding = (array) get_option( 'sfco_pro_branding', array() );
+        $tracking = (array) get_option( 'sfco_tracking', array() );
+
+        $gcal_connected = (string) get_option( 'sfco_gcal_refresh_token', '' ) !== '';
+        $gcal_class     = class_exists( 'SFCO_Pro_GCal' ) ? SFCO_Pro_GCal::get_instance() : null;
+        $gcal_oauth_url = $gcal_class ? $gcal_class->get_oauth_url() : '';
+
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'Smart Forms Settings', 'smart-forms-for-midland' ); ?></h1>
-            <p style="max-width:720px;color:#4B5563;font-size:15px;line-height:1.5;">
-                <?php esc_html_e( 'Every submission flows through this stack: the lead is saved, then automatically synced to your CRM, emailed via Resend, tracked for ads, and (for appointment forms) added to Google Calendar. Click Configure on each card to wire it up.', 'smart-forms-for-midland' ); ?>
-            </p>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px;margin-top:24px;">
-                <?php foreach ( $integrations as $slug => $info ) :
-                    $configured = is_callable( $info['status_check'] ) ? (bool) call_user_func( $info['status_check'] ) : null;
-                    $url        = add_query_arg( array( 'page' => $slug ), admin_url( 'admin.php' ) );
-                    ?>
-                    <div style="background:#fff;border:1px solid #d6e6dc;border-top:4px solid #2F8137;border-radius:8px;padding:22px;display:flex;flex-direction:column;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;">
-                            <h2 style="margin:0;font-size:18px;color:#0F1411;font-weight:800;"><?php echo esc_html( $info['label'] ); ?></h2>
-                            <?php if ( true === $configured ) : ?>
-                                <span style="background:#F3FCF4;color:#2F8137;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid #7CCE8E;"><?php esc_html_e( 'Connected', 'smart-forms-for-midland' ); ?></span>
-                            <?php elseif ( false === $configured ) : ?>
-                                <span style="background:#fdecec;color:#7a1d1d;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid #f1b4b4;"><?php esc_html_e( 'Not set up', 'smart-forms-for-midland' ); ?></span>
-                            <?php endif; ?>
-                        </div>
-                        <p style="margin:0 0 18px;color:#4B5563;font-size:14px;line-height:1.55;flex:1;"><?php echo esc_html( $info['description'] ); ?></p>
-                        <a href="<?php echo esc_url( $url ); ?>" class="button button-primary" style="align-self:flex-start;background:#43A94B;border-color:#43A94B;font-weight:700;">
-                            <?php echo true === $configured ? esc_html__( 'Manage', 'smart-forms-for-midland' ) : esc_html__( 'Configure', 'smart-forms-for-midland' ); ?>
-                        </a>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+            <?php if ( isset( $_GET['saved'] ) ) : ?>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-forms-for-midland' ); ?></p></div>
+            <?php endif; ?>
 
-            <p style="margin-top:32px;color:#6b8278;font-size:13px;">
-                <?php esc_html_e( 'Looking for Tracking (Google Ads / Meta / TikTok pixels)? That stayed in the sidebar as its own page so you can wire ad pixels without coming through here.', 'smart-forms-for-midland' ); ?>
-            </p>
+            <form method="post" action="">
+                <?php wp_nonce_field( 'sfco_unified_save', '_sfco_unified_nonce' ); ?>
+                <input type="hidden" name="sfco_unified_save" value="1">
+
+                <h2><?php esc_html_e( 'Form Notifications', 'smart-forms-for-midland' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Placeholders: {name} {email} {phone} {position} {form_title} {site_name} {entry_url} {fields}', 'smart-forms-for-midland' ); ?></p>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Admin notification', 'smart-forms-for-midland' ); ?></th>
+                        <td><label><input type="checkbox" name="admin_enabled" value="1" <?php checked( ! empty( $notif['admin_enabled'] ) ); ?>> <?php esc_html_e( 'Email a team member on every form submission', 'smart-forms-for-midland' ); ?></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="admin_to"><?php esc_html_e( 'Send to', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="admin_to" name="admin_to" class="regular-text" value="<?php echo esc_attr( $notif['admin_to'] ?? '' ); ?>"><p class="description"><?php esc_html_e( 'Comma- or space-separated emails.', 'smart-forms-for-midland' ); ?></p></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="admin_subject"><?php esc_html_e( 'Admin subject', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="admin_subject" name="admin_subject" class="large-text" value="<?php echo esc_attr( $notif['admin_subject'] ?? '' ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="admin_body"><?php esc_html_e( 'Admin body', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><textarea id="admin_body" name="admin_body" rows="6" class="large-text"><?php echo esc_textarea( $notif['admin_body'] ?? '' ); ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Auto-reply', 'smart-forms-for-midland' ); ?></th>
+                        <td><label><input type="checkbox" name="autoreply_enabled" value="1" <?php checked( ! empty( $notif['autoreply_enabled'] ) ); ?>> <?php esc_html_e( 'Email the submitter back to confirm receipt', 'smart-forms-for-midland' ); ?></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="autoreply_from_name"><?php esc_html_e( 'Auto-reply From name', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="autoreply_from_name" name="autoreply_from_name" class="regular-text" value="<?php echo esc_attr( $notif['autoreply_from_name'] ?? '' ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="autoreply_from_email"><?php esc_html_e( 'Auto-reply From email', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="email" id="autoreply_from_email" name="autoreply_from_email" class="regular-text" value="<?php echo esc_attr( $notif['autoreply_from_email'] ?? '' ); ?>"><p class="description"><?php esc_html_e( 'Must be on a domain authenticated in Resend.', 'smart-forms-for-midland' ); ?></p></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="autoreply_subject"><?php esc_html_e( 'Auto-reply subject', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="autoreply_subject" name="autoreply_subject" class="large-text" value="<?php echo esc_attr( $notif['autoreply_subject'] ?? '' ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="autoreply_body"><?php esc_html_e( 'Auto-reply body', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><textarea id="autoreply_body" name="autoreply_body" rows="8" class="large-text"><?php echo esc_textarea( $notif['autoreply_body'] ?? '' ); ?></textarea></td>
+                    </tr>
+                </table>
+
+                <h2><?php esc_html_e( 'Resend Email (SMTP)', 'smart-forms-for-midland' ); ?></h2>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Enable', 'smart-forms-for-midland' ); ?></th>
+                        <td><label><input type="checkbox" name="resend_enabled" value="1" <?php checked( (int) get_option( 'sfco_resend_enabled' ), 1 ); ?>> <?php esc_html_e( 'Route all WordPress emails through Resend', 'smart-forms-for-midland' ); ?></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="resend_api_key"><?php esc_html_e( 'API key', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="password" id="resend_api_key" name="resend_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_resend_api_key', '' ) ); ?>" autocomplete="off"><p class="description"><?php esc_html_e( 'resend.com → API Keys.', 'smart-forms-for-midland' ); ?></p></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="resend_from_name"><?php esc_html_e( 'From name', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="resend_from_name" name="resend_from_name" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_resend_from_name', get_bloginfo( 'name' ) ) ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="resend_from_email"><?php esc_html_e( 'From email', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="email" id="resend_from_email" name="resend_from_email" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_resend_from_email', get_option( 'admin_email' ) ) ); ?>"></td>
+                    </tr>
+                </table>
+
+                <h2><?php esc_html_e( 'ActiveCampaign CRM', 'smart-forms-for-midland' ); ?></h2>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><label for="crm_api_url"><?php esc_html_e( 'API URL', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="url" id="crm_api_url" name="crm_api_url" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_crm_api_url', '' ) ); ?>" placeholder="https://midland.api-us1.com"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="crm_api_key"><?php esc_html_e( 'API key', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="password" id="crm_api_key" name="crm_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_crm_api_key', '' ) ); ?>" autocomplete="off"><p class="description"><?php esc_html_e( 'AC Settings → Developer.', 'smart-forms-for-midland' ); ?></p></td>
+                    </tr>
+                </table>
+
+                <h2><?php esc_html_e( 'Google Calendar', 'smart-forms-for-midland' ); ?></h2>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Status', 'smart-forms-for-midland' ); ?></th>
+                        <td><?php if ( $gcal_connected ) : ?>
+                            <strong style="color:#2F8137;"><?php esc_html_e( 'Connected', 'smart-forms-for-midland' ); ?></strong>
+                            &nbsp;<a href="<?php echo esc_url( add_query_arg( array( 'page' => 'sfco-gcal' ), admin_url( 'admin.php' ) ) ); ?>"><?php esc_html_e( 'Manage / disconnect', 'smart-forms-for-midland' ); ?></a>
+                        <?php elseif ( $gcal_oauth_url ) : ?>
+                            <a href="<?php echo esc_url( $gcal_oauth_url ); ?>" class="button button-secondary"><?php esc_html_e( 'Connect with Google', 'smart-forms-for-midland' ); ?></a>
+                            <p class="description"><?php esc_html_e( 'Paste Client ID + Secret below and Save, then click Connect.', 'smart-forms-for-midland' ); ?></p>
+                        <?php else : ?>
+                            <em><?php esc_html_e( 'Add Client ID + Secret below and Save first.', 'smart-forms-for-midland' ); ?></em>
+                        <?php endif; ?></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="gcal_client_id"><?php esc_html_e( 'OAuth Client ID', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="gcal_client_id" name="gcal_client_id" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_gcal_client_id', '' ) ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="gcal_client_secret"><?php esc_html_e( 'OAuth Client Secret', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="password" id="gcal_client_secret" name="gcal_client_secret" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_gcal_client_secret', '' ) ); ?>" autocomplete="off"></td>
+                    </tr>
+                </table>
+
+                <h2><?php esc_html_e( 'Calendly', 'smart-forms-for-midland' ); ?></h2>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><label for="calendly_api_key"><?php esc_html_e( 'API key', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="password" id="calendly_api_key" name="calendly_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_calendly_api_key', '' ) ); ?>" autocomplete="off"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="calendly_signing_key"><?php esc_html_e( 'Webhook signing key', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="calendly_signing_key" name="calendly_signing_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_calendly_signing_key', '' ) ); ?>"></td>
+                    </tr>
+                </table>
+
+                <h2><?php esc_html_e( 'Branding', 'smart-forms-for-midland' ); ?></h2>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><label for="branding_primary_color"><?php esc_html_e( 'Primary color', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="branding_primary_color" name="branding_primary_color" value="<?php echo esc_attr( $branding['primary_color'] ?? '#2F8137' ); ?>" placeholder="#2F8137"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="branding_logo_url"><?php esc_html_e( 'Logo URL', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="url" id="branding_logo_url" name="branding_logo_url" class="regular-text" value="<?php echo esc_attr( $branding['logo_url'] ?? '' ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="branding_thank_you"><?php esc_html_e( 'Thank-you message', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><textarea id="branding_thank_you" name="branding_thank_you" rows="3" class="large-text"><?php echo esc_textarea( $branding['thank_you'] ?? '' ); ?></textarea></td>
+                    </tr>
+                </table>
+
+                <h2><?php esc_html_e( 'Tracking (Ad Pixels)', 'smart-forms-for-midland' ); ?></h2>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><label for="google_ads_send_to"><?php esc_html_e( 'Google Ads conversion send-to', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="google_ads_send_to" name="google_ads_send_to" class="regular-text" value="<?php echo esc_attr( $tracking['google_ads_send_to'] ?? '' ); ?>" placeholder="AW-1234567/abcDEFgh"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="google_ads_value"><?php esc_html_e( 'Conversion value', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="google_ads_value" name="google_ads_value" value="<?php echo esc_attr( $tracking['google_ads_value'] ?? '' ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="google_ads_currency"><?php esc_html_e( 'Conversion currency', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="google_ads_currency" name="google_ads_currency" value="<?php echo esc_attr( $tracking['google_ads_currency'] ?? 'USD' ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="facebook_pixel_id"><?php esc_html_e( 'Meta Pixel ID', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="facebook_pixel_id" name="facebook_pixel_id" value="<?php echo esc_attr( $tracking['facebook_pixel_id'] ?? '' ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="tiktok_pixel_id"><?php esc_html_e( 'TikTok Pixel ID', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="text" id="tiktok_pixel_id" name="tiktok_pixel_id" value="<?php echo esc_attr( $tracking['tiktok_pixel_id'] ?? '' ); ?>"></td>
+                    </tr>
+                </table>
+
+                <p class="submit"><button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-for-midland' ); ?></button></p>
+            </form>
         </div>
         <?php
     }
