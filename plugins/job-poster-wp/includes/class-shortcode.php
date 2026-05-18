@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class DPJP_Shortcode {
 
     public static function register(): void {
-        add_shortcode( 'dpjp_jobs', [ __CLASS__, 'render_jobs' ] );
-        add_shortcode( 'dpjp_job',  [ __CLASS__, 'render_single' ] );
-        add_action( 'admin_menu',   [ __CLASS__, 'menu' ] );
+        add_shortcode( 'dpjp_jobs',  [ __CLASS__, 'render_jobs' ] );
+        add_shortcode( 'dpjp_job',   [ __CLASS__, 'render_single' ] );
+        add_action( 'admin_menu',    [ __CLASS__, 'menu' ] );
     }
 
     public static function menu(): void {
@@ -200,7 +200,17 @@ class DPJP_Shortcode {
                 $job->ID, $title
             );
         }
-        $url = class_exists( 'DPJP_Application' ) ? DPJP_Application::apply_url( $job->ID ) : get_permalink( $job );
+        // Prefer the single /apply/ page that hosts the Midland Smart Forms
+        // [sfco_apply] shortcode so every job routes through one application
+        // form. Falls back to the in plugin DPJP_Application flow (or the
+        // job permalink as a last resort) when the apply page hasn't been
+        // created yet (e.g. on a fresh install before the one click setup).
+        $apply_page = get_page_by_path( 'apply', OBJECT, 'page' );
+        if ( $apply_page instanceof WP_Post ) {
+            $url = add_query_arg( 'job', $job->post_name, get_permalink( $apply_page ) );
+        } else {
+            $url = class_exists( 'DPJP_Application' ) ? DPJP_Application::apply_url( $job->ID ) : get_permalink( $job );
+        }
         return sprintf(
             '<a href="%s" style="display:inline-block;background:#0073aa;color:#fff;padding:10px 20px;border-radius:4px;text-decoration:none;font-weight:bold;text-align:center;">Apply Now</a>',
             esc_url( $url )
