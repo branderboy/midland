@@ -29,12 +29,46 @@ class WGB_Settings {
 	/**
 	 * Return the 32-byte key used to encrypt/decrypt stored secrets.
 	 *
-	 * Derives from wp_salt( 'auth' ). This is NOT a HSM-grade
-	 * protection — anyone with filesystem access can read the salt —
-	 * but it is real encryption at-rest and prevents casual exposure
-	 * via a leaked database dump.
+	 * Pre-3.6.4 the key was derived from wp_salt( 'auth' ). Security
+	 * plugins (Wordfence, iThemes, Solid Security, etc.) rotate
+	 * WordPress salts on a schedule, which silently invalidated every
+	 * AES-encrypted token in the database — the UI still showed
+	 * "Token is saved" because the raw bytes were intact, but decrypt
+	 * returned empty and every GitHub API call failed.
+	 *
+	 * The key now lives in a non-autoloaded wp_options row, generated
+	 * once with random_bytes(). Salt rotations no longer affect it,
+	 * and the threat model is unchanged from the salt-derived version
+	 * — anyone with database access already had read access to the
+	 * encrypted payloads next to the key.
+	 *
+	 * Legacy values encrypted with the salt-derived key still decrypt
+	 * via legacy_key() below.
 	 */
 	private static function key() {
+		$stored = get_option( 'wgb_encryption_key', '' );
+		if ( ! is_string( $stored ) || '' === $stored ) {
+			if ( function_exists( 'random_bytes' ) ) {
+				$raw = random_bytes( 32 );
+			} elseif ( function_exists( 'openssl_random_pseudo_bytes' ) ) {
+				$raw = openssl_random_pseudo_bytes( 32 );
+			} else {
+				$raw = hash( 'sha256', wp_salt( 'auth' ) . '|wp-github-backup|v4|' . microtime( true ), true );
+			}
+			$stored = base64_encode( $raw );
+			update_option( 'wgb_encryption_key', $stored, false );
+			return $raw;
+		}
+		$decoded = base64_decode( $stored, true );
+		return ( false !== $decoded && 32 === strlen( $decoded ) ) ? $decoded : hash( 'sha256', $stored, true );
+	}
+
+	/**
+	 * Pre-3.6.4 wp_salt-derived key, retained so values encrypted with
+	 * it still decrypt after upgrading. Successful legacy decryptions
+	 * are re-encrypted lazily by the save_* paths.
+	 */
+	private static function legacy_key() {
 		return hash( 'sha256', wp_salt( 'auth' ) . '|wp-github-backup|v3', true );
 	}
 
@@ -82,7 +116,14 @@ class WGB_Settings {
 			}
 			$iv     = substr( $raw, 0, 16 );
 			$cipher = substr( $raw, 16 );
-			$plain  = openssl_decrypt( $cipher, self::CIPHER, self::key(), OPENSSL_RAW_DATA, $iv );
+			// Try the current stable DB-stored key first, then the legacy
+			// wp_salt-derived key so tokens encrypted before 3.6.4 (or
+			// before salt rotation) still decrypt cleanly. The save_* paths
+			// will re-encrypt with the current key on the next save.
+			$plain = openssl_decrypt( $cipher, self::CIPHER, self::key(), OPENSSL_RAW_DATA, $iv );
+			if ( false === $plain ) {
+				$plain = openssl_decrypt( $cipher, self::CIPHER, self::legacy_key(), OPENSSL_RAW_DATA, $iv );
+			}
 			return false === $plain ? '' : $plain;
 		}
 		if ( 0 === strpos( $value, self::B64_PREFIX ) ) {
