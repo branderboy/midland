@@ -48,33 +48,89 @@ class SFCO_Shortcode {
                     <label for="customer_phone"><?php esc_html_e( 'Phone', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
                     <input type="tel" name="customer_phone" id="customer_phone" required>
                 </div>
-                
+
                 <div class="form-row">
-                    <label for="project_type"><?php esc_html_e( 'Project Type', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
+                    <label><?php esc_html_e( 'Commercial or residential?', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
+                    <div style="display:flex;gap:18px;margin-top:4px;">
+                        <label style="font-weight:400;"><input type="radio" name="property_type" value="commercial" required> <?php esc_html_e( 'Commercial', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;"><input type="radio" name="property_type" value="residential"> <?php esc_html_e( 'Residential', 'smart-forms-for-midland' ); ?></label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label><?php esc_html_e( 'What brings you to Midland?', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="emergency" required> <?php esc_html_e( 'Emergency — I need help now', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="book_visit" checked> <?php esc_html_e( 'Book a visit — come see the space and quote', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="future_project"> <?php esc_html_e( 'Planning a future project (commercial)', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="research"> <?php esc_html_e( 'Just researching for now', 'smart-forms-for-midland' ); ?></label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="project_type"><?php esc_html_e( 'What service?', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
                     <select name="project_type" id="project_type" required>
-                        <option value=""><?php esc_html_e( 'Select...', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Residential Carpet Cleaning"><?php esc_html_e( 'Residential Carpet Cleaning', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Commercial Carpet Care"><?php esc_html_e( 'Commercial Carpet Care', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Commercial Floor Stripping & Wax"><?php esc_html_e( 'Commercial Floor Stripping & Wax', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Tile & Grout Cleaning"><?php esc_html_e( 'Tile & Grout Cleaning', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Water Damage Restoration"><?php esc_html_e( 'Water Damage Restoration', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Concrete Polishing"><?php esc_html_e( 'Concrete Polishing', 'smart-forms-for-midland' ); ?></option>
+                        <option value="" data-segment="both"><?php esc_html_e( 'Select...', 'smart-forms-for-midland' ); ?></option>
+                        <!-- Residential services (carpet cleaning + carpet installation only). -->
+                        <option value="Carpet Cleaning" data-segment="both"><?php esc_html_e( 'Carpet Cleaning', 'smart-forms-for-midland' ); ?></option>
+                        <option value="Carpet Installation" data-segment="residential"><?php esc_html_e( 'Carpet Installation', 'smart-forms-for-midland' ); ?></option>
+                        <!-- Commercial-only services. -->
+                        <option value="Tile & Grout Cleaning"    data-segment="commercial"><?php esc_html_e( 'Tile &amp; Grout Cleaning',    'smart-forms-for-midland' ); ?></option>
+                        <option value="Floor Stripping & Wax"     data-segment="commercial"><?php esc_html_e( 'Floor Stripping &amp; Wax',     'smart-forms-for-midland' ); ?></option>
+                        <option value="Hardwood Floor Care"       data-segment="commercial"><?php esc_html_e( 'Hardwood Floor Care',         'smart-forms-for-midland' ); ?></option>
+                        <option value="Concrete Polishing"        data-segment="commercial"><?php esc_html_e( 'Concrete Polishing',          'smart-forms-for-midland' ); ?></option>
+                        <option value="Upholstery Cleaning"       data-segment="commercial"><?php esc_html_e( 'Upholstery Cleaning',         'smart-forms-for-midland' ); ?></option>
+                        <option value="Water Damage Restoration"  data-segment="commercial"><?php esc_html_e( 'Water Damage Restoration',    'smart-forms-for-midland' ); ?></option>
+                        <option value="Other / Not sure"          data-segment="both"><?php esc_html_e( 'Other / Not sure', 'smart-forms-for-midland' ); ?></option>
                     </select>
                 </div>
-                
+
+                <script>
+                /* Filter the service dropdown by selected property_type.
+                   Residential only does carpet cleaning + carpet installation;
+                   commercial gets the full list. Hidden options are still
+                   in the DOM so search-engine bots see them and form re
+                   selections work cleanly if the visitor changes property
+                   type after picking a service. */
+                (function () {
+                    var form = document.getElementById('smart-forms-quote-form');
+                    if (!form) return;
+                    var select = form.querySelector('select[name="project_type"]');
+                    if (!select) return;
+                    var options = select.querySelectorAll('option');
+                    function filter() {
+                        var checked = form.querySelector('input[name="property_type"]:checked');
+                        var seg = checked ? checked.value : '';
+                        options.forEach(function (opt) {
+                            var allowed = opt.getAttribute('data-segment') || 'both';
+                            var show = (allowed === 'both') || (allowed === seg) || !seg;
+                            opt.hidden = !show;
+                            opt.disabled = !show;
+                            if (!show && select.value === opt.value && opt.value !== '') {
+                                select.value = '';
+                            }
+                        });
+                    }
+                    form.addEventListener('change', function (e) {
+                        if (e.target && e.target.name === 'property_type') filter();
+                    });
+                    filter();
+                })();
+                </script>
+
                 <div class="form-row">
-                    <label for="square_footage"><?php esc_html_e( 'Square Footage', 'smart-forms-for-midland' ); ?></label>
-                    <input type="number" name="square_footage" id="square_footage" min="1">
+                    <label for="square_footage"><?php esc_html_e( 'Square footage (approx.)', 'smart-forms-for-midland' ); ?></label>
+                    <input type="number" name="square_footage" id="square_footage" min="1" placeholder="<?php esc_attr_e( 'Skip if you\'re not sure', 'smart-forms-for-midland' ); ?>">
                 </div>
-                
+
                 <div class="form-row">
-                    <label for="timeline"><?php esc_html_e( 'Timeline', 'smart-forms-for-midland' ); ?></label>
+                    <label for="timeline"><?php esc_html_e( 'How soon?', 'smart-forms-for-midland' ); ?></label>
                     <select name="timeline" id="timeline">
                         <option value=""><?php esc_html_e( 'Select...', 'smart-forms-for-midland' ); ?></option>
-                        <option value="ASAP"><?php esc_html_e( 'ASAP', 'smart-forms-for-midland' ); ?></option>
-                        <option value="This Week"><?php esc_html_e( 'This Week', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Within 2 Weeks"><?php esc_html_e( 'Within 2 Weeks', 'smart-forms-for-midland' ); ?></option>
-                        <option value="Next Month"><?php esc_html_e( 'Next Month', 'smart-forms-for-midland' ); ?></option>
+                        <option value="ASAP"><?php esc_html_e( 'ASAP (this week)', 'smart-forms-for-midland' ); ?></option>
+                        <option value="This Month"><?php esc_html_e( 'This month', 'smart-forms-for-midland' ); ?></option>
+                        <option value="Within 3 Months"><?php esc_html_e( 'Within 3 months', 'smart-forms-for-midland' ); ?></option>
+                        <option value="Just Exploring"><?php esc_html_e( 'Just exploring', 'smart-forms-for-midland' ); ?></option>
                     </select>
                 </div>
                 

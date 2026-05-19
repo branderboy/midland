@@ -107,10 +107,39 @@ class SCRM_Pro_AC_Export {
                 || $service_type === 'water-damage'
                 || stripos( $project_raw, 'emergency' ) !== false
                 || stripos( $project_raw, 'urgent' )    !== false;
-            $is_commercial = stripos( $project_raw, 'commercial' ) !== false;
-            $segment       = $is_commercial ? 'commercial' : 'residential';
-            $zip           = (string) ( $r->zip_code ?? '' );
-            $area          = $this->area_from_zip( $zip );
+            // Segment now comes from the form's explicit property_type
+            // radio (Commercial / Residential). Old leads without the
+            // field fall back to a best guess from project_type so
+            // historic exports don't lose context.
+            $prop = strtolower( (string) ( $r->property_type ?? '' ) );
+            if ( '' !== $prop ) {
+                $segment = ( 'commercial' === $prop ) ? 'commercial' : 'residential';
+            } else {
+                $segment = ( stripos( $project_raw, 'commercial' ) !== false ) ? 'commercial' : 'residential';
+            }
+
+            // Intent comes from the form's lead_intent radio. Values:
+            //   emergency       → urgent on-site response
+            //   book_visit      → standard on-site evaluation (default)
+            //   future_project  → commercial planning, long horizon
+            //   research        → educational drip only, no visit yet
+            // Legacy 'book_now' / 'need_quote' are mapped to book_visit
+            // since both flows ended in "come see the space first".
+            $intent_raw = strtolower( (string) ( $r->lead_intent ?? '' ) );
+            if ( in_array( $intent_raw, array( 'book_now', 'need_quote' ), true ) ) {
+                $intent_raw = 'book_visit';
+            }
+            $allowed_intents = array( 'emergency', 'book_visit', 'future_project', 'research' );
+            $intent          = in_array( $intent_raw, $allowed_intents, true ) ? $intent_raw : 'unknown';
+
+            // Intent 'emergency' is the strongest emergency signal,
+            // stronger than service-type or message-text hints.
+            if ( 'emergency' === $intent ) {
+                $is_emergency = true;
+            }
+
+            $zip  = (string) ( $r->zip_code ?? '' );
+            $area = $this->area_from_zip( $zip );
 
             // Tag stack: each tag drives a separate AC condition. The
             // operator picks one tag per automation. Goal: AC can route
@@ -119,6 +148,7 @@ class SCRM_Pro_AC_Export {
             $tags = array(
                 'midland-segment-new-lead',
                 'midland-segment-new-lead-' . $segment,
+                'midland-intent-' . str_replace( '_', '-', $intent ),
                 'midland-area-' . $area,
                 'midland-service-' . $service_type,
             );
