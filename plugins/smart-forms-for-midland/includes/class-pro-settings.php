@@ -133,6 +133,31 @@ class SFCO_Pro_Settings {
         $gcal_class     = class_exists( 'SFCO_Pro_GCal' ) ? SFCO_Pro_GCal::get_instance() : null;
         $gcal_oauth_url = $gcal_class ? $gcal_class->get_oauth_url() : '';
 
+        $tabs = array(
+            'notifications' => __( 'Notifications', 'smart-forms-for-midland' ),
+            'email'         => __( 'Email',         'smart-forms-for-midland' ),
+            'crm'           => __( 'CRM',           'smart-forms-for-midland' ),
+            'gcal'          => __( 'Google Calendar','smart-forms-for-midland' ),
+            'calendly'      => __( 'Calendly',      'smart-forms-for-midland' ),
+            'branding'      => __( 'Branding',      'smart-forms-for-midland' ),
+            'tracking'      => __( 'Tracking',      'smart-forms-for-midland' ),
+        );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only routing
+        $active = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'notifications';
+        if ( ! isset( $tabs[ $active ] ) ) {
+            $active = 'notifications';
+        }
+        $tab_url = function ( $slug ) {
+            return add_query_arg( array( 'page' => self::PAGE_SLUG, 'tab' => $slug ), admin_url( 'admin.php' ) );
+        };
+
+        // Every section renders, but only the active one is visible.
+        // Hidden sections still POST their inputs so the single Save
+        // Settings button at the bottom updates every option in one
+        // request — switching tabs never loses unsaved edits.
+        $hide = function ( $slug ) use ( $active ) {
+            return $slug === $active ? '' : 'style="display:none;"';
+        };
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'Smart Forms Settings', 'smart-forms-for-midland' ); ?></h1>
@@ -141,11 +166,17 @@ class SFCO_Pro_Settings {
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
 
+            <h2 class="nav-tab-wrapper">
+                <?php foreach ( $tabs as $slug => $label ) : ?>
+                    <a class="nav-tab <?php echo $slug === $active ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $tab_url( $slug ) ); ?>"><?php echo esc_html( $label ); ?></a>
+                <?php endforeach; ?>
+            </h2>
+
             <form method="post" action="">
                 <?php wp_nonce_field( 'sfco_unified_save', '_sfco_unified_nonce' ); ?>
                 <input type="hidden" name="sfco_unified_save" value="1">
 
-                <h2><?php esc_html_e( 'Form Notifications', 'smart-forms-for-midland' ); ?></h2>
+                <div class="sfco-tab sfco-tab-notifications" <?php echo $hide( 'notifications' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>                <h2><?php esc_html_e( 'Form Notifications', 'smart-forms-for-midland' ); ?></h2>
                 <p class="description"><?php esc_html_e( 'Placeholders: {name} {email} {phone} {position} {form_title} {site_name} {entry_url} {fields}', 'smart-forms-for-midland' ); ?></p>
                 <table class="form-table" role="presentation">
                     <tr>
@@ -186,7 +217,10 @@ class SFCO_Pro_Settings {
                     </tr>
                 </table>
 
-                <h2><?php esc_html_e( 'Resend Email (SMTP)', 'smart-forms-for-midland' ); ?></h2>
+                </div><!-- /.sfco-tab-notifications -->
+                <div class="sfco-tab sfco-tab-email" <?php echo $hide( 'email' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+                <h2><?php esc_html_e( 'Resend Email', 'smart-forms-for-midland' ); ?></h2>
+                <p class="description" style="margin:0 0 8px;"><?php esc_html_e( 'Every wp_mail goes through Resend\'s HTTPS API. Skips SMTP entirely so cPanel firewalls blocking ports 465/587 don\'t matter.', 'smart-forms-for-midland' ); ?></p>
                 <table class="form-table" role="presentation">
                     <tr>
                         <th scope="row"><?php esc_html_e( 'Enable', 'smart-forms-for-midland' ); ?></th>
@@ -206,6 +240,8 @@ class SFCO_Pro_Settings {
                     </tr>
                 </table>
 
+                </div><!-- /.sfco-tab-email -->
+                <div class="sfco-tab sfco-tab-crm" <?php echo $hide( 'crm' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
                 <h2><?php esc_html_e( 'ActiveCampaign CRM', 'smart-forms-for-midland' ); ?></h2>
                 <table class="form-table" role="presentation">
                     <tr>
@@ -218,6 +254,8 @@ class SFCO_Pro_Settings {
                     </tr>
                 </table>
 
+                </div><!-- /.sfco-tab-crm -->
+                <div class="sfco-tab sfco-tab-gcal" <?php echo $hide( 'gcal' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
                 <h2><?php esc_html_e( 'Google Calendar', 'smart-forms-for-midland' ); ?></h2>
                 <table class="form-table" role="presentation">
                     <tr>
@@ -242,6 +280,8 @@ class SFCO_Pro_Settings {
                     </tr>
                 </table>
 
+                </div><!-- /.sfco-tab-gcal -->
+                <div class="sfco-tab sfco-tab-calendly" <?php echo $hide( 'calendly' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
                 <h2><?php esc_html_e( 'Calendly', 'smart-forms-for-midland' ); ?></h2>
                 <table class="form-table" role="presentation">
                     <tr>
@@ -250,6 +290,8 @@ class SFCO_Pro_Settings {
                     </tr>
                 </table>
 
+                </div><!-- /.sfco-tab-calendly -->
+                <div class="sfco-tab sfco-tab-branding" <?php echo $hide( 'branding' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
                 <h2><?php esc_html_e( 'Branding', 'smart-forms-for-midland' ); ?></h2>
                 <table class="form-table" role="presentation">
                     <tr>
@@ -266,6 +308,8 @@ class SFCO_Pro_Settings {
                     </tr>
                 </table>
 
+                </div><!-- /.sfco-tab-branding -->
+                <div class="sfco-tab sfco-tab-tracking" <?php echo $hide( 'tracking' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
                 <h2><?php esc_html_e( 'Tracking (Ad Pixels)', 'smart-forms-for-midland' ); ?></h2>
                 <table class="form-table" role="presentation">
                     <tr>
@@ -289,6 +333,8 @@ class SFCO_Pro_Settings {
                         <td><input type="text" id="tiktok_pixel_id" name="tiktok_pixel_id" value="<?php echo esc_attr( $tracking['tiktok_pixel_id'] ?? '' ); ?>"></td>
                     </tr>
                 </table>
+
+                </div><!-- /.sfco-tab-tracking -->
 
                 <p class="submit"><button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-for-midland' ); ?></button></p>
             </form>

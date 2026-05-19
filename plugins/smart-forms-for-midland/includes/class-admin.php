@@ -13,6 +13,7 @@ class SFCO_Admin {
         add_action( 'admin_menu', array( $this, 'add_menu_pages' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
         add_action( 'wp_ajax_sfco_save_form_fields', array( $this, 'ajax_save_form_fields' ) );
+        add_action( 'admin_init', array( $this, 'maybe_export_csv' ) );
     }
     
     public function add_menu_pages() {
@@ -32,6 +33,14 @@ class SFCO_Admin {
             'manage_options',
             'smart-forms',
             array( $this, 'render_forms_page' )
+        );
+        add_submenu_page(
+            'smart-forms',
+            esc_html__( 'New Form', 'smart-forms-for-midland' ),
+            esc_html__( 'New Form', 'smart-forms-for-midland' ),
+            'manage_options',
+            'smart-forms-new',
+            array( $this, 'handle_new_form' )
         );
         add_submenu_page(
             'smart-forms',
@@ -290,9 +299,13 @@ class SFCO_Admin {
         if ( isset( $_POST['sfco_save_form'] ) && check_admin_referer( 'sfco_save_form' ) ) {
             $settings = json_decode( $form->settings_json ?: '{}', true );
             if ( ! is_array( $settings ) ) $settings = array();
-            $settings['notify_email'] = sanitize_email( wp_unslash( $_POST['notify_email'] ?? '' ) );
-            $settings['confirmation'] = sanitize_textarea_field( wp_unslash( $_POST['confirmation'] ?? '' ) );
-            $settings['crm_push']     = isset( $_POST['crm_push'] );
+            $settings['notify_email']      = sanitize_email( wp_unslash( $_POST['notify_email'] ?? '' ) );
+            $settings['confirmation']      = wp_kses_post( wp_unslash( $_POST['confirmation'] ?? '' ) );
+            $settings['confirmation_type'] = in_array( ( $_POST['confirmation_type'] ?? 'message' ), array( 'message', 'redirect', 'page' ), true ) ? sanitize_text_field( wp_unslash( $_POST['confirmation_type'] ) ) : 'message';
+            $settings['redirect_url']      = esc_url_raw( wp_unslash( $_POST['redirect_url'] ?? '' ) );
+            $settings['redirect_page_id']  = absint( $_POST['redirect_page_id'] ?? 0 );
+            $settings['honeypot']          = isset( $_POST['honeypot'] ) ? 1 : 0;
+            $settings['crm_push']          = isset( $_POST['crm_push'] );
             $settings['webhook']      = array(
                 'url'    => esc_url_raw( wp_unslash( $_POST['webhook_url'] ?? '' ) ),
                 'method' => in_array( ( $_POST['webhook_method'] ?? 'POST' ), array( 'POST', 'PUT', 'PATCH', 'GET', 'DELETE' ), true ) ? sanitize_text_field( wp_unslash( $_POST['webhook_method'] ) ) : 'POST',
@@ -439,10 +452,45 @@ class SFCO_Admin {
                             </td>
                         </tr>
                         <tr>
+                            <th><?php esc_html_e( 'After submit', 'smart-forms-for-midland' ); ?></th>
+                            <td>
+                                <?php $ctype = $settings['confirmation_type'] ?? 'message'; ?>
+                                <label style="display:block;margin-bottom:6px;"><input type="radio" name="confirmation_type" value="message" <?php checked( $ctype, 'message' ); ?>> <?php esc_html_e( 'Show a confirmation message', 'smart-forms-for-midland' ); ?></label>
+                                <label style="display:block;margin-bottom:6px;"><input type="radio" name="confirmation_type" value="redirect" <?php checked( $ctype, 'redirect' ); ?>> <?php esc_html_e( 'Redirect to a URL', 'smart-forms-for-midland' ); ?></label>
+                                <label style="display:block;"><input type="radio" name="confirmation_type" value="page" <?php checked( $ctype, 'page' ); ?>> <?php esc_html_e( 'Send to a WordPress page', 'smart-forms-for-midland' ); ?></label>
+                            </td>
+                        </tr>
+                        <tr>
                             <th><?php esc_html_e( 'Confirmation message', 'smart-forms-for-midland' ); ?></th>
                             <td>
                                 <textarea name="confirmation" rows="3" class="large-text"><?php echo esc_textarea( $settings['confirmation'] ?? '' ); ?></textarea>
-                                <p class="description"><?php esc_html_e( 'Shown to the visitor after they submit. HTML allowed.', 'smart-forms-for-midland' ); ?></p>
+                                <p class="description"><?php esc_html_e( 'Shown when "Show a confirmation message" is selected. HTML allowed.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="redirect_url"><?php esc_html_e( 'Redirect URL', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <input type="url" id="redirect_url" name="redirect_url" class="regular-text" value="<?php echo esc_attr( $settings['redirect_url'] ?? '' ); ?>" placeholder="https://midlandfloors.com/thank-you/">
+                                <p class="description"><?php esc_html_e( 'Used when "Redirect to a URL" is selected.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="redirect_page_id"><?php esc_html_e( 'Thank-you page', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <?php wp_dropdown_pages( array(
+                                    'name'              => 'redirect_page_id',
+                                    'id'                => 'redirect_page_id',
+                                    'selected'          => $settings['redirect_page_id'] ?? 0,
+                                    'show_option_none'  => __( '— Select a page —', 'smart-forms-for-midland' ),
+                                    'option_none_value' => 0,
+                                ) ); ?>
+                                <p class="description"><?php esc_html_e( 'Used when "Send to a WordPress page" is selected.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?php esc_html_e( 'Spam protection', 'smart-forms-for-midland' ); ?></th>
+                            <td>
+                                <label><input type="checkbox" name="honeypot" <?php checked( ! empty( $settings['honeypot'] ) ); ?>> <?php esc_html_e( 'Enable honeypot (silently rejects bots that fill the hidden field)', 'smart-forms-for-midland' ); ?></label>
                             </td>
                         </tr>
                         <tr>
@@ -695,8 +743,13 @@ class SFCO_Admin {
 
         $shortcode_url = admin_url( 'admin.php?page=smart-forms-shortcodes' );
         ?>
+        <?php
+        $csv_url = wp_nonce_url( admin_url( 'admin.php?page=smart-forms-leads&sfco_export=csv' ), 'sfco_export_csv' );
+        ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Midland Smart Forms — Leads', 'smart-forms-for-midland' ); ?></h1>
+            <h1 class="wp-heading-inline"><?php esc_html_e( 'All Entries', 'smart-forms-for-midland' ); ?></h1>
+            <a href="<?php echo esc_url( $csv_url ); ?>" class="page-title-action"><?php esc_html_e( 'Export CSV', 'smart-forms-for-midland' ); ?></a>
+            <hr class="wp-header-end">
 
             <?php if ( empty( $leads ) ) : ?>
                 <div style="background:#fff;border:1px dashed #c3c4c7;border-radius:6px;padding:32px 28px;max-width:760px;margin:24px 0;">
@@ -776,6 +829,71 @@ class SFCO_Admin {
             </table>
         </div>
         <?php
+    }
+
+    /**
+     * "New Form" submenu — creates a blank draft form and drops the
+     * operator straight into the builder. Gravity's New Form opens a
+     * modal; we skip the modal because the editor's first tab IS the
+     * field builder, so they're one step away from adding fields.
+     */
+    public function handle_new_form() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( 'No.' );
+        }
+        $form_id = SFCO_Database::create_form( array(
+            'title'         => 'Untitled Form',
+            'slug'          => 'form-' . wp_generate_password( 6, false, false ),
+            'status'        => 'inactive',
+            'fields_json'   => '[]',
+            'settings_json' => wp_json_encode( array(
+                'confirmation_type' => 'message',
+                'confirmation'      => 'Thanks! We received your message and will respond within one business day.',
+                'redirect_url'      => '',
+                'redirect_page_id'  => 0,
+                'honeypot'          => 1,
+            ) ),
+        ) );
+        if ( ! $form_id ) {
+            wp_die( 'Could not create form.' );
+        }
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-forms-edit-form&form_id=' . $form_id ) );
+        exit;
+    }
+
+    /**
+     * CSV export of entries. Hooked off an explicit GET on the leads
+     * page so the operator can pull a flat file for spreadsheets /
+     * external tools / a manual CRM dump.
+     */
+    public function maybe_export_csv() {
+        if ( ! is_admin() || empty( $_GET['sfco_export'] ) || 'csv' !== $_GET['sfco_export'] ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( 'No.' );
+        }
+        check_admin_referer( 'sfco_export_csv' );
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'sfco_leads';
+        $rows  = (array) $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id DESC LIMIT 5000", ARRAY_A ); // phpcs:ignore
+
+        nocache_headers();
+        header( 'Content-Type: text/csv; charset=UTF-8' );
+        header( 'Content-Disposition: attachment; filename=smart-forms-entries-' . gmdate( 'Y-m-d' ) . '.csv' );
+
+        $out = fopen( 'php://output', 'w' );
+        if ( $rows ) {
+            fputcsv( $out, array_keys( $rows[0] ) );
+            foreach ( $rows as $r ) {
+                fputcsv( $out, $r );
+            }
+        } else {
+            fputcsv( $out, array( 'no entries yet' ) );
+        }
+        fclose( $out );
+        exit;
     }
 
     /**

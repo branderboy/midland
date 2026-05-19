@@ -30,6 +30,7 @@ class SFCO_Shortcode {
         <div class="smart-forms-wrapper">
             <form id="smart-forms-quote-form" class="smart-forms-form" enctype="multipart/form-data">
                 <?php wp_nonce_field( 'sfco_submit', '_wpnonce', false ); ?>
+                <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true"><label>Leave this field blank<input type="text" name="sfco_hp_token" tabindex="-1" autocomplete="off"></label></div>
                 
                 <h2><?php echo esc_html( $atts['title'] ); ?></h2>
                 
@@ -146,6 +147,7 @@ class SFCO_Shortcode {
         <div class="smart-forms-wrapper">
             <form id="smart-forms-quote-form" class="smart-forms-form" enctype="multipart/form-data">
                 <?php wp_nonce_field( 'sfco_submit', '_wpnonce', false ); ?>
+                <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true"><label>Leave this field blank<input type="text" name="sfco_hp_token" tabindex="-1" autocomplete="off"></label></div>
                 <input type="hidden" name="form_type" value="job_application">
 
                 <h2><?php echo esc_html( $atts['title'] ); ?></h2>

@@ -17,9 +17,18 @@ class Smart_Forms_Handler {
     public function handle_submission() {
         // CRITICAL FIX: Sanitize nonce BEFORE verification
         $nonce = isset( $_POST['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ) : '';
-        
+
         if ( ! wp_verify_nonce( $nonce, 'sfco_submit' ) ) {
             wp_send_json_error( array( 'message' => esc_html__( 'Security check failed', 'smart-forms-for-midland' ) ) );
+        }
+
+        // Honeypot — every form's shortcode renders a hidden field named
+        // sfco_hp_token. Real users never fill it; bots fill every
+        // visible input. If the field has any value, silently treat the
+        // submission as accepted (return success) so the bot doesn't
+        // retry with a different strategy, but skip every side effect.
+        if ( ! empty( $_POST['sfco_hp_token'] ) ) {
+            wp_send_json_success( array( 'message' => 'OK' ) );
         }
         
         // Validate required fields
