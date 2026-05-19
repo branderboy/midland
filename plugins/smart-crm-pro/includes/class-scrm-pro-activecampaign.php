@@ -831,7 +831,7 @@ class SCRM_Pro_ActiveCampaign {
         update_option( self::OPT_STAGE_LOST,   absint( $_POST['ac_stage_lost']   ?? 0 ) );
         update_option( self::OPT_AUTO_TASKS,   isset( $_POST['ac_auto_tasks'] ) ? 1 : 0 );
 
-        wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&saved=1' ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&saved=1' ) );
         exit;
     }
 
@@ -848,7 +848,7 @@ class SCRM_Pro_ActiveCampaign {
         $api_key = (string) get_option( self::OPT_API_KEY, '' );
 
         if ( '' === $api_url || '' === $api_key ) {
-            wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&test=missing' ) );
+            wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&test=missing' ) );
             exit;
         }
 
@@ -859,7 +859,7 @@ class SCRM_Pro_ActiveCampaign {
 
         $code = is_wp_error( $response ) ? 0 : (int) wp_remote_retrieve_response_code( $response );
         $key  = 200 === $code ? 'ok' : 'fail';
-        wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&test=' . $key ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&test=' . $key ) );
         exit;
     }
 
