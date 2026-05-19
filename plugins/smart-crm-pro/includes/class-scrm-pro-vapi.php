@@ -196,9 +196,9 @@ class SCRM_Pro_Vapi {
                         <td><label><input type="checkbox" name="vapi_enabled" value="1" <?php checked( $enabled, 1 ); ?>> <?php esc_html_e( 'Fire an outbound Vapi call on every new lead', 'smart-crm-pro' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th><label for="vapi_api_key"><?php esc_html_e( 'Vapi API key', 'smart-crm-pro' ); ?></label></th>
+                        <th><label for="vapi_api_key"><?php esc_html_e( 'Vapi private API key', 'smart-crm-pro' ); ?></label></th>
                         <td><input type="password" id="vapi_api_key" name="vapi_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" autocomplete="off">
-                            <p class="description"><?php esc_html_e( 'From dashboard.vapi.ai → API Keys.', 'smart-crm-pro' ); ?></p></td>
+                            <p class="description"><?php esc_html_e( 'Vapi dashboard → Settings → API Keys → copy the PRIVATE key (not the public one). The public key is for browser SDKs only; server-side calls like this one are rejected with HTTP 401.', 'smart-crm-pro' ); ?></p></td>
                     </tr>
                     <tr>
                         <th><label for="vapi_assistant_id"><?php esc_html_e( 'Assistant ID', 'smart-crm-pro' ); ?></label></th>
