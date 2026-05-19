@@ -160,6 +160,14 @@ class SCRM_Pro_Smart_Forms_Bridge {
              * code already has on_chat_lead_captured handling a similar shape.
              */
             do_action( 'scrm_pro_smart_forms_lead', $ac_lead, $priority, $area );
+
+            // Sync the contact into ActiveCampaign with the 'new_lead'
+            // segment tag so the welcome / nurture automation in AC
+            // picks them up immediately. The job-booked / job-completed
+            // tags will be applied later by their respective lifecycle
+            // hooks; this is just the entry point of the funnel.
+            $ac = new SCRM_Pro_ActiveCampaign();
+            $ac->sync_segment( $ac_lead, 'new_lead' );
         }
     }
 

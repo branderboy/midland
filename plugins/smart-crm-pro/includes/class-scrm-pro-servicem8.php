@@ -45,7 +45,7 @@ class SCRM_Pro_ServiceM8 {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-crm-pro',
+            'smart-crm',
             esc_html__( 'ServiceM8 Bridge', 'smart-crm-pro' ),
             esc_html__( 'ServiceM8', 'smart-crm-pro' ),
             'manage_options',
@@ -165,6 +165,22 @@ class SCRM_Pro_ServiceM8 {
         do_action( 'sfco_lead_status_changed', $lead, $old_status, 'completed' );
         do_action( 'sfco_lead_completed',      $lead );
         do_action( 'scrm_pro_job_completed',   $lead );
+
+        // If the job that just completed was an emergency AND the contact
+        // hasn't signed a Floor Care Plan, tag them as the upsell target
+        // segment. AC then runs the "you had an emergency, here's how the
+        // plan prevents the next one" series. When/if they later subscribe,
+        // SCRM_Pro_FloorCarePlan::maybe_generate_plan fires the
+        // 'plan_active' tag and the operator's AC automation removes this
+        // upsell tag.
+        if ( class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
+            $was_emergency = ! empty( $lead->is_emergency ) || ( isset( $lead->project_type ) && stripos( (string) $lead->project_type, 'water' ) !== false );
+            $has_plan      = ! empty( $lead->floor_care_plan_id );
+            if ( $was_emergency && ! $has_plan ) {
+                $ac = new SCRM_Pro_ActiveCampaign();
+                $ac->sync_segment( $lead, 'emergency_no_plan' );
+            }
+        }
 
         return new WP_REST_Response( array(
             'received' => true,

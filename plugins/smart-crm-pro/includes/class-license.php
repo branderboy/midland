@@ -11,8 +11,11 @@ class SCRM_Pro_License {
     }
 
     public function add_menu() {
+        // The in-house build doesn't need a license, but we leave the page
+        // registered (parent: null) so the existing redirect targets still
+        // resolve without rendering a sidebar entry.
         add_submenu_page(
-            'sfco-forms',
+            null,
             __( 'CRM PRO License', 'smart-crm-pro' ),
             __( 'CRM PRO License', 'smart-crm-pro' ),
             'manage_options',

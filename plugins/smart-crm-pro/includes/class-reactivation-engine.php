@@ -221,9 +221,21 @@ class SCRM_Pro_Reactivation_Engine {
                     /* translators: %d: number of cold leads */
                     __( "You have %d leads that are now 30+ days old without a response.\n\nGo to Smart CRM PRO > Reactivation to create a win-back campaign.\n\n%s", 'smart-crm-pro' ),
                     $count,
-                    admin_url( 'admin.php?page=scrm-reactivation' )
+                    admin_url( 'admin.php?page=smart-crm' )
                 )
             );
+
+            // Sync each newly-cold lead into ActiveCampaign with the
+            // 'cold' segment tag so the win-back automation in AC
+            // fires for them immediately. The operator builds the
+            // sequence once in AC and it applies to every new cold
+            // contact going forward without us pre-staging emails.
+            if ( class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
+                $ac = new SCRM_Pro_ActiveCampaign();
+                foreach ( $newly_cold as $lead ) {
+                    $ac->sync_segment( $lead, 'cold' );
+                }
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart CRM
  * Description: Midland-branded CRM. Auto-formats incoming Smart Forms leads by priority + area, schedules follow-up reminders, syncs to ActiveCampaign + ServiceM8, runs the cold-lead reactivation engine and NPS surveys.
- * Version: 1.2.0
+ * Version: 1.3.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-crm-pro
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // hook. plugins_loaded fires for already-active plugins before the activating
 // plugin's own init runs, so anything the activation hook touches (including
 // SCRM_PRO_VERSION inside create_tables()) must exist by file include time.
-define( 'SCRM_PRO_VERSION', '1.2.0' );
+define( 'SCRM_PRO_VERSION', '1.3.0' );
 define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
 
