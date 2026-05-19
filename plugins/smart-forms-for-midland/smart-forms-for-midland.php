@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Forms
  * Description: Multi-form lead capture for Midland Floor Care — floor-care templates, per-form shortcodes, file uploads, automation, Smart CRM Pro sync, Resend email, Google Calendar, branding, analytics, team management. (Formerly Smart Forms Basic + Smart Forms PRO, combined into one.)
- * Version: 2.13.0
+ * Version: 2.14.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-forms-for-midland
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Plugin constants. Internal SFCO_/SFCO_PRO_ prefixes preserved so all
 // existing class code keeps working with zero changes when we merged the
 // Pro plugin into this folder.
-define( 'SFCO_VERSION', '2.13.0' );
+define( 'SFCO_VERSION', '2.14.0' );
 define( 'SFCO_PLUGIN_FILE', __FILE__ );
 define( 'SFCO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SFCO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -106,7 +106,93 @@ class SFCO_Plugin {
         if ( class_exists( 'SFCO_Pro_Log' ) ) {
             SFCO_Pro_Log::create_table();
         }
+        $this->maybe_seed_midland_forms();
         update_option( 'sfco_db_version', SFCO_VERSION );
+    }
+
+    /**
+     * Seed the two Midland forms the operator actually uses:
+     *   1. Midland — Short  (homepage hero / footer) — 4 fields, fast capture
+     *   2. Midland — Long   (quote page) — full unified intake with intent,
+     *      property subtype, service-by-segment filtering, timeline, ZIP,
+     *      notes, photos.
+     *
+     * Idempotent: each form is created only if no form with its slug
+     * already exists, so re-activating the plugin doesn't duplicate them.
+     */
+    public function maybe_seed_midland_forms() {
+        if ( ! class_exists( 'SFCO_Database' ) ) {
+            return;
+        }
+        if ( ! SFCO_Database::get_form_by_slug( 'midland-short' ) ) {
+            SFCO_Database::create_form( array(
+                'title'         => 'Midland — Short Quote Form (Homepage)',
+                'slug'          => 'midland-short',
+                'status'        => 'active',
+                'fields_json'   => wp_json_encode( $this->seed_short_fields() ),
+                'settings_json' => wp_json_encode( array(
+                    'submit_text'       => 'Get a Free Quote',
+                    'confirmation_type' => 'message',
+                    'confirmation'      => 'Thanks! We received your request. A team member will call you within one business day.',
+                    'honeypot'          => 1,
+                    'description'       => 'Tell us a little about you and we\'ll be in touch fast.',
+                ) ),
+            ) );
+        }
+        if ( ! SFCO_Database::get_form_by_slug( 'midland-long' ) ) {
+            SFCO_Database::create_form( array(
+                'title'         => 'Midland — Full Quote Form (Quote Page)',
+                'slug'          => 'midland-long',
+                'status'        => 'active',
+                'fields_json'   => wp_json_encode( $this->seed_long_fields() ),
+                'settings_json' => wp_json_encode( array(
+                    'submit_text'       => 'Request a Visit',
+                    'confirmation_type' => 'message',
+                    'confirmation'      => 'Thanks! We\'ll call you to confirm the visit time within one business day. If it\'s urgent, dial (240) 532-9097.',
+                    'honeypot'          => 1,
+                    'description'       => 'Fill this out so we have what we need to schedule the on-site visit and prep a quote.',
+                ) ),
+            ) );
+        }
+    }
+
+    private function seed_short_fields(): array {
+        return array(
+            array( 'key' => 'customer_name',  'type' => 'text',  'label' => 'Name',  'required' => true,  'placeholder' => 'Full name' ),
+            array( 'key' => 'customer_email', 'type' => 'email', 'label' => 'Email', 'required' => true,  'placeholder' => 'you@example.com' ),
+            array( 'key' => 'customer_phone', 'type' => 'tel',   'label' => 'Phone', 'required' => true,  'placeholder' => '(240) 555-0000' ),
+            array( 'key' => 'property_type',  'type' => 'radio', 'label' => 'Commercial or residential?', 'required' => true, 'options' => array( 'Commercial', 'Residential' ) ),
+        );
+    }
+
+    private function seed_long_fields(): array {
+        return array(
+            array( 'key' => 'customer_name',     'type' => 'text',     'label' => 'Name',                                'required' => true ),
+            array( 'key' => 'customer_email',    'type' => 'email',    'label' => 'Email',                               'required' => true ),
+            array( 'key' => 'customer_phone',    'type' => 'tel',      'label' => 'Phone',                               'required' => true ),
+            array( 'key' => 'property_type',     'type' => 'radio',    'label' => 'Commercial or residential?',          'required' => true, 'options' => array( 'Commercial', 'Residential' ) ),
+            array( 'key' => 'lead_intent',       'type' => 'radio',    'label' => 'What brings you to Midland?',         'required' => true, 'options' => array(
+                'Emergency — I need help now',
+                'Book a visit — come see the space and quote',
+                'Planning a future project (commercial)',
+                'Just researching for now',
+            ) ),
+            array( 'key' => 'property_subtype',  'type' => 'select',   'label' => 'Property type',                       'required' => true, 'options' => array(
+                'House', 'Townhouse', 'Condo', 'Apartment',
+                'Office', 'Retail / Storefront', 'Medical / Dental', 'School / Education',
+                'Hotel / Hospitality', 'Restaurant', 'Warehouse / Industrial', 'Government / Municipal',
+                'Property Management', 'Other',
+            ) ),
+            array( 'key' => 'project_type',      'type' => 'select',   'label' => 'What service?',                       'options' => array(
+                'Carpet Cleaning', 'Carpet Installation', 'Tile & Grout Cleaning',
+                'Floor Stripping & Wax', 'Hardwood Floor Care', 'Concrete Polishing',
+                'Upholstery Cleaning', 'Water Damage Restoration', 'Other / Not sure',
+            ) ),
+            array( 'key' => 'square_footage',    'type' => 'number',   'label' => 'Square footage (approx.)',            'placeholder' => 'Skip if not sure' ),
+            array( 'key' => 'timeline',          'type' => 'select',   'label' => 'How soon?',                            'options' => array( 'ASAP (this week)', 'This month', 'Within 3 months', 'Just exploring' ) ),
+            array( 'key' => 'zip_code',          'type' => 'text',     'label' => 'ZIP code' ),
+            array( 'key' => 'additional_notes',  'type' => 'textarea', 'label' => 'Anything we should know?',             'rows' => 4 ),
+        );
     }
 
     /**

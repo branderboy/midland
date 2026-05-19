@@ -11,6 +11,12 @@ class SFCO_Shortcode {
     
     public function __construct() {
         add_shortcode( 'sfco_quote', array( $this, 'render_form' ) );
+        // [sfco_form id="N"] renders a DB-stored form built in the field
+        // builder. Two seeded forms ship out of the box:
+        //   - "Midland — Short" (homepage) → [sfco_form id="X"]
+        //   - "Midland — Long"  (quote page) → [sfco_form id="Y"]
+        // Operator copies the right shortcode off the Forms list.
+        add_shortcode( 'sfco_form', array( $this, 'render_db_form' ) );
         // One universal job application form, intentionally separate from the
         // quote form so the operator can drop it on a /careers/apply/ page
         // (or anywhere) and link every job's Apply Now button to that single
@@ -18,6 +24,129 @@ class SFCO_Shortcode {
         // position field so applicants always know which role they applied
         // for and the operator can route by position in the inbox.
         add_shortcode( 'sfco_apply', array( $this, 'render_apply_form' ) );
+    }
+
+    /**
+     * Render a DB-stored form (created by the field builder) by ID.
+     * Fields come from form->fields_json; each field is rendered with
+     * the right HTML for its type. Honeypot is always injected. The
+     * existing class-form-handler picks up the submission via the same
+     * AJAX endpoint used by [sfco_quote].
+     */
+    public function render_db_form( $atts ) {
+        $atts = shortcode_atts( array( 'id' => 0, 'title' => '' ), $atts, 'sfco_form' );
+        $id   = absint( $atts['id'] );
+        if ( ! $id || ! class_exists( 'SFCO_Database' ) ) {
+            return '';
+        }
+        $form = SFCO_Database::get_form( $id );
+        if ( ! $form || 'active' !== $form->status ) {
+            return '<p style="color:#7a1d1d;background:#fdecec;padding:10px;border-radius:4px;">' . esc_html__( 'This form is not currently accepting submissions.', 'smart-forms-for-midland' ) . '</p>';
+        }
+
+        $fields   = json_decode( $form->fields_json ?: '[]', true );
+        $settings = json_decode( $form->settings_json ?: '{}', true );
+        if ( ! is_array( $fields ) )   $fields   = array();
+        if ( ! is_array( $settings ) ) $settings = array();
+
+        $display_title = $atts['title'] !== '' ? $atts['title'] : $form->title;
+        $submit_text   = ! empty( $settings['submit_text'] ) ? $settings['submit_text'] : 'Get Quote';
+        $description   = $settings['description'] ?? '';
+
+        // Bump view counter for the form's conversion stats.
+        if ( class_exists( 'SFCO_Database' ) && method_exists( 'SFCO_Database', 'bump_view' ) ) {
+            SFCO_Database::bump_view( $id );
+        }
+
+        ob_start();
+        ?>
+        <div class="smart-forms-wrapper">
+            <form id="smart-forms-quote-form" class="smart-forms-form" enctype="multipart/form-data" data-form-id="<?php echo (int) $id; ?>">
+                <?php wp_nonce_field( 'sfco_submit', '_wpnonce', false ); ?>
+                <input type="hidden" name="form_id" value="<?php echo (int) $id; ?>">
+                <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true"><label>Leave this field blank<input type="text" name="sfco_hp_token" tabindex="-1" autocomplete="off"></label></div>
+
+                <?php if ( $display_title ) : ?>
+                    <h2><?php echo esc_html( $display_title ); ?></h2>
+                <?php endif; ?>
+                <?php if ( $description ) : ?>
+                    <p style="color:#4B5563;margin:0 0 18px;"><?php echo esc_html( $description ); ?></p>
+                <?php endif; ?>
+
+                <?php foreach ( $fields as $field ) : echo $this->render_field( $field ); endforeach; ?>
+
+                <div class="form-row">
+                    <button type="submit" class="submit-button"><?php echo esc_html( $submit_text ); ?></button>
+                </div>
+                <div id="form-message" class="form-message"></div>
+            </form>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render a single field from the field-builder's normalized shape.
+     * Supported types: text, email, tel, number, textarea, select,
+     * radio, checkbox, file, date, hidden, html.
+     */
+    private function render_field( array $f ): string {
+        $type        = $f['type']        ?? 'text';
+        $key         = $f['key']         ?? '';
+        $label       = $f['label']       ?? '';
+        $placeholder = $f['placeholder'] ?? '';
+        $description = $f['description'] ?? '';
+        $required    = ! empty( $f['required'] );
+        $default     = $f['default']     ?? '';
+        $options     = (array) ( $f['options'] ?? array() );
+
+        if ( $type === 'hidden' ) {
+            return '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $default ) . '">';
+        }
+        if ( $type === 'html' ) {
+            return '<div class="form-html">' . wp_kses_post( $f['html'] ?? '' ) . '</div>';
+        }
+
+        $req = $required ? ' required' : '';
+        $star = $required ? ' <span class="required">*</span>' : '';
+        ob_start();
+        ?>
+        <div class="form-row">
+            <?php if ( $type !== 'checkbox' && $type !== 'radio' ) : ?>
+                <label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?><?php echo $star; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></label>
+            <?php endif; ?>
+
+            <?php if ( in_array( $type, array( 'text', 'email', 'tel', 'number', 'date' ), true ) ) : ?>
+                <input type="<?php echo esc_attr( $type ); ?>" id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $default ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>"<?php echo $req; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+            <?php elseif ( $type === 'textarea' ) : ?>
+                <textarea id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $key ); ?>" rows="<?php echo (int) ( $f['rows'] ?? 4 ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>"<?php echo $req; ?>><?php echo esc_textarea( $default ); ?></textarea>
+            <?php elseif ( $type === 'select' ) : ?>
+                <select id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $key ); ?>"<?php echo $req; ?>>
+                    <option value="">Select...</option>
+                    <?php foreach ( $options as $opt ) : ?>
+                        <option value="<?php echo esc_attr( $opt ); ?>" <?php selected( $default, $opt ); ?>><?php echo esc_html( $opt ); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            <?php elseif ( $type === 'radio' ) : ?>
+                <label style="display:block;margin-bottom:6px;font-weight:600;"><?php echo esc_html( $label ); ?><?php echo $star; ?></label>
+                <?php foreach ( $options as $opt ) : ?>
+                    <label style="font-weight:400;display:block;"><input type="radio" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $opt ); ?>"<?php checked( $default, $opt ); ?><?php echo $req; ?>> <?php echo esc_html( $opt ); ?></label>
+                <?php endforeach; ?>
+            <?php elseif ( $type === 'checkbox' ) : ?>
+                <label style="display:block;margin-bottom:6px;font-weight:600;"><?php echo esc_html( $label ); ?><?php echo $star; ?></label>
+                <?php foreach ( $options as $opt ) : ?>
+                    <label style="font-weight:400;display:block;"><input type="checkbox" name="<?php echo esc_attr( $key ); ?>[]" value="<?php echo esc_attr( $opt ); ?>"> <?php echo esc_html( $opt ); ?></label>
+                <?php endforeach; ?>
+            <?php elseif ( $type === 'file' ) : ?>
+                <input type="file" id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $key ); ?>" accept="<?php echo esc_attr( $f['accept'] ?? '' ); ?>"<?php echo $req; ?>>
+            <?php endif; ?>
+
+            <?php if ( $description ) : ?>
+                <p class="description" style="margin:4px 0 0;color:#6b7280;font-size:12px;"><?php echo esc_html( $description ); ?></p>
+            <?php endif; ?>
+        </div>
+        <?php
+        return ob_get_clean();
     }
     
     public function render_form( $atts ) {
