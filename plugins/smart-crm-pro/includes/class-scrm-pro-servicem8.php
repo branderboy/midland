@@ -370,7 +370,7 @@ class SCRM_Pro_ServiceM8 {
         if ( ! in_array( $mode, array( 'off', 'hot', 'all' ), true ) ) $mode = 'all';
         update_option( self::OPT_AUTO_PUSH_MODE, $mode );
 
-        wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-servicem8&saved=1' ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=servicem8&saved=1' ) );
         exit;
     }
 

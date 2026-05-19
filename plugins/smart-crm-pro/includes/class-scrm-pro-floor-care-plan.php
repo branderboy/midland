@@ -436,7 +436,7 @@ class SCRM_Pro_Floor_Care_Plan {
             update_option( self::OPT_TEMPLATE_EMERG, $this->default_template_emergency() );
         }
 
-        wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-floor-care-plan&saved=1' ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=floorplan&saved=1' ) );
         exit;
     }
 

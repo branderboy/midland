@@ -76,7 +76,7 @@ class SCRM_Pro_Vapi {
         $trigger = sanitize_key( $_POST['vapi_trigger'] ?? 'residential' );
         update_option( self::OPT_TRIGGER, in_array( $trigger, array( 'residential', 'both', 'none' ), true ) ? $trigger : 'residential' );
 
-        wp_safe_redirect( admin_url( 'admin.php?page=scrm-vapi&saved=1' ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=vapi&saved=1' ) );
         exit;
     }
 
