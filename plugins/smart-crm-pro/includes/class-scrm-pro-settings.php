@@ -224,10 +224,16 @@ class SCRM_Pro_Settings {
             case 'vapi':
                 $key = (string) get_option( SCRM_Pro_Vapi::OPT_API_KEY );
                 $aid = (string) get_option( SCRM_Pro_Vapi::OPT_ASSISTANT_ID );
-                if ( '' === $key || '' === $aid ) {
-                    wp_send_json_error( array( 'message' => 'Vapi API key + Assistant ID not set.' ) );
+                if ( '' === $key ) {
+                    wp_send_json_error( array( 'message' => 'Vapi private API key not set.' ) );
                 }
-                $r = wp_remote_get( 'https://api.vapi.ai/assistant/' . rawurlencode( $aid ), array(
+                // GET /assistant lists every assistant on the org — works
+                // without an ID, so we can verify the key independently of
+                // whether the Assistant ID field is filled in correctly.
+                $endpoint = '' === $aid
+                    ? 'https://api.vapi.ai/assistant'
+                    : 'https://api.vapi.ai/assistant/' . rawurlencode( $aid );
+                $r = wp_remote_get( $endpoint, array(
                     'headers' => array( 'Authorization' => 'Bearer ' . $key ),
                     'timeout' => 12,
                 ) );
@@ -235,8 +241,14 @@ class SCRM_Pro_Settings {
                     wp_send_json_error( array( 'message' => $r->get_error_message() ) );
                 }
                 $code = wp_remote_retrieve_response_code( $r );
+                if ( 401 === (int) $code || 403 === (int) $code ) {
+                    wp_send_json_error( array( 'message' => 'Vapi rejected the key (HTTP ' . (int) $code . '). Use the PRIVATE key from Vapi → Settings → API Keys, not the public key.' ) );
+                }
+                if ( 404 === (int) $code && '' !== $aid ) {
+                    wp_send_json_error( array( 'message' => 'Vapi auth OK but Assistant ID not found (HTTP 404). Check the Assistant ID.' ) );
+                }
                 if ( $code >= 200 && $code < 300 ) {
-                    wp_send_json_success( array( 'message' => 'Vapi assistant reachable (HTTP ' . $code . ')' ) );
+                    wp_send_json_success( array( 'message' => '' === $aid ? 'Vapi key works (HTTP ' . $code . '). Add an Assistant ID to enable calls.' : 'Vapi assistant reachable (HTTP ' . $code . ')' ) );
                 }
                 wp_send_json_error( array( 'message' => 'Vapi returned HTTP ' . $code ) );
 
