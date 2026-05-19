@@ -21,25 +21,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SCRM_Pro_Settings {
 
-    const PAGE = 'scrm-settings';
+    const PAGE = 'smart-crm';
 
-    public function __construct() {
-        // The integration modules register their pages with a null parent,
-        // so no sidebar cleanup is needed — Smart CRM → Settings is the
-        // single entry, and the parent slug also renders Settings.
-        add_action( 'admin_menu',                        array( $this, 'register' ), 50 );
-        add_action( 'wp_ajax_scrm_test_connection',      array( $this, 'ajax_test_connection' ) );
+    private static $instance = null;
+
+    public static function get_instance() {
+        if ( null === self::$instance ) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
-    public function register() {
-        add_submenu_page(
-            'smart-crm',
-            __( 'Settings', 'smart-crm-pro' ),
-            __( 'Settings', 'smart-crm-pro' ),
-            'manage_options',
-            self::PAGE,
-            array( $this, 'render' )
-        );
+    private function __construct() {
+        // No add_submenu_page — the top-level Smart CRM menu (registered by
+        // class-admin.php with slug 'smart-crm') points its callback at our
+        // render(), so we appear as the single sidebar entry without a
+        // duplicate submenu row.
+        add_action( 'wp_ajax_scrm_test_connection', array( $this, 'ajax_test_connection' ) );
     }
 
     private function tabs(): array {
@@ -256,4 +254,4 @@ class SCRM_Pro_Settings {
     }
 }
 
-new SCRM_Pro_Settings();
+SCRM_Pro_Settings::get_instance();
