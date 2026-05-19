@@ -39,7 +39,7 @@ class SCRM_Pro_ServiceM8 {
 
     private function __construct() {
         add_action( 'rest_api_init', array( $this, 'register_route' ) );
-        add_action( 'admin_menu',    array( $this, 'add_menu' ), 21 );
+        add_action( 'admin_menu',    array( $this, 'add_menu' ), 42 );
         add_action( 'admin_init',    array( $this, 'handle_save' ) );
     }
 

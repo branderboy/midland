@@ -24,7 +24,11 @@ class SCRM_Pro_Settings {
     const PAGE = 'scrm-settings';
 
     public function __construct() {
-        add_action( 'admin_menu',                        array( $this, 'register' ), 22 );
+        // class-admin.php registers the 'smart-crm' top-level menu at
+        // priority 40 — anything earlier silently fails to attach (no
+        // error, just an invisible submenu). Run at 50 so we're after
+        // the parent always.
+        add_action( 'admin_menu',                        array( $this, 'register' ), 50 );
         add_action( 'admin_menu',                        array( $this, 'hide_individual_submenus' ), 999 );
         add_action( 'wp_ajax_scrm_test_connection',      array( $this, 'ajax_test_connection' ) );
     }
