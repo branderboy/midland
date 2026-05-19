@@ -224,12 +224,21 @@ class SFCO_Pro_GCal {
             $end = $appointment['end'];
         }
 
+        // 'tentative' lets Smart CRM drop a placeholder visit on the
+        // calendar the moment a residential lead submits — the op
+        // calls to confirm the time and flips it to 'confirmed' in
+        // Google Calendar. Tentative events also skip the invite
+        // email by default so the customer isn't notified about a
+        // time we haven't agreed on yet.
+        $status = ( ( $appointment['status'] ?? 'confirmed' ) === 'tentative' ) ? 'tentative' : 'confirmed';
+
         $event = array(
             'summary'     => sanitize_text_field( $appointment['title'] ?? 'Appointment' ),
             'description' => wp_kses_post( $appointment['description'] ?? '' ),
             'location'    => $location,
             'start'       => array( 'dateTime' => $start, 'timeZone' => wp_timezone_string() ),
             'end'         => array( 'dateTime' => $end, 'timeZone' => wp_timezone_string() ),
+            'status'      => $status,
             'reminders'   => array(
                 'useDefault' => false,
                 'overrides'  => array(
@@ -246,7 +255,10 @@ class SFCO_Pro_GCal {
                     'displayName' => $appointment['attendee_name'] ?? '',
                 ),
             );
-            $event['sendUpdates'] = 'all';
+            // Tentative events skip invite emails so the customer
+            // doesn't get an "accept this time?" mail before we've
+            // even called them. Confirmed events still notify normally.
+            $event['sendUpdates'] = ( 'tentative' === $status ) ? 'none' : 'all';
         }
 
         $response = wp_remote_post( self::EVENTS_ENDPOINT, array(
