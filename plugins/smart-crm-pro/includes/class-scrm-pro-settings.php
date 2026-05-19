@@ -24,12 +24,10 @@ class SCRM_Pro_Settings {
     const PAGE = 'scrm-settings';
 
     public function __construct() {
-        // class-admin.php registers the 'smart-crm' top-level menu at
-        // priority 40 — anything earlier silently fails to attach (no
-        // error, just an invisible submenu). Run at 50 so we're after
-        // the parent always.
+        // The integration modules register their pages with a null parent,
+        // so no sidebar cleanup is needed — Smart CRM → Settings is the
+        // single entry, and the parent slug also renders Settings.
         add_action( 'admin_menu',                        array( $this, 'register' ), 50 );
-        add_action( 'admin_menu',                        array( $this, 'hide_individual_submenus' ), 999 );
         add_action( 'wp_ajax_scrm_test_connection',      array( $this, 'ajax_test_connection' ) );
     }
 
@@ -42,17 +40,6 @@ class SCRM_Pro_Settings {
             self::PAGE,
             array( $this, 'render' )
         );
-    }
-
-    /**
-     * Remove the per-integration sidebar entries (their pages stay
-     * reachable by URL — e.g. OAuth callbacks land on sfco-gcal style
-     * slugs which the underlying modules still register).
-     */
-    public function hide_individual_submenus() {
-        foreach ( array( 'scrm-pro-activecampaign', 'scrm-pro-servicem8', 'scrm-vapi', 'scrm-pro-floor-care-plan' ) as $slug ) {
-            remove_submenu_page( 'smart-crm', $slug );
-        }
     }
 
     private function tabs(): array {

@@ -374,7 +374,7 @@ class SCRM_Pro_Floor_Care_Plan {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-crm',
+            null,
             esc_html__( 'Floor Care Plan', 'smart-crm-pro' ),
             esc_html__( 'Floor Care Plan', 'smart-crm-pro' ),
             'manage_options',

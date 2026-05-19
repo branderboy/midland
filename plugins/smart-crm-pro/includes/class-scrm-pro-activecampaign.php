@@ -55,8 +55,6 @@ class SCRM_Pro_ActiveCampaign {
         add_action( 'admin_menu',                array( $this, 'add_menu' ), 41 );
         add_action( 'admin_init',                array( $this, 'handle_save' ) );
         add_action( 'admin_init',                array( $this, 'handle_test' ) );
-        add_action( 'admin_init',                array( $this, 'handle_setup_pipeline' ) );
-        add_action( 'admin_init',                array( $this, 'handle_export_blueprint' ) );
 
         // Booking events fire when a new lead is captured from any source.
         add_action( 'sfco_lead_created',         array( $this, 'on_lead_booked' ) );
@@ -88,8 +86,11 @@ class SCRM_Pro_ActiveCampaign {
     }
 
     public function add_menu() {
+        // Registered with null parent so the page is reachable for legacy
+        // bookmarks but does not appear as a sidebar entry. The Settings
+        // hub renders this module inside its ActiveCampaign tab.
         add_submenu_page(
-            'smart-crm',
+            null,
             esc_html__( 'ActiveCampaign', 'smart-crm-pro' ),
             esc_html__( 'ActiveCampaign', 'smart-crm-pro' ),
             'manage_options',
@@ -867,15 +868,14 @@ class SCRM_Pro_ActiveCampaign {
         $api_key  = (string) get_option( self::OPT_API_KEY, '' );
         $tag      = (string) get_option( self::OPT_TAG, 'midland-job-completed' );
         $enabled  = (int) get_option( self::OPT_ENABLED, 0 );
-        $last     = get_option( self::OPT_LAST_PUSH, array() );
         // phpcs:disable WordPress.Security.NonceVerification.Recommended
         $saved    = isset( $_GET['saved'] );
         $test     = isset( $_GET['test'] ) ? sanitize_key( $_GET['test'] ) : '';
         // phpcs:enable
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'ActiveCampaign Bridge', 'smart-crm-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Pushes the contact + a "job complete" tag to ActiveCampaign whenever a lead is marked complete here. AC then runs its own flows.', 'smart-crm-pro' ); ?></p>
+            <h1><?php esc_html_e( 'ActiveCampaign', 'smart-crm-pro' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Pushes contacts and tags to ActiveCampaign. Your AC automations handle the rest.', 'smart-crm-pro' ); ?></p>
 
             <?php if ( $saved ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-crm-pro' ); ?></p></div><?php endif; ?>
             <?php if ( 'ok' === $test ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Connected to ActiveCampaign.', 'smart-crm-pro' ); ?></p></div><?php endif; ?>
@@ -908,122 +908,11 @@ class SCRM_Pro_ActiveCampaign {
                     </tr>
                 </table>
 
-                <h2 style="margin-top:24px;"><?php esc_html_e( 'Sales pipeline (Deals)', 'smart-crm-pro' ); ?></h2>
-                <p class="description">
-                    <?php esc_html_e( 'ActiveCampaign owns the sales pipeline. Each Smart Forms submission creates a Deal in AC and the stage advances automatically on lifecycle events: New → Quoted (after Push to SM8) → Booked → Won (after SM8 marks the job complete). Plug in your pipeline + stage IDs from your AC account.', 'smart-crm-pro' ); ?>
-                </p>
-                <?php
-                $deal_enabled   = (int) get_option( self::OPT_DEAL_ENABLED, 0 );
-                $pipeline_id    = (int) get_option( self::OPT_PIPELINE_ID, 0 );
-                $deal_owner     = (int) get_option( self::OPT_DEAL_OWNER, 0 );
-                $deal_currency  = (string) get_option( self::OPT_DEAL_CURRENCY, 'usd' );
-                $stage_new      = (int) get_option( self::OPT_STAGE_NEW, 0 );
-                $stage_quoted   = (int) get_option( self::OPT_STAGE_QUOTED, 0 );
-                $stage_booked   = (int) get_option( self::OPT_STAGE_BOOKED, 0 );
-                $stage_won      = (int) get_option( self::OPT_STAGE_WON, 0 );
-                $stage_lost     = (int) get_option( self::OPT_STAGE_LOST, 0 );
-                $auto_tasks     = (int) get_option( self::OPT_AUTO_TASKS, 1 );
-                ?>
-                <table class="form-table">
-                    <tr>
-                        <th><?php esc_html_e( 'Enable deal pipeline', 'smart-crm-pro' ); ?></th>
-                        <td>
-                            <label><input type="checkbox" id="ac_deal_enabled" name="ac_deal_enabled" value="1" <?php checked( $deal_enabled, 1 ); ?>>
-                                <?php esc_html_e( 'Create + progress AC Deals from Smart Forms submissions.', 'smart-crm-pro' ); ?>
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="ac_pipeline_id"><?php esc_html_e( 'Pipeline ID', 'smart-crm-pro' ); ?></label></th>
-                        <td>
-                            <input type="number" id="ac_pipeline_id" name="ac_pipeline_id" class="small-text" value="<?php echo esc_attr( $pipeline_id ); ?>" min="1">
-                            <p class="description"><?php esc_html_e( 'AC → Deals → Pipelines → click your pipeline → ID is in the URL (the number after /pipelines/).', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="ac_deal_owner"><?php esc_html_e( 'Default deal owner (AC User ID)', 'smart-crm-pro' ); ?></label></th>
-                        <td>
-                            <input type="number" id="ac_deal_owner" name="ac_deal_owner" class="small-text" value="<?php echo esc_attr( $deal_owner ); ?>" min="0">
-                            <p class="description"><?php esc_html_e( 'AC → Settings → Users → click yourself → ID is in the URL. 0 = let AC pick the pipeline default.', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="ac_deal_currency"><?php esc_html_e( 'Currency', 'smart-crm-pro' ); ?></label></th>
-                        <td>
-                            <input type="text" id="ac_deal_currency" name="ac_deal_currency" class="small-text" value="<?php echo esc_attr( $deal_currency ); ?>" maxlength="3" style="width:80px;">
-                            <p class="description"><?php esc_html_e( 'Three-letter ISO code, lowercase (usd, cad, gbp, eur).', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><?php esc_html_e( 'Auto-create tasks', 'smart-crm-pro' ); ?></th>
-                        <td>
-                            <label><input type="checkbox" id="ac_auto_tasks" name="ac_auto_tasks" value="1" <?php checked( $auto_tasks, 1 ); ?>>
-                                <?php esc_html_e( 'Plugin auto-creates the matching deal task on every stage transition.', 'smart-crm-pro' ); ?>
-                            </label>
-                            <p class="description"><?php esc_html_e( 'Each task lands with note "(auto-created by Smart CRM)" so AC automations can de-dupe by note text. Turn off if your AC automations create the tasks themselves.', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><?php esc_html_e( 'Stage IDs', 'smart-crm-pro' ); ?></th>
-                        <td>
-                            <p class="description" style="margin-top:0;"><?php esc_html_e( 'Find stage IDs at AC → Deals → Pipelines → your pipeline → Manage Stages → hover the edit pencil; the URL shows ?stage=N.', 'smart-crm-pro' ); ?></p>
-                            <table class="form-table" style="margin-top:6px;">
-                                <tr><th style="padding-left:0;width:120px;">New lead</th>     <td><input type="number" name="ac_stage_new"    value="<?php echo esc_attr( $stage_new ); ?>"    class="small-text" min="0"></td></tr>
-                                <tr><th style="padding-left:0;">Quote sent</th>              <td><input type="number" name="ac_stage_quoted" value="<?php echo esc_attr( $stage_quoted ); ?>" class="small-text" min="0"></td></tr>
-                                <tr><th style="padding-left:0;">Booked</th>                  <td><input type="number" name="ac_stage_booked" value="<?php echo esc_attr( $stage_booked ); ?>" class="small-text" min="0"></td></tr>
-                                <tr><th style="padding-left:0;">Won</th>                     <td><input type="number" name="ac_stage_won"    value="<?php echo esc_attr( $stage_won ); ?>"    class="small-text" min="0"></td></tr>
-                                <tr><th style="padding-left:0;">Lost</th>                    <td><input type="number" name="ac_stage_lost"   value="<?php echo esc_attr( $stage_lost ); ?>"   class="small-text" min="0"></td></tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-
-                <?php
-                // Result banner from the one-click setup (?pipeline=ok|fail).
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-                $pl_status = isset( $_GET['pipeline'] ) ? sanitize_key( $_GET['pipeline'] ) : '';
-                if ( 'ok' === $pl_status ) {
-                    $pid = isset( $_GET['pipeline_id'] ) ? (int) $_GET['pipeline_id'] : 0;
-                    $stg = isset( $_GET['stages'] ) ? (int) $_GET['stages'] : 0;
-                    $tsk = isset( $_GET['tasks'] ) ? (int) $_GET['tasks'] : 0;
-                    echo '<div class="notice notice-success" style="margin:14px 0;"><p><strong>✓ Midland pipeline created in ActiveCampaign.</strong> Pipeline ID: <code>' . (int) $pid . '</code> · ' . (int) $stg . ' stages · ' . (int) $tsk . ' task types. All IDs auto-saved below.</p></div>';
-                } elseif ( 'fail' === $pl_status ) {
-                    $err = isset( $_GET['err'] ) ? sanitize_text_field( wp_unslash( $_GET['err'] ) ) : 'Unknown error.';
-                    echo '<div class="notice notice-error"><p><strong>✗ Pipeline setup failed.</strong> ' . esc_html( $err ) . '</p></div>';
-                }
-                ?>
-
                 <p class="submit">
                     <button type="submit" name="scrm_save_ac" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-crm-pro' ); ?></button>
                     <button type="submit" name="scrm_test_ac" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Test Connection', 'smart-crm-pro' ); ?></button>
-                    <button type="submit" name="scrm_setup_ac_pipeline" value="1" class="button button-secondary" style="margin-left:18px;background:#10b981;color:#fff;border-color:#059669;" onclick="return confirm('This will create a new pipeline + 5 stages + 5 task types in your ActiveCampaign account. Continue?');">
-                        🚀 <?php esc_html_e( 'Set up Midland pipeline in AC', 'smart-crm-pro' ); ?>
-                    </button>
-                    <button type="submit" name="scrm_export_ac_blueprint" value="1" class="button" style="margin-left:8px;">
-                        ⬇ <?php esc_html_e( 'Download blueprint JSON', 'smart-crm-pro' ); ?>
-                    </button>
                 </p>
             </form>
-
-            <?php if ( ! empty( $last ) ) : ?>
-                <hr>
-                <h2><?php esc_html_e( 'Last Push', 'smart-crm-pro' ); ?></h2>
-                <p>
-                    <strong><?php echo esc_html( $last['email'] ?? '—' ); ?></strong>
-                    — <?php echo esc_html( $last['lifecycle'] ?? ( $last['tag'] ?? '' ) ); ?>
-                    / <?php echo esc_html( $last['category'] ?? '' ); ?>
-                    — <?php echo esc_html( ! empty( $last['ok'] ) ? __( 'OK', 'smart-crm-pro' ) : __( 'failed', 'smart-crm-pro' ) ); ?>
-                    — <?php echo esc_html( ! empty( $last['at'] ) ? wp_date( 'Y-m-d H:i', (int) $last['at'] ) : '' ); ?>
-                </p>
-                <?php if ( ! empty( $last['tags'] ) ) : ?>
-                    <p style="margin:0 0 12px;color:#555;">
-                        <?php esc_html_e( 'Tags applied:', 'smart-crm-pro' ); ?>
-                        <?php foreach ( (array) $last['tags'] as $t ) : ?>
-                            <code style="margin-right:6px;"><?php echo esc_html( $t ); ?></code>
-                        <?php endforeach; ?>
-                    </p>
-                <?php endif; ?>
-            <?php endif; ?>
         </div>
         <?php
     }

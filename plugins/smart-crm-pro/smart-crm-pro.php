@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Midland Smart CRM
- * Description: Midland-branded CRM. Auto-formats incoming Smart Forms leads by priority + area, schedules follow-up reminders, syncs to ActiveCampaign + ServiceM8, runs the cold-lead reactivation engine and NPS surveys.
- * Version: 1.9.1
+ * Description: Passthrough between Smart Forms and the integrations (ActiveCampaign, ServiceM8, Vapi, Google Calendar, Floor Care Plan). One sidebar entry: Smart CRM → Settings.
+ * Version: 2.0.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-crm-pro
@@ -15,18 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Define constants at file scope so they're available during the activation
-// hook. plugins_loaded fires for already-active plugins before the activating
-// plugin's own init runs, so anything the activation hook touches (including
-// SCRM_PRO_VERSION inside create_tables()) must exist by file include time.
-define( 'SCRM_PRO_VERSION', '1.9.1' );
+define( 'SCRM_PRO_VERSION', '2.0.0' );
 define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
 
 add_action( 'plugins_loaded', 'smart_crm_pro_init', 25 );
 
 function smart_crm_pro_init() {
-    // Require Smart Forms.
     if ( ! defined( 'SFCO_VERSION' ) ) {
         add_action( 'admin_notices', function() {
             echo '<div class="notice notice-error"><p><strong>' . esc_html__( 'Smart CRM PRO requires Smart Forms for Contractors to be installed and active.', 'smart-crm-pro' ) . '</strong></p></div>';
@@ -34,49 +29,20 @@ function smart_crm_pro_init() {
         return;
     }
 
-    require_once SCRM_PRO_DIR . 'includes/class-reactivation-engine.php';
-    require_once SCRM_PRO_DIR . 'includes/class-campaign-manager.php';
-    require_once SCRM_PRO_DIR . 'includes/class-reactivation-analytics.php';
-    require_once SCRM_PRO_DIR . 'includes/class-license.php';
     require_once SCRM_PRO_DIR . 'includes/class-admin.php';
-    // ServiceM8 module intentionally NOT loaded — Smart CRM's scope is
-    // Smart Forms -> AC tagging only. Job dispatch happens elsewhere
-    // (manual, Zapier from AC, or the dispatcher's own tools).
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-activecampaign.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-servicem8.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-floor-care-plan.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-smart-forms-bridge.php';
-    require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-ac-export.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-vapi.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-visit-draft.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-settings.php';
 
     new SCRM_Pro_Admin();
-    new SCRM_Pro_License();
     SCRM_Pro_ActiveCampaign::get_instance();
     SCRM_Pro_ServiceM8::get_instance();
     SCRM_Pro_Floor_Care_Plan::get_instance();
-    new SCRM_Pro_AC_Export();
-
-    // Cron for sending scheduled reactivation emails.
-    add_action( 'scrm_pro_send_campaign_email', array( 'SCRM_Pro_Campaign_Manager', 'send_scheduled_email' ), 10, 2 );
-
-    if ( ! wp_next_scheduled( 'scrm_pro_daily_scan' ) ) {
-        wp_schedule_event( time(), 'daily', 'scrm_pro_daily_scan' );
-    }
-    add_action( 'scrm_pro_daily_scan', array( 'SCRM_Pro_Reactivation_Engine', 'daily_cold_lead_scan' ) );
-}
-
-register_activation_hook( __FILE__, 'scrm_pro_activate' );
-function scrm_pro_activate() {
-    if ( ! defined( 'SFCO_VERSION' ) ) {
-        return;
-    }
-    // smart_crm_pro_init() runs on plugins_loaded which has already fired
-    // for active plugins by the time WP gets here, so the class file hasn't
-    // been required yet — pull it in directly before the static call.
-    require_once SCRM_PRO_DIR . 'includes/class-reactivation-engine.php';
-    SCRM_Pro_Reactivation_Engine::create_tables();
+    new SCRM_Pro_Settings();
 }
 
 register_deactivation_hook( __FILE__, 'scrm_pro_deactivate' );

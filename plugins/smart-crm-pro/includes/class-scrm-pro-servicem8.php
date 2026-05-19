@@ -45,7 +45,7 @@ class SCRM_Pro_ServiceM8 {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-crm',
+            null,
             esc_html__( 'ServiceM8 Bridge', 'smart-crm-pro' ),
             esc_html__( 'ServiceM8', 'smart-crm-pro' ),
             'manage_options',

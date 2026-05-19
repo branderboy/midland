@@ -51,7 +51,7 @@ class SCRM_Pro_Vapi {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-crm',
+            null,
             __( 'Vapi (AI Call)', 'smart-crm-pro' ),
             __( 'Vapi (AI Call)', 'smart-crm-pro' ),
             'manage_options',
