@@ -38,6 +38,37 @@ class SCRM_Pro_Settings {
         // render(), so we appear as the single sidebar entry without a
         // duplicate submenu row.
         add_action( 'wp_ajax_scrm_test_connection', array( $this, 'ajax_test_connection' ) );
+        add_action( 'admin_init', array( $this, 'redirect_legacy_pages' ), 1 );
+    }
+
+    /**
+     * Catch the integration modules' legacy URL slugs (scrm-vapi,
+     * scrm-pro-activecampaign, etc.) and bounce them to the unified
+     * Settings tab. Without this, an old bookmark or a stale install
+     * drops the user on a bare orphan page with no tabs or sidebar
+     * context. Only redirects GETs — POST save handlers run first
+     * (their hooks fire at default priority 10) and we run at 1, but
+     * a save POST always wp_safe_redirect()s, so we never see those.
+     */
+    public function redirect_legacy_pages() {
+        if ( ! is_admin() || empty( $_GET['page'] ) ) {
+            return;
+        }
+        if ( ! empty( $_POST ) || wp_doing_ajax() || wp_doing_cron() ) {
+            return;
+        }
+        $map = array(
+            'scrm-vapi'                 => 'vapi',
+            'scrm-pro-activecampaign'   => 'activecampaign',
+            'scrm-pro-servicem8'        => 'servicem8',
+            'scrm-pro-floor-care-plan'  => 'floorplan',
+        );
+        $page = sanitize_key( wp_unslash( $_GET['page'] ) );
+        if ( ! isset( $map[ $page ] ) ) {
+            return;
+        }
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=' . $map[ $page ] ) );
+        exit;
     }
 
     private function tabs(): array {
