@@ -29,3 +29,23 @@
     background: #00a32a;
     color: #fff;
 }
+
+/* Form builder */
+.sfco-sort-placeholder {
+    background: #F3FCF4;
+    border: 2px dashed #7CCE8E;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    height: 56px;
+    list-style: none;
+}
+.sfco-palette-btn:hover {
+    background: #F3FCF4 !important;
+    border-color: #7CCE8E !important;
+}
+.sfco-field-card .sfco-field-head:hover {
+    background: #FAFCFB;
+}
+.sfco-builder-wrap .nav-tab-active {
+    border-bottom-color: #fff;
+}

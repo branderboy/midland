@@ -12,6 +12,7 @@ class SFCO_Admin {
     public function __construct() {
         add_action( 'admin_menu', array( $this, 'add_menu_pages' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+        add_action( 'wp_ajax_sfco_save_form_fields', array( $this, 'ajax_save_form_fields' ) );
     }
     
     public function add_menu_pages() {
@@ -55,6 +56,14 @@ class SFCO_Admin {
             'manage_options',
             'smart-forms-tracking',
             array( $this, 'render_tracking_page' )
+        );
+        add_submenu_page(
+            'smart-forms',
+            esc_html__( 'Integration Log', 'smart-forms-for-midland' ),
+            esc_html__( 'Log', 'smart-forms-for-midland' ),
+            'manage_options',
+            'smart-forms-log',
+            array( $this, 'render_log_page' )
         );
         add_submenu_page(
             null, // hidden — accessed by clicking a form row
@@ -259,6 +268,14 @@ class SFCO_Admin {
      * Edit a form — title, status, notification email, confirmation message.
      * (Field builder coming in Phase 2; for now you can edit metadata.)
      */
+    /**
+     * Form editor: Gravity-Forms-style three-tab page (Editor / Settings /
+     * Shortcode). The Editor tab is a real field builder — type palette on
+     * the left, sortable field cards in the middle with inline settings
+     * panels, AJAX save. Settings tab keeps the form-level options
+     * (notification email, confirmation message, CRM push). Shortcode tab
+     * shows the embed code.
+     */
     public function render_edit_form_page() {
         if ( ! current_user_can( 'manage_options' ) ) return;
         $form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
@@ -268,12 +285,19 @@ class SFCO_Admin {
             return;
         }
 
+        // Form-level Settings tab save (POST). Field saves happen via
+        // AJAX from the builder — see ajax_save_form_fields().
         if ( isset( $_POST['sfco_save_form'] ) && check_admin_referer( 'sfco_save_form' ) ) {
             $settings = json_decode( $form->settings_json ?: '{}', true );
             if ( ! is_array( $settings ) ) $settings = array();
             $settings['notify_email'] = sanitize_email( wp_unslash( $_POST['notify_email'] ?? '' ) );
             $settings['confirmation'] = sanitize_textarea_field( wp_unslash( $_POST['confirmation'] ?? '' ) );
             $settings['crm_push']     = isset( $_POST['crm_push'] );
+            $settings['webhook']      = array(
+                'url'    => esc_url_raw( wp_unslash( $_POST['webhook_url'] ?? '' ) ),
+                'method' => in_array( ( $_POST['webhook_method'] ?? 'POST' ), array( 'POST', 'PUT', 'PATCH', 'GET', 'DELETE' ), true ) ? sanitize_text_field( wp_unslash( $_POST['webhook_method'] ) ) : 'POST',
+                'format' => ( $_POST['webhook_format'] ?? 'json' ) === 'form' ? 'form' : 'json',
+            );
             SFCO_Database::update_form( $form_id, array(
                 'title'         => sanitize_text_field( wp_unslash( $_POST['title'] ?? $form->title ) ),
                 'status'        => isset( $_POST['active'] ) ? 'active' : 'inactive',
@@ -287,61 +311,194 @@ class SFCO_Admin {
         if ( ! is_array( $settings ) ) $settings = array();
         $fields = json_decode( $form->fields_json ?: '[]', true );
         if ( ! is_array( $fields ) ) $fields = array();
+
+        $tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'editor';
+        if ( ! in_array( $tab, array( 'editor', 'settings', 'shortcode' ), true ) ) {
+            $tab = 'editor';
+        }
+        $base_url = add_query_arg( array( 'page' => 'smart-forms-edit-form', 'form_id' => $form_id ), admin_url( 'admin.php' ) );
+
+        // Field-type palette — same shape the renderer/AJAX accept.
+        $palette = array(
+            array( 'type' => 'text',     'icon' => 'editor-textcolor', 'label' => 'Text' ),
+            array( 'type' => 'email',    'icon' => 'email-alt',        'label' => 'Email' ),
+            array( 'type' => 'tel',      'icon' => 'phone',            'label' => 'Phone' ),
+            array( 'type' => 'number',   'icon' => 'editor-ol-rtl',    'label' => 'Number' ),
+            array( 'type' => 'textarea', 'icon' => 'editor-paragraph', 'label' => 'Paragraph' ),
+            array( 'type' => 'select',   'icon' => 'menu',             'label' => 'Dropdown' ),
+            array( 'type' => 'radio',    'icon' => 'marker',           'label' => 'Radio' ),
+            array( 'type' => 'checkbox', 'icon' => 'yes',              'label' => 'Checkboxes' ),
+            array( 'type' => 'date',     'icon' => 'calendar-alt',     'label' => 'Date' ),
+            array( 'type' => 'file',     'icon' => 'upload',           'label' => 'File Upload' ),
+            array( 'type' => 'hidden',   'icon' => 'hidden',           'label' => 'Hidden' ),
+            array( 'type' => 'html',     'icon' => 'editor-code',      'label' => 'HTML' ),
+        );
+
+        // Localize state for the builder JS — picked up only on the
+        // Editor tab, but cheap enough to localize on every tab.
+        wp_enqueue_script( 'jquery-ui-sortable' );
+        wp_localize_script( 'sfco-admin', 'sfcoBuilder', array(
+            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+            'nonce'   => wp_create_nonce( 'sfco_builder' ),
+            'formId'  => $form_id,
+            'fields'  => $fields,
+            'palette' => $palette,
+        ) );
         ?>
-        <div class="wrap">
-            <h1><?php esc_html_e( 'Edit form:', 'smart-forms-for-midland' ); ?> <?php echo esc_html( $form->title ); ?></h1>
-            <p><a href="<?php echo esc_url( admin_url( 'admin.php?page=smart-forms' ) ); ?>">← <?php esc_html_e( 'All Forms', 'smart-forms-for-midland' ); ?></a></p>
+        <div class="wrap sfco-builder-wrap">
+            <h1 class="wp-heading-inline"><?php esc_html_e( 'Edit form:', 'smart-forms-for-midland' ); ?> <?php echo esc_html( $form->title ); ?></h1>
+            <a class="page-title-action" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-forms' ) ); ?>">← <?php esc_html_e( 'All Forms', 'smart-forms-for-midland' ); ?></a>
 
-            <form method="post">
-                <?php wp_nonce_field( 'sfco_save_form' ); ?>
-                <table class="form-table">
-                    <tr>
-                        <th><?php esc_html_e( 'Title', 'smart-forms-for-midland' ); ?></th>
-                        <td><input type="text" name="title" value="<?php echo esc_attr( $form->title ); ?>" class="regular-text"></td>
-                    </tr>
-                    <tr>
-                        <th><?php esc_html_e( 'Active', 'smart-forms-for-midland' ); ?></th>
-                        <td><label><input type="checkbox" name="active" <?php checked( 'active', $form->status ); ?>> <?php esc_html_e( 'Form is live and accepting submissions', 'smart-forms-for-midland' ); ?></label></td>
-                    </tr>
-                    <tr>
-                        <th><?php esc_html_e( 'Notification email', 'smart-forms-for-midland' ); ?></th>
-                        <td>
-                            <input type="email" name="notify_email" value="<?php echo esc_attr( $settings['notify_email'] ?? '' ); ?>" class="regular-text" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>">
-                            <p class="description"><?php esc_html_e( 'Leave blank to use the site admin email.', 'smart-forms-for-midland' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><?php esc_html_e( 'Confirmation message', 'smart-forms-for-midland' ); ?></th>
-                        <td>
-                            <textarea name="confirmation" rows="3" class="large-text"><?php echo esc_textarea( $settings['confirmation'] ?? '' ); ?></textarea>
-                            <p class="description"><?php esc_html_e( 'Shown to the visitor after they submit. HTML allowed.', 'smart-forms-for-midland' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><?php esc_html_e( 'Push to Smart CRM Pro', 'smart-forms-for-midland' ); ?></th>
-                        <td>
-                            <label><input type="checkbox" name="crm_push" <?php checked( ! empty( $settings['crm_push'] ) ); ?>> <?php esc_html_e( 'Auto-create a contact + lead in Smart CRM Pro on every submission', 'smart-forms-for-midland' ); ?></label>
-                            <p class="description"><?php esc_html_e( 'Requires Smart CRM Pro to be installed and active.', 'smart-forms-for-midland' ); ?></p>
-                        </td>
-                    </tr>
-                </table>
-                <p><button type="submit" name="sfco_save_form" class="button button-primary"><?php esc_html_e( 'Save Form', 'smart-forms-for-midland' ); ?></button></p>
-            </form>
+            <h2 class="nav-tab-wrapper" style="margin-top:14px;">
+                <a class="nav-tab <?php echo 'editor'    === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'tab', 'editor',    $base_url ) ); ?>"><?php esc_html_e( 'Editor',    'smart-forms-for-midland' ); ?></a>
+                <a class="nav-tab <?php echo 'settings'  === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'tab', 'settings',  $base_url ) ); ?>"><?php esc_html_e( 'Settings',  'smart-forms-for-midland' ); ?></a>
+                <a class="nav-tab <?php echo 'shortcode' === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'tab', 'shortcode', $base_url ) ); ?>"><?php esc_html_e( 'Shortcode', 'smart-forms-for-midland' ); ?></a>
+            </h2>
 
-            <h2><?php esc_html_e( 'Fields', 'smart-forms-for-midland' ); ?></h2>
-            <p class="description"><?php esc_html_e( 'Drag-drop field builder coming soon. For now, fields are defined in the template seed. Current fields:', 'smart-forms-for-midland' ); ?></p>
-            <ul style="background:#fff;border:1px solid #c3c4c7;padding:12px 24px;border-radius:6px;max-width:700px;">
-                <?php foreach ( $fields as $f ) : ?>
-                    <li>
-                        <strong><?php echo esc_html( $f['label'] ?? $f['key'] ); ?></strong>
-                        <code style="background:#f6f7f7;padding:1px 6px;border-radius:3px;font-size:11px;"><?php echo esc_html( $f['type'] ); ?></code>
-                        <?php if ( ! empty( $f['required'] ) ) echo '<span style="color:#b32d2e;font-size:12px;"> *</span>'; ?>
+            <?php if ( 'editor' === $tab ) : ?>
+                <div class="sfco-builder" style="display:grid;grid-template-columns:220px 1fr;gap:18px;margin-top:18px;">
+                    <aside class="sfco-builder-palette" style="background:#fff;border:1px solid #d6e6dc;border-radius:8px;padding:14px;">
+                        <h3 style="margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:#2F8137;font-weight:800;"><?php esc_html_e( 'Add a field', 'smart-forms-for-midland' ); ?></h3>
+                        <div id="sfco-palette">
+                            <?php foreach ( $palette as $p ) : ?>
+                                <button type="button" class="sfco-palette-btn" data-type="<?php echo esc_attr( $p['type'] ); ?>" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 10px;margin-bottom:4px;border:1px solid #e0e0e0;border-radius:5px;background:#fafafa;cursor:pointer;font-size:13px;">
+                                    <span class="dashicons dashicons-<?php echo esc_attr( $p['icon'] ); ?>" style="color:#2F8137;"></span>
+                                    <?php echo esc_html( $p['label'] ); ?>
+                                </button>
+                            <?php endforeach; ?>
+                        </div>
+                        <p style="margin:14px 0 0;font-size:12px;color:#6b8278;line-height:1.4;"><?php esc_html_e( 'Click a field type to add it. Drag the handle on any field to reorder.', 'smart-forms-for-midland' ); ?></p>
+                    </aside>
+
+                    <section class="sfco-builder-canvas">
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #d6e6dc;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+                            <strong style="color:#0F1411;"><?php esc_html_e( 'Form fields', 'smart-forms-for-midland' ); ?></strong>
+                            <span>
+                                <span id="sfco-builder-status" style="margin-right:12px;color:#6b8278;font-size:13px;"></span>
+                                <button type="button" id="sfco-builder-save" class="button button-primary" style="background:#43A94B;border-color:#43A94B;font-weight:700;"><?php esc_html_e( 'Save Fields', 'smart-forms-for-midland' ); ?></button>
+                            </span>
+                        </div>
+
+                        <ol id="sfco-fields-list" style="list-style:none;padding:0;margin:0;min-height:80px;">
+                            <!-- Field cards rendered by JS from sfcoBuilder.fields -->
+                        </ol>
+                        <p id="sfco-empty-state" style="display:none;padding:32px;background:#fff;border:1px dashed #cbd5d0;border-radius:8px;text-align:center;color:#6b8278;">
+                            <?php esc_html_e( 'No fields yet. Click a field type on the left to add one.', 'smart-forms-for-midland' ); ?>
+                        </p>
+                    </section>
+                </div>
+
+                <template id="sfco-field-tpl">
+                    <li class="sfco-field-card" data-index="" style="background:#fff;border:1px solid #d6e6dc;border-left:4px solid #2F8137;border-radius:6px;margin-bottom:10px;">
+                        <header class="sfco-field-head" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;">
+                            <span class="dashicons dashicons-menu sfco-handle" style="cursor:move;color:#6b8278;"></span>
+                            <strong class="sfco-field-label" style="flex:1;color:#0F1411;"></strong>
+                            <code class="sfco-field-type" style="background:#F3FCF4;color:#2F8137;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:800;text-transform:uppercase;"></code>
+                            <span class="sfco-field-required" style="display:none;color:#b32d2e;font-weight:700;">*</span>
+                            <button type="button" class="button-link sfco-field-toggle" title="Edit settings"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
+                            <button type="button" class="button-link sfco-field-delete" title="Delete" style="color:#b32d2e;"><span class="dashicons dashicons-trash"></span></button>
+                        </header>
+                        <div class="sfco-field-body" style="display:none;padding:8px 16px 16px;border-top:1px solid #ecf3ef;">
+                            <table class="form-table" role="presentation" style="margin-top:0;">
+                                <tr><th>Label</th><td><input type="text" data-prop="label" class="regular-text"></td></tr>
+                                <tr><th>Field key</th><td><input type="text" data-prop="key" class="regular-text" pattern="[a-z0-9_]+"></td></tr>
+                                <tr class="sfco-row-placeholder"><th>Placeholder</th><td><input type="text" data-prop="placeholder" class="regular-text"></td></tr>
+                                <tr class="sfco-row-description"><th>Help text</th><td><input type="text" data-prop="description" class="regular-text"></td></tr>
+                                <tr class="sfco-row-required"><th>Required</th><td><label><input type="checkbox" data-prop="required"> Field must be filled in</label></td></tr>
+                                <tr class="sfco-row-default"><th>Default value</th><td><input type="text" data-prop="default" class="regular-text"></td></tr>
+                                <tr class="sfco-row-options" style="display:none;"><th>Options</th><td><textarea data-prop="options" rows="4" class="large-text" placeholder="One per line"></textarea></td></tr>
+                                <tr class="sfco-row-rows" style="display:none;"><th>Rows</th><td><input type="number" data-prop="rows" min="1" max="30" class="small-text"></td></tr>
+                                <tr class="sfco-row-minmax" style="display:none;">
+                                    <th>Min / Max</th>
+                                    <td><input type="number" data-prop="min" class="small-text" placeholder="min"> &nbsp; <input type="number" data-prop="max" class="small-text" placeholder="max"></td>
+                                </tr>
+                                <tr class="sfco-row-accept" style="display:none;"><th>Accepted file types</th><td><input type="text" data-prop="accept" class="regular-text" placeholder=".pdf,.doc,.docx,image/*"></td></tr>
+                                <tr class="sfco-row-html" style="display:none;"><th>HTML</th><td><textarea data-prop="html" rows="4" class="large-text"></textarea></td></tr>
+                            </table>
+                        </div>
                     </li>
-                <?php endforeach; ?>
-            </ul>
+                </template>
 
-            <h2><?php esc_html_e( 'Shortcode', 'smart-forms-for-midland' ); ?></h2>
-            <p><code style="background:#f6f7f7;padding:6px 12px;border-radius:3px;display:inline-block;">[sfco_form id="<?php echo (int) $form->id; ?>"]</code></p>
+            <?php elseif ( 'settings' === $tab ) : ?>
+                <form method="post" style="max-width:780px;margin-top:18px;">
+                    <?php wp_nonce_field( 'sfco_save_form' ); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th><?php esc_html_e( 'Title', 'smart-forms-for-midland' ); ?></th>
+                            <td><input type="text" name="title" value="<?php echo esc_attr( $form->title ); ?>" class="regular-text"></td>
+                        </tr>
+                        <tr>
+                            <th><?php esc_html_e( 'Active', 'smart-forms-for-midland' ); ?></th>
+                            <td><label><input type="checkbox" name="active" <?php checked( 'active', $form->status ); ?>> <?php esc_html_e( 'Form is live and accepting submissions', 'smart-forms-for-midland' ); ?></label></td>
+                        </tr>
+                        <tr>
+                            <th><?php esc_html_e( 'Notification email', 'smart-forms-for-midland' ); ?></th>
+                            <td>
+                                <input type="email" name="notify_email" value="<?php echo esc_attr( $settings['notify_email'] ?? '' ); ?>" class="regular-text" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>">
+                                <p class="description"><?php esc_html_e( 'Per-form override. Global notifications live in Smart Forms → Settings.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?php esc_html_e( 'Confirmation message', 'smart-forms-for-midland' ); ?></th>
+                            <td>
+                                <textarea name="confirmation" rows="3" class="large-text"><?php echo esc_textarea( $settings['confirmation'] ?? '' ); ?></textarea>
+                                <p class="description"><?php esc_html_e( 'Shown to the visitor after they submit. HTML allowed.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?php esc_html_e( 'Push to Smart CRM Pro', 'smart-forms-for-midland' ); ?></th>
+                            <td>
+                                <label><input type="checkbox" name="crm_push" <?php checked( ! empty( $settings['crm_push'] ) ); ?>> <?php esc_html_e( 'Auto-create a contact + lead in Smart CRM Pro on every submission', 'smart-forms-for-midland' ); ?></label>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3 style="margin-top:32px;"><?php esc_html_e( 'Outbound webhook', 'smart-forms-for-midland' ); ?></h3>
+                    <p class="description"><?php esc_html_e( 'Fire an HTTP request to a URL of your choice when this form is submitted. Useful for Zapier, Make, n8n, or a custom backend. Lead fields are sent as the request body.', 'smart-forms-for-midland' ); ?></p>
+                    <?php $webhook = is_array( $settings['webhook'] ?? null ) ? $settings['webhook'] : array(); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="webhook_url"><?php esc_html_e( 'Webhook URL', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <input type="url" id="webhook_url" name="webhook_url" class="regular-text" value="<?php echo esc_attr( $webhook['url'] ?? '' ); ?>" placeholder="https://hooks.zapier.com/...">
+                                <p class="description"><?php esc_html_e( 'Leave blank to disable.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="webhook_method"><?php esc_html_e( 'Method', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <select id="webhook_method" name="webhook_method">
+                                    <?php $cur_method = $webhook['method'] ?? 'POST'; ?>
+                                    <?php foreach ( array( 'POST', 'PUT', 'PATCH', 'GET', 'DELETE' ) as $m ) : ?>
+                                        <option value="<?php echo esc_attr( $m ); ?>" <?php selected( $cur_method, $m ); ?>><?php echo esc_html( $m ); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="webhook_format"><?php esc_html_e( 'Body format', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <select id="webhook_format" name="webhook_format">
+                                    <?php $cur_format = $webhook['format'] ?? 'json'; ?>
+                                    <option value="json" <?php selected( $cur_format, 'json' ); ?>>JSON</option>
+                                    <option value="form" <?php selected( $cur_format, 'form' ); ?>>Form-encoded</option>
+                                </select>
+                                <p class="description"><?php esc_html_e( 'Most modern services (Zapier, Make, n8n, Discord) expect JSON. Choose form-encoded for legacy PHP endpoints.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p><button type="submit" name="sfco_save_form" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-for-midland' ); ?></button></p>
+                </form>
+
+            <?php else : // shortcode tab ?>
+                <div style="background:#fff;border:1px solid #d6e6dc;border-radius:8px;padding:22px;margin-top:18px;max-width:780px;">
+                    <h2 style="margin-top:0;"><?php esc_html_e( 'Embed this form', 'smart-forms-for-midland' ); ?></h2>
+                    <p><?php esc_html_e( 'Drop this shortcode into any page, post, or Elementor Shortcode widget:', 'smart-forms-for-midland' ); ?></p>
+                    <pre style="background:#0F1411;color:#7CCE8E;padding:18px;border-radius:6px;font-size:15px;user-select:all;">[sfco_form id="<?php echo (int) $form->id; ?>"]</pre>
+                    <p class="description"><?php esc_html_e( 'The form picks up its Notifications and CRM behavior from the global Smart Forms → Settings page; per-form overrides live on the Settings tab here.', 'smart-forms-for-midland' ); ?></p>
+                </div>
+            <?php endif; ?>
         </div>
         <?php
     }
@@ -619,6 +776,109 @@ class SFCO_Admin {
             </table>
         </div>
         <?php
+    }
+
+    /**
+     * Integration log page — last 100 outbound calls from any
+     * integration (Resend, CRM, Webhooks). Operator's first stop
+     * for "why didn't this lead reach my CRM / inbox / Zapier?".
+     */
+    public function render_log_page() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $rows = class_exists( 'SFCO_Pro_Log' ) ? SFCO_Pro_Log::recent( 100 ) : array();
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Integration Log', 'smart-forms-for-midland' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Every outbound call from Resend, CRM, or a per-form Webhook is recorded here. Shows the 100 most recent events.', 'smart-forms-for-midland' ); ?></p>
+            <?php if ( empty( $rows ) ) : ?>
+                <p style="background:#fff;border:1px dashed #cbd5d0;padding:18px;border-radius:6px;color:#6b8278;"><?php esc_html_e( 'No integration events yet. Submit a form once an integration is configured and they will appear here.', 'smart-forms-for-midland' ); ?></p>
+            <?php else : ?>
+                <table class="widefat striped">
+                    <thead>
+                        <tr>
+                            <th style="width:160px;"><?php esc_html_e( 'When', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:90px;"><?php esc_html_e( 'Service', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:80px;"><?php esc_html_e( 'Status', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:80px;"><?php esc_html_e( 'Form / Lead', 'smart-forms-for-midland' ); ?></th>
+                            <th><?php esc_html_e( 'Message', 'smart-forms-for-midland' ); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ( $rows as $r ) :
+                            $is_ok = ( 'ok' === $r->status );
+                            ?>
+                            <tr>
+                                <td><?php echo esc_html( $r->created_at ); ?> UTC</td>
+                                <td><code><?php echo esc_html( $r->integration ); ?></code></td>
+                                <td><span style="display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;<?php echo $is_ok ? 'background:#F3FCF4;color:#2F8137;border:1px solid #7CCE8E;' : ( 'skipped' === $r->status ? 'background:#fff8e5;color:#7a5b00;border:1px solid #e6c75e;' : 'background:#fdecec;color:#7a1d1d;border:1px solid #f1b4b4;' ); ?>"><?php echo esc_html( $r->status ); ?></span></td>
+                                <td><?php echo $r->form_id ? esc_html( '#' . $r->form_id ) : '—'; ?><?php echo $r->lead_id ? '<br><small>lead ' . esc_html( $r->lead_id ) . '</small>' : ''; ?></td>
+                                <td><?php echo esc_html( $r->message ?: '—' ); ?>
+                                    <?php if ( ! empty( $r->response ) ) : ?>
+                                        <details style="margin-top:4px;"><summary style="cursor:pointer;color:#2F8137;font-size:12px;">view response</summary><pre style="background:#0F1411;color:#7CCE8E;padding:10px;border-radius:4px;font-size:11px;max-height:200px;overflow:auto;"><?php echo esc_html( $r->response ); ?></pre></details>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * AJAX endpoint for the field builder. Receives the serialised field
+     * tree from the editor and persists it to fields_json.
+     */
+    public function ajax_save_form_fields() {
+        check_ajax_referer( 'sfco_builder', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'forbidden', 403 );
+        }
+        $form_id = isset( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+        if ( ! $form_id ) {
+            wp_send_json_error( 'missing form_id' );
+        }
+        $fields_raw = isset( $_POST['fields'] ) ? wp_unslash( $_POST['fields'] ) : '[]';
+        $fields = json_decode( (string) $fields_raw, true );
+        if ( ! is_array( $fields ) ) {
+            wp_send_json_error( 'fields must be a JSON array' );
+        }
+
+        // Whitelist field types so the editor can't inject arbitrary
+        // values that the renderer would have to defend against.
+        $allowed_types = array( 'text', 'email', 'tel', 'number', 'textarea', 'select', 'checkbox', 'radio', 'file', 'date', 'hidden', 'html' );
+        $clean = array();
+        foreach ( $fields as $i => $f ) {
+            if ( ! is_array( $f ) ) {
+                continue;
+            }
+            $type = isset( $f['type'] ) && in_array( $f['type'], $allowed_types, true ) ? $f['type'] : 'text';
+            $key  = sanitize_key( (string) ( $f['key'] ?? 'field_' . ( $i + 1 ) ) );
+            if ( '' === $key ) {
+                $key = 'field_' . ( $i + 1 );
+            }
+            $clean[] = array(
+                'key'         => $key,
+                'type'        => $type,
+                'label'       => sanitize_text_field( (string) ( $f['label'] ?? '' ) ),
+                'placeholder' => sanitize_text_field( (string) ( $f['placeholder'] ?? '' ) ),
+                'description' => sanitize_text_field( (string) ( $f['description'] ?? '' ) ),
+                'required'    => ! empty( $f['required'] ),
+                'default'     => sanitize_text_field( (string) ( $f['default'] ?? '' ) ),
+                'options'     => array_values( array_map( 'sanitize_text_field', (array) ( $f['options'] ?? array() ) ) ),
+                'rows'        => max( 1, min( 30, (int) ( $f['rows'] ?? 4 ) ) ),
+                'min'         => isset( $f['min'] ) && '' !== $f['min'] ? (string) sanitize_text_field( (string) $f['min'] ) : '',
+                'max'         => isset( $f['max'] ) && '' !== $f['max'] ? (string) sanitize_text_field( (string) $f['max'] ) : '',
+                'accept'      => sanitize_text_field( (string) ( $f['accept'] ?? '' ) ),
+                'html'        => wp_kses_post( (string) ( $f['html'] ?? '' ) ),
+            );
+        }
+
+        SFCO_Database::update_form( $form_id, array( 'fields_json' => wp_json_encode( $clean ) ) );
+        wp_send_json_success( array( 'count' => count( $clean ) ) );
     }
 }
 
