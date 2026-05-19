@@ -113,6 +113,24 @@ class SFCO_Admin {
                 SFCO_Database::delete_form( $id );
             } elseif ( 'seed' === $action ) {
                 SFCO_Database::seed_templates();
+            } elseif ( 'duplicate' === $action && $id ) {
+                // Clone an existing form: same fields, same settings,
+                // marked inactive, title prefixed with "Copy of" so the
+                // operator can tell the two apart at a glance.
+                $src = SFCO_Database::get_form( $id );
+                if ( $src ) {
+                    $new_id = SFCO_Database::create_form( array(
+                        'title'         => 'Copy of ' . $src->title,
+                        'slug'          => sanitize_title( $src->title ) . '-copy-' . wp_generate_password( 4, false, false ),
+                        'status'        => 'inactive',
+                        'fields_json'   => $src->fields_json,
+                        'settings_json' => $src->settings_json,
+                    ) );
+                    if ( $new_id ) {
+                        wp_safe_redirect( admin_url( 'admin.php?page=smart-forms-edit-form&form_id=' . $new_id ) );
+                        exit;
+                    }
+                }
             }
             wp_safe_redirect( admin_url( 'admin.php?page=smart-forms' ) );
             exit;
@@ -152,8 +170,9 @@ class SFCO_Admin {
                         $stats     = SFCO_Database::get_form_stats( $form->id );
                         $entries_url = admin_url( 'admin.php?page=smart-forms-form-entries&form_id=' . $form->id );
                         $edit_url    = admin_url( 'admin.php?page=smart-forms-edit-form&form_id=' . $form->id );
-                        $toggle_url  = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=toggle&form_id=' . $form->id ), 'sfco_forms_action' );
-                        $is_active   = ( 'active' === $form->status );
+                        $toggle_url    = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=toggle&form_id=' . $form->id ), 'sfco_forms_action' );
+                        $duplicate_url = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=duplicate&form_id=' . $form->id ), 'sfco_forms_action' );
+                        $is_active     = ( 'active' === $form->status );
                         ?>
                         <tr>
                             <td>
@@ -166,6 +185,7 @@ class SFCO_Admin {
                                 <div class="row-actions">
                                     <span><a href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit', 'smart-forms-for-midland' ); ?></a> | </span>
                                     <span><a href="<?php echo esc_url( $entries_url ); ?>"><?php esc_html_e( 'Entries', 'smart-forms-for-midland' ); ?></a> | </span>
+                                    <span><a href="<?php echo esc_url( $duplicate_url ); ?>"><?php esc_html_e( 'Duplicate', 'smart-forms-for-midland' ); ?></a> | </span>
                                     <span><a href="<?php echo esc_url( $toggle_url ); ?>"><?php echo $is_active ? esc_html__( 'Deactivate', 'smart-forms-for-midland' ) : esc_html__( 'Activate', 'smart-forms-for-midland' ); ?></a></span>
                                 </div>
                             </td>
