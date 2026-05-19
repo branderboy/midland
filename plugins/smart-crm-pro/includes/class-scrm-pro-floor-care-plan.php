@@ -179,17 +179,11 @@ class SCRM_Pro_Floor_Care_Plan {
 
         do_action( 'scrm_pro_floor_care_plan_generated', $post_id, $lead, $tier );
 
-        // Plan generated -> the contact has effectively subscribed to the
-        // monthly floor care service. Tag them in AC with the 'plan_active'
-        // segment so the VIP / retention automation picks them up. The
-        // operator should also configure the AC automation to REMOVE the
-        // 'emergency-no-plan' tag when 'plan-active' is applied so the
-        // upsell sequence stops — that's a one-line "untag" step inside
-        // AC's automation builder.
-        if ( class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
-            $ac = new SCRM_Pro_ActiveCampaign();
-            $ac->sync_segment( $lead, 'plan_active' );
-        }
+        // Plan generation does NOT auto-tag in AC. The WP side of Smart
+        // CRM only handles the 'new_lead' segment at form-submission
+        // time; plan_active / emergency_no_plan / cold are managed
+        // inside ActiveCampaign by the operator's automations watching
+        // the new-lead funnel's engagement signals.
     }
 
     private function pick_tier( $sqft ) {

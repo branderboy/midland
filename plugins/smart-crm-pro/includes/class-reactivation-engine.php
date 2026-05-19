@@ -225,17 +225,11 @@ class SCRM_Pro_Reactivation_Engine {
                 )
             );
 
-            // Sync each newly-cold lead into ActiveCampaign with the
-            // 'cold' segment tag so the win-back automation in AC
-            // fires for them immediately. The operator builds the
-            // sequence once in AC and it applies to every new cold
-            // contact going forward without us pre-staging emails.
-            if ( class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
-                $ac = new SCRM_Pro_ActiveCampaign();
-                foreach ( $newly_cold as $lead ) {
-                    $ac->sync_segment( $lead, 'cold' );
-                }
-            }
+            // Cold-segment tagging stays in ActiveCampaign — Smart CRM's
+            // WP-side scope is "new_lead at submission time" only.
+            // The win-back / reactivation automation in AC watches the
+            // new-lead tag's engagement timeline and moves contacts to
+            // the cold segment itself after N days of no opens / clicks.
         }
     }
 }

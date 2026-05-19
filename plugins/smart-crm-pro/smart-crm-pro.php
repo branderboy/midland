@@ -39,16 +39,19 @@ function smart_crm_pro_init() {
     require_once SCRM_PRO_DIR . 'includes/class-reactivation-analytics.php';
     require_once SCRM_PRO_DIR . 'includes/class-license.php';
     require_once SCRM_PRO_DIR . 'includes/class-admin.php';
-    require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-servicem8.php';
+    // ServiceM8 module intentionally NOT loaded — Smart CRM's scope is
+    // Smart Forms -> AC tagging only. Job dispatch happens elsewhere
+    // (manual, Zapier from AC, or the dispatcher's own tools).
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-activecampaign.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-floor-care-plan.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-smart-forms-bridge.php';
+    require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-ac-export.php';
 
     new SCRM_Pro_Admin();
     new SCRM_Pro_License();
-    SCRM_Pro_ServiceM8::get_instance();
     SCRM_Pro_ActiveCampaign::get_instance();
     SCRM_Pro_Floor_Care_Plan::get_instance();
+    new SCRM_Pro_AC_Export();
 
     // Cron for sending scheduled reactivation emails.
     add_action( 'scrm_pro_send_campaign_email', array( 'SCRM_Pro_Campaign_Manager', 'send_scheduled_email' ), 10, 2 );
