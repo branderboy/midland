@@ -67,7 +67,30 @@ class SFCO_Shortcode {
                     </div>
                 </div>
 
-                <p class="form-helper sfco-helper-residential" style="margin:-6px 0 14px;color:#6b7280;font-size:13px;line-height:1.5;display:none;"><?php esc_html_e( 'For residential, just submit your contact info — we get the rest of the details when we call to schedule the visit.', 'smart-forms-for-midland' ); ?></p>
+                <p class="form-helper sfco-helper-residential" style="margin:-6px 0 14px;color:#6b7280;font-size:13px;line-height:1.5;display:none;"><?php esc_html_e( 'For residential: submit your contact info + property type. We get the rest of the details when we call to confirm the visit.', 'smart-forms-for-midland' ); ?></p>
+
+                <div class="form-row">
+                    <label for="property_subtype"><?php esc_html_e( 'Property type', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
+                    <select name="property_subtype" id="property_subtype" required>
+                        <option value="" data-segment="both"><?php esc_html_e( 'Select...', 'smart-forms-for-midland' ); ?></option>
+                        <!-- Residential -->
+                        <option value="House"          data-segment="residential"><?php esc_html_e( 'House',          'smart-forms-for-midland' ); ?></option>
+                        <option value="Townhouse"      data-segment="residential"><?php esc_html_e( 'Townhouse',      'smart-forms-for-midland' ); ?></option>
+                        <option value="Condo"          data-segment="residential"><?php esc_html_e( 'Condo',          'smart-forms-for-midland' ); ?></option>
+                        <option value="Apartment"      data-segment="residential"><?php esc_html_e( 'Apartment',      'smart-forms-for-midland' ); ?></option>
+                        <!-- Commercial -->
+                        <option value="Office"         data-segment="commercial"><?php esc_html_e( 'Office',          'smart-forms-for-midland' ); ?></option>
+                        <option value="Retail"         data-segment="commercial"><?php esc_html_e( 'Retail / Storefront', 'smart-forms-for-midland' ); ?></option>
+                        <option value="Medical"        data-segment="commercial"><?php esc_html_e( 'Medical / Dental', 'smart-forms-for-midland' ); ?></option>
+                        <option value="School"         data-segment="commercial"><?php esc_html_e( 'School / Education','smart-forms-for-midland' ); ?></option>
+                        <option value="Hotel"          data-segment="commercial"><?php esc_html_e( 'Hotel / Hospitality','smart-forms-for-midland' ); ?></option>
+                        <option value="Restaurant"     data-segment="commercial"><?php esc_html_e( 'Restaurant',      'smart-forms-for-midland' ); ?></option>
+                        <option value="Warehouse"      data-segment="commercial"><?php esc_html_e( 'Warehouse / Industrial','smart-forms-for-midland' ); ?></option>
+                        <option value="Government"     data-segment="commercial"><?php esc_html_e( 'Government / Municipal','smart-forms-for-midland' ); ?></option>
+                        <option value="Property Management" data-segment="commercial"><?php esc_html_e( 'Property Management','smart-forms-for-midland' ); ?></option>
+                        <option value="Other"          data-segment="both"><?php esc_html_e( 'Other', 'smart-forms-for-midland' ); ?></option>
+                    </select>
+                </div>
 
                 <div class="form-row sfco-row-optional-residential">
                     <label for="project_type"><?php esc_html_e( 'What service?', 'smart-forms-for-midland' ); ?> <span class="required sfco-req-mark">*</span></label>
@@ -100,34 +123,38 @@ class SFCO_Shortcode {
                 (function () {
                     var form = document.getElementById('smart-forms-quote-form');
                     if (!form) return;
-                    var select = form.querySelector('select[name="project_type"]');
-                    if (!select) return;
-                    var options    = select.querySelectorAll('option');
+                    var serviceSel = form.querySelector('select[name="project_type"]');
+                    var subtypeSel = form.querySelector('select[name="property_subtype"]');
                     var commRows   = form.querySelectorAll('.sfco-row-commercial-only');
                     var resHelper  = form.querySelector('.sfco-helper-residential');
                     var serviceRow = form.querySelector('.sfco-row-optional-residential');
                     var reqMark    = serviceRow ? serviceRow.querySelector('.sfco-req-mark') : null;
 
-                    function apply() {
-                        var checked = form.querySelector('input[name="property_type"]:checked');
-                        var seg = checked ? checked.value : '';
-                        var isRes = seg === 'residential';
-                        var isCom = seg === 'commercial';
-
-                        options.forEach(function (opt) {
+                    function filterSelect(sel, seg) {
+                        if (!sel) return;
+                        sel.querySelectorAll('option').forEach(function (opt) {
                             var allowed = opt.getAttribute('data-segment') || 'both';
                             var show = (allowed === 'both') || (allowed === seg) || !seg;
-                            opt.hidden = !show;
+                            opt.hidden   = !show;
                             opt.disabled = !show;
-                            if (!show && select.value === opt.value && opt.value !== '') {
-                                select.value = '';
+                            if (!show && sel.value === opt.value && opt.value !== '') {
+                                sel.value = '';
                             }
                         });
+                    }
+
+                    function apply() {
+                        var checked = form.querySelector('input[name="property_type"]:checked');
+                        var seg     = checked ? checked.value : '';
+                        var isRes   = seg === 'residential';
+
+                        filterSelect(serviceSel, seg);
+                        filterSelect(subtypeSel, seg);
 
                         commRows.forEach(function (row) { row.style.display = isRes ? 'none' : ''; });
-                        if (resHelper) resHelper.style.display = isRes ? 'block' : 'none';
-                        if (select) select.required = !isRes;
-                        if (reqMark) reqMark.style.visibility = isRes ? 'hidden' : '';
+                        if (resHelper)  resHelper.style.display = isRes ? 'block' : 'none';
+                        if (serviceSel) serviceSel.required = !isRes;
+                        if (reqMark)    reqMark.style.visibility = isRes ? 'hidden' : '';
                     }
                     form.addEventListener('change', function (e) {
                         if (e.target && e.target.name === 'property_type') apply();
