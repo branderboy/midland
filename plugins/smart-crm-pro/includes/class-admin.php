@@ -50,7 +50,7 @@ class SCRM_Pro_Admin {
             return;
         }
         if ( class_exists( 'SCRM_Pro_Settings' ) ) {
-            ( new SCRM_Pro_Settings() )->render();
+            SCRM_Pro_Settings::get_instance()->render();
             return;
         }
         echo '<div class="wrap"><h1>' . esc_html__( 'Smart CRM', 'smart-crm-pro' ) . '</h1><p>' . esc_html__( 'Settings module failed to load.', 'smart-crm-pro' ) . '</p></div>';

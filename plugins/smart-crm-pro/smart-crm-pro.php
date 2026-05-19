@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart CRM
  * Description: Passthrough between Smart Forms and the integrations (ActiveCampaign, ServiceM8, Vapi, Google Calendar, Floor Care Plan). One sidebar entry: Smart CRM → Settings.
- * Version: 2.0.0
+ * Version: 2.0.1
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-crm-pro
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'SCRM_PRO_VERSION', '2.0.0' );
+define( 'SCRM_PRO_VERSION', '2.0.1' );
 define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
 
@@ -38,11 +38,11 @@ function smart_crm_pro_init() {
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-visit-draft.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-settings.php';
 
+    // Each module's class file self-instantiates its singleton at load
+    // time. Instantiating again here would create duplicate admin_menu
+    // hooks and double-render the page. The bootstrap only owns Admin
+    // (which has no singleton accessor).
     new SCRM_Pro_Admin();
-    SCRM_Pro_ActiveCampaign::get_instance();
-    SCRM_Pro_ServiceM8::get_instance();
-    SCRM_Pro_Floor_Care_Plan::get_instance();
-    new SCRM_Pro_Settings();
 }
 
 register_deactivation_hook( __FILE__, 'scrm_pro_deactivate' );
