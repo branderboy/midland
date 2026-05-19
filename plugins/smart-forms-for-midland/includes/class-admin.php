@@ -331,6 +331,20 @@ class SFCO_Admin {
                 'method' => in_array( ( $_POST['webhook_method'] ?? 'POST' ), array( 'POST', 'PUT', 'PATCH', 'GET', 'DELETE' ), true ) ? sanitize_text_field( wp_unslash( $_POST['webhook_method'] ) ) : 'POST',
                 'format' => ( $_POST['webhook_format'] ?? 'json' ) === 'form' ? 'form' : 'json',
             );
+
+            // Gravity-Forms-parity form settings persisted alongside the
+            // existing fields. Each maps to a render-time decision later
+            // (the shortcode + form-handler classes read settings_json
+            // and apply the chosen behavior).
+            $settings['description']      = sanitize_textarea_field( wp_unslash( $_POST['form_description'] ?? '' ) );
+            $settings['label_placement']  = in_array( ( $_POST['label_placement'] ?? 'top' ), array( 'top', 'left', 'right', 'hidden' ), true ) ? sanitize_text_field( wp_unslash( $_POST['label_placement'] ) ) : 'top';
+            $settings['required_marker']  = in_array( ( $_POST['required_marker'] ?? 'asterisk' ), array( 'asterisk', 'required', 'custom' ), true ) ? sanitize_text_field( wp_unslash( $_POST['required_marker'] ) ) : 'asterisk';
+            $settings['required_custom']  = sanitize_text_field( wp_unslash( $_POST['required_custom'] ?? '' ) );
+            $settings['form_css_class']   = sanitize_html_class( (string) wp_unslash( $_POST['form_css_class'] ?? '' ) );
+            $settings['submit_text']      = sanitize_text_field( wp_unslash( $_POST['submit_text'] ?? '' ) );
+            $settings['submit_css_class'] = sanitize_html_class( (string) wp_unslash( $_POST['submit_css_class'] ?? '' ) );
+            $settings['recaptcha_site']   = sanitize_text_field( wp_unslash( $_POST['recaptcha_site'] ?? '' ) );
+            $settings['recaptcha_secret'] = sanitize_text_field( wp_unslash( $_POST['recaptcha_secret'] ?? '' ) );
             SFCO_Database::update_form( $form_id, array(
                 'title'         => sanitize_text_field( wp_unslash( $_POST['title'] ?? $form->title ) ),
                 'status'        => isset( $_POST['active'] ) ? 'active' : 'inactive',
@@ -518,6 +532,70 @@ class SFCO_Admin {
                             <td>
                                 <label><input type="checkbox" name="crm_push" <?php checked( ! empty( $settings['crm_push'] ) ); ?>> <?php esc_html_e( 'Auto-create a contact + lead in Smart CRM Pro on every submission', 'smart-forms-for-midland' ); ?></label>
                             </td>
+                        </tr>
+                    </table>
+
+                    <h3 style="margin-top:32px;"><?php esc_html_e( 'Form Basics', 'smart-forms-for-midland' ); ?></h3>
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="form_description"><?php esc_html_e( 'Form description', 'smart-forms-for-midland' ); ?></label></th>
+                            <td><textarea name="form_description" id="form_description" rows="3" class="large-text"><?php echo esc_textarea( $settings['description'] ?? '' ); ?></textarea>
+                                <p class="description"><?php esc_html_e( 'Shown above the first field, e.g. "Fill this out and we\'ll be in touch within one business day."', 'smart-forms-for-midland' ); ?></p></td>
+                        </tr>
+                    </table>
+
+                    <h3 style="margin-top:32px;"><?php esc_html_e( 'Form Layout', 'smart-forms-for-midland' ); ?></h3>
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="label_placement"><?php esc_html_e( 'Label placement', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <select name="label_placement" id="label_placement">
+                                    <?php $lp = $settings['label_placement'] ?? 'top'; ?>
+                                    <option value="top"    <?php selected( $lp, 'top' ); ?>><?php esc_html_e( 'Top aligned (default)', 'smart-forms-for-midland' ); ?></option>
+                                    <option value="left"   <?php selected( $lp, 'left' ); ?>><?php esc_html_e( 'Left aligned', 'smart-forms-for-midland' ); ?></option>
+                                    <option value="right"  <?php selected( $lp, 'right' ); ?>><?php esc_html_e( 'Right aligned', 'smart-forms-for-midland' ); ?></option>
+                                    <option value="hidden" <?php selected( $lp, 'hidden' ); ?>><?php esc_html_e( 'Hidden (placeholder only)', 'smart-forms-for-midland' ); ?></option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?php esc_html_e( 'Required field indicator', 'smart-forms-for-midland' ); ?></th>
+                            <td>
+                                <?php $rm = $settings['required_marker'] ?? 'asterisk'; ?>
+                                <label style="display:block;"><input type="radio" name="required_marker" value="asterisk" <?php checked( $rm, 'asterisk' ); ?>> <?php esc_html_e( 'Asterisk: *', 'smart-forms-for-midland' ); ?></label>
+                                <label style="display:block;"><input type="radio" name="required_marker" value="required" <?php checked( $rm, 'required' ); ?>> <?php esc_html_e( 'Text: (Required)', 'smart-forms-for-midland' ); ?></label>
+                                <label style="display:block;"><input type="radio" name="required_marker" value="custom" <?php checked( $rm, 'custom' ); ?>> <?php esc_html_e( 'Custom:', 'smart-forms-for-midland' ); ?> <input type="text" name="required_custom" class="regular-text" value="<?php echo esc_attr( $settings['required_custom'] ?? '' ); ?>" placeholder="e.g. (must fill)"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="form_css_class"><?php esc_html_e( 'Form CSS class', 'smart-forms-for-midland' ); ?></label></th>
+                            <td><input type="text" name="form_css_class" id="form_css_class" class="regular-text" value="<?php echo esc_attr( $settings['form_css_class'] ?? '' ); ?>" placeholder="midland-quote-form">
+                                <p class="description"><?php esc_html_e( 'Added to the form\'s wrapper for custom CSS.', 'smart-forms-for-midland' ); ?></p></td>
+                        </tr>
+                    </table>
+
+                    <h3 style="margin-top:32px;"><?php esc_html_e( 'Submit Button', 'smart-forms-for-midland' ); ?></h3>
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="submit_text"><?php esc_html_e( 'Button text', 'smart-forms-for-midland' ); ?></label></th>
+                            <td><input type="text" name="submit_text" id="submit_text" class="regular-text" value="<?php echo esc_attr( $settings['submit_text'] ?? '' ); ?>" placeholder="Get Quote"></td>
+                        </tr>
+                        <tr>
+                            <th><label for="submit_css_class"><?php esc_html_e( 'Button CSS class', 'smart-forms-for-midland' ); ?></label></th>
+                            <td><input type="text" name="submit_css_class" id="submit_css_class" class="regular-text" value="<?php echo esc_attr( $settings['submit_css_class'] ?? '' ); ?>"></td>
+                        </tr>
+                    </table>
+
+                    <h3 style="margin-top:32px;"><?php esc_html_e( 'Spam Detection', 'smart-forms-for-midland' ); ?></h3>
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="recaptcha_site"><?php esc_html_e( 'reCAPTCHA v3 site key', 'smart-forms-for-midland' ); ?></label></th>
+                            <td><input type="text" name="recaptcha_site" id="recaptcha_site" class="regular-text" value="<?php echo esc_attr( $settings['recaptcha_site'] ?? '' ); ?>">
+                                <p class="description"><?php esc_html_e( 'google.com/recaptcha/admin → create a v3 key for midlandfloors.com. Honeypot above is always on regardless.', 'smart-forms-for-midland' ); ?></p></td>
+                        </tr>
+                        <tr>
+                            <th><label for="recaptcha_secret"><?php esc_html_e( 'reCAPTCHA v3 secret', 'smart-forms-for-midland' ); ?></label></th>
+                            <td><input type="password" name="recaptcha_secret" id="recaptcha_secret" class="regular-text" value="<?php echo esc_attr( $settings['recaptcha_secret'] ?? '' ); ?>" autocomplete="off"></td>
                         </tr>
                     </table>
 
