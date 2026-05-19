@@ -67,8 +67,10 @@ class SFCO_Shortcode {
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <label for="project_type"><?php esc_html_e( 'What service?', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
+                <p class="form-helper sfco-helper-residential" style="margin:-6px 0 14px;color:#6b7280;font-size:13px;line-height:1.5;display:none;"><?php esc_html_e( 'For residential, just submit your contact info — we get the rest of the details when we call to schedule the visit.', 'smart-forms-for-midland' ); ?></p>
+
+                <div class="form-row sfco-row-optional-residential">
+                    <label for="project_type"><?php esc_html_e( 'What service?', 'smart-forms-for-midland' ); ?> <span class="required sfco-req-mark">*</span></label>
                     <select name="project_type" id="project_type" required>
                         <option value="" data-segment="both"><?php esc_html_e( 'Select...', 'smart-forms-for-midland' ); ?></option>
                         <!-- Residential services (carpet cleaning + carpet installation only). -->
@@ -86,21 +88,32 @@ class SFCO_Shortcode {
                 </div>
 
                 <script>
-                /* Filter the service dropdown by selected property_type.
-                   Residential only does carpet cleaning + carpet installation;
-                   commercial gets the full list. Hidden options are still
-                   in the DOM so search-engine bots see them and form re
-                   selections work cleanly if the visitor changes property
-                   type after picking a service. */
+                /* Two jobs:
+                   (1) Filter the service dropdown by selected property
+                       type. Residential = Carpet Cleaning + Carpet
+                       Installation; commercial = full list.
+                   (2) For residential, hide square footage / timeline
+                       and drop the required flag on service — we
+                       collect those details on the phone, not in the
+                       form. Commercial keeps the full intake.
+                */
                 (function () {
                     var form = document.getElementById('smart-forms-quote-form');
                     if (!form) return;
                     var select = form.querySelector('select[name="project_type"]');
                     if (!select) return;
-                    var options = select.querySelectorAll('option');
-                    function filter() {
+                    var options    = select.querySelectorAll('option');
+                    var commRows   = form.querySelectorAll('.sfco-row-commercial-only');
+                    var resHelper  = form.querySelector('.sfco-helper-residential');
+                    var serviceRow = form.querySelector('.sfco-row-optional-residential');
+                    var reqMark    = serviceRow ? serviceRow.querySelector('.sfco-req-mark') : null;
+
+                    function apply() {
                         var checked = form.querySelector('input[name="property_type"]:checked');
                         var seg = checked ? checked.value : '';
+                        var isRes = seg === 'residential';
+                        var isCom = seg === 'commercial';
+
                         options.forEach(function (opt) {
                             var allowed = opt.getAttribute('data-segment') || 'both';
                             var show = (allowed === 'both') || (allowed === seg) || !seg;
@@ -110,20 +123,25 @@ class SFCO_Shortcode {
                                 select.value = '';
                             }
                         });
+
+                        commRows.forEach(function (row) { row.style.display = isRes ? 'none' : ''; });
+                        if (resHelper) resHelper.style.display = isRes ? 'block' : 'none';
+                        if (select) select.required = !isRes;
+                        if (reqMark) reqMark.style.visibility = isRes ? 'hidden' : '';
                     }
                     form.addEventListener('change', function (e) {
-                        if (e.target && e.target.name === 'property_type') filter();
+                        if (e.target && e.target.name === 'property_type') apply();
                     });
-                    filter();
+                    apply();
                 })();
                 </script>
 
-                <div class="form-row">
+                <div class="form-row sfco-row-commercial-only">
                     <label for="square_footage"><?php esc_html_e( 'Square footage (approx.)', 'smart-forms-for-midland' ); ?></label>
                     <input type="number" name="square_footage" id="square_footage" min="1" placeholder="<?php esc_attr_e( 'Skip if you\'re not sure', 'smart-forms-for-midland' ); ?>">
                 </div>
 
-                <div class="form-row">
+                <div class="form-row sfco-row-commercial-only">
                     <label for="timeline"><?php esc_html_e( 'How soon?', 'smart-forms-for-midland' ); ?></label>
                     <select name="timeline" id="timeline">
                         <option value=""><?php esc_html_e( 'Select...', 'smart-forms-for-midland' ); ?></option>
