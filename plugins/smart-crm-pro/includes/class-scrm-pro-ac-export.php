@@ -48,6 +48,41 @@ class SCRM_Pro_AC_Export {
      * shape it as ActiveCampaign's bulk-import format. Returns the array
      * — the download handler json_encodes it; the preview UI renders it.
      */
+    /**
+     * Derive a service-area bucket from the ZIP code so AC automations
+     * can route by territory without us shipping a 41,000-row zip lookup.
+     * DC = 200xx / 202xx. MD = 206xx-219xx. VA = 220xx-246xx. Anything
+     * else falls into 'other' and the operator can drop those from the
+     * funnel manually.
+     */
+    private function area_from_zip( string $zip ): string {
+        $z = (int) substr( preg_replace( '/\D/', '', $zip ), 0, 5 );
+        if ( $z >= 20000 && $z <= 20099 ) return 'dc';
+        if ( $z >= 20200 && $z <= 20599 ) return 'dc';
+        if ( $z >= 20600 && $z <= 21999 ) return 'md';
+        if ( $z >= 22000 && $z <= 24699 ) return 'va';
+        return 'other';
+    }
+
+    /**
+     * Normalise the free-text "project_type" field into one of the
+     * service buckets AC's automation conditions key off. Keeps tag
+     * variants and field values consistent regardless of how the
+     * form labeled the option (some forms say "Carpet", others
+     * "Commercial Carpet Cleaning Services").
+     */
+    private function service_type( string $raw ): string {
+        $s = strtolower( $raw );
+        if ( strpos( $s, 'carpet' )    !== false ) return 'carpet';
+        if ( strpos( $s, 'tile' )      !== false || strpos( $s, 'grout' )    !== false ) return 'tile-grout';
+        if ( strpos( $s, 'strip' )     !== false || strpos( $s, 'wax' )      !== false ) return 'strip-wax';
+        if ( strpos( $s, 'concrete' )  !== false || strpos( $s, 'polish' )   !== false ) return 'concrete-polish';
+        if ( strpos( $s, 'water' )     !== false || strpos( $s, 'restore' )  !== false ) return 'water-damage';
+        if ( strpos( $s, 'upholstery' )!== false )                                       return 'upholstery';
+        if ( strpos( $s, 'hardwood' )  !== false || strpos( $s, 'wood' )     !== false ) return 'hardwood';
+        return 'other';
+    }
+
     private function collect_contacts( int $days = 30 ): array {
         global $wpdb;
         $table = $wpdb->prefix . 'sfco_leads';
@@ -66,10 +101,27 @@ class SCRM_Pro_AC_Export {
             }
             $name_parts = array_pad( explode( ' ', trim( (string) ( $r->customer_name ?? '' ) ), 2 ), 2, '' );
 
-            $is_emergency = ! empty( $r->is_emergency ) || ( isset( $r->project_type ) && stripos( (string) $r->project_type, 'water' ) !== false );
-            $segment      = ( isset( $r->project_type ) && stripos( (string) $r->project_type, 'commercial' ) !== false ) ? 'commercial' : 'residential';
+            $project_raw  = (string) ( $r->project_type ?? '' );
+            $service_type = $this->service_type( $project_raw );
+            $is_emergency = ! empty( $r->is_emergency )
+                || $service_type === 'water-damage'
+                || stripos( $project_raw, 'emergency' ) !== false
+                || stripos( $project_raw, 'urgent' )    !== false;
+            $is_commercial = stripos( $project_raw, 'commercial' ) !== false;
+            $segment       = $is_commercial ? 'commercial' : 'residential';
+            $zip           = (string) ( $r->zip_code ?? '' );
+            $area          = $this->area_from_zip( $zip );
 
-            $tags = array( 'midland-segment-new-lead', 'midland-segment-new-lead-' . $segment );
+            // Tag stack: each tag drives a separate AC condition. The
+            // operator picks one tag per automation. Goal: AC can route
+            // by segment, area, service type, and emergency flag from
+            // tags alone without scanning custom fields.
+            $tags = array(
+                'midland-segment-new-lead',
+                'midland-segment-new-lead-' . $segment,
+                'midland-area-' . $area,
+                'midland-service-' . $service_type,
+            );
             if ( $is_emergency ) {
                 $tags[] = 'midland-segment-new-lead-emergency';
             }
@@ -80,13 +132,22 @@ class SCRM_Pro_AC_Export {
                 'last_name'  => $name_parts[1],
                 'phone'      => (string) ( $r->customer_phone ?? '' ),
                 'tags'       => $tags,
+                // Everything actionable from the form goes into AC custom
+                // fields so personalization tokens ({{contact.zip_code}})
+                // and conditions ("if service_type = water-damage") work.
                 'fields'     => array(
-                    array( 'name' => 'project_type',   'value' => (string) ( $r->project_type ?? '' ) ),
-                    array( 'name' => 'timeline',       'value' => (string) ( $r->timeline ?? '' ) ),
-                    array( 'name' => 'zip_code',       'value' => (string) ( $r->zip_code ?? '' ) ),
-                    array( 'name' => 'square_footage', 'value' => (string) ( $r->square_footage ?? '' ) ),
-                    array( 'name' => 'submitted_at',   'value' => (string) ( $r->created_at ?? '' ) ),
-                    array( 'name' => 'midland_lead_id','value' => (string) ( $r->id ?? '' ) ),
+                    array( 'name' => 'service_type',    'value' => $service_type ),
+                    array( 'name' => 'project_type',    'value' => $project_raw ),
+                    array( 'name' => 'segment',         'value' => $segment ),
+                    array( 'name' => 'is_emergency',    'value' => $is_emergency ? 'yes' : 'no' ),
+                    array( 'name' => 'area',            'value' => $area ),
+                    array( 'name' => 'zip_code',        'value' => $zip ),
+                    array( 'name' => 'timeline',        'value' => (string) ( $r->timeline ?? '' ) ),
+                    array( 'name' => 'square_footage',  'value' => (string) ( $r->square_footage ?? '' ) ),
+                    array( 'name' => 'message',         'value' => (string) ( $r->additional_notes ?? '' ) ),
+                    array( 'name' => 'submitted_at',    'value' => (string) ( $r->created_at ?? '' ) ),
+                    array( 'name' => 'source_form_id',  'value' => (string) ( $r->form_id ?? '' ) ),
+                    array( 'name' => 'midland_lead_id', 'value' => (string) ( $r->id ?? '' ) ),
                 ),
             );
         }
@@ -105,11 +166,26 @@ class SCRM_Pro_AC_Export {
 
         $days     = isset( $_GET['days'] ) ? max( 1, min( 365, (int) $_GET['days'] ) ) : 30;
         $contacts = $this->collect_contacts( $days );
-        $payload  = array( 'contacts' => $contacts );
+
+        // Full automation flow blueprint: contacts on the bottom, the AC
+        // automation recipes the operator should build at the top, plus
+        // a meta block so future re-imports know which Midland install
+        // produced the file.
+        $payload = array(
+            'meta' => array(
+                'source'         => 'midland-smart-crm',
+                'site_url'       => home_url(),
+                'generated_at'   => gmdate( 'c' ),
+                'lookback_days'  => $days,
+                'contact_count'  => count( $contacts ),
+            ),
+            'automation_blueprint' => $this->automation_blueprint(),
+            'contacts'             => $contacts,
+        );
 
         nocache_headers();
         header( 'Content-Type: application/json; charset=UTF-8' );
-        header( 'Content-Disposition: attachment; filename=midland-new-leads-' . gmdate( 'Y-m-d' ) . '.json' );
+        header( 'Content-Disposition: attachment; filename=midland-automation-flow-' . gmdate( 'Y-m-d' ) . '.json' );
         echo wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
         exit;
     }
