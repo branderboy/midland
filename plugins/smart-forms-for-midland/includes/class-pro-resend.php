@@ -23,7 +23,13 @@ class SFCO_Pro_Resend {
         add_action( 'admin_menu',         array( $this, 'add_menu' ), 35 );
         add_action( 'admin_init',         array( $this, 'handle_save' ) );
         add_action( 'admin_init',         array( $this, 'handle_test_email' ) );
-        add_action( 'phpmailer_init',     array( $this, 'configure_phpmailer' ) );
+        // Route every wp_mail through Resend's HTTPS API when enabled.
+        // pre_wp_mail (WP 5.7+) short-circuits the SMTP path entirely
+        // when we return non-null, so we never touch PHPMailer. Avoids
+        // the port 465/587 outbound-blocked-by-cPanel firewall problem
+        // and gets Resend's full delivery telemetry instead of the
+        // opaque "SMTP said 250 OK" you get from phpmailer_init.
+        add_filter( 'pre_wp_mail',        array( $this, 'maybe_send_via_api' ), 10, 2 );
     }
 
     public function add_menu() {
@@ -84,33 +90,117 @@ class SFCO_Pro_Resend {
     }
 
     /**
-     * Override PHPMailer to use Resend SMTP.
-     * Resend SMTP: smtp.resend.com:465 (SSL), user=resend, pass=API key.
+     * Short-circuit wp_mail and send via Resend's HTTPS API.
+     *
+     * @param null|bool $short_circuit Filter contract — return non-null
+     *                                 to skip wp_mail's PHPMailer path.
+     * @param array     $atts          to, subject, message, headers, attachments.
+     * @return null|bool null = continue with default wp_mail; bool = result.
      */
-    public function configure_phpmailer( $phpmailer ) {
+    public function maybe_send_via_api( $short_circuit, $atts ) {
         if ( ! get_option( 'sfco_resend_enabled' ) ) {
-            return;
+            return $short_circuit;
+        }
+        $api_key = (string) get_option( 'sfco_resend_api_key', '' );
+        if ( '' === $api_key ) {
+            return $short_circuit;
         }
 
-        $api_key    = get_option( 'sfco_resend_api_key', '' );
-        $from_name  = get_option( 'sfco_resend_from_name', get_bloginfo( 'name' ) );
-        $from_email = get_option( 'sfco_resend_from_email', get_option( 'admin_email' ) );
+        $from_name  = (string) get_option( 'sfco_resend_from_name', get_bloginfo( 'name' ) );
+        $from_email = (string) get_option( 'sfco_resend_from_email', get_option( 'admin_email' ) );
 
-        if ( empty( $api_key ) ) {
-            return;
+        // Parse the wp_mail atts.
+        $to          = (array) ( is_array( $atts['to'] ?? null ) ? $atts['to'] : array_filter( array_map( 'trim', explode( ',', (string) ( $atts['to'] ?? '' ) ) ) ) );
+        $subject     = (string) ( $atts['subject'] ?? '' );
+        $message     = (string) ( $atts['message'] ?? '' );
+        $headers     = (array) ( $atts['headers'] ?? array() );
+        $attachments = (array) ( $atts['attachments'] ?? array() );
+
+        // Detect HTML vs plain by inspecting Content-Type header.
+        $is_html = false;
+        $reply_to = '';
+        $cc = array();
+        $bcc = array();
+        $headers = is_array( $headers ) ? $headers : array_map( 'trim', explode( "\n", (string) $headers ) );
+        foreach ( $headers as $h ) {
+            if ( ! is_string( $h ) ) continue;
+            if ( stripos( $h, 'content-type:' ) === 0 && stripos( $h, 'text/html' ) !== false ) {
+                $is_html = true;
+            }
+            if ( stripos( $h, 'reply-to:' ) === 0 ) {
+                $reply_to = trim( substr( $h, 9 ) );
+            }
+            if ( stripos( $h, 'cc:' ) === 0 ) {
+                $cc = array_filter( array_map( 'trim', explode( ',', substr( $h, 3 ) ) ) );
+            }
+            if ( stripos( $h, 'bcc:' ) === 0 ) {
+                $bcc = array_filter( array_map( 'trim', explode( ',', substr( $h, 4 ) ) ) );
+            }
+            if ( stripos( $h, 'from:' ) === 0 ) {
+                // Allow a per-message From header to override the default.
+                $raw = trim( substr( $h, 5 ) );
+                if ( preg_match( '/^(.*?)<([^>]+)>$/', $raw, $m ) ) {
+                    $from_name  = trim( $m[1] );
+                    $from_email = trim( $m[2] );
+                } elseif ( is_email( $raw ) ) {
+                    $from_email = $raw;
+                }
+            }
         }
 
-        $phpmailer->isSMTP();
-        $phpmailer->Host       = 'smtp.resend.com';
-        $phpmailer->SMTPAuth   = true;
-        $phpmailer->Port       = 465;
-        $phpmailer->SMTPSecure = 'ssl';
-        $phpmailer->Username   = 'resend';
-        $phpmailer->Password   = $api_key;
-
-        if ( ! empty( $from_email ) ) {
-            $phpmailer->setFrom( $from_email, $from_name );
+        $payload = array(
+            'from'    => ( '' !== $from_name ? sprintf( '%s <%s>', $from_name, $from_email ) : $from_email ),
+            'to'      => array_values( $to ),
+            'subject' => $subject,
+            ( $is_html ? 'html' : 'text' ) => $message,
+        );
+        if ( $reply_to ) {
+            $payload['reply_to'] = $reply_to;
         }
+        if ( $cc ) {
+            $payload['cc'] = array_values( $cc );
+        }
+        if ( $bcc ) {
+            $payload['bcc'] = array_values( $bcc );
+        }
+        if ( $attachments ) {
+            $payload['attachments'] = array();
+            foreach ( $attachments as $path ) {
+                if ( is_readable( $path ) ) {
+                    $payload['attachments'][] = array(
+                        'filename' => basename( $path ),
+                        'content'  => base64_encode( file_get_contents( $path ) ),
+                    );
+                }
+            }
+        }
+
+        $response = wp_remote_post(
+            'https://api.resend.com/emails',
+            array(
+                'timeout' => 15,
+                'headers' => array(
+                    'Authorization' => 'Bearer ' . $api_key,
+                    'Content-Type'  => 'application/json',
+                ),
+                'body' => wp_json_encode( $payload ),
+            )
+        );
+
+        if ( is_wp_error( $response ) ) {
+            if ( class_exists( 'SFCO_Pro_Log' ) ) {
+                SFCO_Pro_Log::record( 'resend', 'error', 'Transport: ' . $response->get_error_message(), null, null, $payload );
+            }
+            return false;
+        }
+        $code     = (int) wp_remote_retrieve_response_code( $response );
+        $body_raw = wp_remote_retrieve_body( $response );
+        $body     = json_decode( $body_raw, true );
+        $ok       = ( $code >= 200 && $code < 300 );
+        if ( class_exists( 'SFCO_Pro_Log' ) ) {
+            SFCO_Pro_Log::record( 'resend', $ok ? 'ok' : 'error', sprintf( 'HTTP %d → %s', $code, $ok ? ( $body['id'] ?? 'sent' ) : ( $body['message'] ?? $body_raw ) ), null, null, $payload, $body ?: $body_raw );
+        }
+        return $ok;
     }
 
     public function render_page() {

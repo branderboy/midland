@@ -58,6 +58,14 @@ class SFCO_Admin {
             array( $this, 'render_tracking_page' )
         );
         add_submenu_page(
+            'smart-forms',
+            esc_html__( 'Integration Log', 'smart-forms-for-midland' ),
+            esc_html__( 'Log', 'smart-forms-for-midland' ),
+            'manage_options',
+            'smart-forms-log',
+            array( $this, 'render_log_page' )
+        );
+        add_submenu_page(
             null, // hidden — accessed by clicking a form row
             esc_html__( 'Form Entries', 'smart-forms-for-midland' ),
             '',
@@ -285,6 +293,11 @@ class SFCO_Admin {
             $settings['notify_email'] = sanitize_email( wp_unslash( $_POST['notify_email'] ?? '' ) );
             $settings['confirmation'] = sanitize_textarea_field( wp_unslash( $_POST['confirmation'] ?? '' ) );
             $settings['crm_push']     = isset( $_POST['crm_push'] );
+            $settings['webhook']      = array(
+                'url'    => esc_url_raw( wp_unslash( $_POST['webhook_url'] ?? '' ) ),
+                'method' => in_array( ( $_POST['webhook_method'] ?? 'POST' ), array( 'POST', 'PUT', 'PATCH', 'GET', 'DELETE' ), true ) ? sanitize_text_field( wp_unslash( $_POST['webhook_method'] ) ) : 'POST',
+                'format' => ( $_POST['webhook_format'] ?? 'json' ) === 'form' ? 'form' : 'json',
+            );
             SFCO_Database::update_form( $form_id, array(
                 'title'         => sanitize_text_field( wp_unslash( $_POST['title'] ?? $form->title ) ),
                 'status'        => isset( $_POST['active'] ) ? 'active' : 'inactive',
@@ -439,6 +452,42 @@ class SFCO_Admin {
                             </td>
                         </tr>
                     </table>
+
+                    <h3 style="margin-top:32px;"><?php esc_html_e( 'Outbound webhook', 'smart-forms-for-midland' ); ?></h3>
+                    <p class="description"><?php esc_html_e( 'Fire an HTTP request to a URL of your choice when this form is submitted. Useful for Zapier, Make, n8n, or a custom backend. Lead fields are sent as the request body.', 'smart-forms-for-midland' ); ?></p>
+                    <?php $webhook = is_array( $settings['webhook'] ?? null ) ? $settings['webhook'] : array(); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th><label for="webhook_url"><?php esc_html_e( 'Webhook URL', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <input type="url" id="webhook_url" name="webhook_url" class="regular-text" value="<?php echo esc_attr( $webhook['url'] ?? '' ); ?>" placeholder="https://hooks.zapier.com/...">
+                                <p class="description"><?php esc_html_e( 'Leave blank to disable.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="webhook_method"><?php esc_html_e( 'Method', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <select id="webhook_method" name="webhook_method">
+                                    <?php $cur_method = $webhook['method'] ?? 'POST'; ?>
+                                    <?php foreach ( array( 'POST', 'PUT', 'PATCH', 'GET', 'DELETE' ) as $m ) : ?>
+                                        <option value="<?php echo esc_attr( $m ); ?>" <?php selected( $cur_method, $m ); ?>><?php echo esc_html( $m ); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="webhook_format"><?php esc_html_e( 'Body format', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <select id="webhook_format" name="webhook_format">
+                                    <?php $cur_format = $webhook['format'] ?? 'json'; ?>
+                                    <option value="json" <?php selected( $cur_format, 'json' ); ?>>JSON</option>
+                                    <option value="form" <?php selected( $cur_format, 'form' ); ?>>Form-encoded</option>
+                                </select>
+                                <p class="description"><?php esc_html_e( 'Most modern services (Zapier, Make, n8n, Discord) expect JSON. Choose form-encoded for legacy PHP endpoints.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                    </table>
+
                     <p><button type="submit" name="sfco_save_form" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-for-midland' ); ?></button></p>
                 </form>
 
@@ -725,6 +774,56 @@ class SFCO_Admin {
                 <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+        <?php
+    }
+
+    /**
+     * Integration log page — last 100 outbound calls from any
+     * integration (Resend, CRM, Webhooks). Operator's first stop
+     * for "why didn't this lead reach my CRM / inbox / Zapier?".
+     */
+    public function render_log_page() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $rows = class_exists( 'SFCO_Pro_Log' ) ? SFCO_Pro_Log::recent( 100 ) : array();
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'Integration Log', 'smart-forms-for-midland' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Every outbound call from Resend, CRM, or a per-form Webhook is recorded here. Shows the 100 most recent events.', 'smart-forms-for-midland' ); ?></p>
+            <?php if ( empty( $rows ) ) : ?>
+                <p style="background:#fff;border:1px dashed #cbd5d0;padding:18px;border-radius:6px;color:#6b8278;"><?php esc_html_e( 'No integration events yet. Submit a form once an integration is configured and they will appear here.', 'smart-forms-for-midland' ); ?></p>
+            <?php else : ?>
+                <table class="widefat striped">
+                    <thead>
+                        <tr>
+                            <th style="width:160px;"><?php esc_html_e( 'When', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:90px;"><?php esc_html_e( 'Service', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:80px;"><?php esc_html_e( 'Status', 'smart-forms-for-midland' ); ?></th>
+                            <th style="width:80px;"><?php esc_html_e( 'Form / Lead', 'smart-forms-for-midland' ); ?></th>
+                            <th><?php esc_html_e( 'Message', 'smart-forms-for-midland' ); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ( $rows as $r ) :
+                            $is_ok = ( 'ok' === $r->status );
+                            ?>
+                            <tr>
+                                <td><?php echo esc_html( $r->created_at ); ?> UTC</td>
+                                <td><code><?php echo esc_html( $r->integration ); ?></code></td>
+                                <td><span style="display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;<?php echo $is_ok ? 'background:#F3FCF4;color:#2F8137;border:1px solid #7CCE8E;' : ( 'skipped' === $r->status ? 'background:#fff8e5;color:#7a5b00;border:1px solid #e6c75e;' : 'background:#fdecec;color:#7a1d1d;border:1px solid #f1b4b4;' ); ?>"><?php echo esc_html( $r->status ); ?></span></td>
+                                <td><?php echo $r->form_id ? esc_html( '#' . $r->form_id ) : '—'; ?><?php echo $r->lead_id ? '<br><small>lead ' . esc_html( $r->lead_id ) . '</small>' : ''; ?></td>
+                                <td><?php echo esc_html( $r->message ?: '—' ); ?>
+                                    <?php if ( ! empty( $r->response ) ) : ?>
+                                        <details style="margin-top:4px;"><summary style="cursor:pointer;color:#2F8137;font-size:12px;">view response</summary><pre style="background:#0F1411;color:#7CCE8E;padding:10px;border-radius:4px;font-size:11px;max-height:200px;overflow:auto;"><?php echo esc_html( $r->response ); ?></pre></details>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
         </div>
         <?php
     }

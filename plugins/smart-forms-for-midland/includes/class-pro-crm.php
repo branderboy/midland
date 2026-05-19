@@ -196,7 +196,8 @@ class SFCO_Pro_CRM {
             $payload['contact']['fieldValues'] = $field_values;
         }
 
-        wp_remote_post( untrailingslashit( $api_url ) . '/api/3/contact/sync', array(
+        $endpoint = untrailingslashit( $api_url ) . '/api/3/contact/sync';
+        $response = wp_remote_post( $endpoint, array(
             'headers' => array(
                 'Api-Token'    => $api_key,
                 'Content-Type' => 'application/json',
@@ -205,6 +206,17 @@ class SFCO_Pro_CRM {
             'body'    => wp_json_encode( $payload ),
             'timeout' => 15,
         ) );
+
+        if ( class_exists( 'SFCO_Pro_Log' ) ) {
+            if ( is_wp_error( $response ) ) {
+                SFCO_Pro_Log::record( 'crm', 'error', 'Transport: ' . $response->get_error_message(), null, null, $payload );
+            } else {
+                $code = (int) wp_remote_retrieve_response_code( $response );
+                $body = json_decode( wp_remote_retrieve_body( $response ), true );
+                $ok   = ( $code >= 200 && $code < 300 );
+                SFCO_Pro_Log::record( 'crm', $ok ? 'ok' : 'error', sprintf( 'ActiveCampaign sync HTTP %d', $code ), null, null, $payload, $body );
+            }
+        }
     }
 
     public function ajax_sync_lead() {
