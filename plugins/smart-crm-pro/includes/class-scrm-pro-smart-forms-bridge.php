@@ -33,10 +33,9 @@ class SCRM_Pro_Smart_Forms_Bridge {
         add_action( 'sfco_lead_submitted',                   array( __CLASS__, 'on_lead_submitted' ), 10, 3 );
         add_action( 'scrm_pro_follow_up_reminder',           array( __CLASS__, 'fire_reminder' ),    10, 1 );
 
-        // Auto-push Hot leads into ServiceM8 as a quote-job (settings-gated).
-        if ( class_exists( 'SCRM_Pro_ServiceM8' ) ) {
-            add_action( 'scrm_pro_smart_forms_lead',         array( 'SCRM_Pro_ServiceM8', 'maybe_auto_push' ), 10, 3 );
-        }
+        // ServiceM8 module removed — Smart CRM's WP-side scope is
+        // Smart Forms -> AC new_lead tagging only. Job dispatch
+        // (ServiceM8 / etc.) is handled outside WP.
 
         // Per-lead action buttons rendered inside the Smart Forms entries view.
         add_action( 'sfco_render_entry_actions',             array( __CLASS__, 'render_entry_actions' ), 10, 1 );
@@ -160,6 +159,14 @@ class SCRM_Pro_Smart_Forms_Bridge {
              * code already has on_chat_lead_captured handling a similar shape.
              */
             do_action( 'scrm_pro_smart_forms_lead', $ac_lead, $priority, $area );
+
+            // Sync the contact into ActiveCampaign with the 'new_lead'
+            // segment tag so the welcome / nurture automation in AC
+            // picks them up immediately. The job-booked / job-completed
+            // tags will be applied later by their respective lifecycle
+            // hooks; this is just the entry point of the funnel.
+            $ac = new SCRM_Pro_ActiveCampaign();
+            $ac->sync_segment( $ac_lead, 'new_lead' );
         }
     }
 

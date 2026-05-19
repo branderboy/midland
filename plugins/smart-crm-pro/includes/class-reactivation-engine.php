@@ -221,9 +221,15 @@ class SCRM_Pro_Reactivation_Engine {
                     /* translators: %d: number of cold leads */
                     __( "You have %d leads that are now 30+ days old without a response.\n\nGo to Smart CRM PRO > Reactivation to create a win-back campaign.\n\n%s", 'smart-crm-pro' ),
                     $count,
-                    admin_url( 'admin.php?page=scrm-reactivation' )
+                    admin_url( 'admin.php?page=smart-crm' )
                 )
             );
+
+            // Cold-segment tagging stays in ActiveCampaign — Smart CRM's
+            // WP-side scope is "new_lead at submission time" only.
+            // The win-back / reactivation automation in AC watches the
+            // new-lead tag's engagement timeline and moves contacts to
+            // the cold segment itself after N days of no opens / clicks.
         }
     }
 }

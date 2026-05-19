@@ -15,8 +15,21 @@ class SCRM_Pro_Admin {
     }
 
     public function add_menu() {
-        add_submenu_page( 'sfco-forms', __( 'Reactivation', 'smart-crm-pro' ), __( 'Reactivation', 'smart-crm-pro' ), 'manage_options', 'scrm-reactivation', array( $this, 'render_reactivation_page' ) );
-        add_submenu_page( 'sfco-forms', __( 'Campaigns', 'smart-crm-pro' ), __( 'Campaigns', 'smart-crm-pro' ), 'manage_options', 'scrm-campaigns', array( $this, 'render_campaigns_page' ) );
+        // Top-level Smart CRM menu. Before 1.3.0 every submenu tried to
+        // attach to parent slug 'sfco-forms' which doesn't exist, so
+        // none of these pages rendered in the sidebar — they were
+        // accessible only by typing the URL manually.
+        add_menu_page(
+            __( 'Smart CRM', 'smart-crm-pro' ),
+            __( 'Smart CRM', 'smart-crm-pro' ),
+            'manage_options',
+            'smart-crm',
+            array( $this, 'render_reactivation_page' ),
+            'dashicons-businessman',
+            40
+        );
+        add_submenu_page( 'smart-crm', __( 'Reactivation', 'smart-crm-pro' ), __( 'Reactivation', 'smart-crm-pro' ), 'manage_options', 'smart-crm', array( $this, 'render_reactivation_page' ) );
+        add_submenu_page( 'smart-crm', __( 'Campaigns',    'smart-crm-pro' ), __( 'Campaigns',    'smart-crm-pro' ), 'manage_options', 'scrm-campaigns', array( $this, 'render_campaigns_page' ) );
     }
 
     public function enqueue_assets( $hook ) {

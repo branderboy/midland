@@ -89,7 +89,7 @@ class SCRM_Pro_ActiveCampaign {
 
     public function add_menu() {
         add_submenu_page(
-            'smart-crm-pro',
+            'smart-crm',
             esc_html__( 'ActiveCampaign', 'smart-crm-pro' ),
             esc_html__( 'ActiveCampaign', 'smart-crm-pro' ),
             'manage_options',
@@ -191,12 +191,42 @@ class SCRM_Pro_ActiveCampaign {
 
         $tags = array();
         switch ( $lifecycle ) {
+            // The four customer segments the operator wants automations
+            // for. Each tag drives a separate AC automation:
+            //   1. New leads               → welcome + nurture series
+            //   2. Cold clients            → win-back series
+            //   3. Emergency-without-plan  → plan upsell series
+            //   4. Monthly plan subscriber → VIP + retention series
+            case 'new_lead':
+                $tags[] = 'midland-segment-new-lead';
+                $tags[] = 'midland-segment-new-lead-' . $segment;
+                if ( $is_emergency ) {
+                    $tags[] = 'midland-segment-new-lead-emergency';
+                }
+                break;
+
+            case 'cold':
+                $tags[] = 'midland-segment-cold-reactivation';
+                $tags[] = 'midland-segment-cold-reactivation-' . $segment;
+                break;
+
+            case 'emergency_no_plan':
+                // Customer who got an emergency job done but never signed a
+                // floor care plan. Highest-value upsell target.
+                $tags[] = 'midland-segment-emergency-no-plan';
+                $tags[] = 'midland-segment-emergency-no-plan-' . $segment;
+                break;
+
+            case 'plan_active':
+                // Active monthly subscriber. VIP comms, plan upgrades,
+                // referral asks.
+                $tags[] = 'midland-segment-monthly-plan-active';
+                $tags[] = 'midland-segment-monthly-plan-active-' . $segment;
+                break;
+
             case 'booked':
                 $tags[] = 'midland-job-booked-' . $segment;
                 if ( 'commercial' === $segment ) {
-                    // Commercial bookings double up: the on-site visit flow + the
-                    // base segment tag, so AC can run different automations off
-                    // each (multi-touch outreach vs. simple notification).
                     $tags[] = 'midland-onsite-booked-commercial';
                 }
                 if ( $is_emergency ) {
@@ -211,9 +241,6 @@ class SCRM_Pro_ActiveCampaign {
                     $tags[] = 'midland-job-completed-emergency';
                     $tags[] = 'midland-job-completed-' . $segment . '-emergency';
                 }
-                // Floor Care Plan offer = commercial only (with extra weight on
-                // commercial-emergency since those benefit most from a recurring
-                // maintenance plan after a costly emergency call-out).
                 if ( 'commercial' === $segment ) {
                     $tags[] = 'midland-floor-care-plan-offer';
                     if ( $is_emergency ) {
@@ -223,6 +250,25 @@ class SCRM_Pro_ActiveCampaign {
                 break;
         }
         return apply_filters( 'scrm_pro_ac_tags', $tags, $lifecycle, $segment, $is_emergency );
+    }
+
+    /**
+     * Public entry point so other modules can push a contact into AC
+     * tagged with one of the four customer segments. Used by:
+     *   - Smart Forms bridge on first submission   → 'new_lead'
+     *   - Reactivation engine daily cron           → 'cold'
+     *   - Job-completed without plan handler       → 'emergency_no_plan'
+     *   - Floor Care Plan activation               → 'plan_active'
+     *
+     * @param mixed  $lead    Object or array — Smart Forms lead row.
+     * @param string $segment new_lead | cold | emergency_no_plan | plan_active
+     */
+    public function sync_segment( $lead, $segment ) {
+        $allowed = array( 'new_lead', 'cold', 'emergency_no_plan', 'plan_active' );
+        if ( ! in_array( $segment, $allowed, true ) ) {
+            return;
+        }
+        $this->push_lead( $lead, $segment );
     }
 
     /**
