@@ -24,6 +24,85 @@ class SFCO_Pro_Settings {
     public function __construct() {
         add_action( 'admin_menu', array( $this, 'register' ), 25 );
         add_action( 'admin_init', array( $this, 'handle_save' ) );
+        add_action( 'wp_ajax_sfco_test_connection', array( $this, 'ajax_test_connection' ) );
+    }
+
+    /**
+     * Per-integration "Test connection" AJAX endpoint. Tied to the
+     * buttons rendered on each tab in the unified Settings page.
+     * Returns success/error JSON which the inline JS shows next to
+     * the button. Same shape as Smart CRM's test endpoint.
+     */
+    public function ajax_test_connection() {
+        check_ajax_referer( 'sfco_test_connection' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+        }
+        $which = isset( $_POST['integration'] ) ? sanitize_key( wp_unslash( $_POST['integration'] ) ) : '';
+
+        switch ( $which ) {
+            case 'resend':
+                $key = (string) get_option( 'sfco_resend_api_key' );
+                if ( '' === $key ) {
+                    wp_send_json_error( array( 'message' => 'Resend API key not set.' ) );
+                }
+                $r = wp_remote_get( 'https://api.resend.com/domains', array(
+                    'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Accept' => 'application/json' ),
+                    'timeout' => 10,
+                ) );
+                if ( is_wp_error( $r ) ) {
+                    wp_send_json_error( array( 'message' => $r->get_error_message() ) );
+                }
+                $code = wp_remote_retrieve_response_code( $r );
+                if ( $code >= 200 && $code < 300 ) {
+                    wp_send_json_success( array( 'message' => 'Resend reachable (HTTP ' . $code . ')' ) );
+                }
+                wp_send_json_error( array( 'message' => 'Resend returned HTTP ' . $code ) );
+
+            case 'crm':
+                $url = (string) get_option( 'sfco_pro_crm_api_url' );
+                $key = (string) get_option( 'sfco_pro_crm_api_key' );
+                if ( '' === $url || '' === $key ) {
+                    wp_send_json_error( array( 'message' => 'AC API URL + key not set.' ) );
+                }
+                $r = wp_remote_get( untrailingslashit( $url ) . '/api/3/users', array(
+                    'headers' => array( 'Api-Token' => $key, 'Accept' => 'application/json' ),
+                    'timeout' => 10,
+                ) );
+                if ( is_wp_error( $r ) ) {
+                    wp_send_json_error( array( 'message' => $r->get_error_message() ) );
+                }
+                $code = wp_remote_retrieve_response_code( $r );
+                if ( $code >= 200 && $code < 300 ) {
+                    wp_send_json_success( array( 'message' => 'ActiveCampaign connected (HTTP ' . $code . ')' ) );
+                }
+                wp_send_json_error( array( 'message' => 'AC returned HTTP ' . $code ) );
+
+            case 'calendly':
+                $url = (string) get_option( 'sfco_pro_calendly_url' );
+                if ( '' === $url ) {
+                    wp_send_json_error( array( 'message' => 'Calendly URL not set.' ) );
+                }
+                $r = wp_remote_head( $url, array( 'timeout' => 10, 'redirection' => 3 ) );
+                if ( is_wp_error( $r ) ) {
+                    wp_send_json_error( array( 'message' => $r->get_error_message() ) );
+                }
+                $code = wp_remote_retrieve_response_code( $r );
+                if ( $code >= 200 && $code < 400 ) {
+                    wp_send_json_success( array( 'message' => 'Calendly URL reachable (HTTP ' . $code . ')' ) );
+                }
+                wp_send_json_error( array( 'message' => 'Calendly URL returned HTTP ' . $code ) );
+
+            case 'gcal':
+                if ( class_exists( 'SFCO_Pro_GCal' ) ) {
+                    $g = SFCO_Pro_GCal::get_instance();
+                    if ( $g && $g->is_connected() ) {
+                        wp_send_json_success( array( 'message' => 'Google Calendar connected.' ) );
+                    }
+                }
+                wp_send_json_error( array( 'message' => 'GCal not connected — complete OAuth on the Google Calendar tab.' ) );
+        }
+        wp_send_json_error( array( 'message' => 'Unknown integration.' ) );
     }
 
     public function register() {
@@ -171,6 +250,51 @@ class SFCO_Pro_Settings {
                     <a class="nav-tab <?php echo $slug === $active ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $tab_url( $slug ) ); ?>"><?php echo esc_html( $label ); ?></a>
                 <?php endforeach; ?>
             </h2>
+
+            <?php
+            // Per-tab Test Connection block. Only tabs that have a
+            // testable remote service get a button — Notifications,
+            // Branding, Tracking are local-only and skip the block.
+            $testable = array(
+                'email'    => 'resend',
+                'crm'      => 'crm',
+                'gcal'     => 'gcal',
+                'calendly' => 'calendly',
+            );
+            if ( isset( $testable[ $active ] ) ) :
+                $test_nonce = wp_create_nonce( 'sfco_test_connection' );
+                ?>
+                <div style="background:#fff;border:1px solid #d6e6dc;border-radius:6px;padding:12px 16px;margin:14px 0;display:flex;align-items:center;gap:12px;">
+                    <strong style="color:#0F1411;"><?php esc_html_e( 'Test connection', 'smart-forms-for-midland' ); ?></strong>
+                    <button type="button" class="button" data-sfco-test="<?php echo esc_attr( $testable[ $active ] ); ?>" data-nonce="<?php echo esc_attr( $test_nonce ); ?>"><?php esc_html_e( 'Run test', 'smart-forms-for-midland' ); ?></button>
+                    <span class="sfco-test-result" style="font-size:14px;"></span>
+                </div>
+                <script>
+                document.addEventListener('click', function (e) {
+                    var btn = e.target.closest('[data-sfco-test]');
+                    if (!btn) return;
+                    var fd = new FormData();
+                    fd.append('action', 'sfco_test_connection');
+                    fd.append('integration', btn.dataset.sfcoTest);
+                    fd.append('_ajax_nonce', btn.dataset.nonce);
+                    var result = btn.parentElement.querySelector('.sfco-test-result');
+                    result.textContent = 'Testing…'; result.style.color = '#6b7280';
+                    btn.disabled = true;
+                    fetch(ajaxurl, { method: 'POST', body: fd, credentials: 'same-origin' })
+                        .then(function (r) { return r.json(); })
+                        .then(function (json) {
+                            btn.disabled = false;
+                            if (json && json.success) {
+                                result.textContent = '✓ ' + (json.data.message || 'OK');
+                                result.style.color = '#2F8137';
+                            } else {
+                                result.textContent = '✗ ' + ((json && json.data && json.data.message) || 'Failed');
+                                result.style.color = '#7a1d1d';
+                            }
+                        });
+                });
+                </script>
+            <?php endif; ?>
 
             <form method="post" action="">
                 <?php wp_nonce_field( 'sfco_unified_save', '_sfco_unified_nonce' ); ?>
