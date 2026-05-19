@@ -48,7 +48,7 @@ class SCRM_Pro_Floor_Care_Plan {
         add_action( 'scrm_pro_job_completed',    array( $this, 'maybe_generate_plan' ), 5 );
         add_action( 'sfco_lead_status_changed',  array( $this, 'on_status_changed' ), 5, 3 );
 
-        add_action( 'admin_menu',                array( $this, 'add_menu' ), 23 );
+        add_action( 'admin_menu',                array( $this, 'add_menu' ), 43 );
         add_action( 'admin_init',                array( $this, 'handle_save' ) );
 
         // Plans are personalized — never let search engines index them.

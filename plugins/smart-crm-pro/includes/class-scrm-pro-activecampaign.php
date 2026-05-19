@@ -52,7 +52,7 @@ class SCRM_Pro_ActiveCampaign {
     }
 
     private function __construct() {
-        add_action( 'admin_menu',                array( $this, 'add_menu' ), 22 );
+        add_action( 'admin_menu',                array( $this, 'add_menu' ), 41 );
         add_action( 'admin_init',                array( $this, 'handle_save' ) );
         add_action( 'admin_init',                array( $this, 'handle_test' ) );
         add_action( 'admin_init',                array( $this, 'handle_setup_pipeline' ) );
