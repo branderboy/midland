@@ -387,7 +387,7 @@ class SCRM_Pro_ServiceM8 {
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'ServiceM8 Bridge', 'smart-crm-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'When a job is completed in ServiceM8, the matching lead is marked completed. That fires the NPS survey via Smart Reviews Pro and the ActiveCampaign push.', 'smart-crm-pro' ); ?></p>
+            <p class="description"><?php esc_html_e( 'On the ServiceM8 Growing plan, the only credential exposed in the dashboard is the API key — Developer Tools and webhook subscriptions are gated to higher tiers. Configure the API key below to enable outbound push (lead → ServiceM8 Quote). The webhook fields further down only apply if you upgrade to a plan that exposes them; leave them blank on Growing.', 'smart-crm-pro' ); ?></p>
 
             <?php if ( $saved ) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-crm-pro' ); ?></p></div>
@@ -395,45 +395,21 @@ class SCRM_Pro_ServiceM8 {
 
             <form method="post">
                 <?php wp_nonce_field( 'scrm_save_sm8', '_scrm_sm8_nonce' ); ?>
+                <h2 style="margin-top:0;"><?php esc_html_e( 'Outbound (CRM → ServiceM8) — works on Growing plan', 'smart-crm-pro' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Lets the per-lead "Push to ServiceM8" button (and the auto-push) create a Quote in ServiceM8 from a Smart Forms lead. Only the API key is required.', 'smart-crm-pro' ); ?></p>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'Webhook URL', 'smart-crm-pro' ); ?></th>
-                        <td>
-                            <code><?php echo esc_html( $webhook_url ); ?></code>
-                            <p class="description"><?php esc_html_e( 'Configure this URL in your ServiceM8 webhook subscription.', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="sm8_secret"><?php esc_html_e( 'Signing Secret', 'smart-crm-pro' ); ?></label></th>
-                        <td>
-                            <input type="password" id="sm8_secret" name="sm8_secret" class="regular-text" value="<?php echo esc_attr( $secret ); ?>">
-                            <p class="description"><?php esc_html_e( 'Required. Webhook is HMAC-SHA256 verified against this secret. Without it the endpoint rejects every request.', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="sm8_completion_status"><?php esc_html_e( 'Completion Keyword', 'smart-crm-pro' ); ?></label></th>
-                        <td>
-                            <input type="text" id="sm8_completion_status" name="sm8_completion_status" value="<?php echo esc_attr( $key ); ?>">
-                            <p class="description"><?php esc_html_e( 'Status or event substring that means "this job is done" (default: completed).', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                </table>
-
-                <h2 style="margin-top:24px;"><?php esc_html_e( 'Outbound (CRM → ServiceM8)', 'smart-crm-pro' ); ?></h2>
-                <p class="description"><?php esc_html_e( 'Lets the per-lead "Push to ServiceM8" button (and Hot-lead auto-push) create a Quote in ServiceM8 from a Smart Forms lead.', 'smart-crm-pro' ); ?></p>
-                <table class="form-table">
-                    <tr>
-                        <th><label for="sm8_api_key"><?php esc_html_e( 'ServiceM8 API Key', 'smart-crm-pro' ); ?></label></th>
+                        <th><label for="sm8_api_key"><?php esc_html_e( 'ServiceM8 API Key', 'smart-crm-pro' ); ?> <span style="color:#b32d2e;">*</span></label></th>
                         <td>
                             <input type="password" id="sm8_api_key" name="sm8_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" autocomplete="off">
-                            <p class="description"><?php esc_html_e( 'ServiceM8 → Settings → Developer Tools → Generate API key. Premium Plus plan supports full API + webhooks.', 'smart-crm-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'ServiceM8 → Settings → API Key (Growing plan exposes this directly — no Developer Tools menu required). Paste the key here. This is the only field needed to push leads into ServiceM8.', 'smart-crm-pro' ); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th><label for="sm8_company_uuid"><?php esc_html_e( 'Default Company UUID', 'smart-crm-pro' ); ?></label></th>
                         <td>
                             <input type="text" id="sm8_company_uuid" name="sm8_company_uuid" class="regular-text" value="<?php echo esc_attr( $company_uuid ); ?>" placeholder="00000000-0000-0000-0000-000000000000">
-                            <p class="description"><?php esc_html_e( 'Optional. ServiceM8 → Clients → click the master "house account" client → copy the UUID from the URL. Leave blank to let ServiceM8 create a contact-only job.', 'smart-crm-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Optional. ServiceM8 → Clients → click the master "house account" client → copy the UUID from the URL. Leave blank and ServiceM8 creates a contact-only job from the lead\'s name/email/phone.', 'smart-crm-pro' ); ?></p>
                         </td>
                     </tr>
                     <tr>
@@ -454,6 +430,33 @@ class SCRM_Pro_ServiceM8 {
                         </td>
                     </tr>
                 </table>
+
+                <h2 style="margin-top:24px;"><?php esc_html_e( 'Inbound (ServiceM8 → CRM) — requires a plan that exposes webhooks', 'smart-crm-pro' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'These fields are only useful on a ServiceM8 plan that exposes Developer Tools / Webhooks (Premium tier and above). On the Growing plan ServiceM8 does not expose a webhook subscription UI, so leave these blank — the outbound push above is the only half that runs. If/when you upgrade, fill in the secret and point a ServiceM8 webhook at the URL below to auto-mark leads completed (which fires the NPS survey and AC push).', 'smart-crm-pro' ); ?></p>
+                <table class="form-table">
+                    <tr>
+                        <th><?php esc_html_e( 'Webhook URL', 'smart-crm-pro' ); ?></th>
+                        <td>
+                            <code><?php echo esc_html( $webhook_url ); ?></code>
+                            <p class="description"><?php esc_html_e( 'Configure this URL in your ServiceM8 webhook subscription (requires Premium plan or higher).', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="sm8_secret"><?php esc_html_e( 'Signing Secret', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="password" id="sm8_secret" name="sm8_secret" class="regular-text" value="<?php echo esc_attr( $secret ); ?>">
+                            <p class="description"><?php esc_html_e( 'Optional on Growing plan (leave blank). On webhook-capable plans this is required — the endpoint rejects every unsigned request.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="sm8_completion_status"><?php esc_html_e( 'Completion Keyword', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="text" id="sm8_completion_status" name="sm8_completion_status" value="<?php echo esc_attr( $key ); ?>">
+                            <p class="description"><?php esc_html_e( 'Status or event substring that means "this job is done" (default: completed). Only used when a webhook is actually wired up.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
                 <p class="submit"><button type="submit" name="scrm_save_sm8" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-crm-pro' ); ?></button></p>
             </form>
 
