@@ -173,7 +173,8 @@ class SFCO_Plugin {
             array( 'key' => 'property_type',     'type' => 'radio',    'label' => 'Commercial or residential?',          'required' => true, 'options' => array( 'Commercial', 'Residential' ) ),
             array( 'key' => 'lead_intent',       'type' => 'radio',    'label' => 'What brings you to Midland?',         'required' => true, 'options' => array(
                 'Emergency — I need help now',
-                'Book a visit — come see the space and quote',
+                'Request a visit — we come on-site to see the space and quote',
+                'Request a call — call me to discuss (residential)',
                 'Planning a future project (commercial)',
                 'Just researching for now',
             ) ),

@@ -119,10 +119,14 @@ Used for sand & refinish, recoat, stain change, restoration.
   - Stain / spot emergency → `service:carpet-stain-emergency` + `trigger:emergency`
   - Carpet installation → `service:carpet-install`
   - Carpet repair / re-stretch → `service:carpet-repair`
-- **How would you like to book?** *(required, residential only)*, the two
-  residential booking options that drive the follow-up channel:
-  - Request a call back → `booking:request-call`
-  - Request a site visit → `booking:request-visit`
+- **How would you like to book?** *(required, residential only — applies to
+  both carpet cleaning and carpet installation)*, the two residential
+  booking options that drive the follow-up channel. These map directly to
+  the `lead_intent` field on the intake form:
+  - Request a visit → `lead_intent=request_visit`, `booking:request-visit`
+    (operator drafts a tentative on-site visit on Google Calendar)
+  - Request a call → `lead_intent=request_call`, `booking:request-call`
+    (no calendar draft; Vapi / operator phones the customer back instead)
 - **Approximate square footage / number of rooms**
 - **Carpet type**, Synthetic / Wool / Berber / Commercial loop / Unsure
 - **Stains / problem areas**, checkbox list (pet / wine / coffee / oil / unknown / other)
