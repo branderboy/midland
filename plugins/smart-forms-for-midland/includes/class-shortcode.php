@@ -189,14 +189,15 @@ class SFCO_Shortcode {
                 <div class="form-row">
                     <label><?php esc_html_e( 'What brings you to Midland?', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
                     <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
-                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="emergency" required> <?php esc_html_e( 'Emergency — I need help now', 'smart-forms-for-midland' ); ?></label>
-                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="book_visit" checked> <?php esc_html_e( 'Book a visit — come see the space and quote', 'smart-forms-for-midland' ); ?></label>
-                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="future_project"> <?php esc_html_e( 'Planning a future project (commercial)', 'smart-forms-for-midland' ); ?></label>
-                        <label style="font-weight:400;"><input type="radio" name="lead_intent" value="research"> <?php esc_html_e( 'Just researching for now', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;" data-segment="both"><input type="radio" name="lead_intent" value="emergency" required> <?php esc_html_e( 'Emergency — I need help now', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;" data-segment="both"><input type="radio" name="lead_intent" value="request_visit" checked> <?php esc_html_e( 'Request a visit — we come on-site to see the space and quote', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;" data-segment="residential"><input type="radio" name="lead_intent" value="request_call"> <?php esc_html_e( 'Request a call — call me to discuss carpet cleaning or installation', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;" data-segment="commercial"><input type="radio" name="lead_intent" value="future_project"> <?php esc_html_e( 'Planning a future project (commercial)', 'smart-forms-for-midland' ); ?></label>
+                        <label style="font-weight:400;" data-segment="both"><input type="radio" name="lead_intent" value="research"> <?php esc_html_e( 'Just researching for now', 'smart-forms-for-midland' ); ?></label>
                     </div>
                 </div>
 
-                <p class="form-helper sfco-helper-residential" style="margin:-6px 0 14px;color:#6b7280;font-size:13px;line-height:1.5;display:none;"><?php esc_html_e( 'For residential: submit your contact info + property type. We get the rest of the details when we call to confirm the visit.', 'smart-forms-for-midland' ); ?></p>
+                <p class="form-helper sfco-helper-residential" style="margin:-6px 0 14px;color:#6b7280;font-size:13px;line-height:1.5;display:none;"><?php esc_html_e( 'For residential carpet cleaning or carpet installation: pick "Request a visit" if you want us on-site, or "Request a call" if you just want us to phone you back. Either way, submit your contact info + property type and we take it from there.', 'smart-forms-for-midland' ); ?></p>
 
                 <div class="form-row">
                     <label for="property_subtype"><?php esc_html_e( 'Property type', 'smart-forms-for-midland' ); ?> <span class="required">*</span></label>
@@ -258,6 +259,7 @@ class SFCO_Shortcode {
                     var resHelper  = form.querySelector('.sfco-helper-residential');
                     var serviceRow = form.querySelector('.sfco-row-optional-residential');
                     var reqMark    = serviceRow ? serviceRow.querySelector('.sfco-req-mark') : null;
+                    var intentLabels = form.querySelectorAll('label[data-segment]');
 
                     function filterSelect(sel, seg) {
                         if (!sel) return;
@@ -284,6 +286,20 @@ class SFCO_Shortcode {
                         if (resHelper)  resHelper.style.display = isRes ? 'block' : 'none';
                         if (serviceSel) serviceSel.required = !isRes;
                         if (reqMark)    reqMark.style.visibility = isRes ? 'hidden' : '';
+
+                        intentLabels.forEach(function (lbl) {
+                            var allowed = lbl.getAttribute('data-segment') || 'both';
+                            var show    = (allowed === 'both') || (allowed === seg) || !seg;
+                            lbl.style.display = show ? '' : 'none';
+                            var input = lbl.querySelector('input[type="radio"]');
+                            if (input) {
+                                input.disabled = !show;
+                                if (!show && input.checked) {
+                                    var fallback = form.querySelector('input[name="lead_intent"][value="request_visit"]');
+                                    if (fallback) fallback.checked = true;
+                                }
+                            }
+                        });
                     }
                     form.addEventListener('change', function (e) {
                         if (e.target && e.target.name === 'property_type') apply();

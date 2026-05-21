@@ -47,6 +47,14 @@ class SCRM_Pro_Visit_Draft {
         $zip              = (string) ( $row['zip_code'] ?? '' );
         $notes            = (string) ( $row['additional_notes'] ?? '' );
 
+        // Residential carpet leads who picked "Request a call" don't want
+        // a site visit yet — they want a phone call. Skip the GCal draft
+        // so the operator isn't chasing a calendar event that shouldn't
+        // exist. The Vapi callback hook (priority 60) still fires.
+        if ( 'request_call' === $intent ) {
+            return;
+        }
+
         // Placeholder time: next business morning 10:00 local. Saturday
         // submits push to Monday; Sunday submits push to Monday. The
         // operator drags the event during the confirmation call.

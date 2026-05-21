@@ -49,4 +49,5 @@ register_deactivation_hook( __FILE__, 'scrm_pro_deactivate' );
 function scrm_pro_deactivate() {
     wp_clear_scheduled_hook( 'scrm_pro_daily_scan' );
     wp_clear_scheduled_hook( 'scrm_pro_send_campaign_email' );
+    wp_clear_scheduled_hook( 'scrm_pro_sm8_poll_jobs' );
 }

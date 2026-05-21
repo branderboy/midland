@@ -26,6 +26,8 @@ class SCRM_Pro_ServiceM8 {
     const OPT_COMPANY_UUID     = 'scrm_pro_sm8_company_uuid'; // default ServiceM8 company UUID
     const OPT_AUTO_PUSH_HOT    = 'scrm_pro_sm8_auto_push_hot';// legacy: auto-create job for Hot leads only
     const OPT_AUTO_PUSH_MODE   = 'scrm_pro_sm8_auto_push_mode';// '' off | 'hot' | 'all' (default 'all')
+    const OPT_LAST_POLL        = 'scrm_pro_sm8_last_poll';    // unix ts of last successful poll
+    const CRON_POLL            = 'scrm_pro_sm8_poll_jobs';    // cron hook for status polling
     const SM8_API_BASE         = 'https://api.servicem8.com/api_1.0/';
 
     private static $instance = null;
@@ -41,6 +43,27 @@ class SCRM_Pro_ServiceM8 {
         add_action( 'rest_api_init', array( $this, 'register_route' ) );
         add_action( 'admin_menu',    array( $this, 'add_menu' ), 42 );
         add_action( 'admin_init',    array( $this, 'handle_save' ) );
+
+        // Growing-plan bridge: no webhooks, so Smart CRM polls ServiceM8
+        // via the API key it already uses for outbound pushes. Each lead
+        // already has a job_id stamped on it from push_lead_as_job(), so
+        // we only need to check those specific jobs.
+        add_filter( 'cron_schedules',          array( $this, 'add_cron_schedule' ) );
+        add_action( self::CRON_POLL,           array( $this, 'poll_active_jobs' ) );
+        if ( ! wp_next_scheduled( self::CRON_POLL ) ) {
+            wp_schedule_event( time() + 5 * MINUTE_IN_SECONDS, 'scrm_pro_ten_min', self::CRON_POLL );
+        }
+        add_action( 'admin_post_scrm_sm8_poll_now', array( $this, 'handle_manual_poll' ) );
+    }
+
+    public function add_cron_schedule( $schedules ) {
+        if ( ! isset( $schedules['scrm_pro_ten_min'] ) ) {
+            $schedules['scrm_pro_ten_min'] = array(
+                'interval' => 10 * MINUTE_IN_SECONDS,
+                'display'  => __( 'Every 10 minutes (Smart CRM ServiceM8 poll)', 'smart-crm-pro' ),
+            );
+        }
+        return $schedules;
     }
 
     public function add_menu() {
@@ -142,9 +165,31 @@ class SCRM_Pro_ServiceM8 {
             ), 200 );
         }
 
+        $result = $this->mark_lead_completed( $lead, $job_id );
+        if ( 'already_completed' === $result ) {
+            return new WP_REST_Response( array( 'received' => true, 'action' => 'already_completed', 'lead_id' => (int) $lead->id ), 200 );
+        }
+
+        return new WP_REST_Response( array(
+            'received' => true,
+            'action'   => 'marked_completed',
+            'lead_id'  => (int) $lead->id,
+        ), 200 );
+    }
+
+    /**
+     * Flip a Smart Forms lead to status=completed and fan out the three
+     * actions Smart Reviews + ActiveCampaign listen on. Shared by the
+     * webhook handler (Premium tier) and the API poller (Growing tier).
+     *
+     * @param object $lead   wp_sfco_leads row.
+     * @param string $job_id Optional SM8 job UUID to stamp on the row.
+     * @return string 'marked_completed' | 'already_completed'
+     */
+    private function mark_lead_completed( $lead, $job_id = '' ) {
         $old_status = (string) $lead->status;
         if ( 'completed' === strtolower( $old_status ) ) {
-            return new WP_REST_Response( array( 'received' => true, 'action' => 'already_completed', 'lead_id' => (int) $lead->id ), 200 );
+            return 'already_completed';
         }
 
         global $wpdb;
@@ -155,7 +200,6 @@ class SCRM_Pro_ServiceM8 {
             array( '%d' )
         );
 
-        // Refresh and broadcast.
         $lead->status = 'completed';
         if ( $job_id && empty( $lead->job_id ) ) {
             $wpdb->update( $wpdb->prefix . 'sfco_leads', array( 'job_id' => $job_id ), array( 'id' => (int) $lead->id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -182,11 +226,7 @@ class SCRM_Pro_ServiceM8 {
             }
         }
 
-        return new WP_REST_Response( array(
-            'received' => true,
-            'action'   => 'marked_completed',
-            'lead_id'  => (int) $lead->id,
-        ), 200 );
+        return 'marked_completed';
     }
 
     private function matches_completion( $status, $event ) {
@@ -352,6 +392,110 @@ class SCRM_Pro_ServiceM8 {
         }
     }
 
+    /**
+     * Cron entry-point. For every lead with a ServiceM8 job_id whose lead
+     * status is not yet 'completed', query SM8 for that specific job and,
+     * if the SM8 status matches the completion keyword, fan the lead out
+     * through the same actions the webhook handler uses (Smart Reviews
+     * NPS + ActiveCampaign job-completed tag). Returns a small summary
+     * array so the manual "Check now" button can show what happened.
+     */
+    public function poll_active_jobs() {
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+        if ( '' === $api_key ) {
+            return array( 'checked' => 0, 'completed' => 0, 'note' => 'no_api_key' );
+        }
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'sfco_leads';
+        $table_check = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        if ( ! $table_check ) {
+            return array( 'checked' => 0, 'completed' => 0, 'note' => 'no_table' );
+        }
+
+        // Only poll leads that were actually pushed to SM8 (job_id set) and
+        // aren't already marked completed locally. Cap the batch so a long
+        // backlog can't blow the cron timeout.
+        $rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT * FROM {$table}
+             WHERE job_id IS NOT NULL AND job_id <> ''
+               AND ( status IS NULL OR LOWER(status) <> 'completed' )
+             ORDER BY id DESC
+             LIMIT 50"
+        );
+
+        $checked   = 0;
+        $completed = 0;
+        foreach ( (array) $rows as $row ) {
+            $checked++;
+            if ( $this->check_and_mark_completed( $row, $api_key ) ) {
+                $completed++;
+            }
+        }
+
+        update_option( self::OPT_LAST_POLL, array(
+            'at'        => time(),
+            'checked'   => $checked,
+            'completed' => $completed,
+        ) );
+
+        return array( 'checked' => $checked, 'completed' => $completed );
+    }
+
+    /**
+     * GET /job/{uuid}.json and decide if the lead should be marked done.
+     * Returns true if the lead was just flipped to completed on this call.
+     */
+    private function check_and_mark_completed( $lead, $api_key ) {
+        $job_id = (string) ( $lead->job_id ?? '' );
+        if ( '' === $job_id ) {
+            return false;
+        }
+
+        $response = wp_remote_get( self::SM8_API_BASE . 'job/' . rawurlencode( $job_id ) . '.json', array(
+            'timeout' => 15,
+            'headers' => array(
+                'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
+                'Accept'        => 'application/json',
+            ),
+        ) );
+        if ( is_wp_error( $response ) ) {
+            return false;
+        }
+        $code = (int) wp_remote_retrieve_response_code( $response );
+        if ( $code < 200 || $code >= 300 ) {
+            return false;
+        }
+        $body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+        if ( ! is_array( $body ) ) {
+            return false;
+        }
+
+        $status = strtolower( (string) ( $body['status'] ?? $body['job_status'] ?? '' ) );
+        if ( '' === $status || ! $this->matches_completion( $status, '' ) ) {
+            return false;
+        }
+
+        $result = $this->mark_lead_completed( $lead, $job_id );
+        return 'marked_completed' === $result;
+    }
+
+    /**
+     * Admin button: "Check SM8 status now". Runs the poller on-demand so the
+     * op doesn't have to wait for the next cron tick after marking a job
+     * complete in ServiceM8.
+     */
+    public function handle_manual_poll() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( 'No.' );
+        }
+        check_admin_referer( 'scrm_sm8_poll_now' );
+        $summary = $this->poll_active_jobs();
+        $back    = admin_url( 'admin.php?page=scrm-pro-servicem8&polled=1&checked=' . (int) ( $summary['checked'] ?? 0 ) . '&completed=' . (int) ( $summary['completed'] ?? 0 ) );
+        wp_safe_redirect( $back );
+        exit;
+    }
+
     public function handle_save() {
         if ( ! isset( $_POST['scrm_save_sm8'] ) || ! current_user_can( 'manage_options' ) ) {
             return;
@@ -387,53 +531,83 @@ class SCRM_Pro_ServiceM8 {
         ?>
         <div class="wrap">
             <h1><?php esc_html_e( 'ServiceM8 Bridge', 'smart-crm-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'When a job is completed in ServiceM8, the matching lead is marked completed. That fires the NPS survey via Smart Reviews Pro and the ActiveCampaign push.', 'smart-crm-pro' ); ?></p>
+            <p class="description"><?php esc_html_e( 'On the ServiceM8 Growing plan, the only credential exposed in the dashboard is the API key — Developer Tools and webhook subscriptions are gated to higher tiers. Configure the API key below to enable outbound push (lead → ServiceM8 Quote). The webhook fields further down only apply if you upgrade to a plan that exposes them; leave them blank on Growing.', 'smart-crm-pro' ); ?></p>
 
             <?php if ( $saved ) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-crm-pro' ); ?></p></div>
             <?php endif; ?>
 
+            <?php
+            // phpcs:disable WordPress.Security.NonceVerification.Recommended
+            if ( isset( $_GET['polled'] ) ) {
+                $checked   = isset( $_GET['checked'] )   ? (int) $_GET['checked']   : 0;
+                $completed = isset( $_GET['completed'] ) ? (int) $_GET['completed'] : 0;
+                echo '<div class="notice notice-info is-dismissible"><p>' . esc_html( sprintf(
+                    /* translators: 1: leads checked, 2: leads newly completed */
+                    __( 'ServiceM8 poll ran: checked %1$d open job(s), %2$d newly marked completed (Smart Reviews + ActiveCampaign fired for those).', 'smart-crm-pro' ),
+                    $checked,
+                    $completed
+                ) ) . '</p></div>';
+            }
+            // phpcs:enable
+            ?>
+
             <form method="post">
                 <?php wp_nonce_field( 'scrm_save_sm8', '_scrm_sm8_nonce' ); ?>
+                <h2 style="margin-top:0;"><?php esc_html_e( 'Outbound (CRM → ServiceM8) — works on Growing plan', 'smart-crm-pro' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Lets the per-lead "Push to ServiceM8" button (and the auto-push) create a Quote in ServiceM8 from a Smart Forms lead. Only the API key is required.', 'smart-crm-pro' ); ?></p>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'Webhook URL', 'smart-crm-pro' ); ?></th>
-                        <td>
-                            <code><?php echo esc_html( $webhook_url ); ?></code>
-                            <p class="description"><?php esc_html_e( 'Configure this URL in your ServiceM8 webhook subscription.', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="sm8_secret"><?php esc_html_e( 'Signing Secret', 'smart-crm-pro' ); ?></label></th>
-                        <td>
-                            <input type="password" id="sm8_secret" name="sm8_secret" class="regular-text" value="<?php echo esc_attr( $secret ); ?>">
-                            <p class="description"><?php esc_html_e( 'Required. Webhook is HMAC-SHA256 verified against this secret. Without it the endpoint rejects every request.', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="sm8_completion_status"><?php esc_html_e( 'Completion Keyword', 'smart-crm-pro' ); ?></label></th>
-                        <td>
-                            <input type="text" id="sm8_completion_status" name="sm8_completion_status" value="<?php echo esc_attr( $key ); ?>">
-                            <p class="description"><?php esc_html_e( 'Status or event substring that means "this job is done" (default: completed).', 'smart-crm-pro' ); ?></p>
-                        </td>
-                    </tr>
-                </table>
-
-                <h2 style="margin-top:24px;"><?php esc_html_e( 'Outbound (CRM → ServiceM8)', 'smart-crm-pro' ); ?></h2>
-                <p class="description"><?php esc_html_e( 'Lets the per-lead "Push to ServiceM8" button (and Hot-lead auto-push) create a Quote in ServiceM8 from a Smart Forms lead.', 'smart-crm-pro' ); ?></p>
-                <table class="form-table">
-                    <tr>
-                        <th><label for="sm8_api_key"><?php esc_html_e( 'ServiceM8 API Key', 'smart-crm-pro' ); ?></label></th>
+                        <th><label for="sm8_api_key"><?php esc_html_e( 'ServiceM8 API Key', 'smart-crm-pro' ); ?> <span style="color:#b32d2e;">*</span></label></th>
                         <td>
                             <input type="password" id="sm8_api_key" name="sm8_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" autocomplete="off">
-                            <p class="description"><?php esc_html_e( 'ServiceM8 → Settings → Developer Tools → Generate API key. Premium Plus plan supports full API + webhooks.', 'smart-crm-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'ServiceM8 → Settings → API Key (Growing plan exposes this directly — no Developer Tools menu required). Paste the key here. This is the only field needed to push leads into ServiceM8.', 'smart-crm-pro' ); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th><label for="sm8_company_uuid"><?php esc_html_e( 'Default Company UUID', 'smart-crm-pro' ); ?></label></th>
                         <td>
                             <input type="text" id="sm8_company_uuid" name="sm8_company_uuid" class="regular-text" value="<?php echo esc_attr( $company_uuid ); ?>" placeholder="00000000-0000-0000-0000-000000000000">
-                            <p class="description"><?php esc_html_e( 'Optional. ServiceM8 → Clients → click the master "house account" client → copy the UUID from the URL. Leave blank to let ServiceM8 create a contact-only job.', 'smart-crm-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Optional. ServiceM8 → Clients → click the master "house account" client → copy the UUID from the URL. Leave blank and ServiceM8 creates a contact-only job from the lead\'s name/email/phone.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php esc_html_e( 'Completion polling', 'smart-crm-pro' ); ?></th>
+                        <td>
+                            <?php
+                            $last_poll = get_option( self::OPT_LAST_POLL, array() );
+                            $next_ts   = wp_next_scheduled( self::CRON_POLL );
+                            $poll_url  = wp_nonce_url( add_query_arg( 'action', 'scrm_sm8_poll_now', admin_url( 'admin-post.php' ) ), 'scrm_sm8_poll_now' );
+                            ?>
+                            <p style="margin-top:0;">
+                                <a class="button button-secondary" href="<?php echo esc_url( $poll_url ); ?>">⚡ <?php esc_html_e( 'Check SM8 status now', 'smart-crm-pro' ); ?></a>
+                            </p>
+                            <p class="description">
+                                <?php esc_html_e( 'Smart CRM polls ServiceM8 every 10 minutes for every lead it pushed (matched by job UUID). When a job\'s status matches the completion keyword above, the lead flips to "completed" — which fires the NPS survey via Smart Reviews and applies the job-completed tag in ActiveCampaign. This is how the chain runs on the Growing plan (no webhook required).', 'smart-crm-pro' ); ?>
+                            </p>
+                            <?php if ( ! empty( $last_poll['at'] ) ) : ?>
+                                <p class="description"><strong><?php esc_html_e( 'Last poll:', 'smart-crm-pro' ); ?></strong>
+                                    <?php
+                                    echo esc_html( wp_date( 'Y-m-d H:i', (int) $last_poll['at'] ) );
+                                    echo ' — ';
+                                    echo esc_html( sprintf(
+                                        /* translators: 1: jobs checked, 2: marked completed */
+                                        __( 'checked %1$d, marked %2$d completed', 'smart-crm-pro' ),
+                                        (int) ( $last_poll['checked']   ?? 0 ),
+                                        (int) ( $last_poll['completed'] ?? 0 )
+                                    ) );
+                                    ?>
+                                </p>
+                            <?php endif; ?>
+                            <?php if ( $next_ts ) : ?>
+                                <p class="description"><em><?php
+                                    echo esc_html( sprintf(
+                                        /* translators: %s: human-readable time-until */
+                                        __( 'Next automatic poll in %s.', 'smart-crm-pro' ),
+                                        human_time_diff( time(), (int) $next_ts )
+                                    ) );
+                                ?></em></p>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <tr>
@@ -454,6 +628,33 @@ class SCRM_Pro_ServiceM8 {
                         </td>
                     </tr>
                 </table>
+
+                <h2 style="margin-top:24px;"><?php esc_html_e( 'Inbound (ServiceM8 → CRM) — requires a plan that exposes webhooks', 'smart-crm-pro' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'These fields are only useful on a ServiceM8 plan that exposes Developer Tools / Webhooks (Premium tier and above). On the Growing plan ServiceM8 does not expose a webhook subscription UI, so leave these blank — the outbound push above is the only half that runs. If/when you upgrade, fill in the secret and point a ServiceM8 webhook at the URL below to auto-mark leads completed (which fires the NPS survey and AC push).', 'smart-crm-pro' ); ?></p>
+                <table class="form-table">
+                    <tr>
+                        <th><?php esc_html_e( 'Webhook URL', 'smart-crm-pro' ); ?></th>
+                        <td>
+                            <code><?php echo esc_html( $webhook_url ); ?></code>
+                            <p class="description"><?php esc_html_e( 'Configure this URL in your ServiceM8 webhook subscription (requires Premium plan or higher).', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="sm8_secret"><?php esc_html_e( 'Signing Secret', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="password" id="sm8_secret" name="sm8_secret" class="regular-text" value="<?php echo esc_attr( $secret ); ?>">
+                            <p class="description"><?php esc_html_e( 'Optional on Growing plan (leave blank). On webhook-capable plans this is required — the endpoint rejects every unsigned request.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="sm8_completion_status"><?php esc_html_e( 'Completion Keyword', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="text" id="sm8_completion_status" name="sm8_completion_status" value="<?php echo esc_attr( $key ); ?>">
+                            <p class="description"><?php esc_html_e( 'Status or event substring that means "this job is done" (default: completed). Only used when a webhook is actually wired up.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
                 <p class="submit"><button type="submit" name="scrm_save_sm8" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-crm-pro' ); ?></button></p>
             </form>
 
