@@ -272,18 +272,19 @@ class SCRM_Pro_ServiceM8 {
         do_action( 'sfco_lead_completed',      $lead );
         do_action( 'scrm_pro_job_completed',   $lead );
 
-        // If the job that just completed was an emergency AND the contact
-        // hasn't signed a Floor Care Plan, tag them as the upsell target
-        // segment. AC then runs the "you had an emergency, here's how the
-        // plan prevents the next one" series. When/if they later subscribe,
-        // SCRM_Pro_FloorCarePlan::maybe_generate_plan fires the
+        // Floor-Care-Plan upsell tag — commercial emergencies only. The plan
+        // is a recurring-service contract for commercial property managers;
+        // residential homeowners get the standard NPS review flow even when
+        // their job was an emergency. When/if a commercial customer later
+        // subscribes, SCRM_Pro_FloorCarePlan::maybe_generate_plan fires the
         // 'plan_active' tag and the operator's AC automation removes this
         // upsell tag.
         if ( class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
-            $was_emergency = ! empty( $lead->is_emergency ) || ( isset( $lead->project_type ) && stripos( (string) $lead->project_type, 'water' ) !== false );
+            $ac            = SCRM_Pro_ActiveCampaign::get_instance();
+            $segment       = $ac->lead_segment( $lead );
+            $is_emergency  = $ac->is_emergency( $lead );
             $has_plan      = ! empty( $lead->floor_care_plan_id );
-            if ( $was_emergency && ! $has_plan ) {
-                $ac = new SCRM_Pro_ActiveCampaign();
+            if ( 'commercial' === $segment && $is_emergency && ! $has_plan ) {
                 $ac->sync_segment( $lead, 'emergency_no_plan' );
             }
         }
