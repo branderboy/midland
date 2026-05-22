@@ -64,6 +64,15 @@ class SCRM_Pro_ActiveCampaign {
         add_action( 'sfco_lead_status_changed',  array( $this, 'on_status_changed' ), 10, 3 );
         add_action( 'sfco_lead_completed',       array( $this, 'on_lead_completed' ) );
         add_action( 'scrm_pro_job_completed',    array( $this, 'on_lead_completed' ) );
+
+        // Job moved from Quote to active in ServiceM8 — push the contact
+        // into AC with the 'booked' lifecycle so deal stage advances and
+        // the booked-job tag fires.
+        add_action( 'scrm_pro_job_created',      array( $this, 'on_job_created' ) );
+    }
+
+    public function on_job_created( $lead ) {
+        $this->push_lead( $lead, 'booked' );
     }
 
     /**

@@ -19,10 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class SRP_CRM_Integration {
 
-    const META_SURVEY_FIRED = '_srp_survey_fired';
-    const CRON_HOOK         = 'srp_crm_poll';
-    const OPT_TRIGGER       = 'srp_crm_trigger_status';
-    const OPT_AUTOFIRE      = 'srp_crm_autofire';
+    const META_SURVEY_FIRED   = '_srp_survey_fired';
+    const META_JOB_IN_FLIGHT  = '_srp_job_in_flight';
+    const CRON_HOOK           = 'srp_crm_poll';
+    const OPT_TRIGGER         = 'srp_crm_trigger_status';
+    const OPT_AUTOFIRE        = 'srp_crm_autofire';
 
     private static $instance = null;
 
@@ -38,6 +39,12 @@ class SRP_CRM_Integration {
         add_action( 'sfco_lead_completed',       array( $this, 'handle_completed_lead' ), 10, 1 );
         add_action( 'sfco_lead_status_changed',  array( $this, 'handle_status_change' ), 10, 3 );
         add_action( 'scrm_pro_job_completed',    array( $this, 'handle_completed_lead' ), 10, 1 );
+
+        // Job opened in ServiceM8 — mark the lead as "survey pending" so
+        // the admin page can distinguish jobs awaiting completion from
+        // jobs that never reached SM8. No email fires here; the NPS goes
+        // out only on completion.
+        add_action( 'scrm_pro_job_created',      array( $this, 'handle_job_created' ), 10, 1 );
 
         // Polling fallback.
         add_action( self::CRON_HOOK, array( $this, 'poll_completed_leads' ) );
@@ -81,6 +88,34 @@ class SRP_CRM_Integration {
         if ( $lead_id > 0 ) {
             $this->mark_fired( $lead_id );
         }
+    }
+
+    /**
+     * Record that a job has been opened in SM8 for this lead. No survey
+     * email — that fires only on completion. Stored as a postmeta marker
+     * (post_id=0) so the admin "CRM Linking" page can later show a count
+     * of jobs in progress.
+     */
+    public function handle_job_created( $lead ) {
+        $data    = $this->normalize_lead( $lead );
+        $lead_id = (int) ( $data['lead_id'] ?? 0 );
+        if ( $lead_id <= 0 ) {
+            return;
+        }
+        global $wpdb;
+        $existing = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            "SELECT meta_id FROM {$wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %d LIMIT 1",
+            self::META_JOB_IN_FLIGHT,
+            $lead_id
+        ) );
+        if ( $existing ) {
+            return;
+        }
+        $wpdb->insert( $wpdb->prefix . 'postmeta', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            'post_id'    => 0,
+            'meta_key'   => self::META_JOB_IN_FLIGHT, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+            'meta_value' => $lead_id,                 // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+        ) );
     }
 
     /**
@@ -177,7 +212,8 @@ class SRP_CRM_Integration {
         $scrm_pro   = defined( 'SCRM_PRO_VERSION' );
         $has_table  = $this->leads_table_exists();
 
-        $ready_leads = array();
+        $ready_leads    = array();
+        $in_flight_leads = array();
         if ( $has_table ) {
             global $wpdb;
             $ready_leads = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -187,6 +223,24 @@ class SRP_CRM_Integration {
                  WHERE l.status = %s AND pm.meta_id IS NULL
                  ORDER BY l.id DESC
                  LIMIT 25",
+                self::META_SURVEY_FIRED,
+                $trigger
+            ) );
+
+            // Jobs that SM8 has opened (postmeta marker set) but the lead is
+            // not yet in the trigger status AND no survey has fired yet.
+            // These are "survey pending" — the customer's job is in flight.
+            $in_flight_leads = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                "SELECT l.* FROM {$wpdb->prefix}sfco_leads l
+                 INNER JOIN {$wpdb->prefix}postmeta pm_in
+                    ON pm_in.meta_key = %s AND pm_in.meta_value = l.id
+                 LEFT JOIN {$wpdb->prefix}postmeta pm_done
+                    ON pm_done.meta_key = %s AND pm_done.meta_value = l.id
+                 WHERE pm_done.meta_id IS NULL
+                   AND ( l.status IS NULL OR l.status <> %s )
+                 ORDER BY l.id DESC
+                 LIMIT 25",
+                self::META_JOB_IN_FLIGHT,
                 self::META_SURVEY_FIRED,
                 $trigger
             ) );
@@ -248,6 +302,34 @@ class SRP_CRM_Integration {
                 </table>
                 <p class="submit"><button type="submit" name="srp_save_crm" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-reviews-pro' ); ?></button></p>
             </form>
+
+            <hr>
+            <h2><?php printf( esc_html__( 'Jobs in Progress — Survey Pending (%d)', 'smart-reviews-pro' ), count( $in_flight_leads ) ); ?></h2>
+            <p class="description"><?php esc_html_e( 'ServiceM8 has opened a job for these leads but the job is not yet complete. The NPS survey will fire automatically when SM8 marks the job complete.', 'smart-reviews-pro' ); ?></p>
+            <?php if ( empty( $in_flight_leads ) ) : ?>
+                <p><em><?php esc_html_e( 'No jobs in progress. Leads appear here once ServiceM8 fires a job-created event.', 'smart-reviews-pro' ); ?></em></p>
+            <?php else : ?>
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e( 'Customer', 'smart-reviews-pro' ); ?></th>
+                            <th><?php esc_html_e( 'Email', 'smart-reviews-pro' ); ?></th>
+                            <th><?php esc_html_e( 'SM8 Job', 'smart-reviews-pro' ); ?></th>
+                            <th><?php esc_html_e( 'Current Status', 'smart-reviews-pro' ); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ( $in_flight_leads as $lead ) : ?>
+                            <tr>
+                                <td><?php echo esc_html( $lead->customer_name ?? '' ); ?></td>
+                                <td><?php echo esc_html( $lead->customer_email ?? '' ); ?></td>
+                                <td><?php echo $lead->job_id ? '<code>' . esc_html( substr( (string) $lead->job_id, 0, 12 ) ) . '…</code>' : '<em>—</em>'; ?></td>
+                                <td><code><?php echo esc_html( $lead->status ?? '' ); ?></code></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
 
             <hr>
             <h2><?php printf( esc_html__( 'Leads Ready to Survey (status = %s)', 'smart-reviews-pro' ), '<code>' . esc_html( $trigger ) . '</code>' ); ?></h2>

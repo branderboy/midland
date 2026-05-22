@@ -135,11 +135,11 @@ class SCRM_Pro_Floor_Care_Plan {
             return;
         }
 
-        // Floor Care Plan fires when a job completes. Two paths in:
-        //   1. Commercial completion  → plan as a recurring-service upsell.
-        //   2. Emergency completion (any segment) → plan to prevent recurrence.
-        // Residential non-emergency leads get the standard review-request
-        // flow instead and are skipped below.
+        // Floor Care Plan is commercial-only. Residential completions —
+        // including residential emergencies — get the standard NPS review
+        // flow instead; we don't pitch a recurring maintenance contract to
+        // a homeowner. The emergency-variant template still fires when a
+        // commercial completion is also an emergency.
         $segment      = 'residential';
         $is_emergency = false;
         if ( class_exists( 'SCRM_Pro_ActiveCampaign' ) ) {
@@ -154,9 +154,7 @@ class SCRM_Pro_Floor_Care_Plan {
             }
         }
 
-        // Skip residential non-emergency completions — those get the
-        // review-request flow, not a Floor Care Plan upsell.
-        if ( 'commercial' !== $segment && ! $is_emergency ) {
+        if ( 'commercial' !== $segment ) {
             return;
         }
 

@@ -106,6 +106,50 @@ class SCRM_Pro_Visit_Draft {
                 array( 'title' => $title, 'start' => $start )
             );
         }
+
+        $this->push_visit_to_sm8( $lead_id, $start, $title, $form );
+    }
+
+    /**
+     * Mirror the tentative visit onto the SM8 dispatch board as a JobActivity
+     * so the field team sees the same window the GCal placeholder marks.
+     * Requires the lead to already have an SM8 job_id — if no job yet, the
+     * push is skipped silently (the manual "Push to SM8" admin button will
+     * create the job + a future visit-draft fire can attach the activity).
+     */
+    private function push_visit_to_sm8( $lead_id, $start, $title, $form ) {
+        if ( ! class_exists( 'SCRM_Pro_ServiceM8' ) ) {
+            return;
+        }
+
+        $result = SCRM_Pro_ServiceM8::push_visit_as_job_activity(
+            (int) $lead_id,
+            $start,
+            '', // default end = start + 2h
+            $title
+        );
+
+        if ( class_exists( 'SFCO_Pro_Log' ) ) {
+            if ( is_wp_error( $result ) ) {
+                SFCO_Pro_Log::record(
+                    'servicem8',
+                    'scrm_sm8_no_job' === $result->get_error_code() ? 'skipped' : 'error',
+                    'SM8 visit push: ' . $result->get_error_message(),
+                    (int) ( $form->id ?? 0 ),
+                    (int) $lead_id,
+                    array()
+                );
+            } elseif ( ! empty( $result ) ) {
+                SFCO_Pro_Log::record(
+                    'servicem8',
+                    'ok',
+                    'SM8 visit pushed (JobActivity ' . $result . ')',
+                    (int) ( $form->id ?? 0 ),
+                    (int) $lead_id,
+                    array( 'activity_uuid' => $result, 'start' => $start )
+                );
+            }
+        }
     }
 }
 
