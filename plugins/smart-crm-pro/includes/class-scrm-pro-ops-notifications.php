@@ -24,7 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class SCRM_Pro_Ops_Notifications {
 
     const DEFAULT_RECIPIENTS = array(
-        'juston@midlandfloors.com',
         'justin@midlandfloors.com',
         'support@midlandfloors.com',
     );
