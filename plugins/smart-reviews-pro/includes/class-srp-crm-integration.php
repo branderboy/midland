@@ -212,7 +212,8 @@ class SRP_CRM_Integration {
         $scrm_pro   = defined( 'SCRM_PRO_VERSION' );
         $has_table  = $this->leads_table_exists();
 
-        $ready_leads = array();
+        $ready_leads    = array();
+        $in_flight_leads = array();
         if ( $has_table ) {
             global $wpdb;
             $ready_leads = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -222,6 +223,24 @@ class SRP_CRM_Integration {
                  WHERE l.status = %s AND pm.meta_id IS NULL
                  ORDER BY l.id DESC
                  LIMIT 25",
+                self::META_SURVEY_FIRED,
+                $trigger
+            ) );
+
+            // Jobs that SM8 has opened (postmeta marker set) but the lead is
+            // not yet in the trigger status AND no survey has fired yet.
+            // These are "survey pending" — the customer's job is in flight.
+            $in_flight_leads = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                "SELECT l.* FROM {$wpdb->prefix}sfco_leads l
+                 INNER JOIN {$wpdb->prefix}postmeta pm_in
+                    ON pm_in.meta_key = %s AND pm_in.meta_value = l.id
+                 LEFT JOIN {$wpdb->prefix}postmeta pm_done
+                    ON pm_done.meta_key = %s AND pm_done.meta_value = l.id
+                 WHERE pm_done.meta_id IS NULL
+                   AND ( l.status IS NULL OR l.status <> %s )
+                 ORDER BY l.id DESC
+                 LIMIT 25",
+                self::META_JOB_IN_FLIGHT,
                 self::META_SURVEY_FIRED,
                 $trigger
             ) );
@@ -283,6 +302,34 @@ class SRP_CRM_Integration {
                 </table>
                 <p class="submit"><button type="submit" name="srp_save_crm" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-reviews-pro' ); ?></button></p>
             </form>
+
+            <hr>
+            <h2><?php printf( esc_html__( 'Jobs in Progress — Survey Pending (%d)', 'smart-reviews-pro' ), count( $in_flight_leads ) ); ?></h2>
+            <p class="description"><?php esc_html_e( 'ServiceM8 has opened a job for these leads but the job is not yet complete. The NPS survey will fire automatically when SM8 marks the job complete.', 'smart-reviews-pro' ); ?></p>
+            <?php if ( empty( $in_flight_leads ) ) : ?>
+                <p><em><?php esc_html_e( 'No jobs in progress. Leads appear here once ServiceM8 fires a job-created event.', 'smart-reviews-pro' ); ?></em></p>
+            <?php else : ?>
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e( 'Customer', 'smart-reviews-pro' ); ?></th>
+                            <th><?php esc_html_e( 'Email', 'smart-reviews-pro' ); ?></th>
+                            <th><?php esc_html_e( 'SM8 Job', 'smart-reviews-pro' ); ?></th>
+                            <th><?php esc_html_e( 'Current Status', 'smart-reviews-pro' ); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ( $in_flight_leads as $lead ) : ?>
+                            <tr>
+                                <td><?php echo esc_html( $lead->customer_name ?? '' ); ?></td>
+                                <td><?php echo esc_html( $lead->customer_email ?? '' ); ?></td>
+                                <td><?php echo $lead->job_id ? '<code>' . esc_html( substr( (string) $lead->job_id, 0, 12 ) ) . '…</code>' : '<em>—</em>'; ?></td>
+                                <td><code><?php echo esc_html( $lead->status ?? '' ); ?></code></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
 
             <hr>
             <h2><?php printf( esc_html__( 'Leads Ready to Survey (status = %s)', 'smart-reviews-pro' ), '<code>' . esc_html( $trigger ) . '</code>' ); ?></h2>
