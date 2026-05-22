@@ -36,6 +36,7 @@ function smart_crm_pro_init() {
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-smart-forms-bridge.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-vapi.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-visit-draft.php';
+    require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-ops-notifications.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-settings.php';
 
     // Each module's class file self-instantiates its singleton at load
