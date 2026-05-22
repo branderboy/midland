@@ -19,10 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class SRP_CRM_Integration {
 
-    const META_SURVEY_FIRED = '_srp_survey_fired';
-    const CRON_HOOK         = 'srp_crm_poll';
-    const OPT_TRIGGER       = 'srp_crm_trigger_status';
-    const OPT_AUTOFIRE      = 'srp_crm_autofire';
+    const META_SURVEY_FIRED   = '_srp_survey_fired';
+    const META_JOB_IN_FLIGHT  = '_srp_job_in_flight';
+    const CRON_HOOK           = 'srp_crm_poll';
+    const OPT_TRIGGER         = 'srp_crm_trigger_status';
+    const OPT_AUTOFIRE        = 'srp_crm_autofire';
 
     private static $instance = null;
 
@@ -38,6 +39,12 @@ class SRP_CRM_Integration {
         add_action( 'sfco_lead_completed',       array( $this, 'handle_completed_lead' ), 10, 1 );
         add_action( 'sfco_lead_status_changed',  array( $this, 'handle_status_change' ), 10, 3 );
         add_action( 'scrm_pro_job_completed',    array( $this, 'handle_completed_lead' ), 10, 1 );
+
+        // Job opened in ServiceM8 — mark the lead as "survey pending" so
+        // the admin page can distinguish jobs awaiting completion from
+        // jobs that never reached SM8. No email fires here; the NPS goes
+        // out only on completion.
+        add_action( 'scrm_pro_job_created',      array( $this, 'handle_job_created' ), 10, 1 );
 
         // Polling fallback.
         add_action( self::CRON_HOOK, array( $this, 'poll_completed_leads' ) );
@@ -81,6 +88,34 @@ class SRP_CRM_Integration {
         if ( $lead_id > 0 ) {
             $this->mark_fired( $lead_id );
         }
+    }
+
+    /**
+     * Record that a job has been opened in SM8 for this lead. No survey
+     * email — that fires only on completion. Stored as a postmeta marker
+     * (post_id=0) so the admin "CRM Linking" page can later show a count
+     * of jobs in progress.
+     */
+    public function handle_job_created( $lead ) {
+        $data    = $this->normalize_lead( $lead );
+        $lead_id = (int) ( $data['lead_id'] ?? 0 );
+        if ( $lead_id <= 0 ) {
+            return;
+        }
+        global $wpdb;
+        $existing = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            "SELECT meta_id FROM {$wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %d LIMIT 1",
+            self::META_JOB_IN_FLIGHT,
+            $lead_id
+        ) );
+        if ( $existing ) {
+            return;
+        }
+        $wpdb->insert( $wpdb->prefix . 'postmeta', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            'post_id'    => 0,
+            'meta_key'   => self::META_JOB_IN_FLIGHT, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+            'meta_value' => $lead_id,                 // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+        ) );
     }
 
     /**

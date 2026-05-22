@@ -29,6 +29,9 @@ class SCRM_Pro_ServiceM8 {
     const OPT_LAST_POLL        = 'scrm_pro_sm8_last_poll';    // unix ts of last successful poll
     const CRON_POLL            = 'scrm_pro_sm8_poll_jobs';    // cron hook for status polling
     const SM8_API_BASE         = 'https://api.servicem8.com/api_1.0/';
+    // Dedupe markers stored in postmeta with post_id=0 (mirrors the
+    // pattern Smart Reviews uses to flag surveys already fired).
+    const META_JOB_OPENED      = '_scrm_job_opened_fired';
 
     private static $instance = null;
 
@@ -150,8 +153,9 @@ class SCRM_Pro_ServiceM8 {
         $job_id = sanitize_text_field( (string) ( $body['job_uuid'] ?? $body['jobId'] ?? '' ) );
 
         $is_completion = $this->matches_completion( $status, $event );
+        $is_creation   = ! $is_completion && $this->matches_creation( $status, $event );
 
-        if ( ! $is_completion ) {
+        if ( ! $is_completion && ! $is_creation ) {
             return new WP_REST_Response( array( 'received' => true, 'action' => 'ignored' ), 200 );
         }
 
@@ -165,6 +169,15 @@ class SCRM_Pro_ServiceM8 {
             ), 200 );
         }
 
+        if ( $is_creation ) {
+            $result = $this->mark_lead_job_opened( $lead, $job_id );
+            return new WP_REST_Response( array(
+                'received' => true,
+                'action'   => $result,
+                'lead_id'  => (int) $lead->id,
+            ), 200 );
+        }
+
         $result = $this->mark_lead_completed( $lead, $job_id );
         if ( 'already_completed' === $result ) {
             return new WP_REST_Response( array( 'received' => true, 'action' => 'already_completed', 'lead_id' => (int) $lead->id ), 200 );
@@ -175,6 +188,55 @@ class SCRM_Pro_ServiceM8 {
             'action'   => 'marked_completed',
             'lead_id'  => (int) $lead->id,
         ), 200 );
+    }
+
+    /**
+     * Stamp a lead with the SM8 job UUID and fan out the job-created action.
+     * Deduped via postmeta so re-delivered webhooks / repeated poller hits don't
+     * fire the action twice. Smart Reviews + AC bridge both listen on
+     * scrm_pro_job_created.
+     *
+     * @param object $lead   wp_sfco_leads row.
+     * @param string $job_id ServiceM8 job UUID.
+     * @return string 'marked_opened' | 'already_opened'
+     */
+    private function mark_lead_job_opened( $lead, $job_id = '' ) {
+        $lead_id = (int) ( $lead->id ?? 0 );
+        if ( $lead_id <= 0 ) {
+            return 'already_opened';
+        }
+        if ( $this->job_opened_already_fired( $lead_id ) ) {
+            return 'already_opened';
+        }
+
+        if ( $job_id && empty( $lead->job_id ) ) {
+            global $wpdb;
+            $wpdb->update( $wpdb->prefix . 'sfco_leads', array( 'job_id' => $job_id ), array( 'id' => $lead_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $lead->job_id = $job_id;
+        }
+
+        do_action( 'scrm_pro_job_created', $lead );
+        $this->mark_job_opened_fired( $lead_id );
+        return 'marked_opened';
+    }
+
+    private function job_opened_already_fired( $lead_id ) {
+        global $wpdb;
+        $found = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            "SELECT meta_id FROM {$wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %d LIMIT 1",
+            self::META_JOB_OPENED,
+            (int) $lead_id
+        ) );
+        return ! empty( $found );
+    }
+
+    private function mark_job_opened_fired( $lead_id ) {
+        global $wpdb;
+        $wpdb->insert( $wpdb->prefix . 'postmeta', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            'post_id'    => 0,
+            'meta_key'   => self::META_JOB_OPENED, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+            'meta_value' => (int) $lead_id,         // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+        ) );
     }
 
     /**
@@ -227,6 +289,37 @@ class SCRM_Pro_ServiceM8 {
         }
 
         return 'marked_completed';
+    }
+
+    /**
+     * Does this webhook payload look like a job-creation / job-opened event?
+     * Match either the raw status (e.g. "Work Order") or the event name
+     * ("job.created", "job.started", etc.) against a fixed list of vocab
+     * ServiceM8 uses for "this job just transitioned from quote to active."
+     */
+    private function matches_creation( $status, $event ) {
+        $status = strtolower( (string) $status );
+        $event  = strtolower( (string) $event );
+        $aliases = array(
+            'work order', 'work_order', 'workorder',
+            'in progress', 'in_progress', 'inprogress',
+            'started', 'job_started', 'jobstarted',
+            'created', 'job_created', 'jobcreated',
+            'accepted', 'job_accepted',
+            'scheduled', 'job_scheduled',
+        );
+        foreach ( $aliases as $alias ) {
+            if ( $status === $alias || $event === $alias ) {
+                return true;
+            }
+            if ( '' !== $status && false !== strpos( $status, $alias ) ) {
+                return true;
+            }
+            if ( '' !== $event && false !== strpos( $event, $alias ) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function matches_completion( $status, $event ) {
@@ -444,6 +537,11 @@ class SCRM_Pro_ServiceM8 {
 
     /**
      * GET /job/{uuid}.json and decide if the lead should be marked done.
+     * Also fires the job-created action if the SM8 status indicates the job
+     * has transitioned from Quote to active (Work Order / scheduled), but the
+     * local lead hasn't been flagged as opened yet — this is the polling
+     * fallback for accounts that don't have a webhook configured.
+     *
      * Returns true if the lead was just flipped to completed on this call.
      */
     private function check_and_mark_completed( $lead, $api_key ) {
@@ -472,12 +570,100 @@ class SCRM_Pro_ServiceM8 {
         }
 
         $status = strtolower( (string) ( $body['status'] ?? $body['job_status'] ?? '' ) );
-        if ( '' === $status || ! $this->matches_completion( $status, '' ) ) {
+        if ( '' === $status ) {
             return false;
         }
 
-        $result = $this->mark_lead_completed( $lead, $job_id );
-        return 'marked_completed' === $result;
+        if ( $this->matches_completion( $status, '' ) ) {
+            $result = $this->mark_lead_completed( $lead, $job_id );
+            return 'marked_completed' === $result;
+        }
+
+        // Not completed yet — but if the job has moved off "Quote" the
+        // job-created fan-out should fire (once, deduped on lead_id).
+        if ( $this->matches_creation( $status, '' ) ) {
+            $this->mark_lead_job_opened( $lead, $job_id );
+        }
+        return false;
+    }
+
+    // ─── Outbound: CRM → ServiceM8 (push scheduled visit as JobActivity) ─────
+
+    /**
+     * Create a ServiceM8 JobActivity (scheduled visit) tied to the lead's
+     * existing job. SM8 requires a job_uuid for any activity, so this is a
+     * no-op if the lead hasn't been pushed to SM8 yet — call push_lead_as_job
+     * first if you need both.
+     *
+     * @param int    $lead_id     wp_sfco_leads row ID.
+     * @param string $start       Visit start, RFC3339 / ISO8601 / strtotime-able.
+     * @param string $end         Optional visit end. Defaults to start + 2 hours.
+     * @param string $description Optional activity description shown on the SM8 dispatch board.
+     * @return string|WP_Error JobActivity UUID on success, WP_Error otherwise.
+     */
+    public static function push_visit_as_job_activity( $lead_id, $start, $end = '', $description = '' ) {
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+        if ( '' === $api_key ) {
+            return new WP_Error( 'scrm_sm8_no_api_key', 'ServiceM8 API key not configured.' );
+        }
+
+        global $wpdb;
+        $lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sfco_leads WHERE id = %d", (int) $lead_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        if ( ! $lead ) {
+            return new WP_Error( 'scrm_sm8_no_lead', 'Lead not found.' );
+        }
+
+        $job_uuid = (string) ( $lead->job_id ?? '' );
+        if ( '' === $job_uuid ) {
+            return new WP_Error( 'scrm_sm8_no_job', 'Lead has no ServiceM8 job_id yet — push the lead to SM8 first.' );
+        }
+
+        $start_ts = is_numeric( $start ) ? (int) $start : strtotime( (string) $start );
+        if ( ! $start_ts ) {
+            return new WP_Error( 'scrm_sm8_bad_start', 'Visit start time is invalid.' );
+        }
+        $end_ts = $end ? ( is_numeric( $end ) ? (int) $end : strtotime( (string) $end ) ) : 0;
+        if ( ! $end_ts || $end_ts <= $start_ts ) {
+            $end_ts = $start_ts + 2 * HOUR_IN_SECONDS;
+        }
+
+        // SM8 stores activity timestamps in UTC, format 'Y-m-d H:i:s'.
+        $payload = array(
+            'job_uuid'               => $job_uuid,
+            'start_date'             => gmdate( 'Y-m-d H:i:s', $start_ts ),
+            'end_date'               => gmdate( 'Y-m-d H:i:s', $end_ts ),
+            'activity_was_scheduled' => 1,
+        );
+        if ( '' !== $description ) {
+            $payload['activity_description'] = $description;
+        }
+
+        $response = wp_remote_post( self::SM8_API_BASE . 'jobactivity.json', array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
+                'Content-Type'  => 'application/json',
+                'Accept'        => 'application/json',
+            ),
+            'body'    => wp_json_encode( $payload ),
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            return $response;
+        }
+        $code = (int) wp_remote_retrieve_response_code( $response );
+        if ( $code < 200 || $code >= 300 ) {
+            return new WP_Error( 'scrm_sm8_http', sprintf( 'ServiceM8 returned HTTP %d', $code ), array( 'body' => wp_remote_retrieve_body( $response ) ) );
+        }
+
+        $headers      = wp_remote_retrieve_headers( $response );
+        $activity_id  = '';
+        if ( method_exists( $headers, 'offsetGet' ) ) {
+            $activity_id = (string) $headers->offsetGet( 'x-record-uuid' );
+        } elseif ( is_array( $headers ) ) {
+            $activity_id = $headers['x-record-uuid'] ?? $headers['X-Record-UUID'] ?? '';
+        }
+        return $activity_id;
     }
 
     /**
