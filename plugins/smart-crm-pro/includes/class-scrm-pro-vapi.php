@@ -2,14 +2,15 @@
 /**
  * Vapi outbound AI call.
  *
- * When a residential lead submits the unified quote form, this module
- * fires an outbound call to their phone number via Vapi's API. The
- * agent (configured in Vapi's dashboard) confirms receipt of the
- * submission and tells the customer a human will follow up shortly.
+ * Fires when a residential lead picks "Request a call" on the unified
+ * quote form (lead_intent === 'request_call'). Vapi places an immediate
+ * outbound call to confirm receipt and gather context before a human
+ * follows up. Residential "Request a visit" leads route through the
+ * visit-draft / SM8 JobActivity path instead and do NOT get a robocall.
  *
- * This is the "they can't book a visit without a next step" piece —
- * the next step is an immediate confirmation call instead of leaving
- * the customer wondering whether the form went through.
+ * Commercial leads never trigger Vapi — the form doesn't even expose
+ * the request_call option to them, so the intent gate naturally
+ * excludes commercial regardless of the segment-trigger setting.
  *
  * Settings live at Smart CRM -> Vapi:
  *   - API key (Bearer token)
@@ -98,6 +99,15 @@ class SCRM_Pro_Vapi {
         }
         $segment = ( strtolower( (string) ( $row['property_type'] ?? '' ) ) === 'commercial' ) ? 'commercial' : 'residential';
         if ( 'residential' === $trigger && 'residential' !== $segment ) {
+            return;
+        }
+
+        // Intent gate — Vapi only fires for "Request a call" submissions.
+        // "Request a visit" leads route through visit-draft + SM8 JobActivity
+        // and explicitly do NOT get a robocall. Emergencies / researching /
+        // future-project intents also skip — they need a human, not an AI.
+        $intent = strtolower( (string) ( $row['lead_intent'] ?? '' ) );
+        if ( 'request_call' !== $intent ) {
             return;
         }
 
