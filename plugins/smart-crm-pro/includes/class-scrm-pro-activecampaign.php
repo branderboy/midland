@@ -57,8 +57,11 @@ class SCRM_Pro_ActiveCampaign {
         add_action( 'admin_init',                array( $this, 'handle_test' ) );
 
         // Booking events fire when a new lead is captured from any source.
+        // Chat leads no longer hook in directly here — the chat-forms bridge
+        // mirrors them into wp_sfco_leads + fires sfco_lead_submitted so
+        // they reach AC through the canonical Smart Forms journey (which
+        // applies a midland-source-chat tag via lead_source()).
         add_action( 'sfco_lead_created',         array( $this, 'on_lead_booked' ) );
-        add_action( 'scai_lead_captured',        array( $this, 'on_chat_lead_captured' ), 10, 2 );
 
         // Lifecycle events when a job actually completes.
         add_action( 'sfco_lead_status_changed',  array( $this, 'on_status_changed' ), 10, 3 );
@@ -79,18 +82,6 @@ class SCRM_Pro_ActiveCampaign {
      * Booking from any source that fires sfco_lead_created with a lead row/array.
      */
     public function on_lead_booked( $lead ) {
-        $this->push_lead( $lead, 'booked' );
-    }
-
-    /**
-     * Booking from the chat plugin — different payload shape (associative array).
-     */
-    public function on_chat_lead_captured( $lead_id, $data ) {
-        // Reshape so push_lead's normalization picks it up.
-        $lead = (object) array_merge(
-            array( 'id' => (int) $lead_id ),
-            (array) $data
-        );
         $this->push_lead( $lead, 'booked' );
     }
 
@@ -187,6 +178,32 @@ class SCRM_Pro_ActiveCampaign {
     public function categorize_lead( $lead ) {
         $category = $this->is_emergency( $lead ) ? 'emergency' : $this->lead_segment( $lead );
         return apply_filters( 'scrm_pro_lead_category', $category, $lead );
+    }
+
+    /**
+     * Identify where the lead came from. Checks explicit columns first, then
+     * pulls from extra_fields_json (which the chat → forms bridge stamps
+     * with lead_source=chat). Returns a slug suitable for tag composition
+     * (chat, form, phone, …) or '' when unknown.
+     */
+    public function lead_source( $lead ) {
+        $explicit = strtolower( (string) $this->get_field( $lead, array( 'lead_source', 'source' ) ) );
+        if ( '' !== $explicit ) {
+            return sanitize_key( $explicit );
+        }
+
+        $extra = (string) $this->get_field( $lead, array( 'extra_fields_json' ) );
+        if ( '' !== $extra ) {
+            $decoded = json_decode( $extra, true );
+            if ( is_array( $decoded ) ) {
+                $from_extra = strtolower( (string) ( $decoded['lead_source'] ?? $decoded['source'] ?? '' ) );
+                if ( '' !== $from_extra ) {
+                    return sanitize_key( $from_extra );
+                }
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -395,6 +412,16 @@ class SCRM_Pro_ActiveCampaign {
         }
 
         $tags = $this->tags_for( $lifecycle, $segment, $is_emergency );
+
+        // Append a source tag (midland-source-chat, midland-source-form, ...)
+        // so AC automations can branch on where the lead came from. Source
+        // lives in either an explicit lead_source / source field on the row
+        // or inside extra_fields_json.
+        $source = $this->lead_source( $lead );
+        if ( '' !== $source ) {
+            $tags[] = 'midland-source-' . $source;
+        }
+
         if ( $contact_id ) {
             foreach ( $tags as $tag ) {
                 $this->apply_tag( $api_url, $api_key, $contact_id, $tag );

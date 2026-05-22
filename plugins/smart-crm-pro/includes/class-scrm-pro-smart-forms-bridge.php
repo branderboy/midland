@@ -155,8 +155,10 @@ class SCRM_Pro_Smart_Forms_Bridge {
                 'reminder_due_at' => $reminder_at,
             ) );
             /**
-             * Lets AC observe the bridge-enriched lead. Existing SCRM_Pro_AC
-             * code already has on_chat_lead_captured handling a similar shape.
+             * Lets AC observe the bridge-enriched lead. Chat-sourced leads
+             * reach this hook the same way: SCRM_Chat_Forms_Bridge mirrors
+             * the scai_lead_captured payload into wp_sfco_leads and fires
+             * sfco_lead_submitted, which routes through this same bridge.
              */
             do_action( 'scrm_pro_smart_forms_lead', $ac_lead, $priority, $area );
 
