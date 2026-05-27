@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget + live messaging. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and hands off to live customer service via the bundled WhatsApp + SMS layer during business hours.
- * Version: 1.3.0
+ * Version: 1.4.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.3.0');
+define('SCAI_VERSION', '1.4.0');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -266,10 +266,24 @@ class SCAI_Plugin {
             'business_type',
             'ai_personality',
         );
-        
+
         foreach ($settings as $setting) {
             register_setting('scai_settings', 'smart_chat_' . $setting);
         }
+
+        // Sitemap ingestion (Site Content) — same options the dedicated page uses,
+        // exposed here so admins can configure everything from one screen.
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_ENABLED, array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_SITEMAP_URL, array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_PAGE_LIMIT, array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_CHARS_PER, array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+
+        // WhatsApp connection — same options the Smart Messages page uses.
+        register_setting( 'scai_settings', 'smsg_whatsapp_token' );
+        register_setting( 'scai_settings', 'smsg_whatsapp_phone_id' );
+        register_setting( 'scai_settings', 'smsg_business_name' );
+        register_setting( 'scai_settings', 'smsg_contractor_phone' );
+        register_setting( 'scai_settings', 'smsg_notify_contractor' );
     }
     
     /**

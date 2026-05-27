@@ -142,21 +142,4 @@ class SMSG_WhatsApp_API {
         return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} ORDER BY created_at DESC LIMIT %d", $limit ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     }
 
-    public function log_sms( $to, $message, $response, $lead_id ) {
-        global $wpdb;
-        $table = $wpdb->prefix . 'smsg_messages';
-
-        $this->maybe_create_table();
-
-        $wpdb->insert( $table, array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            'lead_id'    => $lead_id,
-            'phone'      => $to,
-            'template'   => 'SMS: ' . substr( $message, 0, 50 ) . '...',
-            'status'     => isset( $response['sid'] ) ? 'sent' : 'failed',
-            'message_id' => $response['sid'] ?? null,
-            'error'      => $response['message'] ?? null,
-            'channel'    => 'sms',
-            'created_at' => current_time( 'mysql' ),
-        ) );
-    }
 }

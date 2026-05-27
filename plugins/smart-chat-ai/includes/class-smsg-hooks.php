@@ -279,75 +279,11 @@ class SMSG_Hooks {
     }
 
     /**
-     * Send WhatsApp with SMS fallback.
+     * Send a WhatsApp template message. WhatsApp is the only channel — no SMS fallback.
      */
-    private function send_whatsapp_message( $phone, $template, $params, $lead_id, $sms_text ) {
-        // Try WhatsApp first.
-        $result = $this->api->send_template_message( $phone, $template, $params, $lead_id );
-
-        // If WhatsApp failed and SMS fallback is enabled.
-        if ( ! $result['success'] && get_option( 'smsg_sms_fallback', '1' ) === '1' ) {
-            $this->log( "WhatsApp failed, trying SMS fallback for {$phone}" );
-            $sms_result = $this->send_sms( $phone, $sms_text, $lead_id );
-            return $sms_result;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Send SMS via Twilio.
-     */
-    private function send_sms( $to, $message, $lead_id = null ) {
-        $account_sid = get_option( 'smsg_twilio_sid', '' );
-        $auth_token  = get_option( 'smsg_twilio_token', '' );
-        $from_number = get_option( 'smsg_twilio_phone', '' );
-
-        if ( empty( $account_sid ) || empty( $auth_token ) || empty( $from_number ) ) {
-            $this->log( 'SMS not configured' );
-            return array( 'success' => false, 'error' => __( 'SMS not configured', 'smart-messages' ) );
-        }
-
-        $to = $this->format_phone_e164( $to );
-
-        $response = wp_remote_post(
-            "https://api.twilio.com/2010-04-01/Accounts/{$account_sid}/Messages.json",
-            array(
-                'headers' => array(
-                    'Authorization' => 'Basic ' . base64_encode( "{$account_sid}:{$auth_token}" ),
-                ),
-                'body'    => array(
-                    'From' => $from_number,
-                    'To'   => $to,
-                    'Body' => $message,
-                ),
-                'timeout' => 30,
-            )
-        );
-
-        if ( is_wp_error( $response ) ) {
-            return array( 'success' => false, 'error' => $response->get_error_message() );
-        }
-
-        $data = json_decode( wp_remote_retrieve_body( $response ), true );
-
-        // Log the SMS.
-        $this->api->log_sms( $to, $message, $data, $lead_id );
-
-        if ( isset( $data['sid'] ) ) {
-            $this->log( "SMS sent to {$to}: {$data['sid']}" );
-            return array( 'success' => true, 'message_id' => $data['sid'] );
-        }
-
-        return array( 'success' => false, 'error' => $data['message'] ?? __( 'Unknown error', 'smart-messages' ) );
-    }
-
-    private function format_phone_e164( $phone ) {
-        $phone = preg_replace( '/[^0-9]/', '', $phone );
-        if ( strlen( $phone ) === 10 ) {
-            $phone = '1' . $phone;
-        }
-        return '+' . $phone;
+    private function send_whatsapp_message( $phone, $template, $params, $lead_id, $sms_text = '' ) {
+        unset( $sms_text ); // kept for call-site compat; SMS path removed.
+        return $this->api->send_template_message( $phone, $template, $params, $lead_id );
     }
 
     private function log( $message ) {

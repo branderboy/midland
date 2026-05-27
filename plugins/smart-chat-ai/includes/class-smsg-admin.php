@@ -37,12 +37,6 @@ class SMSG_Admin {
         register_setting( 'smsg_settings', 'smsg_whatsapp_phone_id' );
         register_setting( 'smsg_settings', 'smsg_business_name' );
 
-        // Twilio SMS
-        register_setting( 'smsg_settings', 'smsg_twilio_sid' );
-        register_setting( 'smsg_settings', 'smsg_twilio_token' );
-        register_setting( 'smsg_settings', 'smsg_twilio_phone' );
-        register_setting( 'smsg_settings', 'smsg_sms_fallback' );
-
         // Contractor notification
         register_setting( 'smsg_settings', 'smsg_contractor_phone' );
         register_setting( 'smsg_settings', 'smsg_notify_contractor' );
@@ -103,25 +97,6 @@ class SMSG_Admin {
                                 <tr>
                                     <th><?php esc_html_e( 'Business Name', 'smart-messages' ); ?></th>
                                     <td><input type="text" name="smsg_business_name" value="<?php echo esc_attr( get_option( 'smsg_business_name', get_bloginfo( 'name' ) ) ); ?>" class="regular-text"></td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <!-- Twilio SMS Config -->
-                        <div class="card" style="padding:20px;margin-top:20px;">
-                            <h2><?php esc_html_e( 'Twilio SMS Configuration', 'smart-messages' ); ?></h2>
-                            <table class="form-table">
-                                <tr>
-                                    <th><?php esc_html_e( 'Twilio Account SID', 'smart-messages' ); ?></th>
-                                    <td><input type="text" name="smsg_twilio_sid" value="<?php echo esc_attr( get_option( 'smsg_twilio_sid' ) ); ?>" class="regular-text"></td>
-                                </tr>
-                                <tr>
-                                    <th><?php esc_html_e( 'Twilio Auth Token', 'smart-messages' ); ?></th>
-                                    <td><input type="password" name="smsg_twilio_token" value="<?php echo esc_attr( get_option( 'smsg_twilio_token' ) ); ?>" class="regular-text"></td>
-                                </tr>
-                                <tr>
-                                    <th><?php esc_html_e( 'Twilio Phone Number', 'smart-messages' ); ?></th>
-                                    <td><input type="text" name="smsg_twilio_phone" value="<?php echo esc_attr( get_option( 'smsg_twilio_phone' ) ); ?>" class="regular-text" placeholder="+15551234567"></td>
                                 </tr>
                             </table>
                         </div>
@@ -222,9 +197,7 @@ class SMSG_Admin {
                         <?php if ( empty( $messages ) ) : ?>
                             <p style="color:#666;"><?php esc_html_e( 'No messages sent yet.', 'smart-messages' ); ?></p>
                         <?php else : ?>
-                            <?php foreach ( $messages as $m ) :
-                                $icon = ( $m->channel ?? 'whatsapp' ) === 'sms' ? '&#x1F4AC;' : '&#x1F4F1;';
-                            ?>
+                            <?php foreach ( $messages as $m ) : ?>
                                 <div style="border-bottom:1px solid #eee;padding:10px 0;">
                                     <strong><?php echo esc_html( $m->phone ); ?></strong>
                                     <span style="float:right;color:<?php echo $m->status === 'sent' ? '#38a169' : '#e53e3e'; ?>;">
