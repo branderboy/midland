@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Midland Chat
- * Description: Midland-branded AI chat widget + live messaging. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and hands off to live customer service via the bundled WhatsApp + SMS layer during business hours.
- * Version: 1.3.0
+ * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
+ * Version: 1.5.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.3.0');
+define('SCAI_VERSION', '1.5.0');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -80,37 +80,12 @@ class SCAI_Plugin {
         require_once SCAI_PLUGIN_DIR . 'includes/class-ai-handler.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-lead-manager.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-analytics.php';
-        require_once SCAI_PLUGIN_DIR . 'includes/class-handoff.php';
-        SCAI_Handoff::get_instance();
         require_once SCAI_PLUGIN_DIR . 'includes/class-content-context.php';
         SCAI_Content_Context::get_instance();
 
-        // Bundled messaging layer (formerly the standalone Midland Smart Messages
-        // plugin). Class-exists guards keep us safe if an old install still has
-        // the standalone plugin active — we let that one win and skip our copies.
-        if ( ! defined( 'SMSG_VERSION' ) ) {
-            define( 'SMSG_VERSION', '2.1.0-merged' );
-            define( 'SMSG_PATH', SCAI_PLUGIN_DIR );
-            define( 'SMSG_URL', SCAI_PLUGIN_URL );
-        }
-        if ( ! class_exists( 'SMSG_WhatsApp_API' ) ) {
-            require_once SCAI_PLUGIN_DIR . 'includes/class-smsg-whatsapp-api.php';
-        }
-        if ( ! class_exists( 'SMSG_Hooks' ) ) {
-            require_once SCAI_PLUGIN_DIR . 'includes/class-smsg-hooks.php';
-        }
-        if ( ! class_exists( 'SMSG_Admin' ) ) {
-            require_once SCAI_PLUGIN_DIR . 'includes/class-smsg-admin.php';
-        }
-        if ( class_exists( 'SMSG_WhatsApp_API' ) ) {
-            SMSG_WhatsApp_API::get_instance();
-        }
-        if ( class_exists( 'SMSG_Hooks' ) ) {
-            SMSG_Hooks::get_instance();
-        }
-        if ( class_exists( 'SMSG_Admin' ) ) {
-            SMSG_Admin::get_instance();
-        }
+        // WhatsApp is now click-to-chat only (wa.me link inside the widget). The
+        // old Cloud API + Smart Messages admin layer was removed in 1.5.0 — clients
+        // weren't getting through Meta's developer-app onboarding.
     }
     
     /**
@@ -266,10 +241,21 @@ class SCAI_Plugin {
             'business_type',
             'ai_personality',
         );
-        
+
         foreach ($settings as $setting) {
             register_setting('scai_settings', 'smart_chat_' . $setting);
         }
+
+        // Sitemap ingestion (Site Content) — same options the dedicated page uses,
+        // exposed here so admins can configure everything from one screen.
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_ENABLED, array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_SITEMAP_URL, array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_PAGE_LIMIT, array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+        register_setting( 'scai_settings', SCAI_Content_Context::OPT_CHARS_PER, array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+
+        // WhatsApp click-to-chat — one number, one prefilled greeting, no Meta app needed.
+        register_setting( 'scai_settings', 'smart_chat_whatsapp_number', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+        register_setting( 'scai_settings', 'smart_chat_whatsapp_greeting', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
     }
     
     /**
@@ -325,6 +311,8 @@ class SCAI_Plugin {
             true
         );
         
+        $wa_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'smart_chat_whatsapp_number', '' ) );
+
         wp_localize_script('scai-widget', 'scaiConfig', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('scai_widget'),
@@ -333,6 +321,8 @@ class SCAI_Plugin {
             'title' => get_option('smart_chat_chat_title', 'Chat with us!'),
             'subtitle' => get_option('smart_chat_chat_subtitle', 'We typically reply in a few minutes'),
             'businessName' => get_option('smart_chat_business_name', get_bloginfo('name')),
+            'whatsappNumber' => $wa_number,
+            'whatsappGreeting' => get_option( 'smart_chat_whatsapp_greeting', "Hi! I'd like to ask about your services." ),
         ));
     }
     
