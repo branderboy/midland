@@ -7,6 +7,11 @@ jQuery(document).ready(function($) {
     var $window = $('#smart-chat-window');
     var $messages = $('#smart-chat-messages');
     var $input = $('#smart-chat-input');
+    var $form = $('#smart-chat-form');
+    var $actions = $('#smart-chat-actions');
+
+    // Visitor-intent phrases that auto-open the embedded Smart Form.
+    var intentRegex = /\b(schedul|book|visit|walk[- ]?through|quote|estimate|appointment|on[- ]?site|come (out|by)|get someone (to|out)|set up|set it up)\b/i;
 
     $widget.show();
 
@@ -16,7 +21,7 @@ jQuery(document).ready(function($) {
         if ($window.is(':visible')) {
             $input.focus();
             if ($messages.children().length === 0) {
-                appendMsg('ai', 'Hi! How can I help you today?');
+                appendMsg('ai', 'Hey! What can I help you with?');
             }
         }
     });
@@ -25,6 +30,21 @@ jQuery(document).ready(function($) {
         $window.hide();
         $bubble.show();
     });
+
+    $('#smart-chat-cta-visit').on('click', showForm);
+    $('#smart-chat-form-close').on('click', hideForm);
+
+    function showForm() {
+        $form.slideDown(180);
+        $actions.hide();
+        $input.prop('disabled', true);
+    }
+
+    function hideForm() {
+        $form.slideUp(180);
+        $actions.show();
+        $input.prop('disabled', false).focus();
+    }
 
     function appendMsg(sender, text) {
         var cls = sender === 'user' ? 'smart-chat-msg-user' : 'smart-chat-msg-ai';
@@ -45,6 +65,10 @@ jQuery(document).ready(function($) {
         appendMsg('user', msg);
         $input.val('').focus();
 
+        // If the visitor expressed intent to book, slide the form in
+        // alongside the AI reply so they can act immediately.
+        var triggerForm = intentRegex.test(msg);
+
         $.post(scaiConfig.ajaxurl, {
             action: 'scai_send_message',
             nonce: scaiConfig.nonce,
@@ -53,6 +77,7 @@ jQuery(document).ready(function($) {
         }, function(res) {
             if (res.success) {
                 appendMsg('ai', res.data.message);
+                if (triggerForm) showForm();
             } else {
                 appendMsg('ai', 'Sorry, something went wrong. Please try again.');
             }
@@ -64,5 +89,13 @@ jQuery(document).ready(function($) {
     $('#smart-chat-send').on('click', sendMessage);
     $input.on('keypress', function(e) {
         if (e.which === 13) { sendMessage(); }
+    });
+
+    // When the embedded Smart Form is submitted successfully, Smart Forms
+    // fires its own success state — show a confirmation in chat and close
+    // the form panel.
+    $(document).on('sfco:submitted', function() {
+        hideForm();
+        appendMsg('ai', "Got it — I'll have someone reach out today to lock in a walkthrough.");
     });
 });

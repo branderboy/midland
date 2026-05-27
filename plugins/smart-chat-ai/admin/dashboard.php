@@ -22,6 +22,10 @@ $ctx_ready   = $ctx_enabled && $ctx_count > 0;
 $whatsapp_number = (string) get_option( 'smart_chat_whatsapp_number', '' );
 $whatsapp_ready  = '' !== $whatsapp_number;
 
+$sf_form_id    = (int) get_option( 'smart_chat_sf_form_id', 0 );
+$sf_active     = class_exists( 'SFCO_Database' );
+$sf_ready      = $sf_active && $sf_form_id > 0;
+
 $ok_badge   = '<span style="color:#38a169;font-weight:600;">&#x2713; ' . esc_html__( 'Connected', 'smart-chat-ai' ) . '</span>';
 $warn_badge = '<span style="color:#e53e3e;font-weight:600;">&#x2717; ' . esc_html__( 'Not connected', 'smart-chat-ai' ) . '</span>';
 ?>
@@ -77,6 +81,22 @@ $warn_badge = '<span style="color:#e53e3e;font-weight:600;">&#x2717; ' . esc_htm
                         </small>
                     </td>
                     <td><a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=scai-content' ) ); ?>"><?php esc_html_e( 'Configure', 'smart-chat-ai' ); ?></a></td>
+                </tr>
+                <tr>
+                    <td><strong><?php esc_html_e( 'Smart Forms', 'smart-chat-ai' ); ?></strong><br><small><?php esc_html_e( 'Embedded lead-capture form inside the chat', 'smart-chat-ai' ); ?></small></td>
+                    <td>
+                        <?php echo $sf_ready ? $ok_badge : $warn_badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        <br><small>
+                            <?php if ( ! $sf_active ) {
+                                esc_html_e( 'Smart Forms for Midland not active.', 'smart-chat-ai' );
+                            } elseif ( ! $sf_form_id ) {
+                                esc_html_e( 'Pick a form in Settings to embed in the chat.', 'smart-chat-ai' );
+                            } else {
+                                printf( esc_html__( 'Form #%d embedded — submissions bridge to Smart CRM automatically.', 'smart-chat-ai' ), $sf_form_id );
+                            } ?>
+                        </small>
+                    </td>
+                    <td><a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-chat-settings' ) ); ?>"><?php esc_html_e( 'Configure', 'smart-chat-ai' ); ?></a></td>
                 </tr>
                 <tr>
                     <td><strong><?php esc_html_e( 'WhatsApp', 'smart-chat-ai' ); ?></strong><br><small><?php esc_html_e( 'Click-to-chat handoff', 'smart-chat-ai' ); ?></small></td>
