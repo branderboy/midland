@@ -65,6 +65,12 @@ class SCAI_AI_Handler {
         $business_name = get_option( 'smart_chat_business_name', get_bloginfo( 'name' ) );
         $business_type = get_option( 'smart_chat_business_type', 'contractor' );
         $personality   = get_option( 'smart_chat_ai_personality', 'helpful' );
+        $custom        = trim( (string) get_option( 'smart_chat_preprompt', '' ) );
+
+        // Admin-supplied custom preprompt wins. Empty falls back to the default below.
+        if ( '' !== $custom ) {
+            return apply_filters( 'scai_system_prompt', $custom );
+        }
 
         $prompt = "You are a helpful AI assistant for {$business_name}, a professional {$business_type} company.
 
@@ -75,13 +81,8 @@ Your role:
 - Be friendly, helpful, and {$personality}
 - Keep responses concise (2-3 sentences max unless asked for details)
 - If you don't know something, be honest and offer to have a human follow up
-
-Our services:
-- HVAC installation and repair
-- Plumbing services
-- Drywall installation
-- General contracting
-- Emergency services available 24/7
+- Do NOT include citation markers like [1], [2], [3] in your replies. Write in plain prose.
+- Do NOT include source URLs or footnote references.
 
 When to capture lead:
 - When visitor asks for a quote or estimate
@@ -157,12 +158,30 @@ Never:
             return $this->error_response( 'Sorry, I encountered an error. Please contact us directly.' );
         }
 
+        $content = (string) ( $body['choices'][0]['message']['content'] ?? '' );
+        $content = $this->clean_response( $content );
+
         return array(
-            'message' => (string) ( $body['choices'][0]['message']['content'] ?? '' ),
+            'message' => $content,
             'model'   => $this->model,
             'tokens'  => (int) ( $body['usage']['total_tokens'] ?? 0 ),
             'error'   => false,
         );
+    }
+
+    /**
+     * Perplexity Sonar peppers replies with [1], [2,3], etc. citation markers.
+     * Strip them — the chat widget has no citation panel and they read as noise.
+     */
+    private function clean_response( $text ) {
+        if ( '' === $text ) {
+            return $text;
+        }
+        // Remove [1], [2,3], [1][2][3], ranges like [1-3], etc.
+        $text = preg_replace( '/\s*\[\d+(?:[-,\s]\d+)*\]/u', '', $text );
+        // Collapse double spaces left behind.
+        $text = preg_replace( '/[ \t]{2,}/', ' ', $text );
+        return trim( $text );
     }
 
     private function current_api_key() {

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.6.0
+ * Version: 1.7.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.6.0');
+define('SCAI_VERSION', '1.7.0');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -84,7 +84,7 @@ class SCAI_Plugin {
         SCAI_Content_Context::get_instance();
 
         // WhatsApp is now click-to-chat only (wa.me link inside the widget). The
-        // old Cloud API + Smart Messages admin layer was removed in 1.6.0 — clients
+        // old Cloud API + Smart Messages admin layer was removed in 1.7.0 — clients
         // weren't getting through Meta's developer-app onboarding.
     }
     
@@ -99,7 +99,7 @@ class SCAI_Plugin {
         $defaults = array(
             'chat_enabled' => true,
             'chat_position' => 'bottom-right',
-            'chat_color' => '#16A34A',
+            'chat_color' => '#43A94B',
             'chat_title' => 'Chat with us!',
             'chat_subtitle' => 'We typically reply in a few minutes',
             'ai_provider' => 'openai',
@@ -241,6 +241,7 @@ class SCAI_Plugin {
             'business_name',
             'business_type',
             'ai_personality',
+            'preprompt',
         );
 
         foreach ($settings as $setting) {
@@ -321,7 +322,7 @@ class SCAI_Plugin {
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('scai_widget'),
             'position' => get_option('smart_chat_chat_position', 'bottom-right'),
-            'color' => get_option('smart_chat_chat_color', '#16A34A'),
+            'color' => get_option('smart_chat_chat_color', '#43A94B'),
             'title' => get_option('smart_chat_chat_title', 'Chat with us!'),
             'subtitle' => get_option('smart_chat_chat_subtitle', 'We typically reply in a few minutes'),
             'businessName' => get_option('smart_chat_business_name', get_bloginfo('name')),

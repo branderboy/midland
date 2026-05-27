@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 $position  = get_option( 'smart_chat_chat_position', 'bottom-right' );
-$color     = esc_attr( get_option( 'smart_chat_chat_color', '#16A34A' ) );
+$color     = esc_attr( get_option( 'smart_chat_chat_color', '#43A94B' ) );
 $logo      = esc_url( (string) get_option( 'smart_chat_chat_logo', '' ) );
 $title     = esc_html( get_option( 'smart_chat_chat_title', __( 'Chat with us!', 'smart-chat-ai' ) ) );
 $subtitle  = esc_html( get_option( 'smart_chat_chat_subtitle', __( 'We typically reply in a few minutes', 'smart-chat-ai' ) ) );
