@@ -1,7 +1,8 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 $position  = get_option( 'smart_chat_chat_position', 'bottom-right' );
-$color     = esc_attr( get_option( 'smart_chat_chat_color', '#2563EB' ) );
+$color     = esc_attr( get_option( 'smart_chat_chat_color', '#16A34A' ) );
+$logo      = esc_url( (string) get_option( 'smart_chat_chat_logo', '' ) );
 $title     = esc_html( get_option( 'smart_chat_chat_title', __( 'Chat with us!', 'smart-chat-ai' ) ) );
 $subtitle  = esc_html( get_option( 'smart_chat_chat_subtitle', __( 'We typically reply in a few minutes', 'smart-chat-ai' ) ) );
 $wa_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'smart_chat_whatsapp_number', '' ) );
@@ -10,11 +11,18 @@ $wa_link   = $wa_number ? 'https://wa.me/' . $wa_number . '?text=' . $wa_text : 
 ?>
 <div id="smart-chat-widget" class="smart-chat-<?php echo esc_attr( $position ); ?>" style="display:none;">
     <div id="smart-chat-bubble" style="background:<?php echo $color; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized above ?>;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <?php if ( $logo ) : ?>
+            <img src="<?php echo $logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" alt="">
+        <?php else : ?>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <?php endif; ?>
     </div>
     <div id="smart-chat-window" style="display:none;">
         <div id="smart-chat-header" style="background:<?php echo $color; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;">
-            <div>
+            <?php if ( $logo ) : ?>
+                <img id="smart-chat-header-logo" src="<?php echo $logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" alt="">
+            <?php endif; ?>
+            <div class="smart-chat-header-text">
                 <strong><?php echo $title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above ?></strong>
                 <small><?php echo $subtitle; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above ?></small>
             </div>

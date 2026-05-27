@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.5.0
+ * Version: 1.6.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.5.0');
+define('SCAI_VERSION', '1.6.0');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -84,7 +84,7 @@ class SCAI_Plugin {
         SCAI_Content_Context::get_instance();
 
         // WhatsApp is now click-to-chat only (wa.me link inside the widget). The
-        // old Cloud API + Smart Messages admin layer was removed in 1.5.0 — clients
+        // old Cloud API + Smart Messages admin layer was removed in 1.6.0 — clients
         // weren't getting through Meta's developer-app onboarding.
     }
     
@@ -99,7 +99,7 @@ class SCAI_Plugin {
         $defaults = array(
             'chat_enabled' => true,
             'chat_position' => 'bottom-right',
-            'chat_color' => '#2563EB',
+            'chat_color' => '#16A34A',
             'chat_title' => 'Chat with us!',
             'chat_subtitle' => 'We typically reply in a few minutes',
             'ai_provider' => 'openai',
@@ -228,6 +228,7 @@ class SCAI_Plugin {
             'chat_enabled',
             'chat_position',
             'chat_color',
+            'chat_logo',
             'chat_title',
             'chat_subtitle',
             'ai_provider',
@@ -265,14 +266,17 @@ class SCAI_Plugin {
         if (strpos($hook, 'smart-chat') === false) {
             return;
         }
-        
+
+        // wp.media() — needed for the logo picker on the settings screen.
+        wp_enqueue_media();
+
         wp_enqueue_style(
             'scai-admin',
             SCAI_PLUGIN_URL . 'assets/css/admin.css',
             array(),
             SCAI_VERSION
         );
-        
+
         wp_enqueue_script(
             'scai-admin',
             SCAI_PLUGIN_URL . 'assets/js/admin.js',
@@ -317,7 +321,7 @@ class SCAI_Plugin {
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('scai_widget'),
             'position' => get_option('smart_chat_chat_position', 'bottom-right'),
-            'color' => get_option('smart_chat_chat_color', '#2563EB'),
+            'color' => get_option('smart_chat_chat_color', '#16A34A'),
             'title' => get_option('smart_chat_chat_title', 'Chat with us!'),
             'subtitle' => get_option('smart_chat_chat_subtitle', 'We typically reply in a few minutes'),
             'businessName' => get_option('smart_chat_business_name', get_bloginfo('name')),
