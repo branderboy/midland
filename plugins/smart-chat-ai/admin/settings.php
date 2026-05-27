@@ -24,8 +24,23 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                 </td>
             </tr>
             <tr>
-                <th><label for="smart_chat_chat_color"><?php esc_html_e( 'Color', 'smart-chat-ai' ); ?></label></th>
-                <td><input type="color" name="smart_chat_chat_color" id="smart_chat_chat_color" value="<?php echo esc_attr( get_option( 'smart_chat_chat_color', '#2563EB' ) ); ?>"></td>
+                <th><label for="smart_chat_chat_color"><?php esc_html_e( 'Brand Color', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <input type="color" name="smart_chat_chat_color" id="smart_chat_chat_color" value="<?php echo esc_attr( get_option( 'smart_chat_chat_color', '#16A34A' ) ); ?>">
+                    <p class="description"><?php esc_html_e( 'Used for the bubble, header, and Send button. Set to your primary brand color.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="smart_chat_chat_logo"><?php esc_html_e( 'Logo', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <?php $logo_url = (string) get_option( 'smart_chat_chat_logo', '' ); ?>
+                    <input type="text" name="smart_chat_chat_logo" id="smart_chat_chat_logo" class="regular-text" value="<?php echo esc_attr( $logo_url ); ?>" placeholder="https://...">
+                    <button type="button" class="button" id="smart_chat_logo_upload"><?php esc_html_e( 'Choose Image', 'smart-chat-ai' ); ?></button>
+                    <p class="description"><?php esc_html_e( 'Shown in the chat header and on the bubble. Use a transparent PNG/SVG with good contrast against your brand color.', 'smart-chat-ai' ); ?></p>
+                    <?php if ( $logo_url ) : ?>
+                        <p><img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-height:48px;background:#222;padding:6px 10px;border-radius:6px;"></p>
+                    <?php endif; ?>
+                </td>
             </tr>
             <tr>
                 <th><label for="smart_chat_chat_title"><?php esc_html_e( 'Title', 'smart-chat-ai' ); ?></label></th>
