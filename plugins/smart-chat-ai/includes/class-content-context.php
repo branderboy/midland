@@ -39,6 +39,7 @@ class SCAI_Content_Context {
         add_action( 'admin_menu', array( $this, 'add_menu' ), 61 );
         add_action( 'admin_init', array( $this, 'handle_save' ) );
         add_action( 'admin_init', array( $this, 'handle_refresh' ) );
+        add_action( 'admin_init', array( $this, 'maybe_bootstrap_first_crawl' ) );
 
         // Inject site context into the system prompt.
         add_filter( 'scai_system_prompt', array( $this, 'inject_context' ), 10, 1 );
@@ -48,6 +49,31 @@ class SCAI_Content_Context {
         if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
             wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::CRON_HOOK );
         }
+    }
+
+    /**
+     * First-run bootstrap. Runs on admin_init so it covers upgrades from older
+     * versions (where the activation hook doesn't refire). If sitemap context
+     * is enabled but the cache has never been populated, schedule an immediate
+     * one-shot cron event to do the first crawl.
+     */
+    public function maybe_bootstrap_first_crawl() {
+        // Default-on for new installs that never touched the toggle.
+        if ( false === get_option( self::OPT_ENABLED ) ) {
+            update_option( self::OPT_ENABLED, 1 );
+        }
+        if ( ! (int) get_option( self::OPT_ENABLED, 0 ) ) {
+            return;
+        }
+        $last = get_option( self::OPT_LAST_REFRESH, array() );
+        if ( ! empty( $last['at'] ) ) {
+            return; // Already ran at least once.
+        }
+        if ( wp_next_scheduled( self::CRON_HOOK ) > time() + 60 ) {
+            // A run is already pending soon.
+            return;
+        }
+        wp_schedule_single_event( time() + 10, self::CRON_HOOK );
     }
 
     public function add_menu() {

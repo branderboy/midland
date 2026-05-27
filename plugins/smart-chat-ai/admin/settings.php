@@ -26,7 +26,7 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
             <tr>
                 <th><label for="smart_chat_chat_color"><?php esc_html_e( 'Brand Color', 'smart-chat-ai' ); ?></label></th>
                 <td>
-                    <input type="color" name="smart_chat_chat_color" id="smart_chat_chat_color" value="<?php echo esc_attr( get_option( 'smart_chat_chat_color', '#16A34A' ) ); ?>">
+                    <input type="color" name="smart_chat_chat_color" id="smart_chat_chat_color" value="<?php echo esc_attr( get_option( 'smart_chat_chat_color', '#43A94B' ) ); ?>">
                     <p class="description"><?php esc_html_e( 'Used for the bubble, header, and Send button. Set to your primary brand color.', 'smart-chat-ai' ); ?></p>
                 </td>
             </tr>
@@ -103,6 +103,13 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
             <tr>
                 <th><label for="smart_chat_ai_temperature"><?php esc_html_e( 'Temperature', 'smart-chat-ai' ); ?></label></th>
                 <td><input type="number" name="smart_chat_ai_temperature" id="smart_chat_ai_temperature" min="0" max="1" step="0.1" value="<?php echo esc_attr( get_option( 'smart_chat_ai_temperature', '0.7' ) ); ?>"></td>
+            </tr>
+            <tr>
+                <th><label for="smart_chat_preprompt"><?php esc_html_e( 'Custom Preprompt', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <textarea name="smart_chat_preprompt" id="smart_chat_preprompt" rows="10" class="large-text code" placeholder="<?php esc_attr_e( 'Leave blank to use the default contractor prompt. Anything you put here REPLACES the default system prompt entirely.', 'smart-chat-ai' ); ?>"><?php echo esc_textarea( get_option( 'smart_chat_preprompt', '' ) ); ?></textarea>
+                    <p class="description"><?php esc_html_e( 'Direct instructions for the AI. Use this to set tone, services, do-not-do rules, and how to capture leads. Sitemap content is still appended automatically below your prompt.', 'smart-chat-ai' ); ?></p>
+                </td>
             </tr>
         </table>
 
