@@ -249,7 +249,7 @@ class SCAI_Content_Context {
             return $prompt;
         }
 
-        $reference = "\n\n--- SITE CONTENT REFERENCE ---\nUse these excerpts from our own website. Quote them verbatim where relevant. If the user's question isn't covered, say so honestly.\n\n";
+        $reference = "\n\n--- BACKGROUND ON OUR COMPANY ---\nThese are notes from our own website. Use them as background knowledge only — paraphrase casually in your own words. Do NOT quote them verbatim. Do NOT echo marketing phrases like \"free on-site evaluation\" or \"24-48 hour quote turnaround\" — say it like a normal person would.\n\n";
         foreach ( $picked as $c ) {
             $reference .= "Source: " . $c['url'] . "\n" . $c['text'] . "\n\n";
         }

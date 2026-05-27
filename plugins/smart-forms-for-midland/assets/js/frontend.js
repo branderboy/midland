@@ -27,6 +27,10 @@ jQuery(document).ready(function($) {
                     messageDiv.addClass('success').text(response.data.message).fadeIn();
                     form[0].reset();
 
+                    // Broadcast success so other plugins (Midland Chat widget,
+                    // analytics layers) can react without inspecting our DOM.
+                    $(document).trigger('sfco:submitted', [ response.data, form ]);
+
                     // Show estimate if available
                     if (response.data.estimate) {
                         var estimateText = 'Estimated cost: $' +

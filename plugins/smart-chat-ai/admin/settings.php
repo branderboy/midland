@@ -104,6 +104,32 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                 <th><label for="smart_chat_ai_temperature"><?php esc_html_e( 'Temperature', 'smart-chat-ai' ); ?></label></th>
                 <td><input type="number" name="smart_chat_ai_temperature" id="smart_chat_ai_temperature" min="0" max="1" step="0.1" value="<?php echo esc_attr( get_option( 'smart_chat_ai_temperature', '0.7' ) ); ?>"></td>
             </tr>
+            <?php
+            $sf_forms = array();
+            if ( class_exists( 'SFCO_Database' ) && method_exists( 'SFCO_Database', 'get_forms' ) ) {
+                $sf_forms = (array) SFCO_Database::get_forms( array( 'status' => 'active' ) );
+            }
+            $current_form_id = (int) get_option( 'smart_chat_sf_form_id', 0 );
+            ?>
+            <tr>
+                <th><label for="smart_chat_sf_form_id"><?php esc_html_e( 'Smart Forms Form', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <?php if ( ! empty( $sf_forms ) ) : ?>
+                        <select name="smart_chat_sf_form_id" id="smart_chat_sf_form_id">
+                            <option value="0">— <?php esc_html_e( 'Use built-in lead capture', 'smart-chat-ai' ); ?> —</option>
+                            <?php foreach ( $sf_forms as $f ) : ?>
+                                <option value="<?php echo (int) $f->id; ?>" <?php selected( $current_form_id, (int) $f->id ); ?>>
+                                    <?php echo esc_html( $f->title ); ?> (#<?php echo (int) $f->id; ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="description"><?php esc_html_e( 'When visitors tap "Schedule a Visit" in the chat, this Smart Form renders inside the widget. Submissions flow through Smart Forms → Smart CRM Pro automatically.', 'smart-chat-ai' ); ?></p>
+                    <?php else : ?>
+                        <input type="number" name="smart_chat_sf_form_id" id="smart_chat_sf_form_id" value="<?php echo esc_attr( $current_form_id ); ?>" min="0" style="width:90px;">
+                        <p class="description"><?php esc_html_e( 'Smart Forms not detected. Enter a form ID manually, or activate Smart Forms for Midland to pick from a list.', 'smart-chat-ai' ); ?></p>
+                    <?php endif; ?>
+                </td>
+            </tr>
             <tr>
                 <th><label for="smart_chat_preprompt"><?php esc_html_e( 'Custom Preprompt', 'smart-chat-ai' ); ?></label></th>
                 <td>
