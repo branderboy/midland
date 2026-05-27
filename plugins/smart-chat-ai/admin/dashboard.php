@@ -19,9 +19,8 @@ $ctx_last    = get_option( SCAI_Content_Context::OPT_LAST_REFRESH, array() );
 $ctx_count   = isset( $ctx_last['count'] ) ? (int) $ctx_last['count'] : 0;
 $ctx_ready   = $ctx_enabled && $ctx_count > 0;
 
-$whatsapp_token = (string) get_option( 'smsg_whatsapp_token', '' );
-$whatsapp_phone = (string) get_option( 'smsg_whatsapp_phone_id', '' );
-$whatsapp_ready = ( '' !== $whatsapp_token ) && ( '' !== $whatsapp_phone );
+$whatsapp_number = (string) get_option( 'smart_chat_whatsapp_number', '' );
+$whatsapp_ready  = '' !== $whatsapp_number;
 
 $ok_badge   = '<span style="color:#38a169;font-weight:600;">&#x2713; ' . esc_html__( 'Connected', 'smart-chat-ai' ) . '</span>';
 $warn_badge = '<span style="color:#e53e3e;font-weight:600;">&#x2717; ' . esc_html__( 'Not connected', 'smart-chat-ai' ) . '</span>';
@@ -80,12 +79,18 @@ $warn_badge = '<span style="color:#e53e3e;font-weight:600;">&#x2717; ' . esc_htm
                     <td><a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=scai-content' ) ); ?>"><?php esc_html_e( 'Configure', 'smart-chat-ai' ); ?></a></td>
                 </tr>
                 <tr>
-                    <td><strong><?php esc_html_e( 'WhatsApp', 'smart-chat-ai' ); ?></strong><br><small><?php esc_html_e( 'Live handoff to customer service', 'smart-chat-ai' ); ?></small></td>
+                    <td><strong><?php esc_html_e( 'WhatsApp', 'smart-chat-ai' ); ?></strong><br><small><?php esc_html_e( 'Click-to-chat handoff', 'smart-chat-ai' ); ?></small></td>
                     <td>
                         <?php echo $whatsapp_ready ? $ok_badge : $warn_badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                        <br><small><?php esc_html_e( 'Needs Meta Cloud API Access Token + Phone Number ID.', 'smart-chat-ai' ); ?></small>
+                        <br><small>
+                            <?php if ( $whatsapp_ready ) {
+                                echo esc_html( $whatsapp_number );
+                            } else {
+                                esc_html_e( 'Add your WhatsApp number to enable the in-widget button.', 'smart-chat-ai' );
+                            } ?>
+                        </small>
                     </td>
-                    <td><a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-messages' ) ); ?>"><?php esc_html_e( 'Configure', 'smart-chat-ai' ); ?></a></td>
+                    <td><a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-chat-settings' ) ); ?>"><?php esc_html_e( 'Configure', 'smart-chat-ai' ); ?></a></td>
                 </tr>
             </tbody>
         </table>

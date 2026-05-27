@@ -145,65 +145,33 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
         </table>
 
         <?php
-        $wa_token   = (string) get_option( 'smsg_whatsapp_token', '' );
-        $wa_phone   = (string) get_option( 'smsg_whatsapp_phone_id', '' );
-        $wa_ready   = ( '' !== $wa_token ) && ( '' !== $wa_phone );
+        $wa_number   = (string) get_option( 'smart_chat_whatsapp_number', '' );
+        $wa_greeting = (string) get_option( 'smart_chat_whatsapp_greeting', __( "Hi! I'd like to ask about your services.", 'smart-chat-ai' ) );
+        $wa_ready    = '' !== $wa_number;
         ?>
-        <h2><?php esc_html_e( 'WhatsApp (Live Handoff)', 'smart-chat-ai' ); ?></h2>
+        <h2><?php esc_html_e( 'WhatsApp', 'smart-chat-ai' ); ?></h2>
         <p class="description">
-            <?php esc_html_e( 'Connect Meta\'s WhatsApp Cloud API so the chat can hand a captured lead off to a human on WhatsApp.', 'smart-chat-ai' ); ?>
+            <?php esc_html_e( 'Adds a "Chat on WhatsApp" button inside the chat widget. Visitors tap it, WhatsApp opens with your number and a prefilled greeting, and the conversation lands in your free WhatsApp Business app — no Meta developer app or API token needed.', 'smart-chat-ai' ); ?>
             <?php if ( $wa_ready ) : ?>
                 <span style="color:#38a169;font-weight:600;">&#x2713; <?php esc_html_e( 'Connected', 'smart-chat-ai' ); ?></span>
             <?php else : ?>
-                <span style="color:#e53e3e;font-weight:600;">&#x2717; <?php esc_html_e( 'Not connected', 'smart-chat-ai' ); ?></span>
+                <span style="color:#888;"><?php esc_html_e( '(disabled until you add a number)', 'smart-chat-ai' ); ?></span>
             <?php endif; ?>
         </p>
-        <details style="margin:0 0 12px;padding:10px 14px;background:#f6f7f7;border-left:4px solid #2271b1;max-width:780px;">
-            <summary style="cursor:pointer;font-weight:600;"><?php esc_html_e( 'How to get your Access Token and Phone Number ID', 'smart-chat-ai' ); ?></summary>
-            <ol style="margin:10px 0 0 20px;line-height:1.6;">
-                <li><?php printf(
-                    /* translators: %s: link to Meta for Developers */
-                    wp_kses_post( __( 'Go to <a href="%s" target="_blank" rel="noopener">Meta for Developers</a> and create (or open) an App of type <strong>Business</strong>.', 'smart-chat-ai' ) ),
-                    'https://developers.facebook.com/apps/'
-                ); ?></li>
-                <li><?php esc_html_e( 'In the left sidebar, add the WhatsApp product and open WhatsApp → API Setup.', 'smart-chat-ai' ); ?></li>
-                <li><?php esc_html_e( 'Copy the Temporary access token (24h) — paste it below to test. For production, create a System User in Business Settings and generate a permanent token with the whatsapp_business_messaging + whatsapp_business_management scopes.', 'smart-chat-ai' ); ?></li>
-                <li><?php esc_html_e( 'On the same API Setup screen, copy the Phone number ID (the numeric value under the test or verified WhatsApp number — not the phone number itself).', 'smart-chat-ai' ); ?></li>
-                <li><?php esc_html_e( 'Add your own phone to "To" recipients to test, then click Send Message. Once a template (e.g. lead_received) is approved in WhatsApp Manager, paste the token + ID here.', 'smart-chat-ai' ); ?></li>
-            </ol>
-            <p style="margin:10px 0 0;">
-                <a href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started" target="_blank" rel="noopener"><?php esc_html_e( 'Full Cloud API setup guide →', 'smart-chat-ai' ); ?></a>
-            </p>
-        </details>
         <table class="form-table">
             <tr>
-                <th><label for="smsg_whatsapp_token"><?php esc_html_e( 'Access Token', 'smart-chat-ai' ); ?></label></th>
+                <th><label for="smart_chat_whatsapp_number"><?php esc_html_e( 'WhatsApp Number', 'smart-chat-ai' ); ?></label></th>
                 <td>
-                    <input type="password" id="smsg_whatsapp_token" name="smsg_whatsapp_token" class="regular-text" value="<?php echo esc_attr( $wa_token ); ?>" placeholder="EAA...">
-                    <p class="description"><?php esc_html_e( 'Meta Business Suite → WhatsApp → API Setup → Temporary or System User access token.', 'smart-chat-ai' ); ?></p>
+                    <input type="text" id="smart_chat_whatsapp_number" name="smart_chat_whatsapp_number" class="regular-text" value="<?php echo esc_attr( $wa_number ); ?>" placeholder="+15551234567">
+                    <p class="description"><?php esc_html_e( 'Include country code. US example: +15551234567. This is the number on your phone that runs the free WhatsApp Business app.', 'smart-chat-ai' ); ?></p>
                 </td>
             </tr>
             <tr>
-                <th><label for="smsg_whatsapp_phone_id"><?php esc_html_e( 'Phone Number ID', 'smart-chat-ai' ); ?></label></th>
+                <th><label for="smart_chat_whatsapp_greeting"><?php esc_html_e( 'Prefilled Message', 'smart-chat-ai' ); ?></label></th>
                 <td>
-                    <input type="text" id="smsg_whatsapp_phone_id" name="smsg_whatsapp_phone_id" class="regular-text" value="<?php echo esc_attr( $wa_phone ); ?>">
-                    <p class="description"><?php esc_html_e( 'Numeric ID for the verified WhatsApp business number (not the phone number itself).', 'smart-chat-ai' ); ?></p>
+                    <input type="text" id="smart_chat_whatsapp_greeting" name="smart_chat_whatsapp_greeting" class="regular-text" value="<?php echo esc_attr( $wa_greeting ); ?>">
+                    <p class="description"><?php esc_html_e( 'Pre-populated in the visitor\'s WhatsApp before they hit send. Keep it short.', 'smart-chat-ai' ); ?></p>
                 </td>
-            </tr>
-            <tr>
-                <th><label for="smsg_business_name"><?php esc_html_e( 'Business Name (in messages)', 'smart-chat-ai' ); ?></label></th>
-                <td><input type="text" id="smsg_business_name" name="smsg_business_name" class="regular-text" value="<?php echo esc_attr( get_option( 'smsg_business_name', get_bloginfo( 'name' ) ) ); ?>"></td>
-            </tr>
-            <tr>
-                <th><label for="smsg_contractor_phone"><?php esc_html_e( 'Your Phone (handoff target)', 'smart-chat-ai' ); ?></label></th>
-                <td>
-                    <input type="text" id="smsg_contractor_phone" name="smsg_contractor_phone" class="regular-text" value="<?php echo esc_attr( get_option( 'smsg_contractor_phone' ) ); ?>" placeholder="+15551234567">
-                    <p class="description"><?php esc_html_e( 'Where new booking requests are sent on WhatsApp.', 'smart-chat-ai' ); ?></p>
-                </td>
-            </tr>
-            <tr>
-                <th><?php esc_html_e( 'Notify on New Lead', 'smart-chat-ai' ); ?></th>
-                <td><label><input type="checkbox" name="smsg_notify_contractor" value="1" <?php checked( get_option( 'smsg_notify_contractor', '1' ), '1' ); ?>> <?php esc_html_e( 'WhatsApp me when a new booking request comes in', 'smart-chat-ai' ); ?></label></td>
             </tr>
         </table>
 
