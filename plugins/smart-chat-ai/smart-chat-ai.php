@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.7.0
+ * Version: 1.8.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.7.0');
+define('SCAI_VERSION', '1.8.0');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -84,7 +84,7 @@ class SCAI_Plugin {
         SCAI_Content_Context::get_instance();
 
         // WhatsApp is now click-to-chat only (wa.me link inside the widget). The
-        // old Cloud API + Smart Messages admin layer was removed in 1.7.0 — clients
+        // old Cloud API + Smart Messages admin layer was removed in 1.8.0 — clients
         // weren't getting through Meta's developer-app onboarding.
     }
     
@@ -102,9 +102,9 @@ class SCAI_Plugin {
             'chat_color' => '#43A94B',
             'chat_title' => 'Chat with us!',
             'chat_subtitle' => 'We typically reply in a few minutes',
-            'ai_provider' => 'openai',
+            'ai_provider' => 'perplexity',
             'openai_api_key' => '',
-            'ai_model' => 'gpt-4',
+            'ai_model' => 'sonar',
             'ai_temperature' => 0.7,
             'lead_email' => get_option('admin_email'),
             'enable_email_notifications' => true,
@@ -112,10 +112,32 @@ class SCAI_Plugin {
             'business_type' => 'contractor',
             'ai_personality' => 'helpful',
         );
-        
+
         foreach ($defaults as $key => $value) {
             if (false === get_option('smart_chat_' . $key)) {
                 add_option('smart_chat_' . $key, $value);
+            }
+        }
+
+        // Sitemap ingestion — enabled by default, kick off an immediate crawl
+        // so the AI has real site content on day one instead of waiting on the
+        // first daily cron run.
+        if ( class_exists( 'SCAI_Content_Context' ) ) {
+            if ( false === get_option( SCAI_Content_Context::OPT_ENABLED ) ) {
+                add_option( SCAI_Content_Context::OPT_ENABLED, 1 );
+            } else {
+                update_option( SCAI_Content_Context::OPT_ENABLED, 1 );
+            }
+            if ( false === get_option( SCAI_Content_Context::OPT_PAGE_LIMIT ) ) {
+                add_option( SCAI_Content_Context::OPT_PAGE_LIMIT, 30 );
+            }
+            if ( false === get_option( SCAI_Content_Context::OPT_CHARS_PER ) ) {
+                add_option( SCAI_Content_Context::OPT_CHARS_PER, 1500 );
+            }
+            // Single-shot cron event: refreshes the cache ~30 seconds after
+            // activation on the next page load that triggers WP-Cron.
+            if ( ! wp_next_scheduled( SCAI_Content_Context::CRON_HOOK ) ) {
+                wp_schedule_single_event( time() + 30, SCAI_Content_Context::CRON_HOOK );
             }
         }
     }
