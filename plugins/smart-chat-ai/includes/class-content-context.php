@@ -119,18 +119,61 @@ class SCAI_Content_Context {
     }
 
     /**
+     * Default request args for outbound fetches. Many managed hosts, security
+     * plugins, and CDNs (Cloudflare etc.) return 403/empty to the bare
+     * "WordPress/x.x" user-agent — which is the #1 cause of a sitemap reading
+     * "empty or unreachable". A browser-like UA plus an XML Accept header and
+     * redirect following gets us past the common cases.
+     */
+    private function request_args( $timeout = 15 ) {
+        return array(
+            'timeout'     => $timeout,
+            'redirection' => 5,
+            'user-agent'  => 'Mozilla/5.0 (compatible; MidlandChatBot/1.0; +' . home_url( '/' ) . ')',
+            'headers'     => array(
+                'Accept'          => 'application/xml,text/xml,text/html;q=0.9,*/*;q=0.8',
+                'Accept-Language' => 'en-US,en;q=0.9',
+            ),
+        );
+    }
+
+    /**
      * Walk the sitemap, fetch each page, store plain text in OPT_CHUNKS.
      * Returns the number of pages cached.
      */
     public function refresh_cache() {
-        $sitemap_url = (string) get_option( self::OPT_SITEMAP_URL, '' );
-        if ( '' === $sitemap_url ) {
-            $sitemap_url = home_url( '/wp-sitemap.xml' );
+        $configured = trim( (string) get_option( self::OPT_SITEMAP_URL, '' ) );
+
+        // Try the admin's explicit URL first, then the two common defaults so
+        // the crawl finds a working sitemap regardless of which SEO plugin is
+        // active (WP core = /wp-sitemap.xml, Yoast/Rank Math = /sitemap_index.xml).
+        $candidates = array();
+        if ( '' !== $configured ) {
+            $candidates[] = $configured;
+        }
+        $candidates[] = home_url( '/wp-sitemap.xml' );
+        $candidates[] = home_url( '/sitemap_index.xml' );
+        $candidates[] = home_url( '/sitemap.xml' );
+        $candidates   = array_values( array_unique( $candidates ) );
+
+        $urls   = array();
+        $used    = '';
+        $errors = array();
+        foreach ( $candidates as $candidate ) {
+            $found = $this->fetch_sitemap_urls( $candidate, 0, $errors );
+            if ( ! empty( $found ) ) {
+                $urls = $found;
+                $used = $candidate;
+                break;
+            }
         }
 
-        $urls = $this->fetch_sitemap_urls( $sitemap_url );
         if ( empty( $urls ) ) {
-            update_option( self::OPT_LAST_REFRESH, array( 'at' => time(), 'count' => 0, 'note' => 'sitemap empty or unreachable' ) );
+            $note = 'No sitemap returned URLs. Tried ' . implode( ', ', $candidates );
+            if ( ! empty( $errors ) ) {
+                $note .= ' — ' . implode( '; ', array_slice( $errors, 0, 5 ) );
+            }
+            update_option( self::OPT_LAST_REFRESH, array( 'at' => time(), 'count' => 0, 'note' => $note ) );
             return 0;
         }
 
@@ -151,7 +194,13 @@ class SCAI_Content_Context {
         }
 
         update_option( self::OPT_CHUNKS, $chunks );
-        update_option( self::OPT_LAST_REFRESH, array( 'at' => time(), 'count' => count( $chunks ) ) );
+
+        $note = 'Sitemap: ' . $used;
+        if ( count( $chunks ) < count( $urls ) ) {
+            // Found sitemap URLs but some pages returned no text (blocked, empty, or timed out).
+            $note .= sprintf( ' (%d of %d pages returned text)', count( $chunks ), count( $urls ) );
+        }
+        update_option( self::OPT_LAST_REFRESH, array( 'at' => time(), 'count' => count( $chunks ), 'note' => $note ) );
 
         return count( $chunks );
     }
@@ -159,17 +208,24 @@ class SCAI_Content_Context {
     /**
      * Walk a sitemap, including sitemap-index files (which point at child sitemaps).
      */
-    private function fetch_sitemap_urls( $sitemap_url, $depth = 0 ) {
+    private function fetch_sitemap_urls( $sitemap_url, $depth = 0, &$errors = array() ) {
         if ( $depth > 2 ) {
             return array();
         }
 
-        $response = wp_remote_get( $sitemap_url, array( 'timeout' => 15 ) );
+        $response = wp_remote_get( $sitemap_url, $this->request_args( 15 ) );
         if ( is_wp_error( $response ) ) {
+            $errors[] = $sitemap_url . ' (' . $response->get_error_message() . ')';
             return array();
         }
+        $code = (int) wp_remote_retrieve_response_code( $response );
         $body = (string) wp_remote_retrieve_body( $response );
+        if ( $code >= 400 ) {
+            $errors[] = $sitemap_url . ' (HTTP ' . $code . ')';
+            return array();
+        }
         if ( '' === $body ) {
+            $errors[] = $sitemap_url . ' (empty response)';
             return array();
         }
 
@@ -178,6 +234,7 @@ class SCAI_Content_Context {
         $xml      = simplexml_load_string( $body );
         libxml_use_internal_errors( $previous );
         if ( false === $xml ) {
+            $errors[] = $sitemap_url . ' (not valid XML — likely an HTML page, not a sitemap)';
             return array();
         }
 
@@ -188,7 +245,7 @@ class SCAI_Content_Context {
             foreach ( $xml->sitemap as $entry ) {
                 $loc = trim( (string) $entry->loc );
                 if ( $loc ) {
-                    $urls = array_merge( $urls, $this->fetch_sitemap_urls( $loc, $depth + 1 ) );
+                    $urls = array_merge( $urls, $this->fetch_sitemap_urls( $loc, $depth + 1, $errors ) );
                 }
             }
         } else {
@@ -204,8 +261,11 @@ class SCAI_Content_Context {
     }
 
     private function fetch_page_text( $url, $max_chars ) {
-        $response = wp_remote_get( $url, array( 'timeout' => 10, 'redirection' => 3 ) );
+        $response = wp_remote_get( $url, $this->request_args( 10 ) );
         if ( is_wp_error( $response ) ) {
+            return '';
+        }
+        if ( (int) wp_remote_retrieve_response_code( $response ) >= 400 ) {
             return '';
         }
         $html = (string) wp_remote_retrieve_body( $response );
