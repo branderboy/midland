@@ -172,7 +172,10 @@ class SFCO_Admin {
                         $edit_url    = admin_url( 'admin.php?page=smart-forms-edit-form&form_id=' . $form->id );
                         $toggle_url    = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=toggle&form_id=' . $form->id ), 'sfco_forms_action' );
                         $duplicate_url = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=duplicate&form_id=' . $form->id ), 'sfco_forms_action' );
+                        $delete_url    = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=delete&form_id=' . $form->id ), 'sfco_forms_action' );
                         $is_active     = ( 'active' === $form->status );
+                        /* translators: %s: form title */
+                        $delete_confirm = sprintf( esc_attr__( 'Delete the form "%s" permanently? Entries already collected are kept, but the form and its shortcode will stop working.', 'smart-forms-for-midland' ), $form->title );
                         ?>
                         <tr>
                             <td>
@@ -186,7 +189,8 @@ class SFCO_Admin {
                                     <span><a href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit', 'smart-forms-for-midland' ); ?></a> | </span>
                                     <span><a href="<?php echo esc_url( $entries_url ); ?>"><?php esc_html_e( 'Entries', 'smart-forms-for-midland' ); ?></a> | </span>
                                     <span><a href="<?php echo esc_url( $duplicate_url ); ?>"><?php esc_html_e( 'Duplicate', 'smart-forms-for-midland' ); ?></a> | </span>
-                                    <span><a href="<?php echo esc_url( $toggle_url ); ?>"><?php echo $is_active ? esc_html__( 'Deactivate', 'smart-forms-for-midland' ) : esc_html__( 'Activate', 'smart-forms-for-midland' ); ?></a></span>
+                                    <span><a href="<?php echo esc_url( $toggle_url ); ?>"><?php echo $is_active ? esc_html__( 'Deactivate', 'smart-forms-for-midland' ) : esc_html__( 'Activate', 'smart-forms-for-midland' ); ?></a> | </span>
+                                    <span class="delete"><a href="<?php echo esc_url( $delete_url ); ?>" style="color:#b32d2e;" onclick="return confirm( <?php echo esc_js( wp_json_encode( $delete_confirm ) ); ?> );"><?php esc_html_e( 'Delete', 'smart-forms-for-midland' ); ?></a></span>
                                 </div>
                             </td>
                             <td><?php echo (int) $form->id; ?></td>
