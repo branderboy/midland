@@ -109,7 +109,7 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
             if ( class_exists( 'SFCO_Database' ) && method_exists( 'SFCO_Database', 'get_forms' ) ) {
                 $sf_forms = (array) SFCO_Database::get_forms( array( 'status' => 'active' ) );
             }
-            $current_form_id = (int) get_option( 'smart_chat_sf_form_id', 0 );
+            $current_form_id = (int) get_option( 'smart_chat_sf_form_id', 1 );
             ?>
             <tr>
                 <th><label for="smart_chat_sf_form_id"><?php esc_html_e( 'Smart Forms Form', 'smart-chat-ai' ); ?></label></th>

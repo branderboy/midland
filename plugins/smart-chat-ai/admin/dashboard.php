@@ -22,7 +22,7 @@ $ctx_ready   = $ctx_enabled && $ctx_count > 0;
 $whatsapp_number = (string) get_option( 'smart_chat_whatsapp_number', '' );
 $whatsapp_ready  = '' !== $whatsapp_number;
 
-$sf_form_id    = (int) get_option( 'smart_chat_sf_form_id', 0 );
+$sf_form_id    = (int) get_option( 'smart_chat_sf_form_id', 1 );
 $sf_active     = class_exists( 'SFCO_Database' );
 $sf_ready      = $sf_active && $sf_form_id > 0;
 

@@ -31,7 +31,9 @@ $wa_link   = $wa_number ? 'https://wa.me/' . $wa_number . '?text=' . $wa_text : 
         <div id="smart-chat-messages"></div>
 
         <?php
-        $sf_form_id = (int) get_option( 'smart_chat_sf_form_id', 0 );
+        // Default to form #1 (the Midland "Schedule a Visit" form) so the chat's
+        // Schedule a Visit panel works out of the box; admins can override in Settings.
+        $sf_form_id = (int) get_option( 'smart_chat_sf_form_id', 1 );
         $sf_form_html = '';
         if ( $sf_form_id && shortcode_exists( 'sfco_form' ) ) {
             $sf_form_html = do_shortcode( '[sfco_form id="' . $sf_form_id . '"]' );
