@@ -34,16 +34,41 @@ jQuery(document).ready(function($) {
     $('#smart-chat-cta-visit').on('click', showForm);
     $('#smart-chat-form-close').on('click', hideForm);
 
+    // Enlarge / shrink the chat window.
+    $('#smart-chat-expand').on('click', function() {
+        $window.toggleClass('expanded');
+    });
+
+    var $inputArea = $('#smart-chat-input-area');
+    var autoExpanded = false;
+
+    // When the form opens it takes over the body so there's a single scroll
+    // area (no more dual messages + form scrollbars), and the window jumps to
+    // its larger size so the fields aren't cramped. The form's own close
+    // button brings the conversation back and restores the prior size.
     function showForm() {
-        $form.slideDown(180);
+        if ( ! $window.hasClass('expanded') ) {
+            $window.addClass('expanded');
+            autoExpanded = true;
+        }
+        $messages.hide();
         $actions.hide();
-        $input.prop('disabled', true);
+        $inputArea.hide();
+        $form.stop(true, true).slideDown(180);
     }
 
     function hideForm() {
-        $form.slideUp(180);
-        $actions.show();
-        $input.prop('disabled', false).focus();
+        if ( autoExpanded ) {
+            $window.removeClass('expanded');
+            autoExpanded = false;
+        }
+        $form.stop(true, true).slideUp(180, function() {
+            $messages.show();
+            $inputArea.show();
+            $actions.show();
+            $input.prop('disabled', false).focus();
+            $messages.scrollTop($messages[0].scrollHeight);
+        });
     }
 
     function appendMsg(sender, text) {
