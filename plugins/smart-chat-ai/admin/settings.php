@@ -131,6 +131,13 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                 </td>
             </tr>
             <tr>
+                <th><label for="smart_chat_booking_url"><?php esc_html_e( 'Booking URL (Calendly)', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <input type="url" name="smart_chat_booking_url" id="smart_chat_booking_url" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_booking_url', 'https://calendly.com/justinc-mfc' ) ); ?>" placeholder="https://calendly.com/your-company/30min">
+                    <p class="description"><?php esc_html_e( 'When set, "Schedule a Visit" in the chat shows a "Pick a time" button that opens this link in a new tab. Leave blank to use the embedded Smart Form instead.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
                 <th><label for="smart_chat_preprompt"><?php esc_html_e( 'Custom Preprompt', 'smart-chat-ai' ); ?></label></th>
                 <td>
                     <textarea name="smart_chat_preprompt" id="smart_chat_preprompt" rows="10" class="large-text code" placeholder="<?php esc_attr_e( 'Leave blank to use the default contractor prompt. Anything you put here REPLACES the default system prompt entirely.', 'smart-chat-ai' ); ?>"><?php echo esc_textarea( get_option( 'smart_chat_preprompt', '' ) ); ?></textarea>
