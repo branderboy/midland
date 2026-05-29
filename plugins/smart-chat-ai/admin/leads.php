@@ -48,7 +48,7 @@ $total = $manager->get_count();
                         <td><strong><?php echo esc_html( $lead->name ); ?></strong></td>
                         <td><a href="mailto:<?php echo esc_attr( $lead->email ); ?>"><?php echo esc_html( $lead->email ); ?></a></td>
                         <td><?php echo esc_html( $lead->phone ); ?></td>
-                        <td><?php echo esc_html( wp_trim_words( $lead->message, 10 ) ); ?></td>
+                        <td><?php echo esc_html( wp_trim_words( preg_replace( '/\s*\[sid:[^\]]+\]/', '', $lead->message ), 10 ) ); ?></td>
                         <td><?php echo esc_html( ucfirst( $lead->status ) ); ?></td>
                         <td><?php echo esc_html( date_i18n( 'M j, Y', strtotime( $lead->created_at ) ) ); ?></td>
                     </tr>

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.17
+ * Version: 1.9.21
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.17');
+define('SCAI_VERSION', '1.9.21');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -61,6 +61,11 @@ class SCAI_Plugin {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
         add_action('admin_init', array($this, 'register_settings'));
+
+        // Self-healing schema check. Runs cheaply on every admin load so the
+        // tables and the lead_id column always exist, even when the plugin was
+        // upgraded by overwriting files instead of deactivate/reactivate.
+        add_action('admin_init', array($this, 'maybe_upgrade_db'));
         
         // Frontend hooks
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
@@ -70,6 +75,9 @@ class SCAI_Plugin {
         // this handler (no separate form). "Schedule a visit" uses Smart Forms.
         add_action('wp_ajax_scai_send_message', array($this, 'ajax_send_message'));
         add_action('wp_ajax_nopriv_scai_send_message', array($this, 'ajax_send_message'));
+
+        // Admin-only: test the AI provider connection and surface the raw result.
+        add_action('wp_ajax_scai_test_ai', array($this, 'ajax_test_ai'));
     }
     
     /**
@@ -197,6 +205,35 @@ class SCAI_Plugin {
         dbDelta($sql_leads);
         dbDelta($sql_conversations);
     }
+
+    /**
+     * Run the schema setup if the stored DB version is behind. Cheap: just an
+     * option compare on each admin load, real work only when out of date. This
+     * guarantees the conversations table and its lead_id column exist even if
+     * the plugin was updated by replacing files without reactivation.
+     */
+    public function maybe_upgrade_db() {
+        $installed = get_option( 'smart_chat_db_version', '0' );
+        if ( version_compare( $installed, SCAI_VERSION, '>=' ) ) {
+            return;
+        }
+
+        $this->create_tables();
+
+        // Backfill the lead_id column on older conversations tables that
+        // predate it, since CREATE TABLE IF NOT EXISTS won't add it.
+        global $wpdb;
+        $conv = $wpdb->prefix . 'smart_chat_conversations';
+        $has_col = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SHOW COLUMNS FROM {$conv} LIKE %s",
+            'lead_id'
+        ) );
+        if ( empty( $has_col ) ) {
+            $wpdb->query( "ALTER TABLE {$conv} ADD COLUMN lead_id bigint(20) DEFAULT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        }
+
+        update_option( 'smart_chat_db_version', SCAI_VERSION );
+    }
     
     /**
      * Add admin menu
@@ -212,20 +249,10 @@ class SCAI_Plugin {
             30
         );
 
-        // Leads tab, with a count badge of new leads (like the Comments badge)
-        // so it's obvious the captured-lead feature is live.
-        $leads_label = __( 'Leads', 'smart-chat-ai' );
-        if ( class_exists( 'SCAI_Lead_Manager' ) ) {
-            $lm        = new SCAI_Lead_Manager();
-            $new_count = method_exists( $lm, 'get_count' ) ? (int) $lm->get_count( 'new' ) : 0;
-            if ( $new_count > 0 ) {
-                $leads_label .= ' <span class="awaiting-mod">' . $new_count . '</span>';
-            }
-        }
         add_submenu_page(
             'smart-chat-ai',
             __( 'Leads', 'smart-chat-ai' ),
-            $leads_label,
+            __( 'Leads', 'smart-chat-ai' ),
             'manage_options',
             'smart-chat-leads',
             array($this, 'admin_leads_page')
@@ -290,6 +317,9 @@ class SCAI_Plugin {
         // WhatsApp click-to-chat — one number, one prefilled greeting, no Meta app needed.
         register_setting( 'scai_settings', 'smart_chat_whatsapp_number', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
         register_setting( 'scai_settings', 'smart_chat_whatsapp_greeting', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+
+        // Calendly / booking link, pasted directly in Settings.
+        register_setting( 'scai_settings', 'smart_chat_booking_url', array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
     }
     
     /**
@@ -350,17 +380,19 @@ class SCAI_Plugin {
         
         $wa_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'smart_chat_whatsapp_number', '' ) );
 
-        // Booking link is a PER-FORM setting on the Smart Form the chat embeds
-        // (Smart Forms → edit form → Booking link). Only forms meant to send
-        // people to schedule a visit set it, so it's never global here.
-        $booking_url = '';
-        $sf_form_id  = (int) get_option( 'smart_chat_sf_form_id', 1 );
-        if ( $sf_form_id && class_exists( 'SFCO_Database' ) ) {
-            $sf_form = SFCO_Database::get_form( $sf_form_id );
-            if ( $sf_form && ! empty( $sf_form->settings_json ) ) {
-                $sf_settings = json_decode( $sf_form->settings_json, true );
-                if ( is_array( $sf_settings ) && ! empty( $sf_settings['booking_url'] ) ) {
-                    $booking_url = $sf_settings['booking_url'];
+        // Booking link: use the link pasted in Settings first. If that's empty,
+        // fall back to the embedded Smart Form's per-form booking_url so older
+        // setups keep working.
+        $booking_url = (string) get_option( 'smart_chat_booking_url', '' );
+        if ( '' === $booking_url ) {
+            $sf_form_id = (int) get_option( 'smart_chat_sf_form_id', 1 );
+            if ( $sf_form_id && class_exists( 'SFCO_Database' ) ) {
+                $sf_form = SFCO_Database::get_form( $sf_form_id );
+                if ( $sf_form && ! empty( $sf_form->settings_json ) ) {
+                    $sf_settings = json_decode( $sf_form->settings_json, true );
+                    if ( is_array( $sf_settings ) && ! empty( $sf_settings['booking_url'] ) ) {
+                        $booking_url = $sf_settings['booking_url'];
+                    }
                 }
             }
         }
@@ -396,11 +428,35 @@ class SCAI_Plugin {
     /**
      * AJAX: Send message
      */
+    /**
+     * Admin AJAX: ping the AI provider with a tiny prompt and return the raw
+     * outcome so misconfiguration (bad key, wrong provider) is obvious.
+     */
+    public function ajax_test_ai() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Not allowed.' ) );
+        }
+        check_ajax_referer( 'scai_test_ai', 'nonce' );
+
+        $ai  = new SCAI_AI_Handler();
+        $res = $ai->get_response( 'Say "ok" if you can read this.', 'admin-test-' . time() );
+
+        if ( ! empty( $res['error'] ) ) {
+            $msg = $ai->last_error ? $ai->last_error : $res['message'];
+            wp_send_json_error( array( 'message' => $msg ) );
+        }
+        wp_send_json_success( array( 'message' => 'Connected. Reply: ' . $res['message'] ) );
+    }
+
     public function ajax_send_message() {
         check_ajax_referer('scai_widget', 'nonce');
         
-        $message = sanitize_text_field($_POST['message']);
-        $session_id = sanitize_text_field($_POST['session_id']);
+        $message    = isset( $_POST['message'] )    ? sanitize_text_field( wp_unslash( $_POST['message'] ) )    : '';
+        $session_id = isset( $_POST['session_id'] ) ? sanitize_text_field( wp_unslash( $_POST['session_id'] ) ) : '';
+
+        if ( '' === $message || '' === $session_id ) {
+            wp_send_json_error( array( 'message' => __( 'Missing message or session.', 'smart-chat-ai' ) ) );
+        }
         
         global $wpdb;
         $table = $wpdb->prefix . 'smart_chat_conversations';
@@ -459,10 +515,13 @@ class SCAI_Plugin {
         global $wpdb;
         $conv = $wpdb->prefix . 'smart_chat_conversations';
 
-        // Already captured for this session? (lead_id is stamped on its rows.)
+        // Already captured for this session? Check the leads table by a session
+        // marker we append to the lead's message, so this never depends on a
+        // column that might be missing on an older conversations table.
+        $leads = $wpdb->prefix . 'smart_chat_leads';
         $has_lead = (int) $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            "SELECT COUNT(*) FROM {$conv} WHERE session_id = %s AND lead_id IS NOT NULL",
-            $session_id
+            "SELECT COUNT(*) FROM {$leads} WHERE message LIKE %s",
+            '%' . $wpdb->esc_like( '[sid:' . $session_id . ']' ) . '%'
         ) );
         if ( $has_lead ) {
             return;
@@ -493,12 +552,16 @@ class SCAI_Plugin {
         }
         $topic = sanitize_text_field( (string) ( $info['service_type'] ?? ( $info['message'] ?? '' ) ) );
 
+        // Append a hidden session marker so we can tell this session already
+        // produced a lead without relying on the conversations lead_id column.
+        $message_with_marker = trim( $topic . ' [sid:' . $session_id . ']' );
+
         $lead_manager = new SCAI_Lead_Manager();
         $lead_id = $lead_manager->create_lead( array(
             'name'         => $name,
             'email'        => $email,
             'phone'        => $phone,
-            'message'      => $topic,
+            'message'      => $message_with_marker,
             'service_type' => $topic,
             'session_id'   => $session_id,
         ) );
@@ -526,7 +589,7 @@ class SCAI_Plugin {
         $message .= __( 'Name:', 'smart-chat-ai' ) . ' ' . $lead->name . "\n";
         $message .= __( 'Email:', 'smart-chat-ai' ) . ' ' . $lead->email . "\n";
         $message .= __( 'Phone:', 'smart-chat-ai' ) . ' ' . $lead->phone . "\n";
-        $message .= __( 'About:', 'smart-chat-ai' ) . ' ' . $lead->message . "\n\n";
+        $message .= __( 'About:', 'smart-chat-ai' ) . ' ' . preg_replace( '/\s*\[sid:[^\]]+\]/', '', $lead->message ) . "\n\n";
         $message .= __( 'See the full conversation:', 'smart-chat-ai' ) . ' ' . admin_url( 'admin.php?page=smart-chat-conversations' );
 
         wp_mail( $to, $subject, $message );
