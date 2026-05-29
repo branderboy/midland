@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.11
+ * Version: 1.9.12
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.11');
+define('SCAI_VERSION', '1.9.12');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -66,8 +66,8 @@ class SCAI_Plugin {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('wp_footer', array($this, 'render_chat_widget'));
         
-        // AJAX hooks — conversation only. Lead capture lives in Smart Forms
-        // (the embedded form), not in the chat plugin.
+        // AJAX: send a chat message. Native free-hand lead capture runs inside
+        // this handler (no separate form). "Schedule a visit" uses Smart Forms.
         add_action('wp_ajax_scai_send_message', array($this, 'ajax_send_message'));
         add_action('wp_ajax_nopriv_scai_send_message', array($this, 'ajax_send_message'));
     }
@@ -77,6 +77,7 @@ class SCAI_Plugin {
      */
     private function load_dependencies() {
         require_once SCAI_PLUGIN_DIR . 'includes/class-ai-handler.php';
+        require_once SCAI_PLUGIN_DIR . 'includes/class-lead-manager.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-analytics.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-content-context.php';
         SCAI_Content_Context::get_instance();
@@ -405,8 +406,94 @@ class SCAI_Plugin {
             'tokens_used' => $response['tokens'],
             'created_at' => current_time('mysql'),
         ));
-        
+
+        // Native, free-hand lead capture. No form: as soon as the visitor has
+        // shared a name + an email or phone in the conversation, pull it out and
+        // save a chat lead (which bridges into Smart Forms/CRM) and email it.
+        $this->maybe_capture_lead( $session_id );
+
         wp_send_json_success($response);
+    }
+
+    /**
+     * Extract a lead from the free-text conversation and save it once we have a
+     * name plus a way to reach them. Runs at most once per session.
+     */
+    private function maybe_capture_lead( $session_id ) {
+        global $wpdb;
+        $conv = $wpdb->prefix . 'smart_chat_conversations';
+
+        // Already captured for this session? (lead_id is stamped on its rows.)
+        $has_lead = (int) $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT COUNT(*) FROM {$conv} WHERE session_id = %s AND lead_id IS NOT NULL",
+            $session_id
+        ) );
+        if ( $has_lead ) {
+            return;
+        }
+
+        // Only spend an extraction call once contact info actually appears.
+        $text = (string) $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT GROUP_CONCAT(message SEPARATOR ' ') FROM {$conv} WHERE session_id = %s AND sender = 'user'",
+            $session_id
+        ) );
+        $has_email = (bool) preg_match( '/[^\s@]+@[^\s@]+\.[^\s@]+/', $text );
+        $has_phone = (bool) preg_match( '/(?:\+?\d[\s().\-]?){7,}/', $text );
+        if ( ! $has_email && ! $has_phone ) {
+            return;
+        }
+
+        $ai   = new SCAI_AI_Handler();
+        $info = $ai->extract_lead_info( $session_id );
+        if ( ! is_array( $info ) ) {
+            return;
+        }
+
+        $name  = sanitize_text_field( (string) ( $info['name'] ?? '' ) );
+        $email = sanitize_email( (string) ( $info['email'] ?? '' ) );
+        $phone = sanitize_text_field( (string) ( $info['phone'] ?? '' ) );
+        if ( '' === $email && '' === $phone ) {
+            return; // no way to reach them yet
+        }
+        $topic = sanitize_text_field( (string) ( $info['service_type'] ?? ( $info['message'] ?? '' ) ) );
+
+        $lead_manager = new SCAI_Lead_Manager();
+        $lead_id = $lead_manager->create_lead( array(
+            'name'         => $name,
+            'email'        => $email,
+            'phone'        => $phone,
+            'message'      => $topic,
+            'service_type' => $topic,
+            'session_id'   => $session_id,
+        ) );
+
+        if ( $lead_id && get_option( 'smart_chat_enable_email_notifications', true ) ) {
+            $this->send_lead_notification( $lead_id );
+        }
+    }
+
+    /**
+     * Email the team when a chat lead is captured.
+     */
+    private function send_lead_notification( $lead_id ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'smart_chat_leads';
+        $lead  = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $lead_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        if ( ! $lead ) {
+            return;
+        }
+
+        $to      = get_option( 'smart_chat_lead_email', get_option( 'admin_email' ) );
+        $subject = sprintf( __( 'New chat lead: %s', 'smart-chat-ai' ), $lead->name ? $lead->name : __( 'Website visitor', 'smart-chat-ai' ) );
+
+        $message  = __( 'New lead captured from the website chat:', 'smart-chat-ai' ) . "\n\n";
+        $message .= __( 'Name:', 'smart-chat-ai' ) . ' ' . $lead->name . "\n";
+        $message .= __( 'Email:', 'smart-chat-ai' ) . ' ' . $lead->email . "\n";
+        $message .= __( 'Phone:', 'smart-chat-ai' ) . ' ' . $lead->phone . "\n";
+        $message .= __( 'About:', 'smart-chat-ai' ) . ' ' . $lead->message . "\n\n";
+        $message .= __( 'See the full conversation:', 'smart-chat-ai' ) . ' ' . admin_url( 'admin.php?page=smart-chat-conversations' );
+
+        wp_mail( $to, $subject, $message );
     }
 
     /**
