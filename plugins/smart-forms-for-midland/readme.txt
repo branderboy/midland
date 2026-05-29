@@ -4,7 +4,7 @@ Tags: contractors, leads, quotes, estimates, construction
 Requires at least: 5.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.19.0
+Stable tag: 2.19.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,10 @@ Completely responsive. Looks professional on phones, tablets, and desktops.
 4. Mobile-responsive design
 
 == Changelog ==
+
+= 2.19.1 =
+* Fixed form submit: bind by class instead of ID (duplicate form IDs on one page broke the handler binding), resolve ajaxurl/nonce defensively, restore the button label, and surface the real error message
+* Submission handler now validates against the form's own fields, connects the lead to the submitted form, maps name/email/phone across common field-key spellings, and stores all custom fields — so DB-built forms (like the chat form) capture leads instead of erroring
 
 = 2.19.0 =
 * Added a per-form Booking link (Calendly) field in the form editor. Only forms that should send people to schedule set it; others leave it blank.

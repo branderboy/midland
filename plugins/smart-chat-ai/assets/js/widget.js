@@ -31,26 +31,18 @@ jQuery(document).ready(function($) {
         $bubble.show();
     });
 
-    $('#smart-chat-cta-visit').on('click', startBooking);
+    $('#smart-chat-cta-visit').on('click', showForm);
     $('#smart-chat-form-close').on('click', hideForm);
 
-    // Booking entry point. If a Calendly (or other) booking URL is configured,
-    // show a clean "Pick a time" button in the chat that opens it in a new tab.
-    // Otherwise fall back to the embedded Smart Form.
-    function startBooking() {
-        if (scaiConfig.bookingUrl) {
-            showBooking();
-        } else {
-            showForm();
-        }
-    }
-
-    function showBooking() {
-        var url = scaiConfig.bookingUrl;
+    // After the form is submitted (lead captured), optionally offer a booking
+    // link so the visitor can grab a time. The URL comes from the embedded
+    // form's per-form Booking link setting (scaiConfig.bookingUrl).
+    function appendBookingButton() {
+        if (!scaiConfig.bookingUrl) return;
         var $card = $('<div class="smart-chat-msg smart-chat-msg-ai smart-chat-booking"></div>');
-        $card.append(document.createTextNode('Grab any time that works for you.'));
+        $card.append(document.createTextNode('Want to lock in a time now?'));
         $('<a class="smart-chat-book-btn" target="_blank" rel="noopener noreferrer">Pick a time</a>')
-            .attr('href', url)
+            .attr('href', scaiConfig.bookingUrl)
             .appendTo($card);
         $messages.append($card);
         $messages.scrollTop($messages[0].scrollHeight);
@@ -124,7 +116,7 @@ jQuery(document).ready(function($) {
         }, function(res) {
             if (res.success) {
                 appendMsg('ai', res.data.message);
-                if (triggerBooking) startBooking();
+                if (triggerBooking) showForm();
             } else {
                 appendMsg('ai', 'Sorry, something went wrong. Please try again.');
             }
@@ -144,5 +136,6 @@ jQuery(document).ready(function($) {
     $(document).on('sfco:submitted', function() {
         hideForm();
         appendMsg('ai', "Got it. You're all set. We'll be in touch shortly to confirm your time.");
+        appendBookingButton();
     });
 });

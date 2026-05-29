@@ -1,37 +1,43 @@
 jQuery(document).ready(function($) {
-    $('#smart-forms-quote-form').on('submit', function(e) {
+    // Bind by class, not by ID. The plugin renders the same id="smart-forms-quote-form"
+    // on three different templates, and duplicate IDs on one page break selectors.
+    $('.smart-forms-form').on('submit', function(e) {
         e.preventDefault();
-        
+
         var form = $(this);
         var submitButton = form.find('.submit-button');
-        var messageDiv = form.find('#form-message');
-        
-        // Disable button
+        var originalText = submitButton.text();
+        var messageDiv = form.find('.form-message');
+
+        // Resolve ajaxurl and nonce defensively. If sfcoData failed to load
+        // (caching plugin, footer reorder, conflict), fall back to the nonce
+        // printed into the form by wp_nonce_field and the standard admin-ajax path.
+        var data = (typeof sfcoData !== 'undefined') ? sfcoData : {};
+        var ajaxurl = data.ajaxurl || (window.ajaxurl) || '/wp-admin/admin-ajax.php';
+        var nonce = data.nonce || form.find('input[name="_wpnonce"]').val() || '';
+
         submitButton.prop('disabled', true).text('Sending...');
         messageDiv.removeClass('success error').hide();
-        
-        // Prepare form data
+
         var formData = new FormData(this);
         formData.append('action', 'sfco_submit');
-        formData.append('_wpnonce', sfcoData.nonce);
-        
-        // Submit via AJAX
+        // FormData already includes the form's _wpnonce field; only append if missing.
+        if (!formData.get('_wpnonce') && nonce) {
+            formData.append('_wpnonce', nonce);
+        }
+
         $.ajax({
-            url: sfcoData.ajaxurl,
+            url: ajaxurl,
             type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
             success: function(response) {
-                if (response.success) {
+                if (response && response.success) {
                     messageDiv.addClass('success').text(response.data.message).fadeIn();
                     form[0].reset();
-
-                    // Broadcast success so other plugins (Midland Chat widget,
-                    // analytics layers) can react without inspecting our DOM.
                     $(document).trigger('sfco:submitted', [ response.data, form ]);
 
-                    // Show estimate if available
                     if (response.data.estimate) {
                         var estimateText = 'Estimated cost: $' +
                             Math.round(response.data.estimate.min).toLocaleString() +
@@ -40,15 +46,8 @@ jQuery(document).ready(function($) {
                         messageDiv.append('<br><strong>' + estimateText + '</strong>');
                     }
 
-                    // Fire ad-platform conversion pixels. Each pixel is gated by
-                    // (a) the operator having configured it in Settings → Tracking,
-                    // and (b) the pixel's tag script being present on the page
-                    // (gtag / fbq / ttq). Missing scripts are silently skipped.
                     try {
-                        var tracking = (sfcoData && sfcoData.tracking) || {};
-
-                        // Google Ads: send_to is the conversion ID + label,
-                        // e.g. AW-12345/abcDEFghi
+                        var tracking = (data && data.tracking) || {};
                         if (tracking.google_ads_send_to && typeof gtag === 'function') {
                             gtag('event', 'conversion', {
                                 send_to: tracking.google_ads_send_to,
@@ -56,28 +55,28 @@ jQuery(document).ready(function($) {
                                 currency: tracking.google_ads_currency || 'USD'
                             });
                         }
-
-                        // Facebook / Meta pixel
                         if (tracking.facebook_pixel_id && typeof fbq === 'function') {
                             fbq('track', tracking.facebook_event || 'Lead');
                         }
-
-                        // TikTok pixel
                         if (tracking.tiktok_pixel_id && typeof ttq === 'object' && typeof ttq.track === 'function') {
                             ttq.track(tracking.tiktok_event || 'SubmitForm');
                         }
-                    } catch (e) {
-                        if (window.console && console.warn) { console.warn('Smart Forms pixel firing failed:', e); }
+                    } catch (err) {
+                        if (window.console && console.warn) { console.warn('Smart Forms pixel firing failed:', err); }
                     }
                 } else {
-                    messageDiv.addClass('error').text(response.data.message).fadeIn();
+                    var msg = (response && response.data && response.data.message) ? response.data.message : 'Submission failed. Please try again.';
+                    messageDiv.addClass('error').text(msg).fadeIn();
                 }
             },
-            error: function() {
-                messageDiv.addClass('error').text('An error occurred. Please try again.').fadeIn();
+            error: function(xhr) {
+                var msg = 'An error occurred. Please try again.';
+                if (window.console) { console.error('Smart Forms submit error:', xhr.status, xhr.responseText); }
+                messageDiv.addClass('error').text(msg).fadeIn();
             },
             complete: function() {
-                submitButton.prop('disabled', false).text('Get Quote');
+                // Restore the button's own label instead of hardcoding "Get Quote".
+                submitButton.prop('disabled', false).text(originalText);
             }
         });
     });
