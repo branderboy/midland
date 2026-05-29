@@ -112,8 +112,9 @@ When someone wants to schedule, book, set up, or asks about a visit,
 walkthrough, quote, estimate, or appointment, a booking link appears right
 here in the chat. Point them to it in one line.
 Say something like: "Dropped a link right here so you can grab a time that works."
-Do NOT ask for their name and phone in the chat. Do NOT say someone will
-follow up later. The booking link on screen handles all of that.
+For booking specifically, you don't need their name and phone, the booking
+link handles that. But if they would rather be contacted than book online,
+see CALLBACK OR EMAIL below and just ask.
 If they hesitate, reassure in one short line like "Takes about a minute."
 
 CALLBACK OR EMAIL (just ask, no form)
@@ -126,7 +127,7 @@ Do not ask again once they have answered. Do not read it back to them.
 
 NEVER (you will be replaced if you do these)
 A dash of any kind.
-Asking for name and phone in chat when the booking form is the job.
+Asking for name and phone when they only asked a general question and never wanted a call, email, or follow up.
 The phrases "free on-site evaluation", "24 to 48 hour quote turnaround",
 "fully insured", "EPA approved", "professional commercial", "high traffic".
 Markdown of any kind. No bold, no headers, no bullets, no numbered lists.
@@ -170,7 +171,7 @@ PROMPT;
 
         return $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             "SELECT message, sender FROM {$table}
-            WHERE session_id = %s
+            WHERE session_id = %s AND sender IN ('user','ai')
             ORDER BY created_at ASC
             LIMIT 20",
             $session_id
@@ -310,7 +311,11 @@ PROMPT;
         $messages = array(
             array(
                 'role'    => 'system',
-                'content' => 'Extract lead information from this conversation. Return JSON with fields: name, email, phone, service_type, budget, timeline. Return null for missing fields.',
+                'content' => 'You extract contact details from a chat transcript. '
+                    . 'Return ONLY a JSON object, no prose and no code fences, with these exact keys: '
+                    . 'name, email, phone, service_type. '
+                    . 'Use the visitor lines only. If a value was not clearly given, use an empty string. '
+                    . 'Do not invent or guess values.',
             ),
             array(
                 'role'    => 'user',
@@ -324,6 +329,16 @@ PROMPT;
             return null;
         }
 
-        return json_decode( $response['message'], true );
+        // Tolerant parse: strip code fences and grab the first {...} block so a
+        // chatty model response still yields usable JSON.
+        $raw = (string) $response['message'];
+        $raw = preg_replace( '/```[a-z]*\s*/i', '', $raw );
+        $raw = str_replace( '```', '', $raw );
+        if ( preg_match( '/\{.*\}/s', $raw, $m ) ) {
+            $raw = $m[0];
+        }
+
+        $data = json_decode( trim( $raw ), true );
+        return is_array( $data ) ? $data : null;
     }
 }

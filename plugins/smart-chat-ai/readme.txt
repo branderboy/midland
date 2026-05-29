@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.16
+Stable tag: 1.9.17
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.17 =
+* Improved AI handler: sharper prompt (booking vs callback, no over-asking), conversation history excludes internal system rows, and robust lead extraction (JSON-only + tolerant parsing).
 
 = 1.9.16 =
 * Leads tab now shows a new-lead count badge (deployment-verification build). Confirms the Leads tab + capture are live.
