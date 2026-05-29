@@ -148,11 +148,26 @@ class Smart_Forms_Handler {
         
         // Send notification email
         $this->send_notification_email( $lead_id, $lead_data );
-        
+
+        // Where to send the visitor after submit (e.g. Calendly). Uses the
+        // form's redirect URL if confirmation is set to "redirect", otherwise
+        // the per-form Booking link. The chat widget ignores this (it shows its
+        // own "Pick a time" button instead of navigating away).
+        $redirect = '';
+        $fs = ( $form && ! empty( $form->settings_json ) ) ? json_decode( $form->settings_json, true ) : array();
+        if ( is_array( $fs ) ) {
+            if ( 'redirect' === ( $fs['confirmation_type'] ?? '' ) && ! empty( $fs['redirect_url'] ) ) {
+                $redirect = $fs['redirect_url'];
+            } elseif ( ! empty( $fs['booking_url'] ) ) {
+                $redirect = $fs['booking_url'];
+            }
+        }
+
         // Success response
         wp_send_json_success( array(
             'message' => esc_html__( 'Thank you! We\'ll contact you soon.', 'smart-forms-for-midland' ),
             'lead_id' => absint( $lead_id ),
+            'redirect' => esc_url_raw( $redirect ),
             'estimate' => array(
                 'min' => floatval( $estimate['min'] ),
                 'max' => floatval( $estimate['max'] ),

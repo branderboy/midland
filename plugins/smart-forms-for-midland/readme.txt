@@ -4,7 +4,7 @@ Tags: contractors, leads, quotes, estimates, construction
 Requires at least: 5.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.19.4
+Stable tag: 2.19.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,10 @@ Completely responsive. Looks professional on phones, tablets, and desktops.
 4. Mobile-responsive design
 
 == Changelog ==
+
+= 2.19.5 =
+* Redirect to Calendly after submit (#3): a form with a Booking link (or redirect confirmation) now sends the visitor there on submit. The chat-embedded form is exempt (it shows its own button).
+* Instant prospect email (#2): the Email Notifications settings page is now visible under the Smart Forms menu, so the auto-reply that goes to the submitter can be enabled and edited (Subject + Body with {name}, {fields} tags).
 
 = 2.19.4 =
 * Entries (leads) list now has checkboxes + a Bulk actions > Delete permanently option, so leads can be deleted in mass.

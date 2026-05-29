@@ -44,10 +44,12 @@ class SFCO_Pro_Notifications {
     }
 
     public function add_menu() {
+        // Visible under the Smart Forms menu so the operator can turn on and
+        // edit the instant email reply that goes to the person who submitted.
         add_submenu_page(
-            null,
-            __( 'Notifications', 'smart-forms-for-midland' ),
-            __( 'Notifications', 'smart-forms-for-midland' ),
+            'smart-forms',
+            __( 'Email Notifications', 'smart-forms-for-midland' ),
+            __( 'Email Notifications', 'smart-forms-for-midland' ),
             'manage_options',
             self::PAGE,
             array( $this, 'render_page' )
