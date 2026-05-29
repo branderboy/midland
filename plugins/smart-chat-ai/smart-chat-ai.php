@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.10
+ * Version: 1.9.11
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.10');
+define('SCAI_VERSION', '1.9.11');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -66,11 +66,10 @@ class SCAI_Plugin {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('wp_footer', array($this, 'render_chat_widget'));
         
-        // AJAX hooks
+        // AJAX hooks — conversation only. Lead capture lives in Smart Forms
+        // (the embedded form), not in the chat plugin.
         add_action('wp_ajax_scai_send_message', array($this, 'ajax_send_message'));
         add_action('wp_ajax_nopriv_scai_send_message', array($this, 'ajax_send_message'));
-        add_action('wp_ajax_scai_capture_lead', array($this, 'ajax_capture_lead'));
-        add_action('wp_ajax_nopriv_scai_capture_lead', array($this, 'ajax_capture_lead'));
     }
     
     /**
@@ -78,7 +77,6 @@ class SCAI_Plugin {
      */
     private function load_dependencies() {
         require_once SCAI_PLUGIN_DIR . 'includes/class-ai-handler.php';
-        require_once SCAI_PLUGIN_DIR . 'includes/class-lead-manager.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-analytics.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-content-context.php';
         SCAI_Content_Context::get_instance();
@@ -211,15 +209,6 @@ class SCAI_Plugin {
             array($this, 'admin_dashboard_page'),
             'dashicons-format-chat',
             30
-        );
-
-        add_submenu_page(
-            'smart-chat-ai',
-            __( 'Leads', 'smart-chat-ai' ),
-            __( 'Leads', 'smart-chat-ai' ),
-            'manage_options',
-            'smart-chat-leads',
-            array($this, 'admin_leads_page')
         );
 
         add_submenu_page(
@@ -419,79 +408,14 @@ class SCAI_Plugin {
         
         wp_send_json_success($response);
     }
-    
-    /**
-     * AJAX: Capture lead
-     */
-    public function ajax_capture_lead() {
-        check_ajax_referer('scai_widget', 'nonce');
-        
-        $name = sanitize_text_field($_POST['name']);
-        $email = sanitize_email($_POST['email']);
-        $phone = sanitize_text_field($_POST['phone']);
-        $message = sanitize_textarea_field($_POST['message']);
-        $session_id = sanitize_text_field($_POST['session_id']);
-        
-        // Save lead
-        $lead_manager = new SCAI_Lead_Manager();
-        $lead_id = $lead_manager->create_lead(array(
-            'name' => $name,
-            'email' => $email,
-            'phone' => $phone,
-            'message' => $message,
-            'session_id' => $session_id,
-        ));
-        
-        // Send notification email
-        if (get_option('smart_chat_enable_email_notifications')) {
-            $this->send_lead_notification($lead_id);
-        }
-        
-        wp_send_json_success(array(
-            'lead_id' => $lead_id,
-            'message' => __( "Thanks! We'll get back to you shortly.", 'smart-chat-ai' ),
-        ));
-    }
-    
-    /**
-     * Send lead notification email
-     */
-    private function send_lead_notification($lead_id) {
-        global $wpdb;
-        $table = $wpdb->prefix . 'smart_chat_leads';
-        $lead = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $lead_id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        
-        if (!$lead) {
-            return;
-        }
-        
-        $to = get_option('smart_chat_lead_email', get_option('admin_email'));
-        $subject = sprintf( __( 'New Lead from Smart Chat AI: %s', 'smart-chat-ai' ), $lead->name );
 
-        $message  = __( 'You have a new lead from your website!', 'smart-chat-ai' ) . "\n\n";
-        $message .= __( 'Name:', 'smart-chat-ai' ) . ' ' . $lead->name . "\n";
-        $message .= __( 'Email:', 'smart-chat-ai' ) . ' ' . $lead->email . "\n";
-        $message .= __( 'Phone:', 'smart-chat-ai' ) . ' ' . $lead->phone . "\n";
-        $message .= __( 'Message:', 'smart-chat-ai' ) . ' ' . $lead->message . "\n\n";
-        $message .= __( 'View in dashboard:', 'smart-chat-ai' ) . ' ' . admin_url( 'admin.php?page=smart-chat-leads' );
-        
-        wp_mail($to, $subject, $message);
-    }
-    
     /**
      * Admin dashboard page
      */
     public function admin_dashboard_page() {
         include SCAI_PLUGIN_DIR . 'admin/dashboard.php';
     }
-    
-    /**
-     * Admin leads page
-     */
-    public function admin_leads_page() {
-        include SCAI_PLUGIN_DIR . 'admin/leads.php';
-    }
-    
+
     /**
      * Admin conversations page
      */
