@@ -34,6 +34,8 @@
 .smart-chat-form-header strong { font-size: 14px; color: #0F1411; }
 #smart-chat-form-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #4B5563; padding: 0; line-height: 1; }
 .smart-chat-form-body { padding: 12px 14px; }
+.smart-chat-form-body .smart-forms-form h2,
+.smart-chat-form-body .smart-forms-form h3 { font-size: 16px !important; line-height: 1.3 !important; color: #0F1411 !important; font-weight: 700 !important; margin: 0 0 12px !important; }
 .smart-chat-form-body .smart-forms-form input[type="text"],
 .smart-chat-form-body .smart-forms-form input[type="email"],
 .smart-chat-form-body .smart-forms-form input[type="tel"],
