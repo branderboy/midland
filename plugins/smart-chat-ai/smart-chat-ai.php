@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.15
+ * Version: 1.9.16
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.15');
+define('SCAI_VERSION', '1.9.16');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -212,10 +212,20 @@ class SCAI_Plugin {
             30
         );
 
+        // Leads tab, with a count badge of new leads (like the Comments badge)
+        // so it's obvious the captured-lead feature is live.
+        $leads_label = __( 'Leads', 'smart-chat-ai' );
+        if ( class_exists( 'SCAI_Lead_Manager' ) ) {
+            $lm        = new SCAI_Lead_Manager();
+            $new_count = method_exists( $lm, 'get_count' ) ? (int) $lm->get_count( 'new' ) : 0;
+            if ( $new_count > 0 ) {
+                $leads_label .= ' <span class="awaiting-mod">' . $new_count . '</span>';
+            }
+        }
         add_submenu_page(
             'smart-chat-ai',
             __( 'Leads', 'smart-chat-ai' ),
-            __( 'Leads', 'smart-chat-ai' ),
+            $leads_label,
             'manage_options',
             'smart-chat-leads',
             array($this, 'admin_leads_page')
