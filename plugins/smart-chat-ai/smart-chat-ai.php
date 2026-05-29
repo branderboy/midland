@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.6
+ * Version: 1.9.7
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.6');
+define('SCAI_VERSION', '1.9.7');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -265,6 +265,7 @@ class SCAI_Plugin {
             'ai_personality',
             'preprompt',
             'sf_form_id',
+            'booking_url',
         );
 
         foreach ($settings as $setting) {
@@ -351,6 +352,9 @@ class SCAI_Plugin {
             'businessName' => get_option('smart_chat_business_name', get_bloginfo('name')),
             'whatsappNumber' => $wa_number,
             'whatsappGreeting' => get_option( 'smart_chat_whatsapp_greeting', "Hi! I'd like to ask about your services." ),
+            // When set, "Schedule a Visit" / booking intent shows a clean
+            // Calendly button in the chat instead of the embedded form.
+            'bookingUrl' => esc_url_raw( get_option( 'smart_chat_booking_url', 'https://calendly.com/justinc-mfc' ) ),
         ));
     }
     

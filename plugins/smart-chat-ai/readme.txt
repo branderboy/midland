@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.6
+Stable tag: 1.9.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.7 =
+* Scheduling in chat now shows a clean "Pick a time" Calendly button instead of the embedded form, avoiding the submit error and page redirect (set the URL in Settings, default https://calendly.com/justinc-mfc)
+* Prompt wording updated to point visitors to the booking link
 
 = 1.9.6 =
 * Form title inside the chat is now chat-sized (14px), the description smaller (12px)

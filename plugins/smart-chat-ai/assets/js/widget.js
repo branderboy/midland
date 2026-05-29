@@ -31,8 +31,30 @@ jQuery(document).ready(function($) {
         $bubble.show();
     });
 
-    $('#smart-chat-cta-visit').on('click', showForm);
+    $('#smart-chat-cta-visit').on('click', startBooking);
     $('#smart-chat-form-close').on('click', hideForm);
+
+    // Booking entry point. If a Calendly (or other) booking URL is configured,
+    // show a clean "Pick a time" button in the chat that opens it in a new tab.
+    // Otherwise fall back to the embedded Smart Form.
+    function startBooking() {
+        if (scaiConfig.bookingUrl) {
+            showBooking();
+        } else {
+            showForm();
+        }
+    }
+
+    function showBooking() {
+        var url = scaiConfig.bookingUrl;
+        var $card = $('<div class="smart-chat-msg smart-chat-msg-ai smart-chat-booking"></div>');
+        $card.append(document.createTextNode('Grab any time that works for you.'));
+        $('<a class="smart-chat-book-btn" target="_blank" rel="noopener noreferrer">Pick a time</a>')
+            .attr('href', url)
+            .appendTo($card);
+        $messages.append($card);
+        $messages.scrollTop($messages[0].scrollHeight);
+    }
 
     // Enlarge / shrink the chat window.
     $('#smart-chat-expand').on('click', function() {
@@ -90,9 +112,9 @@ jQuery(document).ready(function($) {
         appendMsg('user', msg);
         $input.val('').focus();
 
-        // If the visitor expressed intent to book, slide the form in
+        // If the visitor expressed booking intent, surface the booking option
         // alongside the AI reply so they can act immediately.
-        var triggerForm = intentRegex.test(msg);
+        var triggerBooking = intentRegex.test(msg);
 
         $.post(scaiConfig.ajaxurl, {
             action: 'scai_send_message',
@@ -102,7 +124,7 @@ jQuery(document).ready(function($) {
         }, function(res) {
             if (res.success) {
                 appendMsg('ai', res.data.message);
-                if (triggerForm) showForm();
+                if (triggerBooking) startBooking();
             } else {
                 appendMsg('ai', 'Sorry, something went wrong. Please try again.');
             }
