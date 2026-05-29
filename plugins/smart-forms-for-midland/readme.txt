@@ -4,7 +4,7 @@ Tags: contractors, leads, quotes, estimates, construction
 Requires at least: 5.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.19.1
+Stable tag: 2.19.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,12 @@ Completely responsive. Looks professional on phones, tablets, and desktops.
 4. Mobile-responsive design
 
 == Changelog ==
+
+= 2.19.3 =
+* Diagnostic: form submit now shows the real error on screen (file + line) instead of a bare "An error occurred", and a thrown journey listener is caught so the lead still saves and the form succeeds.
+
+= 2.19.2 =
+* Fixed form submit 500 ('An error occurred'): the post-save journey hook (Vapi, ServiceM8, ops notifications, visit-draft, webhooks) is now wrapped so a failing listener can never break the submission. The lead saves and the visitor gets a success response; listener errors are logged.
 
 = 2.19.1 =
 * Fixed form submit: bind by class instead of ID (duplicate form IDs on one page broke the handler binding), resolve ajaxurl/nonce defensively, restore the button label, and surface the real error message

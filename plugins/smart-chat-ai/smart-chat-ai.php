@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.13
+ * Version: 1.9.14
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.13');
+define('SCAI_VERSION', '1.9.14');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -383,21 +383,33 @@ class SCAI_Plugin {
         $message = sanitize_text_field($_POST['message']);
         $session_id = sanitize_text_field($_POST['session_id']);
         
-        // Get AI response
-        $ai_handler = new SCAI_AI_Handler();
-        $response = $ai_handler->get_response($message, $session_id);
-        
-        // Save conversation
         global $wpdb;
         $table = $wpdb->prefix . 'smart_chat_conversations';
-        
+
+        // Save the visitor's message FIRST so the conversation is always
+        // captured, even if the AI provider call fails or times out.
         $wpdb->insert($table, array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             'session_id' => $session_id,
             'message' => $message,
             'sender' => 'user',
             'created_at' => current_time('mysql'),
         ));
-        
+
+        // Get AI response. Guarded so a provider error never loses the message
+        // we just saved or breaks the request.
+        try {
+            $ai_handler = new SCAI_AI_Handler();
+            $response = $ai_handler->get_response($message, $session_id);
+        } catch ( \Throwable $e ) {
+            error_log( 'Smart Chat AI response failed: ' . $e->getMessage() );
+            $response = array(
+                'message' => __( 'Sorry, I had trouble responding. Please try again.', 'smart-chat-ai' ),
+                'model'   => null,
+                'tokens'  => 0,
+                'error'   => true,
+            );
+        }
+
         $wpdb->insert($table, array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             'session_id' => $session_id,
             'message' => $response['message'],

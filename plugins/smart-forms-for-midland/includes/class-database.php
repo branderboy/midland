@@ -438,8 +438,17 @@ class SFCO_Database {
          * Fires immediately after a Smart Forms lead is saved. Smart CRM Pro
          * (and anything else) hooks this to push the lead into a CRM, tag it,
          * etc. Receives the new lead ID + the row data + the parent form row.
+         *
+         * Wrapped so a misbehaving journey listener (Vapi, ServiceM8, ops
+         * notifications, visit-draft, webhooks, etc.) can NEVER break the form
+         * submission. The lead is already saved; downstream failures are logged
+         * and swallowed so the visitor still gets a success response.
          */
-        do_action( 'sfco_lead_submitted', $lead_id, $row, self::get_form( $row['form_id'] ) );
+        try {
+            do_action( 'sfco_lead_submitted', $lead_id, $row, self::get_form( $row['form_id'] ) );
+        } catch ( \Throwable $e ) {
+            error_log( 'Smart Forms: sfco_lead_submitted listener failed for lead ' . $lead_id . ': ' . $e->getMessage() );
+        }
 
         return $lead_id;
     }

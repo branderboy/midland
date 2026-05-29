@@ -15,6 +15,7 @@ class Smart_Forms_Handler {
     }
     
     public function handle_submission() {
+        try {
         // CRITICAL FIX: Sanitize nonce BEFORE verification
         $nonce = isset( $_POST['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ) : '';
 
@@ -157,6 +158,13 @@ class Smart_Forms_Handler {
                 'max' => floatval( $estimate['max'] ),
             ),
         ) );
+        } catch ( \Throwable $e ) {
+            // Surface the real fatal in the on-screen form message instead of a
+            // bare "An error occurred", so the cause is visible without DevTools.
+            wp_send_json_error( array(
+                'message' => 'Error: ' . $e->getMessage() . ' @ ' . basename( $e->getFile() ) . ':' . $e->getLine(),
+            ) );
+        }
     }
 
     /**
