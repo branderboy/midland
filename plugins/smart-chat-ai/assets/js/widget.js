@@ -96,6 +96,6 @@ jQuery(document).ready(function($) {
     // the form panel.
     $(document).on('sfco:submitted', function() {
         hideForm();
-        appendMsg('ai', "Got it — I'll have someone reach out today to lock in a walkthrough.");
+        appendMsg('ai', "Got it. You're all set. We'll be in touch shortly to confirm your time.");
     });
 });

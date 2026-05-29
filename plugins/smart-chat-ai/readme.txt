@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.1
+Stable tag: 1.9.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,11 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.2 =
+* Rewrote the default chat prompt: shorter replies, no dashes, no long-winded statements
+* When a visitor wants to schedule, the AI now points them to the booking form that opens in the chat instead of asking for name and phone in text
+* Cleaned up the post-submission confirmation message (no dash)
 
 = 1.9.1 =
 * Sitemap ingestion: try multiple sitemap URLs (configured, /wp-sitemap.xml, /sitemap_index.xml, /sitemap.xml) so the crawl works regardless of SEO plugin
