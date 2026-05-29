@@ -104,6 +104,34 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                 <th><label for="smart_chat_ai_temperature"><?php esc_html_e( 'Temperature', 'smart-chat-ai' ); ?></label></th>
                 <td><input type="number" name="smart_chat_ai_temperature" id="smart_chat_ai_temperature" min="0" max="1" step="0.1" value="<?php echo esc_attr( get_option( 'smart_chat_ai_temperature', '0.7' ) ); ?>"></td>
             </tr>
+            <tr>
+                <th><?php esc_html_e( 'Test Connection', 'smart-chat-ai' ); ?></th>
+                <td>
+                    <button type="button" class="button" id="scai-test-ai"><?php esc_html_e( 'Test AI Connection', 'smart-chat-ai' ); ?></button>
+                    <span id="scai-test-ai-result" style="margin-left:10px;font-weight:600;"></span>
+                    <p class="description"><?php esc_html_e( 'Save your settings first, then click to verify the API key and model actually work.', 'smart-chat-ai' ); ?></p>
+                    <script>
+                    (function(){
+                        var btn = document.getElementById('scai-test-ai');
+                        if(!btn) return;
+                        btn.addEventListener('click', function(){
+                            var out = document.getElementById('scai-test-ai-result');
+                            out.style.color = '#666'; out.textContent = 'Testing...';
+                            var data = new FormData();
+                            data.append('action','scai_test_ai');
+                            data.append('nonce','<?php echo esc_js( wp_create_nonce( 'scai_test_ai' ) ); ?>');
+                            fetch(ajaxurl,{method:'POST',body:data,credentials:'same-origin'})
+                              .then(function(r){return r.json();})
+                              .then(function(j){
+                                if(j.success){ out.style.color='#16794C'; out.textContent='✓ '+j.data.message; }
+                                else { out.style.color='#B91C1C'; out.textContent='✗ '+(j.data&&j.data.message?j.data.message:'Failed'); }
+                              })
+                              .catch(function(){ out.style.color='#B91C1C'; out.textContent='✗ Request failed'; });
+                        });
+                    })();
+                    </script>
+                </td>
+            </tr>
             <?php
             $sf_forms = array();
             if ( class_exists( 'SFCO_Database' ) && method_exists( 'SFCO_Database', 'get_forms' ) ) {
@@ -219,6 +247,17 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                 <td>
                     <input type="text" id="smart_chat_whatsapp_greeting" name="smart_chat_whatsapp_greeting" class="regular-text" value="<?php echo esc_attr( $wa_greeting ); ?>">
                     <p class="description"><?php esc_html_e( 'Pre-populated in the visitor\'s WhatsApp before they hit send. Keep it short.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+        </table>
+
+        <h2><?php esc_html_e( 'Booking / Calendly', 'smart-chat-ai' ); ?></h2>
+        <table class="form-table">
+            <tr>
+                <th><label for="smart_chat_booking_url"><?php esc_html_e( 'Booking Link', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <input type="url" id="smart_chat_booking_url" name="smart_chat_booking_url" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_booking_url', '' ) ); ?>" placeholder="https://calendly.com/your-handle/30min">
+                    <p class="description"><?php esc_html_e( 'Paste your Calendly (or any scheduling) link. When set, the chat shows a "Pick a time" button when someone wants to schedule.', 'smart-chat-ai' ); ?></p>
                 </td>
             </tr>
         </table>

@@ -23,19 +23,37 @@ class SCAI_AI_Handler {
 
     private $provider;
     private $model;
+    public  $last_error = '';
     private $temperature;
 
     public function __construct() {
         $this->provider    = get_option( 'smart_chat_ai_provider', self::PROVIDER_PERPLEXITY );
         $this->temperature = floatval( get_option( 'smart_chat_ai_temperature', 0.7 ) );
-        $this->model       = get_option( 'smart_chat_ai_model', $this->default_model() );
+        $this->model       = $this->normalize_model( (string) get_option( 'smart_chat_ai_model', '' ) );
     }
 
     private function default_model() {
         if ( self::PROVIDER_OPENAI === $this->provider ) {
             return 'gpt-4o-mini';
         }
-        return 'sonar'; // cheapest Perplexity model with built-in web grounding.
+        return 'sonar'; // current cheapest Perplexity model with web grounding.
+    }
+
+    /**
+     * Guard against empty or retired model names that make the API reject the
+     * request. Perplexity retired the old llama-3.1-sonar-* names; anything not
+     * recognized falls back to the provider default.
+     */
+    private function normalize_model( $model ) {
+        $model = trim( $model );
+        if ( self::PROVIDER_OPENAI === $this->provider ) {
+            return '' === $model ? 'gpt-4o-mini' : $model;
+        }
+        $valid = array( 'sonar', 'sonar-pro', 'sonar-reasoning', 'sonar-reasoning-pro', 'sonar-deep-research' );
+        if ( '' === $model || ! in_array( $model, $valid, true ) ) {
+            return 'sonar';
+        }
+        return $model;
     }
 
     /**
@@ -45,14 +63,54 @@ class SCAI_AI_Handler {
         $history       = $this->get_conversation_history( $session_id );
         $system_prompt = $this->build_system_prompt();
 
-        $messages = array( array( 'role' => 'system', 'content' => $system_prompt ) );
+        // Build the turn list from history. The current user message was already
+        // saved to the DB before this call, so it's the last 'user' row in
+        // history — we must NOT append it again or we'd send two user turns in a
+        // row, which Perplexity rejects with a 400.
+        $turns = array();
         foreach ( $history as $msg ) {
-            $messages[] = array(
-                'role'    => $msg->sender === 'user' ? 'user' : 'assistant',
-                'content' => $msg->message,
-            );
+            $role = ( 'user' === $msg->sender ) ? 'user' : 'assistant';
+            $turns[] = array( 'role' => $role, 'content' => (string) $msg->message );
         }
-        $messages[] = array( 'role' => 'user', 'content' => $user_message );
+
+        // Safety net: if history somehow doesn't end with the current user
+        // message (e.g. save failed), add it so the convo ends on a user turn.
+        $last = end( $turns );
+        if ( false === $last || 'user' !== $last['role'] || $last['content'] !== (string) $user_message ) {
+            $turns[] = array( 'role' => 'user', 'content' => (string) $user_message );
+        }
+
+        // Normalize to strict alternation ending on the user turn, which
+        // Perplexity Sonar requires (OpenAI tolerates loose ordering, Sonar
+        // does not). Collapse consecutive same-role turns by keeping the last.
+        $normalized = array();
+        foreach ( $turns as $t ) {
+            if ( '' === trim( $t['content'] ) ) {
+                continue;
+            }
+            $n = count( $normalized );
+            if ( $n > 0 && $normalized[ $n - 1 ]['role'] === $t['role'] ) {
+                $normalized[ $n - 1 ] = $t; // same role twice: keep the newer
+            } else {
+                $normalized[] = $t;
+            }
+        }
+
+        // Must start with a user turn (after the system message). Drop any
+        // leading assistant turn.
+        while ( ! empty( $normalized ) && 'assistant' === $normalized[0]['role'] ) {
+            array_shift( $normalized );
+        }
+
+        // Must end with a user turn.
+        if ( empty( $normalized ) || 'user' !== $normalized[ count( $normalized ) - 1 ]['role'] ) {
+            $normalized[] = array( 'role' => 'user', 'content' => (string) $user_message );
+        }
+
+        $messages = array( array( 'role' => 'system', 'content' => $system_prompt ) );
+        foreach ( $normalized as $t ) {
+            $messages[] = $t;
+        }
 
         return $this->call_chat_completions( $messages );
     }
@@ -214,7 +272,21 @@ PROMPT;
         $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( isset( $body['error'] ) ) {
+            $detail = '';
+            if ( is_array( $body['error'] ) ) {
+                $detail = $body['error']['message'] ?? wp_json_encode( $body['error'] );
+            } else {
+                $detail = (string) $body['error'];
+            }
             error_log( 'Smart Chat (' . $this->provider . ') error: ' . wp_json_encode( $body['error'] ) );
+
+            // Keep the raw detail so the admin Test Connection button can show
+            // the true cause (bad key, retired model, etc.).
+            $this->last_error = 'AI error (' . $this->provider . '/' . $this->model . '): ' . $detail;
+
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                return $this->error_response( $this->last_error );
+            }
             return $this->error_response( 'Sorry, I encountered an error. Please contact us directly.' );
         }
 
@@ -268,13 +340,13 @@ PROMPT;
 
     private function current_api_key() {
         if ( self::PROVIDER_OPENAI === $this->provider ) {
-            return (string) get_option( 'smart_chat_openai_api_key', '' );
+            return trim( (string) get_option( 'smart_chat_openai_api_key', '' ) );
         }
         // Perplexity — first try the chat-specific key, then the AI Rank key
         // already configured on the SEO plugin so admins don't paste twice.
-        $key = (string) get_option( 'smart_chat_perplexity_api_key', '' );
+        $key = trim( (string) get_option( 'smart_chat_perplexity_api_key', '' ) );
         if ( '' === $key ) {
-            $key = (string) get_option( 'rsseo_pro_ai_perplexity_key', '' );
+            $key = trim( (string) get_option( 'rsseo_pro_ai_perplexity_key', '' ) );
         }
         return $key;
     }

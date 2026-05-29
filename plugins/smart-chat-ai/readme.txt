@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.17
+Stable tag: 1.9.21
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,11 +72,9 @@ Yes. Set your business name, type, and AI personality in Settings. The AI adapts
 
 == Changelog ==
 
-= 1.9.17 =
-* Improved AI handler: sharper prompt (booking vs callback, no over-asking), conversation history excludes internal system rows, and robust lead extraction (JSON-only + tolerant parsing).
-
-= 1.9.16 =
-* Leads tab now shows a new-lead count badge (deployment-verification build). Confirms the Leads tab + capture are live.
+= 1.9.21 =
+* Fixed the booking conversion. The intent detector now catches "schedule", "scheduling", "booking", "estimating", "appointments", etc. instead of only exact base words, so when a visitor asks to schedule, the booking link (or form) actually appears. Previously the AI would say "dropped a link right here" but the trailing word-boundary in the matcher meant common phrasings never triggered the booking step, so nothing showed.
+* Source tree resynced to the shipped build (was several versions behind the deployed zip).
 
 = 1.9.15 =
 * Restored the Leads tab (Midland Chat > Leads) so chat leads captured through the conversation are visible in the admin.
