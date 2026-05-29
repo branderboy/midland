@@ -332,6 +332,9 @@ class SFCO_Admin {
             $settings['confirmation_type'] = in_array( ( $_POST['confirmation_type'] ?? 'message' ), array( 'message', 'redirect', 'page' ), true ) ? sanitize_text_field( wp_unslash( $_POST['confirmation_type'] ) ) : 'message';
             $settings['redirect_url']      = esc_url_raw( wp_unslash( $_POST['redirect_url'] ?? '' ) );
             $settings['redirect_page_id']  = absint( $_POST['redirect_page_id'] ?? 0 );
+            // Per-form booking link (Calendly etc.). Only forms that should send
+            // people to schedule a visit set this — most forms leave it blank.
+            $settings['booking_url']       = esc_url_raw( wp_unslash( $_POST['booking_url'] ?? '' ) );
             $settings['honeypot']          = isset( $_POST['honeypot'] ) ? 1 : 0;
             $settings['crm_push']          = isset( $_POST['crm_push'] );
             $settings['webhook']      = array(
@@ -514,6 +517,13 @@ class SFCO_Admin {
                             <td>
                                 <input type="url" id="redirect_url" name="redirect_url" class="regular-text" value="<?php echo esc_attr( $settings['redirect_url'] ?? '' ); ?>" placeholder="https://midlandfloors.com/thank-you/">
                                 <p class="description"><?php esc_html_e( 'Used when "Redirect to a URL" is selected.', 'smart-forms-for-midland' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="booking_url"><?php esc_html_e( 'Booking link (Calendly)', 'smart-forms-for-midland' ); ?></label></th>
+                            <td>
+                                <input type="url" id="booking_url" name="booking_url" class="regular-text" value="<?php echo esc_attr( $settings['booking_url'] ?? '' ); ?>" placeholder="https://calendly.com/justinc-mfc">
+                                <p class="description"><?php esc_html_e( 'Optional, per form. If set, this form offers a "Pick a time" booking button (e.g. in the chat) after the visitor is ready. Leave blank for forms that should not send people to schedule a visit.', 'smart-forms-for-midland' ); ?></p>
                             </td>
                         </tr>
                         <tr>
