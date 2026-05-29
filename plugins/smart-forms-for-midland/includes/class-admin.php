@@ -222,9 +222,27 @@ class SFCO_Admin {
             echo '<div class="wrap"><h1>Form not found</h1><p><a href="' . esc_url( admin_url( 'admin.php?page=smart-forms' ) ) . '">← Back to Forms</a></p></div>';
             return;
         }
+        // Bulk delete entries (mass delete) for this form.
+        $bulk_notice = '';
+        if ( isset( $_POST['sfco_lead_bulk'] ) && check_admin_referer( 'sfco_leads_bulk' ) ) {
+            $bulk = sanitize_key( wp_unslash( $_POST['sfco_lead_bulk'] ) );
+            $ids  = isset( $_POST['lead_ids'] ) ? array_map( 'absint', (array) $_POST['lead_ids'] ) : array();
+            if ( 'delete' === $bulk && $ids ) {
+                foreach ( $ids as $id ) {
+                    if ( $id ) {
+                        SFCO_Database::delete_lead( $id );
+                    }
+                }
+                $bulk_notice = sprintf( _n( '%d entry deleted.', '%d entries deleted.', count( $ids ), 'smart-forms-for-midland' ), count( $ids ) );
+            }
+        }
+
         $leads = SFCO_Database::get_leads( array( 'form_id' => $form_id, 'limit' => 100 ) );
         $stats = SFCO_Database::get_form_stats( $form_id );
         ?>
+        <?php if ( $bulk_notice ) : ?>
+            <div class="notice notice-success is-dismissible"><p><?php echo esc_html( $bulk_notice ); ?></p></div>
+        <?php endif; ?>
         <div class="wrap">
             <h1><?php echo esc_html( $form->title ); ?> — <?php esc_html_e( 'Entries', 'smart-forms-for-midland' ); ?></h1>
             <p>
@@ -241,9 +259,21 @@ class SFCO_Admin {
                     <code style="background:#f6f7f7;padding:3px 8px;border-radius:3px;margin-left:6px;">[sfco_form id="<?php echo (int) $form->id; ?>"]</code>
                 </p>
             <?php else : ?>
+                <form method="post">
+                <?php wp_nonce_field( 'sfco_leads_bulk' ); ?>
+                <div class="tablenav top" style="margin-bottom:8px;">
+                    <div class="alignleft actions bulkactions">
+                        <select name="sfco_lead_bulk">
+                            <option value="-1"><?php esc_html_e( 'Bulk actions', 'smart-forms-for-midland' ); ?></option>
+                            <option value="delete"><?php esc_html_e( 'Delete permanently', 'smart-forms-for-midland' ); ?></option>
+                        </select>
+                        <button type="submit" class="button action" onclick="return confirm('Delete the selected entries permanently? This cannot be undone.');"><?php esc_html_e( 'Apply', 'smart-forms-for-midland' ); ?></button>
+                    </div>
+                </div>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
+                            <td class="check-column" style="width:30px;"><input type="checkbox" onclick="jQuery('.sfco-entry-cb').prop('checked', this.checked);"></td>
                             <th style="width:60px;">ID</th>
                             <th><?php esc_html_e( 'Customer', 'smart-forms-for-midland' ); ?></th>
                             <th><?php esc_html_e( 'Contact', 'smart-forms-for-midland' ); ?></th>
@@ -263,6 +293,7 @@ class SFCO_Admin {
                         $sm8_pushed = ! empty( $lead->job_id );
                         ?>
                         <tr>
+                            <td class="check-column"><input type="checkbox" class="sfco-entry-cb" name="lead_ids[]" value="<?php echo (int) $lead->id; ?>"></td>
                             <td><?php echo (int) $lead->id; ?></td>
                             <td><strong><?php echo esc_html( $lead->customer_name ?? '' ); ?></strong></td>
                             <td>
@@ -296,6 +327,7 @@ class SFCO_Admin {
                     <?php endforeach; ?>
                     </tbody>
                 </table>
+                </form>
             <?php endif; ?>
         </div>
         <?php
