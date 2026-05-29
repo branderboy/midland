@@ -99,24 +99,62 @@ class SFCO_Admin {
     public function render_forms_page() {
         if ( ! current_user_can( 'manage_options' ) ) return;
 
-        // Handle form toggle/delete/seed actions
+        if ( ! class_exists( 'SFCO_Forms_List_Table' ) ) {
+            require_once SFCO_PLUGIN_DIR . 'includes/class-forms-list-table.php';
+        }
+
+        $this->handle_form_actions();
+
+        $table = new SFCO_Forms_List_Table();
+        $table->prepare_items();
+
+        $seed_url   = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=seed' ), 'sfco_forms_action' );
+        $cur_status = isset( $_REQUEST['status'] ) ? sanitize_key( $_REQUEST['status'] ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        ?>
+        <div class="wrap">
+            <h1 class="wp-heading-inline"><?php esc_html_e( 'Smart Forms', 'smart-forms-for-midland' ); ?></h1>
+            <a href="<?php echo esc_url( $seed_url ); ?>" class="page-title-action"><?php esc_html_e( 'Re-seed Midland templates', 'smart-forms-for-midland' ); ?></a>
+            <hr class="wp-header-end">
+
+            <?php $table->views(); ?>
+            <form method="post">
+                <input type="hidden" name="page" value="smart-forms">
+                <input type="hidden" name="status" value="<?php echo esc_attr( $cur_status ); ?>">
+                <?php
+                $table->search_box( __( 'Search Forms', 'smart-forms-for-midland' ), 'sfco-form' );
+                $table->display();
+                ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * Process single-row (GET link) and bulk (POST) actions for the forms list,
+     * then redirect back to the list so the screen never re-submits on refresh.
+     */
+    private function handle_form_actions() {
+        // Single-row actions via the row-action links.
         if ( isset( $_GET['sfco_action'] ) && check_admin_referer( 'sfco_forms_action' ) ) {
             $action = sanitize_key( $_GET['sfco_action'] );
             $id     = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
+
             if ( 'toggle' === $action && $id ) {
                 $form = SFCO_Database::get_form( $id );
                 if ( $form ) {
-                    $new = ( 'active' === $form->status ) ? 'inactive' : 'active';
-                    SFCO_Database::update_form( $id, array( 'status' => $new ) );
+                    SFCO_Database::update_form( $id, array( 'status' => ( 'active' === $form->status ) ? 'inactive' : 'active' ) );
                 }
+            } elseif ( 'trash' === $action && $id ) {
+                SFCO_Database::update_form( $id, array( 'status' => 'trash' ) );
+            } elseif ( 'restore' === $action && $id ) {
+                SFCO_Database::update_form( $id, array( 'status' => 'active' ) );
             } elseif ( 'delete' === $action && $id ) {
                 SFCO_Database::delete_form( $id );
             } elseif ( 'seed' === $action ) {
                 SFCO_Database::seed_templates();
             } elseif ( 'duplicate' === $action && $id ) {
-                // Clone an existing form: same fields, same settings,
-                // marked inactive, title prefixed with "Copy of" so the
-                // operator can tell the two apart at a glance.
+                // Clone an existing form: same fields/settings, marked inactive,
+                // title prefixed with "Copy of" so the two are easy to tell apart.
                 $src = SFCO_Database::get_form( $id );
                 if ( $src ) {
                     $new_id = SFCO_Database::create_form( array(
@@ -132,80 +170,46 @@ class SFCO_Admin {
                     }
                 }
             }
-            wp_safe_redirect( admin_url( 'admin.php?page=smart-forms' ) );
+
+            wp_safe_redirect( $this->forms_redirect_url() );
             exit;
         }
 
-        $forms = SFCO_Database::get_forms();
-        ?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php esc_html_e( 'Smart Forms', 'smart-forms-for-midland' ); ?></h1>
-            <?php
-            $seed_url = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=seed' ), 'sfco_forms_action' );
-            ?>
-            <a href="<?php echo esc_url( $seed_url ); ?>" class="page-title-action"><?php esc_html_e( '+ Re-seed Midland templates', 'smart-forms-for-midland' ); ?></a>
-            <hr class="wp-header-end">
+        // Bulk actions posted from the list table.
+        $bulk = '';
+        if ( isset( $_REQUEST['action'] ) && '-1' !== $_REQUEST['action'] ) {
+            $bulk = sanitize_key( wp_unslash( $_REQUEST['action'] ) );
+        } elseif ( isset( $_REQUEST['action2'] ) && '-1' !== $_REQUEST['action2'] ) {
+            $bulk = sanitize_key( wp_unslash( $_REQUEST['action2'] ) );
+        }
 
-            <?php if ( empty( $forms ) ) : ?>
-                <div style="background:#fff;border:1px dashed #c3c4c7;border-radius:6px;padding:32px;max-width:760px;margin:24px 0;">
-                    <h2 style="margin-top:0;"><?php esc_html_e( 'No forms yet.', 'smart-forms-for-midland' ); ?></h2>
-                    <p><?php esc_html_e( 'Seed the Midland floor-care template library — five pre-built forms ready to embed.', 'smart-forms-for-midland' ); ?></p>
-                    <p><a href="<?php echo esc_url( $seed_url ); ?>" class="button button-primary button-large"><?php esc_html_e( 'Seed Midland templates', 'smart-forms-for-midland' ); ?></a></p>
-                </div>
-            <?php else : ?>
-                <table class="wp-list-table widefat fixed striped" style="margin-top:12px;">
-                    <thead>
-                        <tr>
-                            <th style="width:90px;"><?php esc_html_e( 'Status', 'smart-forms-for-midland' ); ?></th>
-                            <th><?php esc_html_e( 'Title', 'smart-forms-for-midland' ); ?></th>
-                            <th style="width:60px;"><?php esc_html_e( 'ID', 'smart-forms-for-midland' ); ?></th>
-                            <th style="width:80px;"><?php esc_html_e( 'Entries', 'smart-forms-for-midland' ); ?></th>
-                            <th style="width:80px;"><?php esc_html_e( 'Views', 'smart-forms-for-midland' ); ?></th>
-                            <th style="width:90px;"><?php esc_html_e( 'Conversion', 'smart-forms-for-midland' ); ?></th>
-                            <th><?php esc_html_e( 'Shortcode', 'smart-forms-for-midland' ); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ( $forms as $form ) :
-                        $stats     = SFCO_Database::get_form_stats( $form->id );
-                        $entries_url = admin_url( 'admin.php?page=smart-forms-form-entries&form_id=' . $form->id );
-                        $edit_url    = admin_url( 'admin.php?page=smart-forms-edit-form&form_id=' . $form->id );
-                        $toggle_url    = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=toggle&form_id=' . $form->id ), 'sfco_forms_action' );
-                        $duplicate_url = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=duplicate&form_id=' . $form->id ), 'sfco_forms_action' );
-                        $delete_url    = wp_nonce_url( admin_url( 'admin.php?page=smart-forms&sfco_action=delete&form_id=' . $form->id ), 'sfco_forms_action' );
-                        $is_active     = ( 'active' === $form->status );
-                        /* translators: %s: form title */
-                        $delete_confirm = sprintf( esc_attr__( 'Delete the form "%s" permanently? Entries already collected are kept, but the form and its shortcode will stop working.', 'smart-forms-for-midland' ), $form->title );
-                        ?>
-                        <tr>
-                            <td>
-                                <span style="display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;<?php echo $is_active ? 'background:#d1fae5;color:#065f46;' : 'background:#f3f4f6;color:#6b7280;'; ?>">
-                                    <?php echo $is_active ? '● ' . esc_html__( 'Active', 'smart-forms-for-midland' ) : '○ ' . esc_html__( 'Inactive', 'smart-forms-for-midland' ); ?>
-                                </span>
-                            </td>
-                            <td>
-                                <strong><a href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html( $form->title ); ?></a></strong>
-                                <div class="row-actions">
-                                    <span><a href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit', 'smart-forms-for-midland' ); ?></a> | </span>
-                                    <span><a href="<?php echo esc_url( $entries_url ); ?>"><?php esc_html_e( 'Entries', 'smart-forms-for-midland' ); ?></a> | </span>
-                                    <span><a href="<?php echo esc_url( $duplicate_url ); ?>"><?php esc_html_e( 'Duplicate', 'smart-forms-for-midland' ); ?></a> | </span>
-                                    <span><a href="<?php echo esc_url( $toggle_url ); ?>"><?php echo $is_active ? esc_html__( 'Deactivate', 'smart-forms-for-midland' ) : esc_html__( 'Activate', 'smart-forms-for-midland' ); ?></a> | </span>
-                                    <span class="delete"><a href="<?php echo esc_url( $delete_url ); ?>" style="color:#b32d2e;" onclick="return confirm( <?php echo esc_js( wp_json_encode( $delete_confirm ) ); ?> );"><?php esc_html_e( 'Delete', 'smart-forms-for-midland' ); ?></a></span>
-                                </div>
-                            </td>
-                            <td><?php echo (int) $form->id; ?></td>
-                            <td><a href="<?php echo esc_url( $entries_url ); ?>"><?php echo (int) $stats['entries']; ?></a></td>
-                            <td><?php echo (int) $stats['views']; ?></td>
-                            <td><?php echo esc_html( $stats['conversion'] ); ?>%</td>
-                            <td><code style="background:#f6f7f7;padding:3px 8px;border-radius:3px;">[sfco_form id="<?php echo (int) $form->id; ?>"]</code></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-        </div>
-        <?php
+        if ( $bulk && ! empty( $_REQUEST['form'] ) ) {
+            check_admin_referer( 'bulk-forms' );
+            $ids = array_map( 'absint', (array) $_REQUEST['form'] );
+            foreach ( $ids as $id ) {
+                if ( ! $id ) continue;
+                switch ( $bulk ) {
+                    case 'activate':   SFCO_Database::update_form( $id, array( 'status' => 'active' ) ); break;
+                    case 'deactivate': SFCO_Database::update_form( $id, array( 'status' => 'inactive' ) ); break;
+                    case 'trash':      SFCO_Database::update_form( $id, array( 'status' => 'trash' ) ); break;
+                    case 'restore':    SFCO_Database::update_form( $id, array( 'status' => 'active' ) ); break;
+                    case 'delete':     SFCO_Database::delete_form( $id ); break;
+                }
+            }
+            wp_safe_redirect( $this->forms_redirect_url() );
+            exit;
+        }
     }
+
+    private function forms_redirect_url() {
+        $args = array( 'page' => 'smart-forms' );
+        $status = isset( $_REQUEST['status'] ) ? sanitize_key( $_REQUEST['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( $status && 'all' !== $status ) {
+            $args['status'] = $status;
+        }
+        return add_query_arg( $args, admin_url( 'admin.php' ) );
+    }
+
 
     /**
      * Entries for a single form.
