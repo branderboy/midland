@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.9.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,12 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.1 =
+* Sitemap ingestion: try multiple sitemap URLs (configured, /wp-sitemap.xml, /sitemap_index.xml, /sitemap.xml) so the crawl works regardless of SEO plugin
+* Send a browser-like user-agent + XML Accept header and follow redirects, fixing "sitemap empty or unreachable" caused by hosts/WAFs blocking the default WordPress user-agent
+* Report the real failure reason per sitemap candidate (HTTP code, WP error, invalid XML)
+* Default the embedded Smart Forms "Schedule a Visit" form to form #1; still overridable in Settings
 
 = 1.0.0 =
 * Initial release

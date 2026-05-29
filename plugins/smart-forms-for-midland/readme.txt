@@ -4,7 +4,7 @@ Tags: contractors, leads, quotes, estimates, construction
 Requires at least: 5.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 2.18.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,16 @@ Completely responsive. Looks professional on phones, tablets, and desktops.
 4. Mobile-responsive design
 
 == Changelog ==
+
+= 2.18.0 =
+* Forms list rebuilt on WordPress core's WP_List_Table — Gravity-Forms-style management
+* Bulk actions: Activate / Deactivate / Move to Trash (Restore / Delete Permanently in Trash view)
+* Status filter views (All | Active | Inactive | Trash) with counts, search box, and sortable columns
+* Per-row actions: Edit | Entries | Duplicate | Activate/Deactivate | Trash
+* Trash is a soft delete; trashed forms stop accepting submissions but entries are preserved until permanently deleted
+
+= 2.17.1 =
+* Added a Delete action to the forms list row actions
 
 = 1.2.0 =
 * Renamed shortcode to [sfco_quote] for prefix compliance
