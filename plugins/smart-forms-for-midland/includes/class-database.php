@@ -458,4 +458,9 @@ class SFCO_Database {
         $table = $wpdb->prefix . 'sfco_leads';
         return $wpdb->update( $table, array( 'status' => sanitize_text_field( $status ) ), array( 'id' => absint( $lead_id ) ), array( '%s' ), array( '%d' ) ); // phpcs:ignore
     }
+
+    public static function delete_lead( $lead_id ) {
+        global $wpdb;
+        return $wpdb->delete( $wpdb->prefix . 'sfco_leads', array( 'id' => absint( $lead_id ) ), array( '%d' ) ); // phpcs:ignore
+    }
 }

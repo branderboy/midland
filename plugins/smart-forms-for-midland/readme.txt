@@ -4,7 +4,7 @@ Tags: contractors, leads, quotes, estimates, construction
 Requires at least: 5.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.19.3
+Stable tag: 2.19.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ Completely responsive. Looks professional on phones, tablets, and desktops.
 4. Mobile-responsive design
 
 == Changelog ==
+
+= 2.19.4 =
+* Entries (leads) list now has checkboxes + a Bulk actions > Delete permanently option, so leads can be deleted in mass.
 
 = 2.19.3 =
 * Diagnostic: form submit now shows the real error on screen (file + line) instead of a bare "An error occurred", and a thrown journey listener is caught so the lead still saves and the form succeeds.
