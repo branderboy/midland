@@ -38,6 +38,14 @@ jQuery(document).ready(function($) {
                     form[0].reset();
                     $(document).trigger('sfco:submitted', [ response.data, form ]);
 
+                    // Redirect after submit (e.g. Calendly) — but NOT when the
+                    // form is embedded in the chat widget, which keeps the
+                    // visitor in the conversation and shows its own booking button.
+                    if (response.data.redirect && form.closest('#smart-chat-form').length === 0) {
+                        window.location.href = response.data.redirect;
+                        return;
+                    }
+
                     if (response.data.estimate) {
                         var estimateText = 'Estimated cost: $' +
                             Math.round(response.data.estimate.min).toLocaleString() +

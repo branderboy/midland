@@ -845,6 +845,21 @@ class SFCO_Admin {
             return;
         }
 
+        // Bulk delete entries (mass delete). Runs before the list is fetched so
+        // the table reflects the deletions.
+        if ( isset( $_POST['sfco_lead_bulk'] ) && check_admin_referer( 'sfco_leads_bulk' ) ) {
+            $bulk = sanitize_key( wp_unslash( $_POST['sfco_lead_bulk'] ) );
+            $ids  = isset( $_POST['lead_ids'] ) ? array_map( 'absint', (array) $_POST['lead_ids'] ) : array();
+            if ( 'delete' === $bulk && $ids ) {
+                foreach ( $ids as $id ) {
+                    if ( $id ) {
+                        SFCO_Database::delete_lead( $id );
+                    }
+                }
+                echo '<div class="notice notice-success is-dismissible"><p>' . sprintf( esc_html( _n( '%d entry deleted.', '%d entries deleted.', count( $ids ), 'smart-forms-for-midland' ) ), count( $ids ) ) . '</p></div>';
+            }
+        }
+
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $filter_status   = isset( $_GET['status'] )   ? sanitize_text_field( wp_unslash( $_GET['status'] ) )   : '';
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -895,9 +910,21 @@ class SFCO_Admin {
                 </select>
             </div>
 
+            <form method="post">
+            <?php wp_nonce_field( 'sfco_leads_bulk' ); ?>
+            <div class="tablenav top" style="margin-bottom:8px;">
+                <div class="alignleft actions bulkactions">
+                    <select name="sfco_lead_bulk">
+                        <option value="-1"><?php esc_html_e( 'Bulk actions', 'smart-forms-for-midland' ); ?></option>
+                        <option value="delete"><?php esc_html_e( 'Delete permanently', 'smart-forms-for-midland' ); ?></option>
+                    </select>
+                    <button type="submit" class="button action" onclick="return confirm('Delete the selected entries permanently? This cannot be undone.');"><?php esc_html_e( 'Apply', 'smart-forms-for-midland' ); ?></button>
+                </div>
+            </div>
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                     <tr>
+                        <td class="check-column" style="width:30px;"><input type="checkbox" onclick="jQuery('.sfco-lead-cb').prop('checked', this.checked);"></td>
                         <th><?php esc_html_e( 'ID', 'smart-forms-for-midland' ); ?></th>
                         <th><?php esc_html_e( 'Customer', 'smart-forms-for-midland' ); ?></th>
                         <th><?php esc_html_e( 'Contact', 'smart-forms-for-midland' ); ?></th>
@@ -914,6 +941,7 @@ class SFCO_Admin {
                     elseif ( 'This Week' === ( $lead->timeline ?? '' ) ) $timeline_class = 'timeline-soon';
                     ?>
                     <tr>
+                        <td class="check-column"><input type="checkbox" class="sfco-lead-cb" name="lead_ids[]" value="<?php echo (int) $lead->id; ?>"></td>
                         <td><?php echo esc_html( $lead->id ); ?></td>
                         <td><strong><?php echo esc_html( $lead->customer_name ?? '' ); ?></strong></td>
                         <td>
@@ -943,6 +971,7 @@ class SFCO_Admin {
                 <?php endforeach; ?>
                 </tbody>
             </table>
+            </form>
         </div>
         <?php
     }
