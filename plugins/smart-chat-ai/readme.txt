@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.13
+Stable tag: 1.9.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.14 =
+* Conversation capture hardened: the visitor message is saved before the AI call, and the AI call is guarded, so the conversation is always recorded even if the provider errors. Native lead capture (name/email/phone from the chat) still runs and emails + bridges the lead.
 
 = 1.9.13 =
 * Hardened: native lead capture is wrapped so a failing CRM/bridge hook can never break message sending (conversation always works)
