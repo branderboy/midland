@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.12
+Stable tag: 1.9.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.13 =
+* Hardened: native lead capture is wrapped so a failing CRM/bridge hook can never break message sending (conversation always works)
 
 = 1.9.12 =
 * Native free-hand lead capture: the assistant just asks for name, email or phone, and what it's about (no form). Once shared, a chat lead is saved, bridged into Smart Forms/CRM, and an email notification is sent.
