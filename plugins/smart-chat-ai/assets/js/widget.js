@@ -40,11 +40,17 @@ jQuery(document).ready(function($) {
     });
 
     var $inputArea = $('#smart-chat-input-area');
+    var autoExpanded = false;
 
     // When the form opens it takes over the body so there's a single scroll
-    // area (no more dual messages + form scrollbars). The form's own close
-    // button brings the conversation back.
+    // area (no more dual messages + form scrollbars), and the window jumps to
+    // its larger size so the fields aren't cramped. The form's own close
+    // button brings the conversation back and restores the prior size.
     function showForm() {
+        if ( ! $window.hasClass('expanded') ) {
+            $window.addClass('expanded');
+            autoExpanded = true;
+        }
         $messages.hide();
         $actions.hide();
         $inputArea.hide();
@@ -52,6 +58,10 @@ jQuery(document).ready(function($) {
     }
 
     function hideForm() {
+        if ( autoExpanded ) {
+            $window.removeClass('expanded');
+            autoExpanded = false;
+        }
         $form.stop(true, true).slideUp(180, function() {
             $messages.show();
             $inputArea.show();
