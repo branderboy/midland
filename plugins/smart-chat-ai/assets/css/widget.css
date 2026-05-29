@@ -20,6 +20,9 @@
 .smart-chat-msg { margin-bottom: 12px; max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; color: #0F1411; word-wrap: break-word; }
 .smart-chat-msg-user { background: #0F1411; color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
 .smart-chat-msg-ai { background: #F3FCF4; border: 1px solid #d6efd9; border-bottom-left-radius: 4px; color: #0F1411; }
+.smart-chat-booking { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.smart-chat-book-btn { display: inline-block; background: #43A94B; color: #fff !important; text-decoration: none !important; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; line-height: 1; }
+.smart-chat-book-btn:hover { background: #38913f; color: #fff !important; }
 #smart-chat-input-area { display: flex; border-top: 1px solid #e5e7eb; padding: 12px; gap: 8px; }
 #smart-chat-input { flex: 1; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; font-size: 14px; outline: none; }
 #smart-chat-input:focus { border-color: #43A94B; }

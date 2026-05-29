@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.6
+ * Version: 1.9.9
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.6');
+define('SCAI_VERSION', '1.9.9');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -341,6 +341,21 @@ class SCAI_Plugin {
         
         $wa_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'smart_chat_whatsapp_number', '' ) );
 
+        // Booking link is a PER-FORM setting on the Smart Form the chat embeds
+        // (Smart Forms → edit form → Booking link). Only forms meant to send
+        // people to schedule a visit set it, so it's never global here.
+        $booking_url = '';
+        $sf_form_id  = (int) get_option( 'smart_chat_sf_form_id', 1 );
+        if ( $sf_form_id && class_exists( 'SFCO_Database' ) ) {
+            $sf_form = SFCO_Database::get_form( $sf_form_id );
+            if ( $sf_form && ! empty( $sf_form->settings_json ) ) {
+                $sf_settings = json_decode( $sf_form->settings_json, true );
+                if ( is_array( $sf_settings ) && ! empty( $sf_settings['booking_url'] ) ) {
+                    $booking_url = $sf_settings['booking_url'];
+                }
+            }
+        }
+
         wp_localize_script('scai-widget', 'scaiConfig', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('scai_widget'),
@@ -351,6 +366,9 @@ class SCAI_Plugin {
             'businessName' => get_option('smart_chat_business_name', get_bloginfo('name')),
             'whatsappNumber' => $wa_number,
             'whatsappGreeting' => get_option( 'smart_chat_whatsapp_greeting', "Hi! I'd like to ask about your services." ),
+            // From the embedded form's per-form Booking link. When present,
+            // "Schedule a Visit" / booking intent shows a "Pick a time" button.
+            'bookingUrl' => esc_url_raw( $booking_url ),
         ));
     }
     

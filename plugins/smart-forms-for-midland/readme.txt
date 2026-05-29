@@ -4,7 +4,7 @@ Tags: contractors, leads, quotes, estimates, construction
 Requires at least: 5.5
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.18.0
+Stable tag: 2.19.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ Completely responsive. Looks professional on phones, tablets, and desktops.
 4. Mobile-responsive design
 
 == Changelog ==
+
+= 2.19.0 =
+* Added a per-form Booking link (Calendly) field in the form editor. Only forms that should send people to schedule set it; others leave it blank.
 
 = 2.18.0 =
 * Forms list rebuilt on WordPress core's WP_List_Table — Gravity-Forms-style management
