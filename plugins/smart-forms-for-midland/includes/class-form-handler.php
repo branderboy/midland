@@ -31,27 +31,54 @@ class Smart_Forms_Handler {
             wp_send_json_success( array( 'message' => 'OK' ) );
         }
         
-        // Validate required fields
-        $required_fields = array( 'customer_name', 'customer_email', 'customer_phone', 'project_type' );
-        foreach ( $required_fields as $field ) {
-            if ( empty( $_POST[ $field ] ) ) {
-                wp_send_json_error( array( 
-                    'message' => sprintf( 
-                        /* translators: %s: field name */
-                        esc_html__( '%s is required', 'smart-forms-for-midland' ), 
-                        esc_html( $field ) 
-                    ) 
-                ) );
+        // Identify the form so we validate against ITS fields and connect the
+        // lead to the right form. The chat embeds a DB-built form (its own
+        // fields), so the old hardcoded customer_name/project_type required list
+        // broke capture for anything other than the legacy [sfco_quote] form.
+        $form_id = isset( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+        $form    = $form_id ? SFCO_Database::get_form( $form_id ) : null;
+
+        $db_fields = array();
+        if ( $form && ! empty( $form->fields_json ) ) {
+            $decoded = json_decode( $form->fields_json, true );
+            if ( is_array( $decoded ) ) {
+                $db_fields = $decoded;
             }
         }
-        
-        // Validate email
-        if ( ! isset( $_POST['customer_email'] ) ) {
-            wp_send_json_error( array( 'message' => esc_html__( 'Email is required', 'smart-forms-for-midland' ) ) );
+
+        if ( ! empty( $db_fields ) ) {
+            // DB-built form: required = whatever the field builder marked required.
+            foreach ( $db_fields as $f ) {
+                $key = $f['key'] ?? '';
+                if ( $key && ! empty( $f['required'] ) && empty( $_POST[ $key ] ) ) {
+                    wp_send_json_error( array(
+                        /* translators: %s: field label */
+                        'message' => sprintf( esc_html__( '%s is required', 'smart-forms-for-midland' ), esc_html( $f['label'] ?? $key ) ),
+                    ) );
+                }
+            }
+        } else {
+            // Legacy [sfco_quote] form keeps its original required set.
+            foreach ( array( 'customer_name', 'customer_email', 'customer_phone', 'project_type' ) as $field ) {
+                if ( empty( $_POST[ $field ] ) ) {
+                    wp_send_json_error( array(
+                        /* translators: %s: field name */
+                        'message' => sprintf( esc_html__( '%s is required', 'smart-forms-for-midland' ), esc_html( $field ) ),
+                    ) );
+                }
+            }
         }
-        
-        $email = sanitize_email( wp_unslash( $_POST['customer_email'] ) );
-        if ( ! is_email( $email ) ) {
+
+        // Flexible identity mapping so custom field keys still produce a usable
+        // lead (name / first_name+last_name, email, phone/tel).
+        $name = $this->first_nonempty( array( 'customer_name', 'name', 'full_name' ) );
+        if ( '' === $name ) {
+            $name = trim( $this->first_nonempty( array( 'first_name', 'fname' ) ) . ' ' . $this->first_nonempty( array( 'last_name', 'lname' ) ) );
+        }
+        $email = sanitize_email( $this->first_nonempty( array( 'customer_email', 'email' ) ) );
+        $phone = $this->first_nonempty( array( 'customer_phone', 'phone', 'tel' ) );
+
+        if ( '' !== $email && ! is_email( $email ) ) {
             wp_send_json_error( array( 'message' => esc_html__( 'Invalid email address', 'smart-forms-for-midland' ) ) );
         }
         
@@ -75,11 +102,29 @@ class Smart_Forms_Handler {
         $project_type = isset( $_POST['project_type'] ) ? sanitize_text_field( wp_unslash( $_POST['project_type'] ) ) : '';
         $estimate = $this->calculate_estimate( $square_footage, $project_type );
         
+        // Collect any other submitted fields (custom DB-form fields) so nothing
+        // is lost — stored on the lead as extra_fields_json.
+        $reserved = array(
+            'action', '_wpnonce', '_wp_http_referer', 'sfco_hp_token', 'form_id',
+            'customer_name', 'name', 'full_name', 'first_name', 'fname', 'last_name', 'lname',
+            'customer_email', 'email', 'customer_phone', 'phone', 'tel',
+            'project_type', 'square_footage', 'material_type', 'finish_level',
+            'timeline', 'zip_code', 'additional_notes',
+        );
+        $extra_fields = array();
+        foreach ( wp_unslash( $_POST ) as $k => $v ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- nonce verified above; values sanitized below
+            if ( in_array( $k, $reserved, true ) ) {
+                continue;
+            }
+            $extra_fields[ sanitize_key( $k ) ] = is_array( $v ) ? array_map( 'sanitize_text_field', $v ) : sanitize_text_field( $v );
+        }
+
         // Prepare lead data
         $lead_data = array(
-            'customer_name' => isset( $_POST['customer_name'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_name'] ) ) : '',
+            'form_id' => $form_id ?: 1,
+            'customer_name' => sanitize_text_field( $name ),
             'customer_email' => $email,
-            'customer_phone' => isset( $_POST['customer_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_phone'] ) ) : '',
+            'customer_phone' => sanitize_text_field( $phone ),
             'project_type' => $project_type,
             'square_footage' => $square_footage,
             'material_type' => isset( $_POST['material_type'] ) ? sanitize_text_field( wp_unslash( $_POST['material_type'] ) ) : '',
@@ -88,6 +133,7 @@ class Smart_Forms_Handler {
             'zip_code' => isset( $_POST['zip_code'] ) ? sanitize_text_field( wp_unslash( $_POST['zip_code'] ) ) : '',
             'additional_notes' => isset( $_POST['additional_notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['additional_notes'] ) ) : '',
             'photo_urls' => $photo_urls,
+            'extra_fields' => $extra_fields,
             'estimated_cost_min' => $estimate['min'],
             'estimated_cost_max' => $estimate['max'],
         );
@@ -112,7 +158,25 @@ class Smart_Forms_Handler {
             ),
         ) );
     }
-    
+
+    /**
+     * Return the first non-empty value among a list of $_POST keys. Lets the
+     * handler accept several common field-key spellings (customer_name / name,
+     * customer_phone / phone, etc.) so DB-built forms map cleanly to a lead.
+     * Nonce is verified at the top of handle_submission().
+     */
+    private function first_nonempty( array $keys ) {
+        foreach ( $keys as $k ) {
+            if ( isset( $_POST[ $k ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+                $val = trim( (string) wp_unslash( $_POST[ $k ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                if ( '' !== $val ) {
+                    return $val;
+                }
+            }
+        }
+        return '';
+    }
+
     private function handle_photo_uploads() {
         if ( ! function_exists( 'wp_handle_upload' ) ) {
             require_once ABSPATH . 'wp-admin/includes/file.php';

@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.9
+Stable tag: 1.9.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.10 =
+* Chat scheduling uses the embedded form again so leads are captured (connected to the chat form); the Calendly "Pick a time" link is now offered after the form submits, not instead of it
 
 = 1.9.9 =
 * Booking link is now read from the embedded form's per-form setting (Smart Forms > edit form > Booking link), not a global chat setting; removed the Booking URL field from chat Settings
