@@ -26,6 +26,12 @@ $wa_link   = $wa_number ? 'https://wa.me/' . $wa_number . '?text=' . $wa_text : 
                 <strong><?php echo $title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above ?></strong>
                 <small><?php echo $subtitle; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above ?></small>
             </div>
+            <button id="smart-chat-expand" type="button" aria-label="<?php esc_attr_e( 'Enlarge', 'smart-chat-ai' ); ?>" title="<?php esc_attr_e( 'Enlarge', 'smart-chat-ai' ); ?>">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+            </button>
+            <button id="smart-chat-expand" type="button" aria-label="<?php esc_attr_e( 'Enlarge', 'smart-chat-ai' ); ?>" title="<?php esc_attr_e( 'Enlarge', 'smart-chat-ai' ); ?>">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+            </button>
             <button id="smart-chat-close">&times;</button>
         </div>
         <div id="smart-chat-messages"></div>

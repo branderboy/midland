@@ -4,7 +4,7 @@ Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.2
+Stable tag: 1.9.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,11 @@ OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversa
 Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
 
 == Changelog ==
+
+= 1.9.3 =
+* Fixed the double-scrollbar when the booking form opens: the form now takes over the chat body so there is a single scroll area
+* Added an Enlarge button in the header to expand the chat window (and shrink it back)
+* Taller, viewport-aware window so the form fits without cramped nested scrolling
 
 = 1.9.2 =
 * Rewrote the default chat prompt: shorter replies, no dashes, no long-winded statements

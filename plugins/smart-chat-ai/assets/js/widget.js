@@ -34,16 +34,31 @@ jQuery(document).ready(function($) {
     $('#smart-chat-cta-visit').on('click', showForm);
     $('#smart-chat-form-close').on('click', hideForm);
 
+    // Enlarge / shrink the chat window.
+    $('#smart-chat-expand').on('click', function() {
+        $window.toggleClass('expanded');
+    });
+
+    var $inputArea = $('#smart-chat-input-area');
+
+    // When the form opens it takes over the body so there's a single scroll
+    // area (no more dual messages + form scrollbars). The form's own close
+    // button brings the conversation back.
     function showForm() {
-        $form.slideDown(180);
+        $messages.hide();
         $actions.hide();
-        $input.prop('disabled', true);
+        $inputArea.hide();
+        $form.stop(true, true).slideDown(180);
     }
 
     function hideForm() {
-        $form.slideUp(180);
-        $actions.show();
-        $input.prop('disabled', false).focus();
+        $form.stop(true, true).slideUp(180, function() {
+            $messages.show();
+            $inputArea.show();
+            $actions.show();
+            $input.prop('disabled', false).focus();
+            $messages.scrollTop($messages[0].scrollHeight);
+        });
     }
 
     function appendMsg(sender, text) {
