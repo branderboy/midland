@@ -60,7 +60,7 @@ class SCRM_Pro_ActiveCampaign {
         // when an invitee.created event maps to a lead — this is the "booked"
         // conversion. Pushes the contact to AC with the midland-job-booked tag
         // and advances the AC deal to the Booked stage.
-        add_action( 'sfco_lead_booked',          array( $this, 'on_lead_booked' ) );
+        add_action( 'sfco_lead_booked',          array( $this, 'on_lead_booked' ), 10, 2 );
 
         // Cancellation — invitee.canceled in Calendly reverses the booking:
         // apply the canceled tag and move the deal off the Booked stage.
@@ -83,10 +83,44 @@ class SCRM_Pro_ActiveCampaign {
 
     /**
      * Booking conversion — fired by the Calendly webhook via sfco_lead_booked
-     * with the lead row (status already = booked).
+     * with the lead row (status already = booked). On a re-book (a previously
+     * canceled lead booking again) clear the stale midland-job-canceled tags
+     * first so they don't sit on the contact alongside the fresh booked tag.
      */
-    public function on_lead_booked( $lead ) {
+    public function on_lead_booked( $lead, $is_rebook = false ) {
+        if ( $is_rebook ) {
+            $this->remove_canceled_tags( $lead );
+        }
         $this->push_lead( $lead, 'booked' );
+    }
+
+    /**
+     * Remove the midland-job-canceled* tags from a contact. Used when a
+     * canceled lead re-books so cancellation-triggered automations don't keep
+     * a stale tag. Best-effort: looks the contact up by email, then deletes
+     * each canceled tag association if present.
+     */
+    private function remove_canceled_tags( $lead ) {
+        if ( ! get_option( self::OPT_ENABLED, 0 ) ) {
+            return;
+        }
+        $api_url = (string) get_option( self::OPT_API_URL, '' );
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+        if ( '' === $api_url || '' === $api_key ) {
+            return;
+        }
+        $email = sanitize_email( $this->get_field( $lead, array( 'customer_email', 'email' ) ) );
+        if ( ! is_email( $email ) ) {
+            return;
+        }
+
+        $segment      = $this->lead_segment( $lead );
+        $is_emergency  = $this->is_emergency( $lead );
+        $canceled_tags = $this->tags_for( 'canceled', $segment, $is_emergency );
+
+        foreach ( $canceled_tags as $tag ) {
+            $this->remove_tag( $api_url, $api_key, $email, $tag );
+        }
     }
 
     /**
@@ -512,6 +546,78 @@ class SCRM_Pro_ActiveCampaign {
                 'contactTag' => array( 'contact' => (int) $contact_id, 'tag' => (int) $tag_id ),
             ) ),
         ) );
+    }
+
+    /**
+     * Remove a tag from a contact (by email). Resolves contact id → tag id →
+     * the contactTag association id, then DELETEs the association. Best-effort:
+     * returns silently if the contact, tag, or association doesn't exist (the
+     * tag was never applied, nothing to remove).
+     */
+    private function remove_tag( $api_url, $api_key, $email, $tag_name ) {
+        $api_url = untrailingslashit( $api_url );
+        $headers = array(
+            'Api-Token'    => $api_key,
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+        );
+
+        // Resolve the contact id by email.
+        $lookup = wp_remote_get( $api_url . '/api/3/contacts?email=' . rawurlencode( $email ), array(
+            'headers' => $headers,
+            'timeout' => 10,
+        ) );
+        if ( is_wp_error( $lookup ) ) {
+            return;
+        }
+        $body       = json_decode( wp_remote_retrieve_body( $lookup ), true );
+        $contact_id = isset( $body['contacts'][0]['id'] ) ? (int) $body['contacts'][0]['id'] : 0;
+        if ( $contact_id <= 0 ) {
+            return;
+        }
+
+        // Resolve the tag id by name.
+        $tag_lookup = wp_remote_get( $api_url . '/api/3/tags?search=' . rawurlencode( $tag_name ), array(
+            'headers' => $headers,
+            'timeout' => 10,
+        ) );
+        if ( is_wp_error( $tag_lookup ) ) {
+            return;
+        }
+        $tbody  = json_decode( wp_remote_retrieve_body( $tag_lookup ), true );
+        $tag_id = 0;
+        foreach ( (array) ( $tbody['tags'] ?? array() ) as $t ) {
+            if ( strtolower( (string) ( $t['tag'] ?? '' ) ) === strtolower( $tag_name ) ) {
+                $tag_id = (int) $t['id'];
+                break;
+            }
+        }
+        if ( $tag_id <= 0 ) {
+            return;
+        }
+
+        // Find the contactTag association id for (contact, tag) and delete it.
+        $assoc = wp_remote_get( $api_url . '/api/3/contacts/' . $contact_id . '/contactTags', array(
+            'headers' => $headers,
+            'timeout' => 10,
+        ) );
+        if ( is_wp_error( $assoc ) ) {
+            return;
+        }
+        $abody = json_decode( wp_remote_retrieve_body( $assoc ), true );
+        foreach ( (array) ( $abody['contactTags'] ?? array() ) as $ct ) {
+            if ( (int) ( $ct['tag'] ?? 0 ) === $tag_id ) {
+                $ct_id = (int) ( $ct['id'] ?? 0 );
+                if ( $ct_id > 0 ) {
+                    wp_remote_request( $api_url . '/api/3/contactTags/' . $ct_id, array(
+                        'method'  => 'DELETE',
+                        'headers' => $headers,
+                        'timeout' => 10,
+                    ) );
+                }
+                break;
+            }
+        }
     }
 
     // ── AC Deal pipeline helpers ─────────────────────────────────────────────

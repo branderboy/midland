@@ -321,6 +321,12 @@ class SFCO_Pro_Calendly {
             return 'already_booked';
         }
 
+        // A canceled lead that books again is a re-book: it falls through here
+        // and re-fires the booked conversion below. We flag it so AC can clear
+        // the stale midland-job-canceled tag rather than leave it stuck on the
+        // contact alongside the fresh booked tag.
+        $is_rebook = ( 'canceled' === $current );
+
         global $wpdb;
         $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             $wpdb->prefix . 'sfco_leads',
@@ -352,11 +358,14 @@ class SFCO_Pro_Calendly {
          * tag + deal-stage advance). Passing the lead row by handle means
          * listeners on the same tick see status=booked.
          *
-         * @param object $lead wp_sfco_leads row, status already = booked.
+         * @param object $lead      wp_sfco_leads row, status already = booked.
+         * @param bool   $is_rebook True when a previously-canceled lead booked
+         *                          again — listeners should clear stale
+         *                          cancellation state.
          */
-        do_action( 'sfco_lead_booked', $lead );
+        do_action( 'sfco_lead_booked', $lead, $is_rebook );
 
-        return 'marked_booked';
+        return $is_rebook ? 'marked_rebooked' : 'marked_booked';
     }
 
     /**
