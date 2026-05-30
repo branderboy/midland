@@ -57,6 +57,33 @@ class SCRM_Pro_ServiceM8 {
             wp_schedule_event( time() + 5 * MINUTE_IN_SECONDS, 'scrm_pro_ten_min', self::CRON_POLL );
         }
         add_action( 'admin_post_scrm_sm8_poll_now', array( $this, 'handle_manual_poll' ) );
+
+        // Calendly booking → create the ServiceM8 job. Fired by the Calendly
+        // webhook (SFCO_Pro_Calendly::mark_lead_booked) once a booking maps to
+        // a lead. push_lead_as_job() is idempotent — it no-ops if the lead
+        // already has a job_id, so a re-delivered webhook won't double-create.
+        add_action( 'sfco_lead_booked', array( $this, 'on_lead_booked' ), 20, 1 );
+    }
+
+    /**
+     * Create the ServiceM8 job for a freshly-booked lead. Runs after the AC
+     * bridge (priority 10) so the booked tag/deal fire first. Silent no-op
+     * when the API key isn't configured yet — the booking still tags in AC.
+     *
+     * @param object $lead wp_sfco_leads row (status already = booked).
+     */
+    public function on_lead_booked( $lead ) {
+        $lead_id = (int) ( is_object( $lead ) ? ( $lead->id ?? 0 ) : ( is_array( $lead ) ? ( $lead['id'] ?? 0 ) : 0 ) );
+        if ( $lead_id <= 0 ) {
+            return;
+        }
+        if ( '' === (string) get_option( self::OPT_API_KEY, '' ) ) {
+            return; // Token not added yet — booking is still tagged in AC.
+        }
+        $result = self::push_lead_as_job( $lead_id );
+        if ( is_wp_error( $result ) ) {
+            error_log( 'SCRM SM8 booking push failed for lead ' . $lead_id . ': ' . $result->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+        }
     }
 
     public function add_cron_schedule( $schedules ) {

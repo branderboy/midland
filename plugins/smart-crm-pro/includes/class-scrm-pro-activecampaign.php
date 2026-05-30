@@ -56,12 +56,11 @@ class SCRM_Pro_ActiveCampaign {
         add_action( 'admin_init',                array( $this, 'handle_save' ) );
         add_action( 'admin_init',                array( $this, 'handle_test' ) );
 
-        // Booking events fire when a new lead is captured from any source.
-        // Chat leads no longer hook in directly here — the chat-forms bridge
-        // mirrors them into wp_sfco_leads + fires sfco_lead_submitted so
-        // they reach AC through the canonical Smart Forms journey (which
-        // applies a midland-source-chat tag via lead_source()).
-        add_action( 'sfco_lead_created',         array( $this, 'on_lead_booked' ) );
+        // Booking conversion. Fired by the Calendly webhook (SFCO_Pro_Calendly)
+        // when an invitee.created event maps to a lead — this is the "booked"
+        // conversion. Pushes the contact to AC with the midland-job-booked tag
+        // and advances the AC deal to the Booked stage.
+        add_action( 'sfco_lead_booked',          array( $this, 'on_lead_booked' ) );
 
         // Lifecycle events when a job actually completes.
         add_action( 'sfco_lead_status_changed',  array( $this, 'on_status_changed' ), 10, 3 );
@@ -79,7 +78,8 @@ class SCRM_Pro_ActiveCampaign {
     }
 
     /**
-     * Booking from any source that fires sfco_lead_created with a lead row/array.
+     * Booking conversion — fired by the Calendly webhook via sfco_lead_booked
+     * with the lead row (status already = booked).
      */
     public function on_lead_booked( $lead ) {
         $this->push_lead( $lead, 'booked' );
@@ -394,10 +394,13 @@ class SCRM_Pro_ActiveCampaign {
         if ( $contact_id && get_option( self::OPT_DEAL_ENABLED, 0 ) ) {
             $existing_deal = $this->get_field( $lead, array( 'deal_id' ) );
             if ( '' === $existing_deal ) {
-                $deal_id = $this->create_deal( $api_url, $api_key, $contact_id, $lead, $lifecycle );
-                if ( $deal_id && ! empty( $lead['id'] ) ) {
+                $deal_id  = $this->create_deal( $api_url, $api_key, $contact_id, $lead, $lifecycle );
+                // $lead may be an object (Calendly/SM8 path) or array (forms
+                // bridge) — use get_field() so deal_id persists either way.
+                $lead_row_id = (int) $this->get_field( $lead, array( 'id' ) );
+                if ( $deal_id && $lead_row_id > 0 ) {
                     global $wpdb;
-                    $wpdb->update( $wpdb->prefix . 'sfco_leads', array( 'deal_id' => $deal_id ), array( 'id' => (int) $lead['id'] ), array( '%s' ), array( '%d' ) ); // phpcs:ignore
+                    $wpdb->update( $wpdb->prefix . 'sfco_leads', array( 'deal_id' => $deal_id ), array( 'id' => $lead_row_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore
                 }
                 // Fire the matching task on first deal creation.
                 if ( $deal_id ) {
