@@ -29,6 +29,12 @@ class SCRM_Pro_Floor_Care_Plan {
     const OPT_TEMPLATE_EMERG    = 'scrm_pro_fcp_template_emergency';
     const OPT_ENABLED           = 'scrm_pro_fcp_enabled';
     const OPT_LAST_RUN          = 'scrm_pro_fcp_last_run';
+    // Dedupe marker — stored in postmeta with post_id=0, mirroring the
+    // pattern Smart Reviews + the ServiceM8 bridge use. A single job
+    // completion fires three actions (sfco_lead_completed, scrm_pro_job_completed,
+    // sfco_lead_status_changed) all hooked here; without this guard a customer
+    // would get 3-4 duplicate plan pages + emails.
+    const META_PLAN_FIRED       = '_scrm_fcp_fired';
 
     private static $instance = null;
 
@@ -162,6 +168,20 @@ class SCRM_Pro_Floor_Care_Plan {
         if ( ! is_email( $email ) ) {
             return;
         }
+
+        // Dedupe: one completion fans out to three hooks (all wired here), and
+        // on_status_changed adds a fourth call. Generate exactly one plan per
+        // lead. Guard keyed on lead id; falls back to email when the row has
+        // no id (defensive — shouldn't happen on the completion path).
+        $lead_id_for_guard = (int) $this->get_field( $lead, array( 'id' ) );
+        $guard_key         = $lead_id_for_guard > 0 ? (string) $lead_id_for_guard : 'email:' . $email;
+        if ( $this->plan_already_fired( $guard_key ) ) {
+            return;
+        }
+        // Mark before doing the work so re-entrant hooks on the same tick can't
+        // race past the check and double-generate.
+        $this->mark_plan_fired( $guard_key );
+
         $name = (string) $this->get_field( $lead, array( 'customer_name', 'name' ) );
         $sqft = (int) $this->get_field( $lead, array( 'square_footage', 'sqft', 'square_feet' ) );
 
@@ -246,6 +266,29 @@ class SCRM_Pro_Floor_Care_Plan {
         // time; plan_active / emergency_no_plan / cold are managed
         // inside ActiveCampaign by the operator's automations watching
         // the new-lead funnel's engagement signals.
+    }
+
+    /**
+     * Has a plan already been generated for this lead/guard key? Mirrors the
+     * postmeta-with-post_id-0 dedupe used by Smart Reviews and the SM8 bridge.
+     */
+    private function plan_already_fired( $guard_key ) {
+        global $wpdb;
+        $found = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            "SELECT meta_id FROM {$wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %s LIMIT 1",
+            self::META_PLAN_FIRED,
+            (string) $guard_key
+        ) );
+        return ! empty( $found );
+    }
+
+    private function mark_plan_fired( $guard_key ) {
+        global $wpdb;
+        $wpdb->insert( $wpdb->prefix . 'postmeta', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            'post_id'    => 0,
+            'meta_key'   => self::META_PLAN_FIRED,   // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+            'meta_value' => (string) $guard_key,     // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+        ) );
     }
 
     private function pick_tier( $sqft ) {

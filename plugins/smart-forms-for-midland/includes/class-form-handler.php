@@ -162,6 +162,18 @@ class Smart_Forms_Handler {
                 $redirect = $fs['booking_url'];
             }
         }
+        // Fall back to the global Calendly URL when the form has no per-form link.
+        if ( '' === $redirect && class_exists( 'SFCO_Pro_Calendly' ) ) {
+            $redirect = SFCO_Pro_Calendly::get_booking_url();
+        }
+
+        // Stamp the lead id + identity onto a Calendly booking link so the
+        // Calendly webhook can map the resulting booking back to THIS lead
+        // (utm_content=LEAD_<id>) and prefill the customer's details. No-op for
+        // non-Calendly redirect targets.
+        if ( '' !== $redirect && class_exists( 'SFCO_Pro_Calendly' ) ) {
+            $redirect = SFCO_Pro_Calendly::decorate_booking_url( $redirect, (int) $lead_id, sanitize_text_field( $name ), $email );
+        }
 
         // Success response
         wp_send_json_success( array(
