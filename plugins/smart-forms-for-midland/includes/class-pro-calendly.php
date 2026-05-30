@@ -218,9 +218,8 @@ class SFCO_Pro_Calendly {
         $body  = $request->get_json_params();
         $event = $body['event'] ?? '';
 
-        // We only act on a confirmed booking. invitee.canceled could later
-        // flip the lead back, but that's a separate flow.
-        if ( 'invitee.created' !== $event ) {
+        // Act on a confirmed booking or a cancellation; ignore everything else.
+        if ( 'invitee.created' !== $event && 'invitee.canceled' !== $event ) {
             return new WP_REST_Response( array( 'received' => true, 'action' => 'ignored' ), 200 );
         }
 
@@ -238,7 +237,12 @@ class SFCO_Pro_Calendly {
             ), 200 );
         }
 
-        $result = $this->mark_lead_booked( $lead, $time, $name, $email );
+        if ( 'invitee.canceled' === $event ) {
+            $reason = sanitize_text_field( (string) ( $payload['cancellation']['reason'] ?? '' ) );
+            $result = $this->mark_lead_canceled( $lead, $name, $email, $reason );
+        } else {
+            $result = $this->mark_lead_booked( $lead, $time, $name, $email );
+        }
 
         return new WP_REST_Response( array(
             'received' => true,
@@ -353,6 +357,70 @@ class SFCO_Pro_Calendly {
         do_action( 'sfco_lead_booked', $lead );
 
         return 'marked_booked';
+    }
+
+    /**
+     * Flip a booked lead back to "canceled" when the invitee cancels in
+     * Calendly, and fan out sfco_lead_canceled so Smart CRM can remove the
+     * booked tag / reverse the AC deal stage.
+     *
+     * Only a currently-booked lead is reversed — we never overwrite a
+     * completed job (the work was already done) or re-cancel an already
+     * canceled lead. This keeps the booked-conversion count honest: a
+     * cancellation undoes the conversion rather than leaving a phantom.
+     *
+     * @param object $lead   wp_sfco_leads row.
+     * @param string $name   Invitee name for the admin email.
+     * @param string $email  Invitee email for the admin email.
+     * @param string $reason Cancellation reason, if Calendly supplied one.
+     * @return string 'marked_canceled' | 'not_booked' | 'already_completed'
+     */
+    private function mark_lead_canceled( $lead, $name = '', $email = '', $reason = '' ) {
+        $current = strtolower( (string) ( $lead->status ?? '' ) );
+        if ( 'completed' === $current ) {
+            return 'already_completed';
+        }
+        if ( 'booked' !== $current ) {
+            // Nothing to reverse — the lead was never marked booked.
+            return 'not_booked';
+        }
+
+        global $wpdb;
+        $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $wpdb->prefix . 'sfco_leads',
+            array( 'status' => 'canceled' ),
+            array( 'id' => (int) $lead->id ),
+            array( '%s' ),
+            array( '%d' )
+        );
+        $lead->status = 'canceled';
+
+        // Notify the operator.
+        $admin_email = get_option( 'admin_email' );
+        wp_mail(
+            $admin_email,
+            /* translators: %s: invitee name */
+            sprintf( __( 'Canceled: %s canceled their Calendly booking', 'smart-forms-pro' ), $name ?: $email ),
+            sprintf(
+                /* translators: 1: name, 2: email, 3: reason */
+                __( "%1\$s canceled their appointment.\n\nEmail: %2\$s\nReason: %3\$s\n\nLead has been marked as Canceled and the booked tag/deal stage has been reversed in ActiveCampaign.", 'smart-forms-pro' ),
+                $name,
+                $email,
+                $reason ?: __( '(none given)', 'smart-forms-pro' )
+            )
+        );
+
+        /**
+         * Cancellation signal — Smart CRM Pro hooks this to apply the
+         * canceled tag in ActiveCampaign and move the deal off the Booked
+         * stage. Lead row passed by handle with status already = canceled.
+         *
+         * @param object $lead   wp_sfco_leads row, status already = canceled.
+         * @param string $reason Cancellation reason (may be empty).
+         */
+        do_action( 'sfco_lead_canceled', $lead, $reason );
+
+        return 'marked_canceled';
     }
 
     /**

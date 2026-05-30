@@ -62,6 +62,10 @@ class SCRM_Pro_ActiveCampaign {
         // and advances the AC deal to the Booked stage.
         add_action( 'sfco_lead_booked',          array( $this, 'on_lead_booked' ) );
 
+        // Cancellation — invitee.canceled in Calendly reverses the booking:
+        // apply the canceled tag and move the deal off the Booked stage.
+        add_action( 'sfco_lead_canceled',        array( $this, 'on_lead_canceled' ) );
+
         // Lifecycle events when a job actually completes.
         add_action( 'sfco_lead_status_changed',  array( $this, 'on_status_changed' ), 10, 3 );
         add_action( 'sfco_lead_completed',       array( $this, 'on_lead_completed' ) );
@@ -83,6 +87,15 @@ class SCRM_Pro_ActiveCampaign {
      */
     public function on_lead_booked( $lead ) {
         $this->push_lead( $lead, 'booked' );
+    }
+
+    /**
+     * Cancellation — fired by the Calendly webhook via sfco_lead_canceled
+     * with the lead row (status already = canceled). Tags the contact and
+     * moves the deal off the Booked stage to Lost.
+     */
+    public function on_lead_canceled( $lead ) {
+        $this->push_lead( $lead, 'canceled' );
     }
 
     public function add_menu() {
@@ -259,6 +272,14 @@ class SCRM_Pro_ActiveCampaign {
                 if ( $is_emergency ) {
                     $tags[] = 'midland-job-booked-emergency';
                     $tags[] = 'midland-job-booked-' . $segment . '-emergency';
+                }
+                break;
+
+            case 'canceled':
+                $tags[] = 'midland-job-canceled';
+                $tags[] = 'midland-job-canceled-' . $segment;
+                if ( $is_emergency ) {
+                    $tags[] = 'midland-job-canceled-emergency';
                 }
                 break;
 
@@ -504,6 +525,7 @@ class SCRM_Pro_ActiveCampaign {
             case 'completed': return (int) get_option( self::OPT_STAGE_WON,    0 );
             case 'booked':    return (int) get_option( self::OPT_STAGE_BOOKED, 0 );
             case 'quoted':    return (int) get_option( self::OPT_STAGE_QUOTED, 0 );
+            case 'canceled':  return (int) get_option( self::OPT_STAGE_LOST,   0 );
             case 'lost':      return (int) get_option( self::OPT_STAGE_LOST,   0 );
             case 'new':
             default:          return (int) get_option( self::OPT_STAGE_NEW,    0 );
@@ -605,6 +627,7 @@ class SCRM_Pro_ActiveCampaign {
             case 'completed': return (int) get_option( self::OPT_TASK_WON,    0 );
             case 'booked':    return (int) get_option( self::OPT_TASK_BOOKED, 0 );
             case 'quoted':    return (int) get_option( self::OPT_TASK_QUOTED, 0 );
+            case 'canceled':  return (int) get_option( self::OPT_TASK_LOST,   0 );
             case 'lost':      return (int) get_option( self::OPT_TASK_LOST,   0 );
             case 'new':
             default:          return (int) get_option( self::OPT_TASK_NEW,    0 );
