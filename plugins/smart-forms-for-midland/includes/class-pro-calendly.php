@@ -8,6 +8,7 @@ class SFCO_Pro_Calendly {
     public function __construct() {
         add_action( 'admin_menu', array( $this, 'add_menu' ), 32 );
         add_action( 'admin_init', array( $this, 'handle_save' ) );
+        add_action( 'admin_init', array( $this, 'handle_connect' ) );
         add_action( 'rest_api_init', array( $this, 'register_webhook' ) );
     }
 
@@ -45,6 +46,111 @@ class SFCO_Pro_Calendly {
         update_option( 'sfco_pro_calendly_enabled', $enabled );
 
         wp_safe_redirect( admin_url( 'admin.php?page=sfco-calendar&saved=1' ) );
+        exit;
+    }
+
+    /**
+     * One-click "Connect Calendly" — uses the saved Personal Access Token to:
+     *   1. Resolve the current user + their organization URI (/users/me).
+     *   2. Create an organization-scoped webhook subscription pointed at our
+     *      REST endpoint, subscribed to invitee.created (+ invitee.canceled
+     *      for future use), with a generated signing key.
+     *   3. Persist that signing key so verify_webhook_signature() works.
+     *
+     * Calendly has no dashboard UI for webhook creation — it's API-only — so
+     * this is the only way to wire the inbound side without curl gymnastics.
+     */
+    public function handle_connect() {
+        if ( ! isset( $_POST['sfco_connect_calendly'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $nonce = isset( $_POST['_sfco_cal_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_cal_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'sfco_save_calendly' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+        }
+
+        // Persist whatever the operator typed into the API key field first so
+        // they don't have to "Save" before "Connect".
+        if ( isset( $_POST['calendly_api_key'] ) ) {
+            update_option( 'sfco_pro_calendly_api_key', sanitize_text_field( wp_unslash( $_POST['calendly_api_key'] ) ) );
+        }
+
+        $token = (string) get_option( 'sfco_pro_calendly_api_key', '' );
+        if ( '' === $token ) {
+            $this->connect_redirect( 'fail', __( 'Add your Calendly API key first.', 'smart-forms-pro' ) );
+        }
+
+        $headers = array(
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json',
+        );
+
+        // 1. Who am I → organization URI.
+        $me = wp_remote_get( 'https://api.calendly.com/users/me', array( 'headers' => $headers, 'timeout' => 15 ) );
+        if ( is_wp_error( $me ) ) {
+            $this->connect_redirect( 'fail', $me->get_error_message() );
+        }
+        $me_code = (int) wp_remote_retrieve_response_code( $me );
+        $me_body = json_decode( (string) wp_remote_retrieve_body( $me ), true );
+        if ( 200 !== $me_code || empty( $me_body['resource']['current_organization'] ) ) {
+            $msg = $me_body['message'] ?? sprintf( __( 'Calendly rejected the API key (HTTP %d).', 'smart-forms-pro' ), $me_code );
+            $this->connect_redirect( 'fail', $msg );
+        }
+        $org_uri = (string) $me_body['resource']['current_organization'];
+
+        // 2. Create an org-scoped webhook subscription with a generated
+        //    signing key (used to HMAC-verify every inbound event).
+        $signing_key = wp_generate_password( 40, false );
+        $payload = array(
+            'url'          => rest_url( 'sfco-pro/v1/calendly/webhook' ),
+            'events'       => array( 'invitee.created', 'invitee.canceled' ),
+            'organization' => $org_uri,
+            'scope'        => 'organization',
+            'signing_key'  => $signing_key,
+        );
+
+        $create = wp_remote_post( 'https://api.calendly.com/webhook_subscriptions', array(
+            'headers' => $headers,
+            'timeout' => 20,
+            'body'    => wp_json_encode( $payload ),
+        ) );
+        if ( is_wp_error( $create ) ) {
+            $this->connect_redirect( 'fail', $create->get_error_message() );
+        }
+        $code = (int) wp_remote_retrieve_response_code( $create );
+        $body = json_decode( (string) wp_remote_retrieve_body( $create ), true );
+
+        // 201 = created. 409 = a subscription for this URL already exists —
+        // treat as success but we can't recover the original signing key, so
+        // only overwrite ours when we actually created a new one.
+        if ( 201 === $code && ! empty( $body['resource']['uri'] ) ) {
+            update_option( 'sfco_pro_calendly_signing_key', $signing_key );
+            update_option( 'sfco_pro_calendly_webhook_uri', (string) $body['resource']['uri'] );
+            update_option( 'sfco_pro_calendly_enabled', 1 );
+            $this->connect_redirect( 'ok', '' );
+        }
+
+        if ( 409 === $code ) {
+            $this->connect_redirect( 'exists', __( 'A webhook for this site already exists in Calendly. If bookings are not arriving, delete it in Calendly (API) and reconnect so a fresh signing key can be stored.', 'smart-forms-pro' ) );
+        }
+
+        $msg = '';
+        if ( is_array( $body ) ) {
+            $msg = (string) ( $body['message'] ?? '' );
+            if ( '' === $msg && ! empty( $body['details'][0]['message'] ) ) {
+                $msg = (string) $body['details'][0]['message'];
+            }
+        }
+        $this->connect_redirect( 'fail', $msg ?: sprintf( __( 'Calendly returned HTTP %d.', 'smart-forms-pro' ), $code ) );
+    }
+
+    private function connect_redirect( $status, $message ) {
+        $args = array( 'page' => 'sfco-calendar', 'connect' => $status );
+        if ( '' !== $message ) {
+            $args['connect_msg'] = rawurlencode( $message );
+        }
+        wp_safe_redirect( admin_url( 'admin.php?' . http_build_query( $args ) ) );
         exit;
     }
 
@@ -312,10 +418,31 @@ class SFCO_Pro_Calendly {
         <div class="wrap">
             <h1><?php esc_html_e( 'Calendar / Calendly Integration', 'smart-forms-pro' ); ?></h1>
 
-            <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+            <?php // phpcs:disable WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Calendar settings saved.', 'smart-forms-pro' ); ?></p></div>
             <?php endif; ?>
+            <?php
+            $connect     = isset( $_GET['connect'] ) ? sanitize_key( $_GET['connect'] ) : '';
+            $connect_msg = isset( $_GET['connect_msg'] ) ? sanitize_text_field( wp_unslash( $_GET['connect_msg'] ) ) : '';
+            ?>
+            <?php if ( 'ok' === $connect ) : ?>
+                <div class="notice notice-success is-dismissible"><p><strong><?php esc_html_e( 'Connected to Calendly.', 'smart-forms-pro' ); ?></strong> <?php esc_html_e( 'The webhook subscription was created and the signing key was stored automatically. Bookings will now mark leads as Booked, push to ServiceM8, and tag in ActiveCampaign.', 'smart-forms-pro' ); ?></p></div>
+            <?php elseif ( 'exists' === $connect ) : ?>
+                <div class="notice notice-warning is-dismissible"><p><?php echo esc_html( $connect_msg ); ?></p></div>
+            <?php elseif ( 'fail' === $connect ) : ?>
+                <div class="notice notice-error is-dismissible"><p><strong><?php esc_html_e( 'Calendly connection failed.', 'smart-forms-pro' ); ?></strong> <?php echo esc_html( $connect_msg ); ?></p></div>
+            <?php endif; ?>
+            <?php // phpcs:enable WordPress.Security.NonceVerification.Recommended ?>
+
+            <?php $is_connected = '' !== (string) get_option( 'sfco_pro_calendly_signing_key', '' ); ?>
+            <p>
+                <?php if ( $is_connected ) : ?>
+                    <span style="display:inline-block;padding:4px 10px;background:#dcfce7;color:#166534;border-radius:3px;font-weight:600;">✓ <?php esc_html_e( 'Webhook connected', 'smart-forms-pro' ); ?></span>
+                <?php else : ?>
+                    <span style="display:inline-block;padding:4px 10px;background:#fef3c7;color:#92400e;border-radius:3px;font-weight:600;"><?php esc_html_e( 'Webhook not connected — add your API key and click Connect Calendly', 'smart-forms-pro' ); ?></span>
+                <?php endif; ?>
+            </p>
 
             <form method="post">
                 <?php wp_nonce_field( 'sfco_save_calendly', '_sfco_cal_nonce' ); ?>
@@ -333,10 +460,10 @@ class SFCO_Pro_Calendly {
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="calendly_api_key"><?php esc_html_e( 'API Key (optional)', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="calendly_api_key"><?php esc_html_e( 'API Key', 'smart-forms-pro' ); ?> <span style="color:#b32d2e;">*</span></label></th>
                         <td>
-                            <input type="password" name="calendly_api_key" id="calendly_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>">
-                            <p class="description"><?php esc_html_e( 'For webhook integration. Get yours at calendly.com/integrations.', 'smart-forms-pro' ); ?></p>
+                            <input type="password" name="calendly_api_key" id="calendly_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" autocomplete="off">
+                            <p class="description"><?php esc_html_e( 'Your Calendly Personal Access Token (Calendly → Integrations → API & Webhooks). Used to create the webhook subscription automatically — click "Connect Calendly" below after pasting it.', 'smart-forms-pro' ); ?></p>
                         </td>
                     </tr>
                     <tr>
@@ -359,14 +486,16 @@ class SFCO_Pro_Calendly {
                         <th><label for="calendly_signing_key"><?php esc_html_e( 'Webhook Signing Key', 'smart-forms-pro' ); ?></label></th>
                         <td>
                             <input type="password" name="calendly_signing_key" id="calendly_signing_key" class="regular-text" value="<?php echo esc_attr( $signing_key ); ?>">
-                            <p class="description"><?php esc_html_e( 'Required. Calendly returns this when you create the webhook subscription. Without it, the webhook endpoint rejects every request.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Filled in automatically when you click "Connect Calendly". Without it, the webhook endpoint rejects every request. Only edit this if you created the webhook subscription manually.', 'smart-forms-pro' ); ?></p>
                         </td>
                     </tr>
                 </table>
 
                 <p class="submit">
-                    <button type="submit" name="sfco_save_calendly" value="1" class="button button-primary"><?php esc_html_e( 'Save Calendar Settings', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_connect_calendly" value="1" class="button button-primary"><?php esc_html_e( 'Connect Calendly', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_save_calendly" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Save Calendar Settings', 'smart-forms-pro' ); ?></button>
                 </p>
+                <p class="description" style="max-width:640px;"><?php esc_html_e( '"Connect Calendly" uses your API key to create the booking webhook and store its signing key for you (Calendly has no dashboard UI for this). "Save Calendar Settings" just stores the fields above without touching Calendly.', 'smart-forms-pro' ); ?></p>
             </form>
         </div>
         <?php
