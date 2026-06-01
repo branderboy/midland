@@ -15,8 +15,8 @@ class SFCO_Pro_Calendly {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Calendar', 'smart-forms-pro' ),
-            esc_html__( 'Calendar', 'smart-forms-pro' ),
+            esc_html__( 'Calendly', 'smart-forms-pro' ),
+            esc_html__( 'Calendly', 'smart-forms-pro' ),
             'manage_options',
             'sfco-calendar',
             array( $this, 'render_page' )
@@ -493,11 +493,11 @@ class SFCO_Pro_Calendly {
         $webhook_url = rest_url( 'sfco-pro/v1/calendly/webhook' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Calendar / Calendly Integration', 'smart-forms-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'Calendly Integration', 'smart-forms-pro' ); ?></h1>
 
             <?php // phpcs:disable WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Calendar settings saved.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Calendly settings saved.', 'smart-forms-pro' ); ?></p></div>
             <?php endif; ?>
             <?php
             $connect     = isset( $_GET['connect'] ) ? sanitize_key( $_GET['connect'] ) : '';
@@ -570,9 +570,9 @@ class SFCO_Pro_Calendly {
 
                 <p class="submit">
                     <button type="submit" name="sfco_connect_calendly" value="1" class="button button-primary"><?php esc_html_e( 'Connect Calendly', 'smart-forms-pro' ); ?></button>
-                    <button type="submit" name="sfco_save_calendly" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Save Calendar Settings', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_save_calendly" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Save Calendly Settings', 'smart-forms-pro' ); ?></button>
                 </p>
-                <p class="description" style="max-width:640px;"><?php esc_html_e( '"Connect Calendly" uses your API key to create the booking webhook and store its signing key for you (Calendly has no dashboard UI for this). "Save Calendar Settings" just stores the fields above without touching Calendly.', 'smart-forms-pro' ); ?></p>
+                <p class="description" style="max-width:640px;"><?php esc_html_e( '"Connect Calendly" uses your API key to create the booking webhook and store its signing key for you (Calendly has no dashboard UI for this). "Save Calendly Settings" just stores the fields above without touching Calendly.', 'smart-forms-pro' ); ?></p>
             </form>
         </div>
         <?php
