@@ -192,7 +192,7 @@ class SCRM_Pro_ServiceM8 {
             return new WP_REST_Response( array( 'received' => true, 'action' => 'ignored' ), 200 );
         }
 
-        $lead = $this->find_lead( $email, $phone );
+        $lead = $this->find_lead( $email, $phone, $job_id );
 
         if ( ! $lead ) {
             return new WP_REST_Response( array(
@@ -254,22 +254,15 @@ class SCRM_Pro_ServiceM8 {
     }
 
     private function job_opened_already_fired( $lead_id ) {
-        global $wpdb;
-        $found = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            "SELECT meta_id FROM {$wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %d LIMIT 1",
-            self::META_JOB_OPENED,
-            (int) $lead_id
-        ) );
-        return ! empty( $found );
+        // Stored as a dedicated (non-autoloaded) option rather than postmeta
+        // with post_id=0 — orphan post_id=0 meta rows get wiped by DB-cleanup
+        // plugins, which would silently break dedupe and re-fire the job-opened
+        // actions / emails.
+        return '' !== (string) get_option( self::META_JOB_OPENED . '_' . (int) $lead_id, '' );
     }
 
     private function mark_job_opened_fired( $lead_id ) {
-        global $wpdb;
-        $wpdb->insert( $wpdb->prefix . 'postmeta', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            'post_id'    => 0,
-            'meta_key'   => self::META_JOB_OPENED, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-            'meta_value' => (int) $lead_id,         // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-        ) );
+        update_option( self::META_JOB_OPENED . '_' . (int) $lead_id, time(), false );
     }
 
     /**
@@ -382,7 +375,7 @@ class SCRM_Pro_ServiceM8 {
         return false;
     }
 
-    private function find_lead( $email, $phone ) {
+    private function find_lead( $email, $phone, $job_id = '' ) {
         global $wpdb;
         $table = $wpdb->prefix . 'sfco_leads';
         // Confirm the table exists — Smart Forms is a hard dependency at plugin level
@@ -390,6 +383,19 @@ class SCRM_Pro_ServiceM8 {
         $table_check = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         if ( ! $table_check ) {
             return null;
+        }
+
+        // Match the stamped SM8 job_id first — it's an exact 1:1 link to the
+        // lead we pushed, so a returning customer's older lead can't be flipped
+        // by an unrelated new job that happens to share their email/phone.
+        if ( ! empty( $job_id ) ) {
+            $row = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                "SELECT * FROM {$table} WHERE job_id = %s ORDER BY id DESC LIMIT 1",
+                $job_id
+            ) );
+            if ( $row ) {
+                return $row;
+            }
         }
 
         if ( ! empty( $email ) ) {

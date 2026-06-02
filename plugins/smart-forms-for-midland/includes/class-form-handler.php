@@ -146,8 +146,16 @@ class Smart_Forms_Handler {
             wp_send_json_error( array( 'message' => esc_html__( 'Failed to save lead', 'smart-forms-for-midland' ) ) );
         }
         
-        // Send notification email
-        $this->send_notification_email( $lead_id, $lead_data );
+        // Send notification email. This is the legacy fallback notifier — when
+        // the Pro Notifications module is active and its admin notification is
+        // enabled, it sends a (richer) admin email off sfco_lead_submitted, so
+        // skip this one to avoid the operator getting two emails per lead.
+        $pro_notifs = class_exists( 'SFCO_Pro_Notifications' )
+            ? SFCO_Pro_Notifications::get_settings()
+            : array();
+        if ( empty( $pro_notifs['admin_enabled'] ) ) {
+            $this->send_notification_email( $lead_id, $lead_data );
+        }
 
         // Where to send the visitor after submit (e.g. Calendly). Uses the
         // form's redirect URL if confirmation is set to "redirect", otherwise

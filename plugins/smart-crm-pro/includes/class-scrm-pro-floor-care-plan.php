@@ -273,22 +273,20 @@ class SCRM_Pro_Floor_Care_Plan {
      * postmeta-with-post_id-0 dedupe used by Smart Reviews and the SM8 bridge.
      */
     private function plan_already_fired( $guard_key ) {
-        global $wpdb;
-        $found = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            "SELECT meta_id FROM {$wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %s LIMIT 1",
-            self::META_PLAN_FIRED,
-            (string) $guard_key
-        ) );
-        return ! empty( $found );
+        // Dedicated (non-autoloaded) option instead of postmeta with post_id=0,
+        // which DB-optimization plugins prune — that would re-fire plan
+        // generation for a lead that already has one.
+        return '' !== (string) get_option( $this->plan_fired_option( $guard_key ), '' );
     }
 
     private function mark_plan_fired( $guard_key ) {
-        global $wpdb;
-        $wpdb->insert( $wpdb->prefix . 'postmeta', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            'post_id'    => 0,
-            'meta_key'   => self::META_PLAN_FIRED,   // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-            'meta_value' => (string) $guard_key,     // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-        ) );
+        update_option( $this->plan_fired_option( $guard_key ), time(), false );
+    }
+
+    private function plan_fired_option( $guard_key ) {
+        // Guard key is an arbitrary string; hash it for a safe, bounded-length
+        // option name.
+        return self::META_PLAN_FIRED . '_' . md5( (string) $guard_key );
     }
 
     private function pick_tier( $sqft ) {

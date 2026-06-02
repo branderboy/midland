@@ -461,7 +461,17 @@ class SCRM_Pro_ActiveCampaign {
                 $lead_row_id = (int) $this->get_field( $lead, array( 'id' ) );
                 if ( $deal_id && $lead_row_id > 0 ) {
                     global $wpdb;
-                    $wpdb->update( $wpdb->prefix . 'sfco_leads', array( 'deal_id' => $deal_id ), array( 'id' => $lead_row_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore
+                    $table = $wpdb->prefix . 'sfco_leads';
+                    // Guard the write — not every install's sfco_leads has a
+                    // deal_id column, and an unguarded update throws a DB error
+                    // on each push.
+                    $has_column = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                        "SHOW COLUMNS FROM {$table} LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                        'deal_id'
+                    ) );
+                    if ( $has_column ) {
+                        $wpdb->update( $table, array( 'deal_id' => $deal_id ), array( 'id' => $lead_row_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                    }
                 }
                 // Fire the matching task on first deal creation.
                 if ( $deal_id ) {

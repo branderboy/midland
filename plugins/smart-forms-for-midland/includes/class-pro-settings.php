@@ -148,9 +148,13 @@ class SFCO_Pro_Settings {
         );
         update_option( 'sfco_pro_notifications', $notif, false );
 
-        // Resend.
+        // Resend. The API key is a secret and is no longer echoed back into the
+        // form, so a blank field means "keep the stored key" rather than "clear".
         update_option( 'sfco_resend_enabled',    isset( $_POST['resend_enabled'] ) ? 1 : 0 );
-        update_option( 'sfco_resend_api_key',    sanitize_text_field( wp_unslash( $_POST['resend_api_key'] ?? '' ) ) );
+        $resend_key = sanitize_text_field( wp_unslash( $_POST['resend_api_key'] ?? '' ) );
+        if ( '' !== $resend_key ) {
+            update_option( 'sfco_resend_api_key', $resend_key );
+        }
         update_option( 'sfco_resend_from_name',  sanitize_text_field( wp_unslash( $_POST['resend_from_name'] ?? '' ) ) );
         update_option( 'sfco_resend_from_email', sanitize_email( wp_unslash( $_POST['resend_from_email'] ?? '' ) ) );
 
@@ -175,12 +179,16 @@ class SFCO_Pro_Settings {
         update_option( 'sfco_pro_calendly_url', $cal_url );
         update_option( 'sfco_pro_calendly_enabled', '' !== $cal_url ? 1 : 0 );
 
-        // Branding (stored as a single array, matching class-pro-branding).
-        $branding = array(
+        // Branding (stored as a single array, shared with class-pro-branding).
+        // Merge over the existing value so saving here doesn't wipe the keys
+        // only the dedicated Branding page writes (button_color, text_color,
+        // company_name, custom_css) — and vice-versa.
+        $existing_branding = (array) get_option( 'sfco_pro_branding', array() );
+        $branding = array_merge( $existing_branding, array(
             'primary_color' => sanitize_hex_color( wp_unslash( $_POST['branding_primary_color'] ?? '' ) ),
             'logo_url'      => esc_url_raw( wp_unslash( $_POST['branding_logo_url'] ?? '' ) ),
             'thank_you'     => wp_kses_post( wp_unslash( $_POST['branding_thank_you'] ?? '' ) ),
-        );
+        ) );
         update_option( 'sfco_pro_branding', $branding, false );
 
         // Tracking pixels (Ad platforms).
@@ -352,7 +360,7 @@ class SFCO_Pro_Settings {
                     </tr>
                     <tr>
                         <th scope="row"><label for="resend_api_key"><?php esc_html_e( 'API key', 'smart-forms-for-midland' ); ?></label></th>
-                        <td><input type="password" id="resend_api_key" name="resend_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_resend_api_key', '' ) ); ?>" autocomplete="off"><p class="description"><?php esc_html_e( 'resend.com → API Keys.', 'smart-forms-for-midland' ); ?></p></td>
+                        <td><input type="password" id="resend_api_key" name="resend_api_key" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) get_option( 'sfco_resend_api_key', '' ) ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : '' ); ?>"><p class="description"><?php esc_html_e( 'resend.com → API Keys.', 'smart-forms-for-midland' ); ?></p></td>
                     </tr>
                     <tr>
                         <th scope="row"><label for="resend_from_name"><?php esc_html_e( 'From name', 'smart-forms-for-midland' ); ?></label></th>
@@ -374,7 +382,7 @@ class SFCO_Pro_Settings {
                     </tr>
                     <tr>
                         <th scope="row"><label for="crm_api_key"><?php esc_html_e( 'API key', 'smart-forms-for-midland' ); ?></label></th>
-                        <td><input type="password" id="crm_api_key" name="crm_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_crm_api_key', '' ) ); ?>" autocomplete="off"><p class="description"><?php esc_html_e( 'AC Settings → Developer.', 'smart-forms-for-midland' ); ?></p></td>
+                        <td><input type="password" id="crm_api_key" name="crm_api_key" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) get_option( 'sfco_pro_crm_api_key', '' ) ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : '' ); ?>"><p class="description"><?php esc_html_e( 'AC Settings → Developer.', 'smart-forms-for-midland' ); ?></p></td>
                     </tr>
                 </table>
 
@@ -400,7 +408,7 @@ class SFCO_Pro_Settings {
                     </tr>
                     <tr>
                         <th scope="row"><label for="gcal_client_secret"><?php esc_html_e( 'OAuth Client Secret', 'smart-forms-for-midland' ); ?></label></th>
-                        <td><input type="password" id="gcal_client_secret" name="gcal_client_secret" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_gcal_client_secret', '' ) ); ?>" autocomplete="off"></td>
+                        <td><input type="password" id="gcal_client_secret" name="gcal_client_secret" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) get_option( 'sfco_gcal_client_secret', '' ) ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : '' ); ?>"></td>
                     </tr>
                 </table>
 

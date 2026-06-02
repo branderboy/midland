@@ -240,14 +240,30 @@ class SFCO_Plugin {
         }
         
         global $wpdb;
-        
-        $table = $wpdb->prefix . 'sfco_leads';
-        
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin-owned table name built from $wpdb->prefix.
-        $wpdb->query( "DROP TABLE IF EXISTS {$table}" );
-        
-        delete_option( 'sfco_version' );
-        delete_option( 'sfco_settings' );
+
+        // Drop every plugin-owned table, not just leads — otherwise forms, the
+        // integration log, and the four Pro tables (plus any secrets they hold)
+        // survive an uninstall.
+        $tables = array(
+            'sfco_leads',
+            'sfco_forms',
+            'sfco_integration_log',
+            'sfco_automations',
+            'sfco_automation_logs',
+            'sfco_crm_sync',
+            'sfco_team_members',
+        );
+        foreach ( $tables as $t ) {
+            $table = $wpdb->prefix . $t;
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin-owned table name built from $wpdb->prefix.
+            $wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+        }
+
+        // Remove every option this plugin and its Pro modules wrote (version,
+        // settings, integration keys/secrets, branding, tracking, calendly,
+        // gcal, resend, notifications, etc.) — all share the sfco prefix.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( 'sfco' ) . '%' ) );
     }
 }
 
