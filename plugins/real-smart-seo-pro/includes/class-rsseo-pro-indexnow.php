@@ -121,7 +121,13 @@ class RSSEO_Pro_IndexNow {
 
         $url = get_permalink( $post_id );
         if ( $url ) {
-            $this->ping_single( $url );
+            // Defer the outbound pings (up to two blocking 10–15s HTTP POSTs)
+            // off the publish request via the already-registered
+            // rsseo_indexnow_ping → ping_single() cron hook, so a slow IndexNow
+            // / Rapid URL Indexer endpoint can't stall every post save.
+            if ( ! wp_next_scheduled( 'rsseo_indexnow_ping', array( $url ) ) ) {
+                wp_schedule_single_event( time(), 'rsseo_indexnow_ping', array( $url ) );
+            }
         }
     }
 

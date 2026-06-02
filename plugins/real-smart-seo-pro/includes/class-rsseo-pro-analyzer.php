@@ -12,6 +12,14 @@ class RSSEO_Pro_Analyzer {
      * @return int|WP_Error Pro report ID or error.
      */
     public static function analyze( $scan_id ) {
+        // The version constant gate in the bootstrap only proves the base
+        // plugin is present, not that this specific version still ships the
+        // classes/methods we call. Guard the hard dependencies so a base
+        // mismatch surfaces a clean error instead of a fatal.
+        if ( ! class_exists( 'RSSEO_Database' ) || ! class_exists( 'RSSEO_Claude_API' ) || ! method_exists( 'RSSEO_Claude_API', 'ask' ) ) {
+            return new WP_Error( 'base_incompatible', __( 'The installed Real Smart SEO base plugin is missing required components — update it to a compatible version.', 'real-smart-seo-pro' ) );
+        }
+
         $base_scan = RSSEO_Database::get_scan( $scan_id );
         $pro_scan  = RSSEO_Pro_Database::get_pro_scan( $scan_id );
 
@@ -29,7 +37,9 @@ class RSSEO_Pro_Analyzer {
             return $result;
         }
 
-        $raw_text = $result['text'];
+        // Null-coalesce every key — a differently-shaped success array from a
+        // newer/older base API must not throw undefined-index warnings.
+        $raw_text = (string) ( $result['text'] ?? '' );
         $parsed   = self::parse_pro_report( $raw_text );
 
         // Store report via base plugin DB.
@@ -42,8 +52,8 @@ class RSSEO_Pro_Analyzer {
             'issues_medium'   => $parsed['counts']['medium'],
             'issues_low'      => $parsed['counts']['low'],
             'fixes_available' => $parsed['fixes_available'],
-            'model'           => $result['model'],
-            'tokens_used'     => $result['input_tokens'] + $result['output_tokens'],
+            'model'           => (string) ( $result['model'] ?? '' ),
+            'tokens_used'     => (int) ( $result['input_tokens'] ?? 0 ) + (int) ( $result['output_tokens'] ?? 0 ),
             'created_at'      => current_time( 'mysql' ),
         ) );
 

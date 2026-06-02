@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Routes survey scores:
- * Score >= 9 → GMB review link (+ 2 follow-up reminders if not clicked)
- * Score < 9  → private feedback form only, owner notified
+ * Routes survey scores (1–5 star scale):
+ * Score >= 4★ → Google review link (+ 2 follow-up reminders if not clicked)
+ * Score < 4★  → private feedback form only, manager notified
  */
 class SRP_Review_Router {
 
@@ -30,6 +30,12 @@ class SRP_Review_Router {
      */
     public function route( $survey_id, $score, $survey ) {
         $threshold = (int) get_option( 'srp_threshold', SRP_Survey::THRESHOLD );
+        // Guard against a stale option from the old 0–10 scale (e.g. 9): on the
+        // 1–5 star scale that would make a Google review unreachable, so fall
+        // back to the default 4★ threshold.
+        if ( $threshold < 1 || $threshold > SRP_Survey::MAX_SCORE ) {
+            $threshold = SRP_Survey::THRESHOLD;
+        }
 
         if ( $score >= $threshold ) {
             $this->send_review_request( $survey_id, $survey );
@@ -103,8 +109,8 @@ class SRP_Review_Router {
 
         wp_mail(
             $owner_email,
-            "[{$business}] Score {$score}/10 — follow up needed",
-            "Customer {$survey->customer_name} ({$survey->customer_email}) rated their experience {$score}/10.\n\nThis customer did NOT receive a Google review request.\n\nPlease follow up directly to resolve any concerns.",
+            "[{$business}] Score {$score}/5 — follow up needed",
+            "Customer {$survey->customer_name} ({$survey->customer_email}) rated their experience {$score}/5 stars.\n\nThis customer did NOT receive a Google review request.\n\nPlease follow up directly to resolve any concerns.",
             array( 'Content-Type: text/plain; charset=UTF-8' )
         );
     }
