@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.29
+ * Version: 1.9.30
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.29');
+define('SCAI_VERSION', '1.9.30');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -421,6 +421,7 @@ class SCAI_Plugin {
             'whatsappGreeting' => get_option( 'smart_chat_whatsapp_greeting', "Hi! I'd like to ask about your services." ),
             'bookingUrl' => esc_url_raw( $booking_url ),
             'suggestions' => $suggestions,
+            'session_token' => '',
         ));
     }
     
@@ -444,10 +445,11 @@ class SCAI_Plugin {
      * outcome so misconfiguration (bad key, wrong provider) is obvious.
      */
     public function ajax_test_ai() {
+        check_ajax_referer( 'scai_test_ai', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array( 'message' => 'Not allowed.' ) );
+            return;
         }
-        check_ajax_referer( 'scai_test_ai', 'nonce' );
 
         $ai  = new SCAI_AI_Handler();
         $res = $ai->get_response( 'Say "ok" if you can read this.', 'admin-test-' . time() );
@@ -485,10 +487,30 @@ class SCAI_Plugin {
             wp_send_json_error( array( 'message' => __( 'Missing message.', 'smart-chat-ai' ) ) );
         }
 
-        // One conversation per IP address. We derive the session from the
-        // visitor's IP (hashed) instead of a per-browser id, so refreshes,
-        // new tabs, and return visits all land in the same thread.
-        $session_id = $this->session_id_for_ip();
+        // Rate limit: max 30 messages per IP per hour. Keyed on the hashed-IP
+        // id (not the browser token) so it can't be bypassed by rotating the
+        // session token.
+        $rate_key   = 'scai_rl_' . substr( $this->session_id_for_ip(), 0, 24 );
+        $rate_count = (int) get_transient( $rate_key );
+        if ( $rate_count >= 30 ) {
+            wp_send_json_error( array( 'message' => __( 'Too many messages. Please try again in a little while.', 'smart-chat-ai' ) ) );
+            return;
+        }
+        // Creates the transient with a 1-hour expiry on the first message.
+        set_transient( $rate_key, $rate_count + 1, HOUR_IN_SECONDS );
+
+        // Conversation thread id: a browser-local session token sent by the
+        // widget. When the browser hasn't stored one yet (empty / not a 32-char
+        // hex string) we mint a new token and return it so the JS can persist
+        // and reuse it. session_id_for_ip() stays as the hashed-IP fallback.
+        $session_token = isset( $_POST['session_token'] ) ? sanitize_text_field( wp_unslash( $_POST['session_token'] ) ) : '';
+        $new_token     = '';
+        if ( preg_match( '/^[a-f0-9]{32}$/', $session_token ) ) {
+            $session_id = $session_token;
+        } else {
+            $new_token  = bin2hex( random_bytes( 16 ) );
+            $session_id = $new_token;
+        }
         global $wpdb;
         $table = $wpdb->prefix . 'smart_chat_conversations';
 
@@ -535,6 +557,10 @@ class SCAI_Plugin {
             error_log( 'Smart Chat lead capture failed: ' . $e->getMessage() );
         }
 
+        // Hand the browser its session token so it can persist and reuse it.
+        if ( '' !== $new_token ) {
+            $response['session_id'] = $new_token;
+        }
         wp_send_json_success($response);
     }
 

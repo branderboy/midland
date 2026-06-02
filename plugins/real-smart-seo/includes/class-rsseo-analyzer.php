@@ -289,13 +289,21 @@ INSTRUCTIONS;
      * Convert inline markdown (**bold**, *italic*, `code`) to HTML.
      */
     private static function inline_markdown( $text ) {
-        $text = esc_html( $text );
+        // Escape only the captured content as each token is wrapped, so the
+        // tags we add aren't themselves escaped.
         // Bold: **text**
-        $text = preg_replace( '/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text );
+        $text = preg_replace_callback( '/\*\*(.+?)\*\*/s', function ( $m ) {
+            return '<strong>' . esc_html( $m[1] ) . '</strong>';
+        }, $text );
         // Italic: *text*
-        $text = preg_replace( '/\*(.+?)\*/', '<em>$1</em>', $text );
+        $text = preg_replace_callback( '/\*(.+?)\*/s', function ( $m ) {
+            return '<em>' . esc_html( $m[1] ) . '</em>';
+        }, $text );
         // Code: `text`
-        $text = preg_replace( '/`(.+?)`/', '<code>$1</code>', $text );
-        return $text;
+        $text = preg_replace_callback( '/`(.+?)`/s', function ( $m ) {
+            return '<code>' . esc_html( $m[1] ) . '</code>';
+        }, $text );
+        // Escape any plain text that fell through while keeping the tags above.
+        return wp_kses( $text, array( 'strong' => array(), 'em' => array(), 'code' => array() ) );
     }
 }
