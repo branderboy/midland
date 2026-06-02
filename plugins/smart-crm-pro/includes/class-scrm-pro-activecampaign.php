@@ -55,6 +55,12 @@ class SCRM_Pro_ActiveCampaign {
         add_action( 'admin_menu',                array( $this, 'add_menu' ), 41 );
         add_action( 'admin_init',                array( $this, 'handle_save' ) );
         add_action( 'admin_init',                array( $this, 'handle_test' ) );
+        // One-click pipeline setup + blueprint export. These handlers existed
+        // but were never hooked, so the feature was unreachable. Buttons that
+        // post scrm_setup_ac_pipeline / scrm_export_ac_blueprint are rendered
+        // on the AC settings page.
+        add_action( 'admin_init',                array( $this, 'handle_setup_pipeline' ) );
+        add_action( 'admin_init',                array( $this, 'handle_export_blueprint' ) );
 
         // Booking conversion. Fired by the Calendly webhook (SFCO_Pro_Calendly)
         // when an invitee.created event maps to a lead — this is the "booked"
@@ -982,7 +988,19 @@ class SCRM_Pro_ActiveCampaign {
             wp_die( esc_html__( 'Security check failed.', 'smart-crm-pro' ) );
         }
 
-        update_option( self::OPT_API_URL, untrailingslashit( esc_url_raw( wp_unslash( $_POST['ac_api_url'] ?? '' ) ) ) );
+        // SSRF guard: the AC base URL is used in every outbound request with
+        // the API key attached. Reject anything that isn't https or that
+        // resolves to a loopback/private/reserved host (e.g. cloud metadata at
+        // 169.254.169.254, localhost) before persisting it.
+        $api_url = untrailingslashit( esc_url_raw( wp_unslash( $_POST['ac_api_url'] ?? '' ) ) );
+        if ( '' !== $api_url ) {
+            $scheme = strtolower( (string) wp_parse_url( $api_url, PHP_URL_SCHEME ) );
+            if ( 'https' !== $scheme || ! wp_http_validate_url( $api_url ) ) {
+                wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&saved=0&err=' . rawurlencode( 'ActiveCampaign API URL must be a public https:// address.' ) ) );
+                exit;
+            }
+        }
+        update_option( self::OPT_API_URL, $api_url );
         update_option( self::OPT_API_KEY, sanitize_text_field( wp_unslash( $_POST['ac_api_key'] ?? '' ) ) );
         update_option( self::OPT_TAG,     sanitize_text_field( wp_unslash( $_POST['ac_tag'] ?? 'midland-job-completed' ) ) );
         update_option( self::OPT_ENABLED, isset( $_POST['ac_enabled'] ) ? 1 : 0 );
@@ -1079,6 +1097,14 @@ class SCRM_Pro_ActiveCampaign {
                 <p class="submit">
                     <button type="submit" name="scrm_save_ac" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-crm-pro' ); ?></button>
                     <button type="submit" name="scrm_test_ac" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Test Connection', 'smart-crm-pro' ); ?></button>
+                </p>
+
+                <hr>
+                <h2><?php esc_html_e( 'Midland Pipeline', 'smart-crm-pro' ); ?></h2>
+                <p class="description" style="max-width:640px;"><?php esc_html_e( 'Create the Midland deal pipeline and its stages in ActiveCampaign and auto-fill the stage/task IDs above, or export the current configuration as a JSON blueprint. Save your AC API URL + key first.', 'smart-crm-pro' ); ?></p>
+                <p class="submit">
+                    <button type="submit" name="scrm_setup_ac_pipeline" value="1" class="button"><?php esc_html_e( 'Set up Midland pipeline', 'smart-crm-pro' ); ?></button>
+                    <button type="submit" name="scrm_export_ac_blueprint" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Export blueprint (JSON)', 'smart-crm-pro' ); ?></button>
                 </p>
             </form>
         </div>

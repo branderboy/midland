@@ -1060,11 +1060,23 @@ class SFCO_Admin {
         header( 'Content-Type: text/csv; charset=UTF-8' );
         header( 'Content-Disposition: attachment; filename=smart-forms-entries-' . gmdate( 'Y-m-d' ) . '.csv' );
 
+        // Guard against CSV formula injection: a stored value beginning with
+        // = + - @ (or a leading tab/CR) is executed as a formula when the file
+        // is opened in Excel / Google Sheets. Prefix such cells with a single
+        // quote so they're treated as text.
+        $escape_cell = static function ( $value ) {
+            $value = (string) $value;
+            if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+                $value = "'" . $value;
+            }
+            return $value;
+        };
+
         $out = fopen( 'php://output', 'w' );
         if ( $rows ) {
             fputcsv( $out, array_keys( $rows[0] ) );
             foreach ( $rows as $r ) {
-                fputcsv( $out, $r );
+                fputcsv( $out, array_map( $escape_cell, $r ) );
             }
         } else {
             fputcsv( $out, array( 'no entries yet' ) );

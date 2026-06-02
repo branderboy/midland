@@ -186,10 +186,17 @@ class Smart_Forms_Handler {
             ),
         ) );
         } catch ( \Throwable $e ) {
-            // Surface the real fatal in the on-screen form message instead of a
-            // bare "An error occurred", so the cause is visible without DevTools.
+            // Log the real fatal server-side for debugging, but never leak file
+            // paths, line numbers, or DB internals to the (unauthenticated)
+            // visitor — this handler also serves wp_ajax_nopriv.
+            error_log( sprintf(
+                'Smart Forms submission error: %s @ %s:%d',
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ) );
             wp_send_json_error( array(
-                'message' => 'Error: ' . $e->getMessage() . ' @ ' . basename( $e->getFile() ) . ':' . $e->getLine(),
+                'message' => esc_html__( 'Something went wrong submitting the form. Please try again.', 'smart-forms-for-midland' ),
             ) );
         }
     }
@@ -270,10 +277,12 @@ class Smart_Forms_Handler {
                 return new WP_Error( 'invalid_file_type', esc_html__( 'Invalid file type', 'smart-forms-for-midland' ) );
             }
             
-            // Only allow images
-            $allowed_types = array( 'jpg', 'jpeg', 'png', 'gif' );
+            // Allow images (project photos) and common résumé/document formats —
+            // the job-application form posts a PDF/DOC/DOCX résumé through this
+            // same photos[] field, so an images-only filter silently dropped them.
+            $allowed_types = array( 'jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx' );
             if ( ! in_array( $filetype['ext'], $allowed_types, true ) ) {
-                return new WP_Error( 'invalid_image', esc_html__( 'Only JPG, PNG, and GIF images allowed', 'smart-forms-for-midland' ) );
+                return new WP_Error( 'invalid_file', esc_html__( 'Only JPG, PNG, GIF images and PDF/DOC/DOCX documents are allowed', 'smart-forms-for-midland' ) );
             }
             
             $file['type'] = $filetype['type'];

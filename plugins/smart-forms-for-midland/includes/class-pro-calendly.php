@@ -13,9 +13,14 @@ class SFCO_Pro_Calendly {
     }
 
     public function add_menu() {
+        // Parent under the Smart Forms top-level menu so the API Key / Connect /
+        // signing-key fields are actually reachable. Previously this used a null
+        // parent, leaving the only Calendly-credentials screen invisible — the
+        // page existed but had no menu entry, so operators could not find where
+        // to paste their token.
         add_submenu_page(
-            null,
-            esc_html__( 'Calendar', 'smart-forms-pro' ),
+            'smart-forms',
+            esc_html__( 'Calendar (Calendly)', 'smart-forms-pro' ),
             esc_html__( 'Calendar', 'smart-forms-pro' ),
             'manage_options',
             'sfco-calendar',

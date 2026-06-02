@@ -413,6 +413,15 @@ class SFCO_Pro_Settings {
                         <td><input type="url" id="calendly_url" name="calendly_url" class="regular-text" value="<?php echo esc_attr( get_option( 'sfco_pro_calendly_url', '' ) ); ?>" placeholder="https://calendly.com/midlandfloors/30min"><p class="description"><?php esc_html_e( 'Paste your public Calendly scheduling URL. After a form submits, the submitter is offered this booking link.', 'smart-forms-for-midland' ); ?></p></td>
                     </tr>
                 </table>
+                <p class="description" style="max-width:640px;">
+                    <?php
+                    printf(
+                        /* translators: %s: URL to the Calendar (Calendly) credentials page */
+                        wp_kses( __( 'To connect the booking webhook (API key + automatic lead status updates), open <a href="%s">Smart Forms &rarr; Calendar</a> and click <strong>Connect Calendly</strong>.', 'smart-forms-for-midland' ), array( 'a' => array( 'href' => array() ), 'strong' => array() ) ),
+                        esc_url( admin_url( 'admin.php?page=sfco-calendar' ) )
+                    );
+                    ?>
+                </p>
 
                 </div><!-- /.sfco-tab-calendly -->
                 <div class="sfco-tab sfco-tab-branding" <?php echo $hide( 'branding' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>

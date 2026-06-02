@@ -42,6 +42,16 @@ class SFCO_Pro_Webhooks {
             return;
         }
 
+        // SSRF guard: only allow http(s) and reject URLs that resolve to
+        // loopback/private/reserved ranges (e.g. http://169.254.169.254/ cloud
+        // metadata, http://localhost). wp_http_validate_url() performs the IP
+        // checks WordPress uses for its own safe-redirect / HTTP API.
+        $scheme = strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
+        if ( ! in_array( $scheme, array( 'http', 'https' ), true ) || ! wp_http_validate_url( $url ) ) {
+            SFCO_Pro_Log::record( 'webhook', 'error', 'Blocked unsafe webhook URL: ' . $url, (int) ( $form->id ?? 0 ), (int) $lead_id );
+            return;
+        }
+
         $method = strtoupper( (string) ( $hook['method'] ?? 'POST' ) );
         if ( ! in_array( $method, array( 'POST', 'PUT', 'PATCH', 'GET', 'DELETE' ), true ) ) {
             $method = 'POST';
@@ -59,9 +69,10 @@ class SFCO_Pro_Webhooks {
         ) );
 
         $args = array(
-            'method'  => $method,
-            'timeout' => 15,
-            'headers' => array(),
+            'method'             => $method,
+            'timeout'            => 15,
+            'reject_unsafe_urls' => true,
+            'headers'            => array(),
         );
 
         if ( in_array( $method, array( 'POST', 'PUT', 'PATCH' ), true ) ) {

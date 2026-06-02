@@ -54,8 +54,8 @@ class SFCO_Shortcode {
         $description   = $settings['description'] ?? '';
 
         // Bump view counter for the form's conversion stats.
-        if ( class_exists( 'SFCO_Database' ) && method_exists( 'SFCO_Database', 'bump_view' ) ) {
-            SFCO_Database::bump_view( $id );
+        if ( class_exists( 'SFCO_Database' ) && method_exists( 'SFCO_Database', 'increment_form_view' ) ) {
+            SFCO_Database::increment_form_view( $id );
         }
 
         ob_start();

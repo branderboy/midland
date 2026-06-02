@@ -63,6 +63,12 @@ class SCRM_Pro_ServiceM8 {
         // a lead. push_lead_as_job() is idempotent — it no-ops if the lead
         // already has a job_id, so a re-delivered webhook won't double-create.
         add_action( 'sfco_lead_booked', array( $this, 'on_lead_booked' ), 20, 1 );
+
+        // New-lead auto-push: the Smart Forms bridge fires this once it has
+        // enriched/scored a fresh lead. Without this listener the
+        // "push every lead / hot only" setting (OPT_AUTO_PUSH_MODE) had no
+        // effect — jobs were only ever created on a Calendly booking.
+        add_action( 'scrm_pro_smart_forms_lead', array( __CLASS__, 'maybe_auto_push' ), 10, 3 );
     }
 
     /**
@@ -351,10 +357,15 @@ class SCRM_Pro_ServiceM8 {
     }
 
     private function matches_completion( $status, $event ) {
-        $key = sanitize_key( (string) get_option( self::OPT_COMPLETION_KEY, 'completed' ) );
+        // sanitize_text_field (not sanitize_key) so a multi-word status like
+        // "Work Complete" or "Invoice Sent" survives — sanitize_key would strip
+        // the spaces/case and never substring-match the real SM8 status.
+        $key = strtolower( trim( sanitize_text_field( (string) get_option( self::OPT_COMPLETION_KEY, 'completed' ) ) ) );
         if ( '' === $key ) {
             $key = 'completed';
         }
+        $status = strtolower( (string) $status );
+        $event  = strtolower( (string) $event );
         if ( false !== strpos( $status, $key ) ) {
             return true;
         }
@@ -720,7 +731,7 @@ class SCRM_Pro_ServiceM8 {
         }
 
         update_option( self::OPT_SECRET, sanitize_text_field( wp_unslash( $_POST['sm8_secret'] ?? '' ) ) );
-        update_option( self::OPT_COMPLETION_KEY, sanitize_key( wp_unslash( $_POST['sm8_completion_status'] ?? 'completed' ) ) );
+        update_option( self::OPT_COMPLETION_KEY, sanitize_text_field( wp_unslash( $_POST['sm8_completion_status'] ?? 'completed' ) ) );
         update_option( self::OPT_API_KEY,        sanitize_text_field( wp_unslash( $_POST['sm8_api_key'] ?? '' ) ) );
         update_option( self::OPT_COMPANY_UUID,   sanitize_text_field( wp_unslash( $_POST['sm8_company_uuid'] ?? '' ) ) );
         update_option( self::OPT_AUTO_PUSH_HOT,  isset( $_POST['sm8_auto_push_hot'] ) ? 1 : 0 );
