@@ -111,6 +111,11 @@ class CTM_Cron {
         if ( ! $force && empty( $settings['enabled'] ) ) {
             return new WP_Error( 'ctm_disabled', __( 'Alerts are disabled.', 'content-traffic-maker' ) );
         }
+        // One email per day: if the scheduled alert already went out today
+        // (e.g. WP-Cron fired twice), skip without spending an API call.
+        if ( ! $force && CTM_Emailer::already_sent_today() ) {
+            return new WP_Error( 'ctm_already_sent', __( 'A brief was already emailed today.', 'content-traffic-maker' ) );
+        }
 
         $brief = CTM_Generator::generate( $settings );
         if ( is_wp_error( $brief ) ) {

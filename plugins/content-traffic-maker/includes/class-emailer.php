@@ -8,15 +8,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class CTM_Emailer {
 
+    const SENT_DATE_OPT = 'ctm_last_sent_date';
+
+    /** True if a brief email already went out today (site time). */
+    public static function already_sent_today() {
+        return get_option( self::SENT_DATE_OPT, '' ) === current_time( 'Y-m-d' );
+    }
+
     /**
-     * Send a brief to the configured recipient.
+     * Send a brief to the configured recipient. Hard-capped to one email per
+     * calendar day so a cron double-fire or a manual generate can't send a
+     * second alert the same day.
      *
      * @param array  $brief    Structured brief from CTM_Generator.
      * @param array  $settings Settings.
      * @param string $html     Pre-rendered HTML (optional; rendered if empty).
-     * @return bool wp_mail result.
+     * @return bool wp_mail result (false if skipped by the daily cap).
      */
     public static function send( $brief, $settings, $html = '' ) {
+        if ( self::already_sent_today() ) {
+            return false;
+        }
         $to = sanitize_email( (string) ( $settings['recipient'] ?? '' ) );
         if ( ! is_email( $to ) ) {
             return false;
@@ -24,7 +36,12 @@ class CTM_Emailer {
         if ( '' === $html ) {
             $html = self::render_html( $brief, $settings );
         }
-        return wp_mail( $to, self::subject( $settings ), $html, array( 'Content-Type: text/html; charset=UTF-8' ) );
+        $sent = wp_mail( $to, self::subject( $settings ), $html, array( 'Content-Type: text/html; charset=UTF-8' ) );
+        if ( $sent ) {
+            // Stamp the day so no further alert goes out until tomorrow.
+            update_option( self::SENT_DATE_OPT, current_time( 'Y-m-d' ), false );
+        }
+        return $sent;
     }
 
     public static function subject( $settings ) {
