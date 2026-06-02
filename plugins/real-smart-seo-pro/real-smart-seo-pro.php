@@ -144,6 +144,7 @@ class RSSEO_Pro_Plugin {
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-geogrid.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-ai-rank.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-backlinks.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-growth-digest.php';
     }
 
     private function init_classes() {
