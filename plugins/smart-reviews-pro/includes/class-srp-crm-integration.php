@@ -85,7 +85,13 @@ class SRP_CRM_Integration {
         }
 
         do_action( 'srp_job_completed', $data );
-        if ( $lead_id > 0 ) {
+
+        // Only mark the lead surveyed when the email actually went out. If the
+        // send failed, leave it unmarked so the hourly poll retries it instead
+        // of silently dropping the customer's survey. (Defaults to "sent" when
+        // the survey module isn't available, to avoid an endless retry loop.)
+        $sent = ! class_exists( 'SRP_Survey' ) || SRP_Survey::was_sent( $data['email'] );
+        if ( $lead_id > 0 && $sent ) {
             $this->mark_fired( $lead_id );
         }
     }

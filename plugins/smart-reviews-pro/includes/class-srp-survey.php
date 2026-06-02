@@ -16,6 +16,20 @@ class SRP_Survey {
 
     private static $instance = null;
 
+    /**
+     * Outcome of the most recent send_survey() per email, so the CRM dedupe
+     * only marks a lead "surveyed" when the email actually went out — a failed
+     * send is left unmarked so the hourly poll retries it.
+     *
+     * @var array<string,bool>
+     */
+    private static $last_send_ok = array();
+
+    /** Whether the last survey email to $email was sent successfully. */
+    public static function was_sent( $email ) {
+        return ! empty( self::$last_send_ok[ sanitize_email( (string) $email ) ] );
+    }
+
     public static function get_instance() {
         if ( null === self::$instance ) {
             self::$instance = new self();
@@ -73,7 +87,13 @@ class SRP_Survey {
         $subject = "How did we do? Quick question from {$business}";
         $body    = $this->survey_email_html( $from_name, $business, $survey_url, $token );
 
-        wp_mail( $email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
+        $sent = wp_mail( $email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
+
+        // Record the outcome so SRP_CRM_Integration only marks the lead as
+        // surveyed on a successful send — a failed send stays unmarked and the
+        // hourly poll retries it next run.
+        self::$last_send_ok[ $email ] = (bool) $sent;
+        return (bool) $sent;
     }
 
     /**
