@@ -46,7 +46,7 @@ class SRP_Admin {
         }
 
         update_option( 'srp_gmb_review_url', esc_url_raw( wp_unslash( $_POST['gmb_review_url'] ?? '' ) ) );
-        update_option( 'srp_threshold',      absint( $_POST['score_threshold'] ?? 9 ) );
+        update_option( 'srp_threshold',      min( SRP_Survey::MAX_SCORE, max( 1, absint( $_POST['score_threshold'] ?? SRP_Survey::THRESHOLD ) ) ) );
         update_option( 'srp_owner_email',    sanitize_email( wp_unslash( $_POST['owner_email'] ?? '' ) ) );
 
         wp_safe_redirect( admin_url( 'admin.php?page=srp-settings&saved=1' ) );
@@ -128,7 +128,7 @@ class SRP_Admin {
                     <tbody>
                         <?php foreach ( $recent as $row ) :
                             $score_null = null === $row->score || '' === $row->score;
-                            $score_color = $score_null ? '#999' : ( $row->score >= 9 ? '#22c55e' : ( $row->score >= 7 ? '#f59e0b' : '#ef4444' ) );
+                            $score_color = $score_null ? '#999' : ( $row->score >= 4 ? '#22c55e' : ( $row->score >= 3 ? '#f59e0b' : '#ef4444' ) );
                         ?>
                             <tr>
                                 <td>
@@ -139,7 +139,7 @@ class SRP_Admin {
                                     <?php if ( $score_null ) : ?>
                                         <span style="color:#999;"><?php esc_html_e( 'No response', 'smart-reviews-pro' ); ?></span>
                                     <?php else : ?>
-                                        <strong style="color:<?php echo esc_attr( $score_color ); ?>;font-size:18px;"><?php echo esc_html( $row->score ); ?></strong><span style="color:#999;">/10</span>
+                                        <strong style="color:<?php echo esc_attr( $score_color ); ?>;font-size:18px;"><?php echo esc_html( $row->score ); ?></strong><span style="color:#999;">/5&#9733;</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -166,7 +166,8 @@ class SRP_Admin {
 
     public function render_settings() {
         $gmb_url    = get_option( 'srp_gmb_review_url', '' );
-        $threshold  = get_option( 'srp_threshold', SRP_Survey::THRESHOLD );
+        $threshold  = (int) get_option( 'srp_threshold', SRP_Survey::THRESHOLD );
+        if ( $threshold < 1 || $threshold > SRP_Survey::MAX_SCORE ) { $threshold = SRP_Survey::THRESHOLD; } // heal a stale 0–10 value
         $owner_email = get_option( 'srp_owner_email', get_option( 'admin_email' ) );
 
         // phpcs:disable WordPress.Security.NonceVerification.Recommended
@@ -199,8 +200,8 @@ class SRP_Admin {
                     <tr>
                         <th><label for="score_threshold"><?php esc_html_e( 'Review Request Threshold', 'smart-reviews-pro' ); ?></label></th>
                         <td>
-                            <input type="number" id="score_threshold" name="score_threshold" value="<?php echo esc_attr( $threshold ); ?>" min="1" max="10" style="width:70px;">
-                            <span class="description"><?php esc_html_e( 'Score ≥ this number → GMB review link sent. Default: 9', 'smart-reviews-pro' ); ?></span>
+                            <input type="number" id="score_threshold" name="score_threshold" value="<?php echo esc_attr( $threshold ); ?>" min="1" max="5" style="width:70px;">
+                            <span class="description"><?php esc_html_e( 'Star rating ≥ this number → Google review link sent; below it → manager is emailed. 1–5 scale, default: 4', 'smart-reviews-pro' ); ?></span>
                         </td>
                     </tr>
                     <tr>
@@ -281,7 +282,7 @@ class SRP_Admin {
                     <?php else : ?>
                         <?php foreach ( $responses as $row ) :
                             $score_null = null === $row->score || '' === $row->score;
-                            $score_color = $score_null ? '#999' : ( $row->score >= 9 ? '#22c55e' : ( $row->score >= 7 ? '#f59e0b' : '#ef4444' ) );
+                            $score_color = $score_null ? '#999' : ( $row->score >= 4 ? '#22c55e' : ( $row->score >= 3 ? '#f59e0b' : '#ef4444' ) );
                         ?>
                             <tr>
                                 <td>
@@ -295,7 +296,7 @@ class SRP_Admin {
                                     <?php if ( $score_null ) : ?>
                                         <span style="color:#999;">—</span>
                                     <?php else : ?>
-                                        <strong style="color:<?php echo esc_attr( $score_color ); ?>;font-size:20px;"><?php echo esc_html( $row->score ); ?></strong>
+                                        <strong style="color:<?php echo esc_attr( $score_color ); ?>;font-size:20px;"><?php echo esc_html( $row->score ); ?></strong><span style="color:#999;font-size:13px;">/5&#9733;</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>

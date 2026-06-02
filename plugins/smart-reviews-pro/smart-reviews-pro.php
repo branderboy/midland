@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Midland Smart Reviews
- * Description: Midland-branded survey-gated review collection. NPS 0-10 survey fires automatically after job completion (driven by sfco_lead_completed + sfco_lead_status_changed actions from Midland Smart Forms / Smart CRM). Score ≥9 sends the GMB review link + 2 follow-up reminders; score <9 captures private feedback only — no public review request.
+ * Description: Midland-branded survey-gated review collection. A 1–5 star survey fires automatically after job completion (driven by sfco_lead_completed + sfco_lead_status_changed actions from Midland Smart Forms / Smart CRM). Score ≥4★ sends the Google review link + 2 follow-up reminders; score <4★ captures private feedback only and emails the manager — no public review request.
  * Version: 1.3.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html

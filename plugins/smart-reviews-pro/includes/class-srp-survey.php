@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * SRP Survey — sends NPS 0-10 survey after job completion.
+ * SRP Survey — sends a 1–5 star survey after job completion.
  * Hooks:
  *   srp_job_completed( $data ) — fire this from any plugin/theme to trigger the survey.
  *   srp_survey_response        — public AJAX handler for the survey form.
@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class SRP_Survey {
 
-    const THRESHOLD = 9; // Score >= THRESHOLD → route to GMB review link.
+    const THRESHOLD = 4; // 1–5 star scale: score >= THRESHOLD (4★) → route to Google review.
+    const MAX_SCORE = 5; // Top of the rating scale.
 
     private static $instance = null;
 
@@ -104,10 +105,10 @@ class SRP_Survey {
         // The actual score submission requires a POST + nonce there, so email-scanner
         // pre-fetches (Mimecast / Defender / etc.) cannot record a fake score.
         $scores_html = '';
-        for ( $i = 0; $i <= 10; $i++ ) {
+        for ( $i = 1; $i <= self::MAX_SCORE; $i++ ) {
             $score_url    = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
-            $bg           = $i >= self::THRESHOLD ? '#22c55e' : ( $i >= 7 ? '#f59e0b' : '#ef4444' );
-            $scores_html .= '<a href="' . esc_url( $score_url ) . '" style="display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:16px;border-radius:6px;text-decoration:none;margin:2px;">' . $i . '</a>';
+            $bg           = $i >= self::THRESHOLD ? '#22c55e' : ( $i >= 3 ? '#f59e0b' : '#ef4444' );
+            $scores_html .= '<a href="' . esc_url( $score_url ) . '" style="display:inline-block;width:48px;height:48px;line-height:48px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
         }
 
         return '<!DOCTYPE html>
@@ -122,8 +123,8 @@ class SRP_Survey {
       </td></tr>
       <tr><td style="padding:40px 32px;">
         <p style="font-size:16px;color:#333;margin:0 0 8px;">' . esc_html( $greeting ) . '</p>
-        <p style="font-size:15px;color:#555;margin:0 0 32px;">Thank you for choosing ' . esc_html( $business ) . '. We\'d love to know how we did. On a scale of 0–10, how likely are you to recommend us to a friend or neighbor?</p>
-        <p style="font-size:13px;color:#888;margin:0 0 12px;">0 = Not at all likely &nbsp;&nbsp; 10 = Extremely likely</p>
+        <p style="font-size:15px;color:#555;margin:0 0 32px;">Thank you for choosing ' . esc_html( $business ) . '. We\'d love to know how we did. How would you rate your experience?</p>
+        <p style="font-size:13px;color:#888;margin:0 0 12px;">1&#9733; = Poor &nbsp;&nbsp; 5&#9733; = Excellent</p>
         <p style="margin:0 0 32px;">' . $scores_html . '</p>
         <p style="font-size:13px;color:#aaa;margin:0;">Takes about 20 seconds. Your feedback directly improves our service.</p>
       </td></tr>
@@ -163,7 +164,7 @@ class SRP_Survey {
 
             $score = isset( $_POST['score'] ) ? (int) $_POST['score'] : null;
             if ( null !== $score && null === $survey->score ) {
-                $score = min( 10, max( 0, $score ) );
+                $score = min( self::MAX_SCORE, max( 1, $score ) );
                 SRP_DB::update_survey( $survey->id, array(
                     'score'        => $score,
                     'responded_at' => current_time( 'mysql' ),
@@ -187,7 +188,7 @@ class SRP_Survey {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $picked = isset( $_GET['pick'] ) ? (int) $_GET['pick'] : null;
         if ( null !== $picked ) {
-            $picked = min( 10, max( 0, $picked ) );
+            $picked = min( self::MAX_SCORE, max( 1, $picked ) );
         }
 
         $this->render_survey_page( $survey, $token, $picked );
@@ -206,22 +207,22 @@ class SRP_Survey {
 
         if ( null === $score || '' === $score ) {
             $scores_html = '';
-            for ( $i = 0; $i <= 10; $i++ ) {
+            for ( $i = 1; $i <= self::MAX_SCORE; $i++ ) {
                 $url = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
-                $bg  = $i >= self::THRESHOLD ? '#22c55e' : ( $i >= 7 ? '#f59e0b' : '#ef4444' );
-                $scores_html .= '<a href="' . esc_url( $url ) . '" style="display:inline-block;width:48px;height:48px;line-height:48px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '</a>';
+                $bg  = $i >= self::THRESHOLD ? '#22c55e' : ( $i >= 3 ? '#f59e0b' : '#ef4444' );
+                $scores_html .= '<a href="' . esc_url( $url ) . '" style="display:inline-block;width:52px;height:52px;line-height:52px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
             }
 
             $confirm_html = '';
             if ( null !== $picked ) {
-                $bg = $picked >= self::THRESHOLD ? '#22c55e' : ( $picked >= 7 ? '#f59e0b' : '#ef4444' );
+                $bg = $picked >= self::THRESHOLD ? '#22c55e' : ( $picked >= 3 ? '#f59e0b' : '#ef4444' );
                 $confirm_html = '
 <form method="post" action="' . esc_url( home_url( '/' ) ) . '" style="margin-top:24px;">
   <input type="hidden" name="srp_survey" value="' . esc_attr( $token ) . '">
   <input type="hidden" name="score" value="' . esc_attr( (string) $picked ) . '">
   <input type="hidden" name="_srp_nonce" value="' . esc_attr( wp_create_nonce( 'srp_score_' . $token ) ) . '">
-  <p style="color:#333;font-size:15px;margin:0 0 16px;">You picked <strong style="color:' . $bg . ';">' . esc_html( (string) $picked ) . ' / 10</strong>. Tap submit to confirm.</p>
-  <button type="submit" style="background:#1a1a2e;color:#fff;border:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">Submit my score</button>
+  <p style="color:#333;font-size:15px;margin:0 0 16px;">You picked <strong style="color:' . $bg . ';">' . esc_html( (string) $picked ) . ' / 5&#9733;</strong>. Tap submit to confirm.</p>
+  <button type="submit" style="background:#1a1a2e;color:#fff;border:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">Submit my rating</button>
 </form>';
             }
 
@@ -229,7 +230,7 @@ class SRP_Survey {
 <body style="margin:0;padding:40px 16px;background:#f4f4f4;font-family:system-ui,sans-serif;text-align:center;">
 <div style="max-width:540px;margin:0 auto;background:#fff;border-radius:12px;padding:40px;box-shadow:0 2px 16px rgba(0,0,0,.08);">
 <h1 style="font-size:22px;margin:0 0 8px;">How was your experience?</h1>
-<p style="color:#555;margin:0 0 32px;">0 = Not likely at all &nbsp;&nbsp; 10 = Extremely likely</p>
+<p style="color:#555;margin:0 0 32px;">1&#9733; = Poor &nbsp;&nbsp; 5&#9733; = Excellent</p>
 ' . $scores_html . $confirm_html . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 '</div></body></html>';
             return;
@@ -304,8 +305,8 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         $business    = get_bloginfo( 'name' );
         wp_mail(
             $owner_email,
-            "[{$business}] Private feedback received — score {$survey->score}/10",
-            "Customer: {$survey->customer_name} ({$survey->customer_email})\nScore: {$survey->score}/10\n\nFeedback:\n{$feedback}",
+            "[{$business}] Private feedback received — score {$survey->score}/5",
+            "Customer: {$survey->customer_name} ({$survey->customer_email})\nScore: {$survey->score}/5\n\nFeedback:\n{$feedback}",
             array( 'Content-Type: text/plain; charset=UTF-8' )
         );
 
