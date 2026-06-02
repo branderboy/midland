@@ -47,6 +47,11 @@ class Smart_Forms_Handler {
             }
         }
 
+        // reCAPTCHA v3 (only enforced when the form has both site + secret keys).
+        if ( ! $this->verify_recaptcha( $form ) ) {
+            wp_send_json_error( array( 'message' => esc_html__( 'Spam verification failed. Please reload the page and try again.', 'smart-forms-for-midland' ) ) );
+        }
+
         if ( ! empty( $db_fields ) ) {
             // DB-built form: required = whatever the field builder marked required.
             foreach ( $db_fields as $f ) {
@@ -225,6 +230,64 @@ class Smart_Forms_Handler {
             }
         }
         return '';
+    }
+
+    /**
+     * Verify a Google reCAPTCHA v3 token for the submitted form.
+     *
+     * Enforcement is opt-in per form and only kicks in when BOTH the site key
+     * and the secret are configured — a secret without a site key would block
+     * every submission because the frontend can't mint a token. Transport
+     * errors (Google outage) fail open so legitimate leads aren't dropped; a
+     * present-but-invalid token, or a score below the (filterable) 0.5
+     * threshold, fails closed.
+     *
+     * The form nonce is verified at the top of handle_submission().
+     *
+     * @param object|null $form Form row (settings_json holds the keys).
+     * @return bool True to allow the submission, false to reject it.
+     */
+    private function verify_recaptcha( $form ) {
+        if ( ! $form || empty( $form->settings_json ) ) {
+            return true;
+        }
+        $settings = json_decode( $form->settings_json, true );
+        if ( ! is_array( $settings ) ) {
+            return true;
+        }
+        $site   = isset( $settings['recaptcha_site'] ) ? trim( (string) $settings['recaptcha_site'] ) : '';
+        $secret = isset( $settings['recaptcha_secret'] ) ? trim( (string) $settings['recaptcha_secret'] ) : '';
+        if ( '' === $site || '' === $secret ) {
+            return true;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in handle_submission()
+        $token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ) : '';
+        if ( '' === $token ) {
+            return false;
+        }
+
+        $resp = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', array(
+            'timeout' => 10,
+            'body'    => array(
+                'secret'   => $secret,
+                'response' => $token,
+                'remoteip' => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
+            ),
+        ) );
+        if ( is_wp_error( $resp ) ) {
+            // Fail open — don't let a Google outage drop real leads.
+            return true;
+        }
+
+        $body = json_decode( (string) wp_remote_retrieve_body( $resp ), true );
+        if ( ! is_array( $body ) || empty( $body['success'] ) ) {
+            return false;
+        }
+        // v3 returns a 0.0–1.0 score; treat below the threshold as a bot.
+        $score     = isset( $body['score'] ) ? (float) $body['score'] : 1.0;
+        $threshold = (float) apply_filters( 'sfco_recaptcha_threshold', 0.5, $form );
+        return $score >= $threshold;
     }
 
     private function handle_photo_uploads() {

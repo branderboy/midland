@@ -58,10 +58,25 @@ class SFCO_Shortcode {
             SFCO_Database::increment_form_view( $id );
         }
 
+        // reCAPTCHA v3: when a site key is configured for this form, load
+        // Google's API for that key and stamp the key on the <form> so
+        // frontend.js can mint a token at submit time. Enforcement happens
+        // server-side only when the secret is also set.
+        $recaptcha_site = isset( $settings['recaptcha_site'] ) ? trim( (string) $settings['recaptcha_site'] ) : '';
+        if ( '' !== $recaptcha_site ) {
+            wp_enqueue_script(
+                'sfco-recaptcha',
+                'https://www.google.com/recaptcha/api.js?render=' . rawurlencode( $recaptcha_site ),
+                array(),
+                null,
+                true
+            );
+        }
+
         ob_start();
         ?>
         <div class="smart-forms-wrapper">
-            <form id="smart-forms-quote-form" class="smart-forms-form" enctype="multipart/form-data" data-form-id="<?php echo (int) $id; ?>">
+            <form id="smart-forms-quote-form" class="smart-forms-form" enctype="multipart/form-data" data-form-id="<?php echo (int) $id; ?>"<?php echo '' !== $recaptcha_site ? ' data-recaptcha-site="' . esc_attr( $recaptcha_site ) . '"' : ''; ?>>
                 <?php wp_nonce_field( 'sfco_submit', '_wpnonce', false ); ?>
                 <input type="hidden" name="form_id" value="<?php echo (int) $id; ?>">
                 <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true"><label>Leave this field blank<input type="text" name="sfco_hp_token" tabindex="-1" autocomplete="off"></label></div>
