@@ -26,6 +26,9 @@ jQuery(document).ready(function($) {
             formData.append('_wpnonce', nonce);
         }
 
+        // The actual AJAX submit, factored out so it can run either
+        // immediately or after a reCAPTCHA v3 token has been attached.
+        var sendRequest = function() {
         $.ajax({
             url: ajaxurl,
             type: 'POST',
@@ -87,5 +90,29 @@ jQuery(document).ready(function($) {
                 submitButton.prop('disabled', false).text(originalText);
             }
         });
+        };
+
+        // reCAPTCHA v3: if this form carries a site key, mint a fresh token and
+        // attach it as g-recaptcha-response before sending. Tokens are
+        // short-lived, so this is done at submit time. If the API never loaded
+        // (network/adblock), we still submit — the server decides whether to
+        // enforce based on whether a secret is configured.
+        var siteKey = form.attr('data-recaptcha-site') || '';
+        if (siteKey && typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
+            try {
+                grecaptcha.ready(function() {
+                    grecaptcha.execute(siteKey, { action: 'submit' }).then(function(token) {
+                        if (token) { formData.append('g-recaptcha-response', token); }
+                        sendRequest();
+                    }, function() {
+                        sendRequest();
+                    });
+                });
+            } catch (err) {
+                sendRequest();
+            }
+        } else {
+            sendRequest();
+        }
     });
 });

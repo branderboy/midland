@@ -32,14 +32,17 @@ class SFCO_Pro_Branding {
             wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
         }
 
-        $branding = array(
+        // Merge over the existing array so we don't wipe keys written by the
+        // unified Settings page (notably 'thank_you'), which only sets a subset.
+        $existing = (array) get_option( 'sfco_pro_branding', array() );
+        $branding = array_merge( $existing, array(
             'primary_color'   => isset( $_POST['brand_primary'] ) ? sanitize_hex_color( $_POST['brand_primary'] ) : '#0073aa',
             'button_color'    => isset( $_POST['brand_button'] ) ? sanitize_hex_color( $_POST['brand_button'] ) : '#0073aa',
             'text_color'      => isset( $_POST['brand_text'] ) ? sanitize_hex_color( $_POST['brand_text'] ) : '#333333',
             'logo_url'        => isset( $_POST['brand_logo'] ) ? esc_url_raw( wp_unslash( $_POST['brand_logo'] ) ) : '',
             'company_name'    => isset( $_POST['brand_company'] ) ? sanitize_text_field( wp_unslash( $_POST['brand_company'] ) ) : '',
             'custom_css'      => isset( $_POST['brand_css'] ) ? wp_strip_all_tags( wp_unslash( $_POST['brand_css'] ) ) : '',
-        );
+        ) );
 
         update_option( 'sfco_pro_branding', $branding );
         wp_safe_redirect( admin_url( 'admin.php?page=sfco-branding&saved=1' ) );

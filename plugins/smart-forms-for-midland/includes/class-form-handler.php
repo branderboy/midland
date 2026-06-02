@@ -47,6 +47,11 @@ class Smart_Forms_Handler {
             }
         }
 
+        // reCAPTCHA v3 (only enforced when the form has both site + secret keys).
+        if ( ! $this->verify_recaptcha( $form ) ) {
+            wp_send_json_error( array( 'message' => esc_html__( 'Spam verification failed. Please reload the page and try again.', 'smart-forms-for-midland' ) ) );
+        }
+
         if ( ! empty( $db_fields ) ) {
             // DB-built form: required = whatever the field builder marked required.
             foreach ( $db_fields as $f ) {
@@ -146,8 +151,16 @@ class Smart_Forms_Handler {
             wp_send_json_error( array( 'message' => esc_html__( 'Failed to save lead', 'smart-forms-for-midland' ) ) );
         }
         
-        // Send notification email
-        $this->send_notification_email( $lead_id, $lead_data );
+        // Send notification email. This is the legacy fallback notifier — when
+        // the Pro Notifications module is active and its admin notification is
+        // enabled, it sends a (richer) admin email off sfco_lead_submitted, so
+        // skip this one to avoid the operator getting two emails per lead.
+        $pro_notifs = class_exists( 'SFCO_Pro_Notifications' )
+            ? SFCO_Pro_Notifications::get_settings()
+            : array();
+        if ( empty( $pro_notifs['admin_enabled'] ) ) {
+            $this->send_notification_email( $lead_id, $lead_data );
+        }
 
         // Where to send the visitor after submit (e.g. Calendly). Uses the
         // form's redirect URL if confirmation is set to "redirect", otherwise
@@ -186,10 +199,17 @@ class Smart_Forms_Handler {
             ),
         ) );
         } catch ( \Throwable $e ) {
-            // Surface the real fatal in the on-screen form message instead of a
-            // bare "An error occurred", so the cause is visible without DevTools.
+            // Log the real fatal server-side for debugging, but never leak file
+            // paths, line numbers, or DB internals to the (unauthenticated)
+            // visitor — this handler also serves wp_ajax_nopriv.
+            error_log( sprintf(
+                'Smart Forms submission error: %s @ %s:%d',
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ) );
             wp_send_json_error( array(
-                'message' => 'Error: ' . $e->getMessage() . ' @ ' . basename( $e->getFile() ) . ':' . $e->getLine(),
+                'message' => esc_html__( 'Something went wrong submitting the form. Please try again.', 'smart-forms-for-midland' ),
             ) );
         }
     }
@@ -210,6 +230,64 @@ class Smart_Forms_Handler {
             }
         }
         return '';
+    }
+
+    /**
+     * Verify a Google reCAPTCHA v3 token for the submitted form.
+     *
+     * Enforcement is opt-in per form and only kicks in when BOTH the site key
+     * and the secret are configured — a secret without a site key would block
+     * every submission because the frontend can't mint a token. Transport
+     * errors (Google outage) fail open so legitimate leads aren't dropped; a
+     * present-but-invalid token, or a score below the (filterable) 0.5
+     * threshold, fails closed.
+     *
+     * The form nonce is verified at the top of handle_submission().
+     *
+     * @param object|null $form Form row (settings_json holds the keys).
+     * @return bool True to allow the submission, false to reject it.
+     */
+    private function verify_recaptcha( $form ) {
+        if ( ! $form || empty( $form->settings_json ) ) {
+            return true;
+        }
+        $settings = json_decode( $form->settings_json, true );
+        if ( ! is_array( $settings ) ) {
+            return true;
+        }
+        $site   = isset( $settings['recaptcha_site'] ) ? trim( (string) $settings['recaptcha_site'] ) : '';
+        $secret = isset( $settings['recaptcha_secret'] ) ? trim( (string) $settings['recaptcha_secret'] ) : '';
+        if ( '' === $site || '' === $secret ) {
+            return true;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in handle_submission()
+        $token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ) : '';
+        if ( '' === $token ) {
+            return false;
+        }
+
+        $resp = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', array(
+            'timeout' => 10,
+            'body'    => array(
+                'secret'   => $secret,
+                'response' => $token,
+                'remoteip' => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
+            ),
+        ) );
+        if ( is_wp_error( $resp ) ) {
+            // Fail open — don't let a Google outage drop real leads.
+            return true;
+        }
+
+        $body = json_decode( (string) wp_remote_retrieve_body( $resp ), true );
+        if ( ! is_array( $body ) || empty( $body['success'] ) ) {
+            return false;
+        }
+        // v3 returns a 0.0–1.0 score; treat below the threshold as a bot.
+        $score     = isset( $body['score'] ) ? (float) $body['score'] : 1.0;
+        $threshold = (float) apply_filters( 'sfco_recaptcha_threshold', 0.5, $form );
+        return $score >= $threshold;
     }
 
     private function handle_photo_uploads() {
@@ -270,10 +348,12 @@ class Smart_Forms_Handler {
                 return new WP_Error( 'invalid_file_type', esc_html__( 'Invalid file type', 'smart-forms-for-midland' ) );
             }
             
-            // Only allow images
-            $allowed_types = array( 'jpg', 'jpeg', 'png', 'gif' );
+            // Allow images (project photos) and common résumé/document formats —
+            // the job-application form posts a PDF/DOC/DOCX résumé through this
+            // same photos[] field, so an images-only filter silently dropped them.
+            $allowed_types = array( 'jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx' );
             if ( ! in_array( $filetype['ext'], $allowed_types, true ) ) {
-                return new WP_Error( 'invalid_image', esc_html__( 'Only JPG, PNG, and GIF images allowed', 'smart-forms-for-midland' ) );
+                return new WP_Error( 'invalid_file', esc_html__( 'Only JPG, PNG, GIF images and PDF/DOC/DOCX documents are allowed', 'smart-forms-for-midland' ) );
             }
             
             $file['type'] = $filetype['type'];

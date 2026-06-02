@@ -203,7 +203,8 @@ class SCRM_Pro_Vapi {
                 <table class="form-table">
                     <tr>
                         <th><?php esc_html_e( 'Enable', 'smart-crm-pro' ); ?></th>
-                        <td><label><input type="checkbox" name="vapi_enabled" value="1" <?php checked( $enabled, 1 ); ?>> <?php esc_html_e( 'Fire an outbound Vapi call on every new lead', 'smart-crm-pro' ); ?></label></td>
+                        <td><label><input type="checkbox" name="vapi_enabled" value="1" <?php checked( $enabled, 1 ); ?>> <?php esc_html_e( 'Fire an outbound Vapi call on new residential leads that requested a call back', 'smart-crm-pro' ); ?></label>
+                            <p class="description"><?php esc_html_e( 'Calls fire only for residential leads whose intent is "request a call", and require an Assistant ID and a Phone Number ID below.', 'smart-crm-pro' ); ?></p></td>
                     </tr>
                     <tr>
                         <th><label for="vapi_api_key"><?php esc_html_e( 'Vapi private API key', 'smart-crm-pro' ); ?></label></th>

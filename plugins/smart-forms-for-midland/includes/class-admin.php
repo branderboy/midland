@@ -387,7 +387,12 @@ class SFCO_Admin {
             $settings['submit_text']      = sanitize_text_field( wp_unslash( $_POST['submit_text'] ?? '' ) );
             $settings['submit_css_class'] = sanitize_html_class( (string) wp_unslash( $_POST['submit_css_class'] ?? '' ) );
             $settings['recaptcha_site']   = sanitize_text_field( wp_unslash( $_POST['recaptcha_site'] ?? '' ) );
-            $settings['recaptcha_secret'] = sanitize_text_field( wp_unslash( $_POST['recaptcha_secret'] ?? '' ) );
+            // Secret is not echoed back into the field, so a blank value means
+            // "keep the stored secret" rather than "clear it".
+            $posted_secret = sanitize_text_field( wp_unslash( $_POST['recaptcha_secret'] ?? '' ) );
+            if ( '' !== $posted_secret ) {
+                $settings['recaptcha_secret'] = $posted_secret;
+            }
             SFCO_Database::update_form( $form_id, array(
                 'title'         => sanitize_text_field( wp_unslash( $_POST['title'] ?? $form->title ) ),
                 'status'        => isset( $_POST['active'] ) ? 'active' : 'inactive',
@@ -641,11 +646,12 @@ class SFCO_Admin {
                         <tr>
                             <th><label for="recaptcha_site"><?php esc_html_e( 'reCAPTCHA v3 site key', 'smart-forms-for-midland' ); ?></label></th>
                             <td><input type="text" name="recaptcha_site" id="recaptcha_site" class="regular-text" value="<?php echo esc_attr( $settings['recaptcha_site'] ?? '' ); ?>">
-                                <p class="description"><?php esc_html_e( 'google.com/recaptcha/admin → create a v3 key for midlandfloors.com. Honeypot above is always on regardless.', 'smart-forms-for-midland' ); ?></p></td>
+                                <p class="description"><?php esc_html_e( 'google.com/recaptcha/admin → create a v3 key for midlandfloors.com. Enforcement is active only when BOTH the site key and secret are filled in. The always-on honeypot above works independently.', 'smart-forms-for-midland' ); ?></p></td>
                         </tr>
                         <tr>
                             <th><label for="recaptcha_secret"><?php esc_html_e( 'reCAPTCHA v3 secret', 'smart-forms-for-midland' ); ?></label></th>
-                            <td><input type="password" name="recaptcha_secret" id="recaptcha_secret" class="regular-text" value="<?php echo esc_attr( $settings['recaptcha_secret'] ?? '' ); ?>" autocomplete="off"></td>
+                            <td><input type="password" name="recaptcha_secret" id="recaptcha_secret" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) ( $settings['recaptcha_secret'] ?? '' ) ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : '' ); ?>">
+                                <p class="description"><?php esc_html_e( 'Submissions scoring below 0.5 are rejected as bots. Filter sfco_recaptcha_threshold to tune.', 'smart-forms-for-midland' ); ?></p></td>
                         </tr>
                     </table>
 
@@ -1060,11 +1066,23 @@ class SFCO_Admin {
         header( 'Content-Type: text/csv; charset=UTF-8' );
         header( 'Content-Disposition: attachment; filename=smart-forms-entries-' . gmdate( 'Y-m-d' ) . '.csv' );
 
+        // Guard against CSV formula injection: a stored value beginning with
+        // = + - @ (or a leading tab/CR) is executed as a formula when the file
+        // is opened in Excel / Google Sheets. Prefix such cells with a single
+        // quote so they're treated as text.
+        $escape_cell = static function ( $value ) {
+            $value = (string) $value;
+            if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+                $value = "'" . $value;
+            }
+            return $value;
+        };
+
         $out = fopen( 'php://output', 'w' );
         if ( $rows ) {
             fputcsv( $out, array_keys( $rows[0] ) );
             foreach ( $rows as $r ) {
-                fputcsv( $out, $r );
+                fputcsv( $out, array_map( $escape_cell, $r ) );
             }
         } else {
             fputcsv( $out, array( 'no entries yet' ) );

@@ -167,7 +167,10 @@ class SCRM_Pro_Smart_Forms_Bridge {
             // picks them up immediately. The job-booked / job-completed
             // tags will be applied later by their respective lifecycle
             // hooks; this is just the entry point of the funnel.
-            $ac = new SCRM_Pro_ActiveCampaign();
+            // Use the shared singleton — `new` here would re-run the
+            // constructor and register every lifecycle hook a second time,
+            // causing duplicate AC syncs / deals / tasks on later events.
+            $ac = SCRM_Pro_ActiveCampaign::get_instance();
             $ac->sync_segment( $ac_lead, 'new_lead' );
         }
     }
