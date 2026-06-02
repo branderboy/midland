@@ -80,7 +80,8 @@ class CTM_Cron {
      * occurrence of the time; weekly = next Monday at that time.
      */
     private static function first_run( $settings, $freq ) {
-        $now  = current_time( 'timestamp' );
+        // WP-local "now" without the discouraged current_time('timestamp') call.
+        $now  = time() + ( (int) ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
         $time = preg_match( '/^([01]?\d|2[0-3]):([0-5]\d)$/', (string) ( $settings['send_time'] ?? '08:00' ) )
             ? $settings['send_time']
             : '08:00';

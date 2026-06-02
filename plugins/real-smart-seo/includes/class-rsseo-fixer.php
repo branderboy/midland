@@ -33,8 +33,7 @@ class RSSEO_Fixer {
 
         RSSEO_Database::apply_fix( $fix_id );
 
-        // Update report fix count.
-        global $wpdb;
+        // Update report fix count. ($wpdb already declared global above.)
         $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             "UPDATE {$wpdb->prefix}rsseo_reports SET fixes_applied = fixes_applied + 1 WHERE id = %d",
             $fix->report_id

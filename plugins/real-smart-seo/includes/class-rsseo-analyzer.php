@@ -262,13 +262,13 @@ INSTRUCTIONS;
 
             // Numbered list item: "1. text"
             if ( preg_match( '/^\d+\.\s+(.+)/', $line, $m ) ) {
-                $html .= '<p class="rsseo-list-item">' . wp_kses_post( self::inline_markdown( $m[1] ) ) . '</p>' . "\n";
+                $html .= '<p class="rsseo-list-item">' . self::inline_markdown( $m[1] ) . '</p>' . "\n";
                 continue;
             }
 
             // Bullet list item.
             if ( preg_match( '/^[-*]\s+(.+)/', $line, $m ) ) {
-                $html .= '<p class="rsseo-bullet-item">&bull; ' . wp_kses_post( self::inline_markdown( $m[1] ) ) . '</p>' . "\n";
+                $html .= '<p class="rsseo-bullet-item">&bull; ' . self::inline_markdown( $m[1] ) . '</p>' . "\n";
                 continue;
             }
 
@@ -279,7 +279,7 @@ INSTRUCTIONS;
             }
 
             // Default: paragraph with inline markdown.
-            $html .= '<p>' . wp_kses_post( self::inline_markdown( $line ) ) . '</p>' . "\n";
+            $html .= '<p>' . self::inline_markdown( $line ) . '</p>' . "\n";
         }
 
         return $html;

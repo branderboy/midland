@@ -154,8 +154,17 @@ class RSSEO_Database {
     public static function prune_old_scans( $keep = 10 ) {
         global $wpdb;
         $keep = max( 1, (int) $keep );
+        // Everything except the newest $keep scans. The derived table is
+        // required so MySQL accepts LIMIT inside the NOT IN subquery.
         $stale_ids = $wpdb->get_col( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            "SELECT id FROM {$wpdb->prefix}rsseo_scans ORDER BY created_at DESC, id DESC LIMIT %d, 1000000",
+            "SELECT id FROM {$wpdb->prefix}rsseo_scans
+             WHERE id NOT IN (
+                 SELECT id FROM (
+                     SELECT id FROM {$wpdb->prefix}rsseo_scans
+                     ORDER BY created_at DESC, id DESC
+                     LIMIT %d
+                 ) keep_ids
+             )",
             $keep
         ) );
         if ( empty( $stale_ids ) ) return 0;
