@@ -107,20 +107,19 @@ class CTM_Emailer {
             __( 'Nonprofit idea', 'content-traffic-maker' ) => $b( 'nonprofit_backlink' ),
         ) );
 
-        // YouTube SEO Video (commercial + residential).
+        // YouTube SEO Video (commercial + residential carpet/installation).
         $html .= $section( '&#9654;&#65039;', __( 'YouTube SEO Video', 'content-traffic-maker' ), array(
-            __( 'Commercial', 'content-traffic-maker' )  => $b( 'youtube_idea' ),
-            __( 'Residential', 'content-traffic-maker' ) => $b( 'youtube_residential' ),
+            __( 'Commercial', 'content-traffic-maker' )                       => $b( 'youtube_idea' ),
+            __( 'Residential (carpet / installation)', 'content-traffic-maker' ) => $b( 'youtube_residential' ),
         ) );
 
-        // TikTok — SEO, viral, and what's trending right now.
+        // TikTok — SEO + viral.
         $html .= $section( '&#127909;', __( 'TikTok Videos', 'content-traffic-maker' ), array(
-            __( 'SEO video', 'content-traffic-maker' )         => $b( 'tiktok_seo' ),
-            __( 'Viral video', 'content-traffic-maker' )       => $b( 'tiktok_viral' ),
-            __( 'Trending right now', 'content-traffic-maker' ) => $b( 'trending_tiktok_idea' ),
+            __( 'SEO video', 'content-traffic-maker' )   => $b( 'tiktok_seo' ),
+            __( 'Viral video', 'content-traffic-maker' ) => $b( 'tiktok_viral' ),
         ) );
 
-        // Residential Offer Video.
+        // Residential Offer Video (carpet cleaning / installation).
         $html .= $section( '&#127968;', __( 'Residential Offer Video', 'content-traffic-maker' ), array(
             '' => $b( 'residential_offer_video' ),
         ) );

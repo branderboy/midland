@@ -115,7 +115,7 @@ class CTM_DB {
             'target_city'    => 'Washington',
             'target_state'   => 'DC',
             'target_audience'=> 'commercial property managers, facility managers, realtors, and homeowners',
-            'main_service'   => 'commercial & residential floor cleaning, strip & wax, VCT, tile & grout, carpet extraction',
+            'main_service'   => 'commercial floor care (strip & wax, VCT, tile & grout) plus residential carpet cleaning and floor installation',
             'website_url'    => home_url(),
             'recipient'      => get_option( 'admin_email' ),
             'frequency'      => 'weekly',

@@ -229,13 +229,12 @@ class CTM_Admin {
             __( 'Outreach angle', 'content-traffic-maker' )      => $brief['outreach_angle'] ?? '',
             __( '.gov backlink', 'content-traffic-maker' )       => $brief['gov_backlink'] ?? '',
             __( 'Nonprofit backlink', 'content-traffic-maker' )  => $brief['nonprofit_backlink'] ?? '',
-            __( 'YouTube SEO (commercial)', 'content-traffic-maker' )  => $brief['youtube_idea'] ?? '',
-            __( 'YouTube SEO (residential)', 'content-traffic-maker' ) => $brief['youtube_residential'] ?? '',
-            __( 'TikTok SEO video', 'content-traffic-maker' )          => $brief['tiktok_seo'] ?? '',
-            __( 'Viral TikTok video', 'content-traffic-maker' )        => $brief['tiktok_viral'] ?? '',
-            __( 'Trending on TikTok now', 'content-traffic-maker' )    => $brief['trending_tiktok_idea'] ?? '',
-            __( 'Residential offer video', 'content-traffic-maker' )   => $brief['residential_offer_video'] ?? '',
-            __( 'CTA', 'content-traffic-maker' )                       => $brief['cta'] ?? '',
+            __( 'YouTube SEO (commercial)', 'content-traffic-maker' )            => $brief['youtube_idea'] ?? '',
+            __( 'YouTube SEO (residential carpet/install)', 'content-traffic-maker' ) => $brief['youtube_residential'] ?? '',
+            __( 'TikTok SEO video', 'content-traffic-maker' )                    => $brief['tiktok_seo'] ?? '',
+            __( 'Viral TikTok video', 'content-traffic-maker' )                  => $brief['tiktok_viral'] ?? '',
+            __( 'Residential carpet/install offer video', 'content-traffic-maker' ) => $brief['residential_offer_video'] ?? '',
+            __( 'CTA', 'content-traffic-maker' )                                 => $brief['cta'] ?? '',
         );
         ?>
         <div class="ctm-card ctm-brief">
