@@ -83,6 +83,30 @@ class RSSEO_Pro_Plugin {
         $this->includes();
         $this->init_classes();
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_brand_layout' ) );
+        // Ensure pro tables exist/upgrade even when the plugin is updated in
+        // place (git/FTP) without a deactivate→reactivate, which is how this
+        // plugin is deployed. Without this, Geo-Grid / AI-Rank / pro-scan
+        // tables silently never get created and those features render blank.
+        add_action( 'admin_init', array( $this, 'maybe_upgrade_db' ) );
+    }
+
+    /**
+     * Run create_tables() (dbDelta, idempotent) whenever the stored DB version
+     * differs from the plugin version. Cheap no-op once versions match.
+     */
+    public function maybe_upgrade_db() {
+        if ( get_option( 'rsseo_pro_db_version' ) === RSSEO_PRO_VERSION ) {
+            return;
+        }
+        if ( class_exists( 'RSSEO_Pro_Database' ) ) { RSSEO_Pro_Database::create_tables(); }
+        if ( class_exists( 'RSSEO_Pro_Geogrid' ) )  { RSSEO_Pro_Geogrid::create_tables(); }
+        if ( class_exists( 'RSSEO_Pro_AI_Rank' ) )  { RSSEO_Pro_AI_Rank::create_tables(); }
+        // Flush rewrite rules here (admin_init) rather than in activate(): by
+        // now the programmatic mfc_location CPT has registered on init, so its
+        // permalinks resolve instead of 404ing. activate() flushes too early
+        // (the CPT file isn't loaded during activation).
+        flush_rewrite_rules();
+        update_option( 'rsseo_pro_db_version', RSSEO_PRO_VERSION );
     }
 
     /**
