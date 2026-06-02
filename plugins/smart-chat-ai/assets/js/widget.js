@@ -1,17 +1,14 @@
 jQuery(document).ready(function($) {
     'use strict';
 
-    // Persist the session so conversation history survives refreshes and the
-    // admin Conversations screen shows one coherent thread per visitor.
-    var sessionId;
+    // Browser-local session token (per tab). Persisted in sessionStorage and
+    // sent on every request; when empty the server mints one and returns it,
+    // which we then store and reuse.
+    var sessionToken;
     try {
-        sessionId = window.localStorage.getItem('scai_session_id');
-        if (!sessionId) {
-            sessionId = 'sc_' + Math.random().toString(36).substr(2, 12) + '_' + Date.now();
-            window.localStorage.setItem('scai_session_id', sessionId);
-        }
+        sessionToken = window.sessionStorage.getItem('scai_session_id') || '';
     } catch (e) {
-        sessionId = 'sc_' + Math.random().toString(36).substr(2, 12) + '_' + Date.now();
+        sessionToken = '';
     }
     var $widget = $('#smart-chat-widget');
     var $bubble = $('#smart-chat-bubble');
@@ -87,7 +84,7 @@ jQuery(document).ready(function($) {
     }
 
     // Enlarge / shrink the chat window.
-    $('#smart-chat-expand').on('click', function() {
+    $('#smart-chat-expand-lg, #smart-chat-expand-sm').on('click', function() {
         $window.toggleClass('expanded');
     });
 
@@ -120,9 +117,14 @@ jQuery(document).ready(function($) {
             action: 'scai_send_message',
             nonce: scaiConfig.nonce,
             message: msg,
-            session_id: sessionId
+            session_token: sessionToken
         }, function(res) {
             if (res.success) {
+                // Store/refresh the server-issued session token.
+                if (res.data && res.data.session_id) {
+                    sessionToken = res.data.session_id;
+                    try { window.sessionStorage.setItem('scai_session_id', sessionToken); } catch (e) {}
+                }
                 appendMsg('ai', res.data.message);
 
                 // Show the booking link only when the AI's own reply points the
