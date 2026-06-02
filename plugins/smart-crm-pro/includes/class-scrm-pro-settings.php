@@ -211,6 +211,7 @@ class SCRM_Pro_Settings {
         check_ajax_referer( 'scrm_test_connection' );
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+            return;
         }
         $which = isset( $_POST['integration'] ) ? sanitize_key( wp_unslash( $_POST['integration'] ) ) : '';
 

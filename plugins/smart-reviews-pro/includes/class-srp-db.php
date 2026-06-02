@@ -36,7 +36,7 @@ class SRP_DB {
 
     public static function insert_survey( $data ) {
         global $wpdb;
-        $data['created_at'] = current_time( 'mysql' );
+        $data['created_at'] = current_time( 'mysql', true );
         $wpdb->insert( $wpdb->prefix . 'srp_surveys', $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         return $wpdb->insert_id;
     }
@@ -117,7 +117,11 @@ class SRP_DB {
         }
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared
-        return $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}srp_surveys WHERE {$where} ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}" );
+        return $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}srp_surveys WHERE {$where} ORDER BY created_at DESC LIMIT %d OFFSET %d",
+            $limit,
+            $offset
+        ) );
     }
 
     /**

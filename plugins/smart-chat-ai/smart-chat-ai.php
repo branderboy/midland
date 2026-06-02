@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.21
+ * Version: 1.9.29
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.21');
+define('SCAI_VERSION', '1.9.29');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -300,7 +300,6 @@ class SCAI_Plugin {
             'business_type',
             'ai_personality',
             'preprompt',
-            'sf_form_id',
         );
 
         foreach ($settings as $setting) {
@@ -320,6 +319,13 @@ class SCAI_Plugin {
 
         // Calendly / booking link, pasted directly in Settings.
         register_setting( 'scai_settings', 'smart_chat_booking_url', array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
+
+        // Resend email delivery for lead notifications.
+        register_setting( 'scai_settings', 'smart_chat_resend_api_key', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+        register_setting( 'scai_settings', 'smart_chat_resend_from', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+
+        // Suggested starter questions (one per line) shown when the chat opens.
+        register_setting( 'scai_settings', 'smart_chat_suggestions', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
     }
     
     /**
@@ -380,22 +386,28 @@ class SCAI_Plugin {
         
         $wa_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'smart_chat_whatsapp_number', '' ) );
 
-        // Booking link: use the link pasted in Settings first. If that's empty,
-        // fall back to the embedded Smart Form's per-form booking_url so older
-        // setups keep working.
+        // Booking link comes from the Booking / Calendly field in Settings.
+        // If that's empty, fall back to the Smart Forms Calendly URL (the
+        // Calendar settings page), so the link works wherever it's configured.
+        // This reads an option only — no form is embedded.
         $booking_url = (string) get_option( 'smart_chat_booking_url', '' );
         if ( '' === $booking_url ) {
-            $sf_form_id = (int) get_option( 'smart_chat_sf_form_id', 1 );
-            if ( $sf_form_id && class_exists( 'SFCO_Database' ) ) {
-                $sf_form = SFCO_Database::get_form( $sf_form_id );
-                if ( $sf_form && ! empty( $sf_form->settings_json ) ) {
-                    $sf_settings = json_decode( $sf_form->settings_json, true );
-                    if ( is_array( $sf_settings ) && ! empty( $sf_settings['booking_url'] ) ) {
-                        $booking_url = $sf_settings['booking_url'];
-                    }
+            if ( class_exists( 'SFCO_Pro_Calendly' ) && method_exists( 'SFCO_Pro_Calendly', 'get_booking_url' ) ) {
+                $booking_url = (string) SFCO_Pro_Calendly::get_booking_url();
+            }
+            if ( '' === $booking_url ) {
+                // Direct option read in case the class isn't loaded on the front end.
+                if ( get_option( 'sfco_pro_calendly_enabled', 0 ) ) {
+                    $booking_url = (string) get_option( 'sfco_pro_calendly_url', '' );
                 }
             }
         }
+
+        // Suggested starter questions, one per line in Settings. Defaults give
+        // useful shortcuts out of the box.
+        $raw_suggestions = (string) get_option( 'smart_chat_suggestions', "Do you clean carpet?\nCan I get a quote?\nWhat areas do you serve?\nI want to schedule a visit" );
+        $suggestions = array_values( array_filter( array_map( 'trim', explode( "\n", $raw_suggestions ) ) ) );
+        $suggestions = array_slice( $suggestions, 0, 6 );
 
         wp_localize_script('scai-widget', 'scaiConfig', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
@@ -407,9 +419,8 @@ class SCAI_Plugin {
             'businessName' => get_option('smart_chat_business_name', get_bloginfo('name')),
             'whatsappNumber' => $wa_number,
             'whatsappGreeting' => get_option( 'smart_chat_whatsapp_greeting', "Hi! I'd like to ask about your services." ),
-            // From the embedded form's per-form Booking link. When present,
-            // "Schedule a Visit" / booking intent shows a "Pick a time" button.
             'bookingUrl' => esc_url_raw( $booking_url ),
+            'suggestions' => $suggestions,
         ));
     }
     
@@ -448,16 +459,36 @@ class SCAI_Plugin {
         wp_send_json_success( array( 'message' => 'Connected. Reply: ' . $res['message'] ) );
     }
 
+    /**
+     * Build a stable session id from the visitor's IP so each IP has exactly
+     * one ongoing conversation. Hashed with the site's auth salt so the raw IP
+     * isn't used directly as a key.
+     */
+    private function session_id_for_ip() {
+        $ip = '';
+        if ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+            $ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+        }
+        if ( '' === $ip ) {
+            $ip = 'unknown';
+        }
+        $salt = function_exists( 'wp_salt' ) ? wp_salt( 'auth' ) : 'scai';
+        return 'ip_' . substr( hash( 'sha256', $ip . '|' . $salt ), 0, 32 );
+    }
+
     public function ajax_send_message() {
         check_ajax_referer('scai_widget', 'nonce');
-        
-        $message    = isset( $_POST['message'] )    ? sanitize_text_field( wp_unslash( $_POST['message'] ) )    : '';
-        $session_id = isset( $_POST['session_id'] ) ? sanitize_text_field( wp_unslash( $_POST['session_id'] ) ) : '';
 
-        if ( '' === $message || '' === $session_id ) {
-            wp_send_json_error( array( 'message' => __( 'Missing message or session.', 'smart-chat-ai' ) ) );
+        $message = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
+
+        if ( '' === $message ) {
+            wp_send_json_error( array( 'message' => __( 'Missing message.', 'smart-chat-ai' ) ) );
         }
-        
+
+        // One conversation per IP address. We derive the session from the
+        // visitor's IP (hashed) instead of a per-browser id, so refreshes,
+        // new tabs, and return visits all land in the same thread.
+        $session_id = $this->session_id_for_ip();
         global $wpdb;
         $table = $wpdb->prefix . 'smart_chat_conversations';
 
@@ -541,16 +572,81 @@ class SCAI_Plugin {
         $ai   = new SCAI_AI_Handler();
         $info = $ai->extract_lead_info( $session_id );
         if ( ! is_array( $info ) ) {
-            return;
+            $info = array();
         }
 
         $name  = sanitize_text_field( (string) ( $info['name'] ?? '' ) );
         $email = sanitize_email( (string) ( $info['email'] ?? '' ) );
         $phone = sanitize_text_field( (string) ( $info['phone'] ?? '' ) );
-        if ( '' === $email && '' === $phone ) {
-            return; // no way to reach them yet
+
+        // Anti-hallucination: the AI sometimes invents a plausible email or
+        // phone the visitor never typed. Only keep a value if it actually
+        // appears in the visitor's own messages. Compare digits-only for phone.
+        if ( '' !== $email && false === stripos( $text, $email ) ) {
+            $email = '';
         }
+        if ( '' !== $phone ) {
+            $phone_digits = preg_replace( '/\D+/', '', $phone );
+            $text_digits  = preg_replace( '/\D+/', '', $text );
+            if ( strlen( $phone_digits ) < 7 || false === strpos( $text_digits, $phone_digits ) ) {
+                $phone = '';
+            }
+        }
+
+        // Fallback: if the AI didn't return a usable email/phone but one is
+        // clearly present in the visitor text, pull it straight out. The
+        // contact info is right there, so we don't depend on the AI to find it.
+        if ( '' === $email && preg_match( '/[^\s@]+@[^\s@]+\.[^\s@]+/', $text, $em ) ) {
+            $email = sanitize_email( $em[0] );
+        }
+        if ( '' === $phone && preg_match( '/\(?\+?\d[\d\s().\-]{6,}\d/', $text, $ph ) ) {
+            $cand = preg_replace( '/\D+/', '', $ph[0] );
+            if ( strlen( $cand ) >= 7 && strlen( $cand ) <= 15 ) {
+                $phone = sanitize_text_field( trim( $ph[0] ) );
+            }
+        }
+
+        if ( '' === $email && '' === $phone ) {
+            return; // nothing the visitor actually provided
+        }
+
+        // Don't let an invented name through: keep the AI's name only when it
+        // appears in the visitor's text; otherwise fall back to a neutral label.
+        if ( '' !== $name && false === stripos( $text, $name ) ) {
+            $name = '';
+        }
+        if ( '' === $name ) {
+            $name = $email ? strstr( $email, '@', true ) : __( 'Website visitor', 'smart-chat-ai' );
+        }
+
         $topic = sanitize_text_field( (string) ( $info['service_type'] ?? ( $info['message'] ?? '' ) ) );
+
+        // Classify the visitor's INTENT from what they said. The chat can only
+        // know they signaled intent, not that anything was actually booked, so
+        // these are intent slugs (the CRM owns the real "booked" tag, which
+        // fires from Calendly/ServiceM8 events, not from chat).
+        $intent = '';
+        if ( preg_match( '/\b(schedul|book|appointment|set up a time|pick a time|come (out|by)|visit|walk[- ]?through)\b/i', $text ) ) {
+            $intent = 'booking';
+        } elseif ( preg_match( '/\b(quote|estimate|how much|pricing|price|cost)\b/i', $text ) ) {
+            $intent = 'quote';
+        } elseif ( preg_match( '/\b(call me|call back|callback|reach me|get in touch|follow up|have someone)\b/i', $text ) ) {
+            $intent = 'callback';
+        }
+
+        // Human-readable label on the lead row for the team to skim.
+        if ( 'booking' === $intent ) {
+            $label = 'Sought to book appointment';
+        } elseif ( 'quote' === $intent ) {
+            $label = 'Requested a quote';
+        } elseif ( 'callback' === $intent ) {
+            $label = 'Requested a callback';
+        } else {
+            $label = '';
+        }
+        if ( '' !== $label ) {
+            $topic = $label . ( '' !== $topic ? ', ' . $topic : '' );
+        }
 
         // Append a hidden session marker so we can tell this session already
         // produced a lead without relying on the conversations lead_id column.
@@ -564,6 +660,7 @@ class SCAI_Plugin {
             'message'      => $message_with_marker,
             'service_type' => $topic,
             'session_id'   => $session_id,
+            'intent'       => $intent, // booking | quote | callback | '' (for the CRM bridge)
         ) );
 
         if ( $lead_id && get_option( 'smart_chat_enable_email_notifications', true ) ) {
@@ -582,17 +679,93 @@ class SCAI_Plugin {
             return;
         }
 
-        $to      = get_option( 'smart_chat_lead_email', get_option( 'admin_email' ) );
-        $subject = sprintf( __( 'New chat lead: %s', 'smart-chat-ai' ), $lead->name ? $lead->name : __( 'Website visitor', 'smart-chat-ai' ) );
+        // Recipient: the notification email set in Settings, falling back to the
+        // support inbox, then the site admin. wp_mail is intercepted by the
+        // Smart Forms Resend integration (pre_wp_mail) when Resend is enabled,
+        // so this is delivered through Resend without any extra code here.
+        $to = get_option( 'smart_chat_lead_email', '' );
+        if ( '' === $to || ! is_email( $to ) ) {
+            $to = 'support@midlandfloors.com';
+        }
+
+        $clean_topic = trim( preg_replace( '/\s*\[sid:[^\]]+\]/', '', (string) $lead->message ) );
+        $name = $lead->name ? $lead->name : __( 'Website visitor', 'smart-chat-ai' );
+
+        $subject = sprintf( __( 'New chat lead: %s', 'smart-chat-ai' ), $name );
 
         $message  = __( 'New lead captured from the website chat:', 'smart-chat-ai' ) . "\n\n";
-        $message .= __( 'Name:', 'smart-chat-ai' ) . ' ' . $lead->name . "\n";
-        $message .= __( 'Email:', 'smart-chat-ai' ) . ' ' . $lead->email . "\n";
-        $message .= __( 'Phone:', 'smart-chat-ai' ) . ' ' . $lead->phone . "\n";
-        $message .= __( 'About:', 'smart-chat-ai' ) . ' ' . preg_replace( '/\s*\[sid:[^\]]+\]/', '', $lead->message ) . "\n\n";
+        $message .= __( 'Name:', 'smart-chat-ai' )  . ' ' . $name . "\n";
+        $message .= __( 'Email:', 'smart-chat-ai' ) . ' ' . ( $lead->email ? $lead->email : '-' ) . "\n";
+        $message .= __( 'Phone:', 'smart-chat-ai' ) . ' ' . ( $lead->phone ? $lead->phone : '-' ) . "\n";
+        $message .= __( 'About:', 'smart-chat-ai' ) . ' ' . ( '' !== $clean_topic ? $clean_topic : '-' ) . "\n\n";
         $message .= __( 'See the full conversation:', 'smart-chat-ai' ) . ' ' . admin_url( 'admin.php?page=smart-chat-conversations' );
 
-        wp_mail( $to, $subject, $message );
+        // Reply-To set to the visitor's email so the team can reply straight
+        // from the inbox.
+        $reply_to = '';
+        if ( $lead->email && is_email( $lead->email ) ) {
+            $reply_to = $name . ' <' . $lead->email . '>';
+        }
+
+        // If a Resend API key is configured here, send directly through Resend.
+        // Otherwise fall back to wp_mail (which a site-wide mailer may handle).
+        $resend_key = trim( (string) get_option( 'smart_chat_resend_api_key', '' ) );
+        if ( '' !== $resend_key ) {
+            $sent = $this->send_via_resend( $resend_key, $to, $subject, $message, $reply_to );
+            if ( $sent ) {
+                return;
+            }
+            // If Resend failed, fall through to wp_mail as a backup.
+        }
+
+        $headers = array();
+        if ( '' !== $reply_to ) {
+            $headers[] = 'Reply-To: ' . $reply_to;
+        }
+        wp_mail( $to, $subject, $message, $headers );
+    }
+
+    /**
+     * Send a plain-text notification through the Resend API.
+     * Returns true on a 2xx response, false otherwise.
+     */
+    private function send_via_resend( $api_key, $to, $subject, $message, $reply_to = '' ) {
+        // From address: use the configured sender, else a safe default. The
+        // sending domain must be verified in your Resend account.
+        $from = trim( (string) get_option( 'smart_chat_resend_from', '' ) );
+        if ( '' === $from ) {
+            $from = 'Midland Floor Care <support@midlandfloors.com>';
+        }
+
+        $payload = array(
+            'from'    => $from,
+            'to'      => array( $to ),
+            'subject' => $subject,
+            'text'    => $message,
+        );
+        if ( '' !== $reply_to ) {
+            $payload['reply_to'] = $reply_to;
+        }
+
+        $response = wp_remote_post( 'https://api.resend.com/emails', array(
+            'timeout' => 15,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body'    => wp_json_encode( $payload ),
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            error_log( 'Smart Chat Resend transport error: ' . $response->get_error_message() );
+            return false;
+        }
+        $code = (int) wp_remote_retrieve_response_code( $response );
+        if ( $code < 200 || $code >= 300 ) {
+            error_log( 'Smart Chat Resend error HTTP ' . $code . ': ' . wp_remote_retrieve_body( $response ) );
+            return false;
+        }
+        return true;
     }
 
     /**
