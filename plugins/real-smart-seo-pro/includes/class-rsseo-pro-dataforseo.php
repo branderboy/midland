@@ -17,7 +17,13 @@ class RSSEO_Pro_DataForSEO {
     }
 
     public static function get_password() {
-        return RSSEO_Settings::decrypt_key( get_option( 'rsseo_pro_dfs_password', '' ) );
+        $stored = get_option( 'rsseo_pro_dfs_password', '' );
+        // Degrade gracefully if the base plugin's crypto helper is unavailable
+        // (version mismatch) instead of fataling on an undefined method.
+        if ( ! method_exists( 'RSSEO_Settings', 'decrypt_key' ) ) {
+            return $stored;
+        }
+        return RSSEO_Settings::decrypt_key( $stored );
     }
 
     public static function is_configured() {
@@ -26,7 +32,10 @@ class RSSEO_Pro_DataForSEO {
 
     public static function save_credentials( $login, $password ) {
         update_option( 'rsseo_pro_dfs_login', sanitize_text_field( $login ) );
-        update_option( 'rsseo_pro_dfs_password', RSSEO_Settings::encrypt_key( $password ) );
+        $to_store = method_exists( 'RSSEO_Settings', 'encrypt_key' )
+            ? RSSEO_Settings::encrypt_key( $password )
+            : $password;
+        update_option( 'rsseo_pro_dfs_password', $to_store );
     }
 
     /**
