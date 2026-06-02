@@ -1060,7 +1060,6 @@ class SFCO_Admin {
 
         global $wpdb;
         $table = $wpdb->prefix . 'sfco_leads';
-        $rows  = (array) $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id DESC LIMIT 5000", ARRAY_A ); // phpcs:ignore
 
         nocache_headers();
         header( 'Content-Type: text/csv; charset=UTF-8' );
@@ -1078,13 +1077,30 @@ class SFCO_Admin {
             return $value;
         };
 
-        $out = fopen( 'php://output', 'w' );
-        if ( $rows ) {
-            fputcsv( $out, array_keys( $rows[0] ) );
+        $out          = fopen( 'php://output', 'w' );
+        $chunk        = 500;
+        $offset       = 0;
+        $wrote_header = false;
+
+        do {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} ORDER BY id DESC LIMIT %d OFFSET %d", $chunk, $offset ), ARRAY_A );
             foreach ( $rows as $r ) {
+                if ( ! $wrote_header ) {
+                    fputcsv( $out, array_keys( $r ) );
+                    $wrote_header = true;
+                }
                 fputcsv( $out, array_map( $escape_cell, $r ) );
             }
-        } else {
+            // Stream this chunk to the client and free the buffer before the next.
+            if ( ob_get_level() > 0 ) {
+                ob_flush();
+            }
+            flush();
+            $offset += $chunk;
+        } while ( count( $rows ) === $chunk );
+
+        if ( ! $wrote_header ) {
             fputcsv( $out, array( 'no entries yet' ) );
         }
         fclose( $out );
