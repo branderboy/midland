@@ -107,15 +107,22 @@ class CTM_Emailer {
             __( 'Nonprofit idea', 'content-traffic-maker' ) => $b( 'nonprofit_backlink' ),
         ) );
 
-        // YouTube SEO Video.
+        // YouTube SEO Video (commercial + residential).
         $html .= $section( '&#9654;&#65039;', __( 'YouTube SEO Video', 'content-traffic-maker' ), array(
-            '' => $b( 'youtube_idea' ),
+            __( 'Commercial', 'content-traffic-maker' )  => $b( 'youtube_idea' ),
+            __( 'Residential', 'content-traffic-maker' ) => $b( 'youtube_residential' ),
         ) );
 
-        // TikTok Viral Video (+ SEO).
-        $html .= $section( '&#127909;', __( 'TikTok Viral Video', 'content-traffic-maker' ), array(
-            __( 'SEO video', 'content-traffic-maker' )   => $b( 'tiktok_seo' ),
-            __( 'Viral video', 'content-traffic-maker' ) => $b( 'tiktok_viral' ),
+        // TikTok — SEO, viral, and what's trending right now.
+        $html .= $section( '&#127909;', __( 'TikTok Videos', 'content-traffic-maker' ), array(
+            __( 'SEO video', 'content-traffic-maker' )         => $b( 'tiktok_seo' ),
+            __( 'Viral video', 'content-traffic-maker' )       => $b( 'tiktok_viral' ),
+            __( 'Trending right now', 'content-traffic-maker' ) => $b( 'trending_tiktok_idea' ),
+        ) );
+
+        // Residential Offer Video.
+        $html .= $section( '&#127968;', __( 'Residential Offer Video', 'content-traffic-maker' ), array(
+            '' => $b( 'residential_offer_video' ),
         ) );
 
         // CTA.

@@ -29,8 +29,11 @@ class CTM_Generator {
             'gov_backlink',
             'nonprofit_backlink',
             'youtube_idea',
+            'youtube_residential',
             'tiktok_seo',
             'tiktok_viral',
+            'residential_offer_video',
+            'trending_tiktok_idea',
             'cta',
             'priority_score',
         );
@@ -175,9 +178,14 @@ class CTM_Generator {
             . "- outreach_angle: the outreach angle / reason they would link.\n"
             . "- gov_backlink: a realistic .gov backlink idea (city/county vendor registration, gov facility/resource page).\n"
             . "- nonprofit_backlink: a realistic local nonprofit backlink idea (facility partner, sponsorship, resource listing).\n"
-            . "- youtube_idea: a YouTube SEO video idea — include the target keyword and a title.\n"
+            . "- youtube_idea: a YouTube SEO video idea for the COMMERCIAL audience — include the target keyword and a title.\n"
+            . "- youtube_residential: a YouTube SEO video idea for the RESIDENTIAL audience (homeowners) — include the keyword and a title.\n"
             . "- tiktok_seo: a TikTok SEO video idea — include the keyword and a hook.\n"
             . "- tiktok_viral: a viral TikTok video idea — include the hook and concept.\n"
+            . "- residential_offer_video: a short promotional/offer video idea aimed at RESIDENTIAL customers that ties to a "
+            . "specific offer or seasonal hook (e.g. pre-sale home floor refresh, spring deep clean) — include the hook and the offer/CTA.\n"
+            . "- trending_tiktok_idea: a TikTok format, sound, or trend that is ACTUALLY popular right now (use live search) and "
+            . "show how Midland Floor can adapt it to floor cleaning — name the trend/sound and the adaptation.\n"
             . "- cta: one specific call-to-action to use this week.\n"
             . "- priority_score: an integer 1-10 for how high-impact this brief is.\n\n"
             . "Be direct and concrete. Name real local organizations where possible. No generic advice, no filler.";
