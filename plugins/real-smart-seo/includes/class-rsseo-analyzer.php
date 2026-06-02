@@ -298,3 +298,4 @@ INSTRUCTIONS;
         $text = preg_replace( '/`(.+?)`/', '<code>$1</code>', $text );
         return $text;
     }
+}

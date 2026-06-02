@@ -36,31 +36,6 @@ $wa_link   = $wa_number ? 'https://wa.me/' . $wa_number . '?text=' . $wa_text : 
         </div>
         <div id="smart-chat-messages"></div>
 
-        <?php
-        // Default to form #1 (the Midland "Schedule a Visit" form) so the chat's
-        // Schedule a Visit panel works out of the box; admins can override in Settings.
-        $sf_form_id = (int) get_option( 'smart_chat_sf_form_id', 1 );
-        $sf_form_html = '';
-        if ( $sf_form_id && shortcode_exists( 'sfco_form' ) ) {
-            $sf_form_html = do_shortcode( '[sfco_form id="' . $sf_form_id . '"]' );
-        }
-        ?>
-        <div id="smart-chat-form" style="display:none;">
-            <div class="smart-chat-form-header">
-                <strong><?php esc_html_e( 'Schedule a visit', 'smart-chat-ai' ); ?></strong>
-                <button type="button" id="smart-chat-form-close" aria-label="Close">&times;</button>
-            </div>
-            <?php if ( $sf_form_html ) : ?>
-                <div class="smart-chat-form-body">
-                    <?php echo $sf_form_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- output of trusted Smart Forms shortcode ?>
-                </div>
-            <?php else : ?>
-                <p style="padding:12px;color:#4B5563;font-size:13px;">
-                    <?php esc_html_e( 'Form not configured yet. Set Smart Forms Form ID in Midland Chat → Settings.', 'smart-chat-ai' ); ?>
-                </p>
-            <?php endif; ?>
-        </div>
-
         <div id="smart-chat-actions">
             <button type="button" id="smart-chat-cta-visit" style="background:<?php echo $color; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;">
                 <?php esc_html_e( 'Schedule a Visit', 'smart-chat-ai' ); ?>

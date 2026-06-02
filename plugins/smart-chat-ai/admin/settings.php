@@ -132,37 +132,18 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                     </script>
                 </td>
             </tr>
-            <?php
-            $sf_forms = array();
-            if ( class_exists( 'SFCO_Database' ) && method_exists( 'SFCO_Database', 'get_forms' ) ) {
-                $sf_forms = (array) SFCO_Database::get_forms( array( 'status' => 'active' ) );
-            }
-            $current_form_id = (int) get_option( 'smart_chat_sf_form_id', 1 );
-            ?>
-            <tr>
-                <th><label for="smart_chat_sf_form_id"><?php esc_html_e( 'Smart Forms Form', 'smart-chat-ai' ); ?></label></th>
-                <td>
-                    <?php if ( ! empty( $sf_forms ) ) : ?>
-                        <select name="smart_chat_sf_form_id" id="smart_chat_sf_form_id">
-                            <option value="0">— <?php esc_html_e( 'Use built-in lead capture', 'smart-chat-ai' ); ?> —</option>
-                            <?php foreach ( $sf_forms as $f ) : ?>
-                                <option value="<?php echo (int) $f->id; ?>" <?php selected( $current_form_id, (int) $f->id ); ?>>
-                                    <?php echo esc_html( $f->title ); ?> (#<?php echo (int) $f->id; ?>)
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <p class="description"><?php esc_html_e( 'When visitors tap "Schedule a Visit" in the chat, this Smart Form renders inside the widget. Submissions flow through Smart Forms → Smart CRM Pro automatically.', 'smart-chat-ai' ); ?></p>
-                    <?php else : ?>
-                        <input type="number" name="smart_chat_sf_form_id" id="smart_chat_sf_form_id" value="<?php echo esc_attr( $current_form_id ); ?>" min="0" style="width:90px;">
-                        <p class="description"><?php esc_html_e( 'Smart Forms not detected. Enter a form ID manually, or activate Smart Forms for Midland to pick from a list.', 'smart-chat-ai' ); ?></p>
-                    <?php endif; ?>
-                </td>
-            </tr>
             <tr>
                 <th><label for="smart_chat_preprompt"><?php esc_html_e( 'Custom Preprompt', 'smart-chat-ai' ); ?></label></th>
                 <td>
                     <textarea name="smart_chat_preprompt" id="smart_chat_preprompt" rows="10" class="large-text code" placeholder="<?php esc_attr_e( 'Leave blank to use the default contractor prompt. Anything you put here REPLACES the default system prompt entirely.', 'smart-chat-ai' ); ?>"><?php echo esc_textarea( get_option( 'smart_chat_preprompt', '' ) ); ?></textarea>
                     <p class="description"><?php esc_html_e( 'Direct instructions for the AI. Use this to set tone, services, do-not-do rules, and how to capture leads. Sitemap content is still appended automatically below your prompt.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="smart_chat_suggestions"><?php esc_html_e( 'Suggested Questions', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <textarea name="smart_chat_suggestions" id="smart_chat_suggestions" rows="5" class="large-text" placeholder="Do you clean carpet?&#10;Can I get a quote?&#10;What areas do you serve?&#10;I want to schedule a visit"><?php echo esc_textarea( get_option( 'smart_chat_suggestions', "Do you clean carpet?\nCan I get a quote?\nWhat areas do you serve?\nI want to schedule a visit" ) ); ?></textarea>
+                    <p class="description"><?php esc_html_e( 'One question per line. These show as tappable shortcuts when the chat first opens. Up to 6 are shown.', 'smart-chat-ai' ); ?></p>
                 </td>
             </tr>
         </table>
@@ -284,7 +265,24 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
             </tr>
             <tr>
                 <th><label for="smart_chat_lead_email"><?php esc_html_e( 'Notification Email', 'smart-chat-ai' ); ?></label></th>
-                <td><input type="email" name="smart_chat_lead_email" id="smart_chat_lead_email" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_lead_email', get_option( 'admin_email' ) ) ); ?>"></td>
+                <td>
+                    <input type="email" name="smart_chat_lead_email" id="smart_chat_lead_email" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_lead_email', 'support@midlandfloors.com' ) ); ?>" placeholder="support@midlandfloors.com">
+                    <p class="description"><?php esc_html_e( 'Where new chat leads are emailed.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="smart_chat_resend_api_key"><?php esc_html_e( 'Resend API Key', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <input type="password" name="smart_chat_resend_api_key" id="smart_chat_resend_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_resend_api_key', '' ) ); ?>" placeholder="re_...">
+                    <p class="description"><?php esc_html_e( 'Paste your Resend API key to send lead emails through Resend. Leave blank to use the default site mailer.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="smart_chat_resend_from"><?php esc_html_e( 'Resend From', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <input type="text" name="smart_chat_resend_from" id="smart_chat_resend_from" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_resend_from', '' ) ); ?>" placeholder="Midland Floor Care &lt;support@midlandfloors.com&gt;">
+                    <p class="description"><?php esc_html_e( 'The from name and address. The domain must be verified in your Resend account.', 'smart-chat-ai' ); ?></p>
+                </td>
             </tr>
             <tr>
                 <th><?php esc_html_e( 'Email Notifications', 'smart-chat-ai' ); ?></th>

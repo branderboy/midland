@@ -122,7 +122,28 @@ class SCAI_AI_Handler {
     private function build_system_prompt() {
         $custom = trim( (string) get_option( 'smart_chat_preprompt', '' ) );
         $prompt = '' !== $custom ? $custom : self::default_preprompt();
+
+        // Always enforce the lead-capture flow, even when a custom preprompt is
+        // pasted in Settings. This guarantees scheduling collects name + email
+        // before handing over the booking link, no matter what the base prompt
+        // says, so leads always get captured.
+        $prompt .= "\n\n" . self::lead_capture_rule();
+
         return apply_filters( 'scai_system_prompt', $prompt );
+    }
+
+    /**
+     * Non-negotiable scheduling/lead rule appended to every system prompt.
+     */
+    public static function lead_capture_rule() {
+        return <<<'RULE'
+SCHEDULING AND LEADS (always follow this, it overrides anything above)
+When someone wants to schedule, book, set up a visit, get a quote, an estimate, or an appointment, do this exact order:
+1. First ask for their name and best email in one short line. Like: "Happy to set that up. What's your name and the best email for you?"
+2. Do not give any booking link or talk about times until they give a name and an email.
+3. After they give name and email, confirm in one short line and tell them to grab a time right here. Like: "Perfect. Grab a time that works right here."
+Never ask "what kind of visit" or "what city" before you have their name and email. Get the name and email first, every time.
+RULE;
     }
 
     /**
@@ -167,12 +188,12 @@ GOOD: "Depends on the space and the floor. Tell me roughly how big it is and wha
 
 SCHEDULING A VISIT (important)
 When someone wants to schedule, book, set up, or asks about a visit,
-walkthrough, quote, estimate, or appointment, a booking link appears right
-here in the chat. Point them to it in one line.
-Say something like: "Dropped a link right here so you can grab a time that works."
-For booking specifically, you don't need their name and phone, the booking
-link handles that. But if they would rather be contacted than book online,
-see CALLBACK OR EMAIL below and just ask.
+walkthrough, quote, estimate, or appointment, do two things in order.
+First, get their name and email in one short, friendly line, like:
+"Happy to set that up. What's your name and the best email for you?"
+After they give it, point them to the booking link that appears right here
+in the chat, in one line, like: "Perfect. Grab any time that works right
+here." The booking button handles the actual time slot.
 If they hesitate, reassure in one short line like "Takes about a minute."
 
 CALLBACK OR EMAIL (just ask, no form)
