@@ -394,22 +394,36 @@ do_action( 'srp_job_completed', array(
     }
 
     private function already_fired( $lead_id ) {
+        $lead_id = (int) $lead_id;
+        // Authoritative, prune-proof dedupe: a dedicated non-autoloaded option.
+        // post_id=0 postmeta (below) gets wiped by DB-optimization plugins,
+        // which would let the hourly poll re-send a duplicate NPS email to the
+        // customer — the embarrassing failure mode this guards against.
+        if ( '' !== (string) get_option( self::META_SURVEY_FIRED . '_' . $lead_id, '' ) ) {
+            return true;
+        }
+        // Fall back to the legacy postmeta marker for leads surveyed before
+        // this change.
         global $wpdb;
         $found = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             "SELECT meta_id FROM {$wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %d LIMIT 1",
             self::META_SURVEY_FIRED,
-            (int) $lead_id
+            $lead_id
         ) );
         return ! empty( $found );
     }
 
     private function mark_fired( $lead_id ) {
+        $lead_id = (int) $lead_id;
+        // Authoritative dedupe marker that DB-cleanup plugins can't prune.
+        update_option( self::META_SURVEY_FIRED . '_' . $lead_id, time(), false );
+        // Also keep the postmeta marker so the admin "CRM Linking" list and the
+        // poll query (both LEFT JOIN on this meta) still exclude surveyed leads.
         global $wpdb;
-        // Stored in postmeta with post_id=0 — gives us a flat dedupe table without an extra schema.
         $wpdb->insert( $wpdb->prefix . 'postmeta', array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             'post_id'    => 0,
             'meta_key'   => self::META_SURVEY_FIRED, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-            'meta_value' => (int) $lead_id,           // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+            'meta_value' => $lead_id,                 // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
         ) );
     }
 
