@@ -1,21 +1,22 @@
 <?php
 /**
- * Plugin Name: Content Traffic Maker
- * Description: Sends Midland Floor a daily or weekly Perplexity-generated "traffic brief" — floor-cleaning guest posts, local + .gov + nonprofit backlink targets, and YouTube/TikTok SEO + viral video ideas — to drive traffic, links, leads, and video visibility.
- * Version: 1.0.0
+ * Plugin Name: Midland Floors Video Brief
+ * Description: Daily SEO keyword, offer, and viral video brief with real TikTok + YouTube examples — delivered to your client via Resend.
+ * Version: 1.8.1
  * Author: Midland Floor Care
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: content-traffic-maker
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ * Update URI: false
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'CTM_VERSION', '1.0.0' );
+define( 'CTM_VERSION', '1.8.1' );
 define( 'CTM_FILE', __FILE__ );
 define( 'CTM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CTM_URL', plugin_dir_url( __FILE__ ) );

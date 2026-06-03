@@ -11,7 +11,7 @@ class CTM_DB {
 
     const TABLE       = 'content_traffic_maker_briefs';
     const OPTION      = 'ctm_settings';
-    const DB_VERSION  = '1.0.0';
+    const DB_VERSION  = '1.8.0';
     const DB_VERS_KEY = 'ctm_db_version';
 
     /** Fully-qualified table name. */
@@ -95,9 +95,22 @@ class CTM_DB {
     }
 
     /**
-     * @param int $id
-     * @return object|null
+     * Mark a stored brief as sent.
      */
+    public static function mark_sent( $id, $sent_to ) {
+        global $wpdb;
+        $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            self::table(),
+            array(
+                'status'  => 'sent',
+                'sent_to' => sanitize_text_field( $sent_to ),
+            ),
+            array( 'id' => (int) $id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+    }
+
     public static function get_brief( $id ) {
         global $wpdb;
         return $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -110,19 +123,18 @@ class CTM_DB {
 
     public static function defaults() {
         return array(
-            'business_name'  => 'Midland Floor',
-            'business_type'  => 'contractor',
-            'target_city'    => 'Washington',
-            'target_state'   => 'DC',
-            'target_audience'=> 'commercial property managers, facility managers, realtors, and homeowners',
-            'main_service'   => 'commercial floor care (strip & wax, VCT, tile & grout) plus residential carpet cleaning and floor installation',
-            'website_url'    => home_url(),
-            'recipient'      => get_option( 'admin_email' ),
-            'frequency'      => 'weekly',
-            'send_time'      => '08:00',
-            'api_key'        => '',
-            'model'          => 'sonar',
-            'enabled'        => 0,
+            'business_name'   => 'Midland Floors',
+            'target_city'     => 'Washington',
+            'target_state'    => 'DC',
+            'recipient'       => get_option( 'admin_email' ),
+            'frequency'       => 'daily',
+            'send_time'       => '08:00',
+            'api_key'         => '',
+            'model'           => 'sonar',
+            'enabled'         => 0,
+            'resend_api_key'  => '',
+            'from_name'       => 'Midland Floors',
+            'from_email'      => '',
         );
     }
 

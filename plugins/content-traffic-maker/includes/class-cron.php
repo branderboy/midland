@@ -102,30 +102,23 @@ class CTM_Cron {
     }
 
     /**
-     * Cron callback: generate, store, and email the brief.
-     *
-     * @param bool $force Bypass the enabled check (used by the manual button).
-     * @return array|WP_Error { brief, brief_html, brief_id } or error.
+     * Scheduled cron callback — generate + email in one shot.
+     * Respects the daily cap and enabled flag.
      */
     public static function run( $force = false ) {
         $settings = CTM_DB::get_settings();
         if ( ! $force && empty( $settings['enabled'] ) ) {
             return new WP_Error( 'ctm_disabled', __( 'Alerts are disabled.', 'content-traffic-maker' ) );
         }
-        // One email per day: if the scheduled alert already went out today
-        // (e.g. WP-Cron fired twice), skip without spending an API call.
         if ( ! $force && CTM_Emailer::already_sent_today() ) {
             return new WP_Error( 'ctm_already_sent', __( 'A brief was already emailed today.', 'content-traffic-maker' ) );
         }
 
         $brief = CTM_Generator::generate( $settings );
-        if ( is_wp_error( $brief ) ) {
-            return $brief;
-        }
+        if ( is_wp_error( $brief ) ) return $brief;
 
-        $html = CTM_Emailer::render_html( $brief, $settings );
-        $sent = CTM_Emailer::send( $brief, $settings, $html );
-
+        $html     = CTM_Emailer::render_html( $brief );
+        $sent     = CTM_Emailer::send( $brief, $settings, $html, $force );
         $brief_id = CTM_DB::insert_brief( array(
             'business_name' => $settings['business_name'] ?? '',
             'brief'         => $brief,
@@ -140,5 +133,64 @@ class CTM_Cron {
             'brief_id'   => $brief_id,
             'sent'       => (bool) $sent,
         );
+    }
+
+    /**
+     * Generate and store a brief WITHOUT sending email.
+     * Used by the dashboard "Generate" button.
+     */
+    public static function generate_only() {
+        $settings = CTM_DB::get_settings();
+        $brief    = CTM_Generator::generate( $settings );
+        if ( is_wp_error( $brief ) ) return $brief;
+
+        $html     = CTM_Emailer::render_html( $brief );
+        $brief_id = CTM_DB::insert_brief( array(
+            'business_name' => $settings['business_name'] ?? '',
+            'brief'         => $brief,
+            'brief_html'    => $html,
+            'sent_to'       => '',
+            'status'        => 'generated',
+        ) );
+
+        return array(
+            'brief'      => $brief,
+            'brief_html' => $html,
+            'brief_id'   => $brief_id,
+            'sent'       => false,
+        );
+    }
+
+    /**
+     * Send an already-stored brief by ID — always bypasses the daily cap.
+     * Used by the dashboard "Send Email" button.
+     */
+    public static function send_brief_by_id( $brief_id ) {
+        $settings = CTM_DB::get_settings();
+        $row      = CTM_DB::get_brief( (int) $brief_id );
+        if ( ! $row ) {
+            return new WP_Error( 'ctm_not_found', __( 'Brief not found.', 'content-traffic-maker' ) );
+        }
+
+        $brief = json_decode( (string) $row->brief_json, true );
+        if ( ! is_array( $brief ) ) {
+            return new WP_Error( 'ctm_bad_json', __( 'Brief data is corrupt.', 'content-traffic-maker' ) );
+        }
+
+        $html = (string) $row->brief_html;
+        if ( '' === $html ) {
+            $html = CTM_Emailer::render_html( $brief );
+        }
+
+        // Force-send bypasses the daily cap so you can push anytime from the dashboard.
+        $sent = CTM_Emailer::send( $brief, $settings, $html, true );
+
+        if ( $sent ) {
+            CTM_DB::mark_sent( (int) $brief_id, $settings['recipient'] ?? '' );
+        }
+
+        return $sent
+            ? array( 'sent' => true, 'brief_id' => (int) $brief_id )
+            : new WP_Error( 'ctm_send_failed', __( 'Email failed to send. Check your Resend key and from address.', 'content-traffic-maker' ) );
     }
 }
