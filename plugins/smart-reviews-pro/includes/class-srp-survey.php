@@ -22,6 +22,13 @@ class SRP_Survey {
      */
     const DEFAULT_BUSINESS   = 'Midland Floors';
     const DEFAULT_COLOR      = '#43A94B'; // Midland primary green.
+
+    // Fixed star-rating button colors — intentionally NOT tied to the editable
+    // brand color, so a light/blank brand setting can never make 4–5★ disappear.
+    const STAR_5    = '#2F8137'; // 5★ darker Midland green
+    const STAR_4    = '#43A94B'; // 4★ light Midland green
+    const STAR_OK   = '#f59e0b'; // 3★ amber
+    const STAR_BAD  = '#DC2525'; // 1–2★ red
     const DEFAULT_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=ChIJ59SJ6ue7t4kRIVMYpQVYY6Y';
     // Hosted on the live (public) site so it actually loads in customer inboxes —
     // the GitHub repo is private, so raw.githubusercontent URLs 404 in email.
@@ -36,7 +43,17 @@ class SRP_Survey {
     /** Primary brand color for buttons and email/survey headers. */
     public static function brand_color() {
         $c = trim( (string) get_option( 'srp_brand_color', '' ) );
-        return '' !== $c ? $c : self::DEFAULT_COLOR;
+        if ( ! preg_match( '/^#?([0-9a-fA-F]{6})$/', $c, $m ) ) {
+            return self::DEFAULT_COLOR; // empty / invalid → brand green
+        }
+        $hex = $m[1];
+        // Reject colors too light to carry white button text (relative luminance),
+        // otherwise a near-white brand color blanks out the CTA buttons.
+        $r = hexdec( substr( $hex, 0, 2 ) );
+        $g = hexdec( substr( $hex, 2, 2 ) );
+        $b = hexdec( substr( $hex, 4, 2 ) );
+        $lum = ( 0.2126 * $r + 0.7152 * $g + 0.0722 * $b ) / 255;
+        return $lum > 0.7 ? self::DEFAULT_COLOR : '#' . strtolower( $hex );
     }
 
     /** White logo shown on the brand-color header. */
@@ -56,7 +73,7 @@ class SRP_Survey {
         $name  = self::business_name();
         $color = self::brand_color();
         $inner = $logo
-            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="46" style="height:46px;width:auto;max-width:260px;border:0;display:inline-block;">'
+            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="60" style="height:60px;width:auto;max-width:300px;border:0;display:inline-block;">'
             : '<span style="color:#0F1411;font-size:20px;font-weight:700;">' . esc_html( $name ) . '</span>';
         return '<tr><td style="background:#ffffff;padding:22px;text-align:center;border-bottom:3px solid ' . esc_attr( $color ) . ';">' . $inner . '</td></tr>';
     }
@@ -67,7 +84,7 @@ class SRP_Survey {
         $logo  = self::logo_url();
         $name  = self::business_name();
         $head  = $logo
-            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="42" style="height:42px;width:auto;max-width:240px;border:0;">'
+            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="56" style="height:56px;width:auto;max-width:280px;border:0;">'
             : '<span style="color:#0F1411;font-size:18px;font-weight:700;">' . esc_html( $name ) . '</span>';
         return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . esc_html( $title ) . '</title></head>
 <body style="margin:0;padding:40px 16px;background:#F3FCF4;font-family:system-ui,-apple-system,sans-serif;text-align:center;">
@@ -170,7 +187,7 @@ class SRP_Survey {
         $scores_html = '';
         for ( $i = 1; $i <= self::MAX_SCORE; $i++ ) {
             $score_url    = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
-            $bg           = $i >= self::THRESHOLD ? self::brand_color() : ( $i >= 3 ? '#f59e0b' : '#DC2525' );
+            $bg           = 5 === $i ? self::STAR_5 : ( 4 === $i ? self::STAR_4 : ( $i === 3 ? self::STAR_OK : self::STAR_BAD ) );
             $scores_html .= '<a href="' . esc_url( $score_url ) . '" style="display:inline-block;width:48px;height:48px;line-height:48px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
         }
 
@@ -270,13 +287,13 @@ class SRP_Survey {
             $scores_html = '';
             for ( $i = 1; $i <= self::MAX_SCORE; $i++ ) {
                 $url = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
-                $bg  = $i >= self::THRESHOLD ? self::brand_color() : ( $i >= 3 ? '#f59e0b' : '#DC2525' );
+                $bg  = 5 === $i ? self::STAR_5 : ( 4 === $i ? self::STAR_4 : ( $i === 3 ? self::STAR_OK : self::STAR_BAD ) );
                 $scores_html .= '<a href="' . esc_url( $url ) . '" style="display:inline-block;width:52px;height:52px;line-height:52px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
             }
 
             $confirm_html = '';
             if ( null !== $picked ) {
-                $bg = $picked >= self::THRESHOLD ? self::brand_color() : ( $picked >= 3 ? '#f59e0b' : '#DC2525' );
+                $bg = 5 === $picked ? self::STAR_5 : ( 4 === $picked ? self::STAR_4 : ( $picked === 3 ? self::STAR_OK : self::STAR_BAD ) );
                 $confirm_html = '
 <form method="post" action="' . esc_url( home_url( '/' ) ) . '" style="margin-top:24px;">
   <input type="hidden" name="srp_survey" value="' . esc_attr( $token ) . '">
