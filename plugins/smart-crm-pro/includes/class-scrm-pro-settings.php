@@ -145,6 +145,33 @@ class SCRM_Pro_Settings {
             array( 'midland-job-canceled', 'midland-job-canceled-{segment}' ),
             __( 'Reverses the booked tags and moves the deal off Booked.', 'smart-crm-pro' )
         );
+
+        // Recent tag activity — proof the CRM is the tag owner, visible even
+        // when ActiveCampaign is off (tags are stored locally regardless).
+        $recent = class_exists( 'SCRM_Pro_Tags' ) ? SCRM_Pro_Tags::recent( 25 ) : array();
+        echo '<h3 style="margin-top:20px;">' . esc_html__( 'Recent tag activity', 'smart-crm-pro' ) . '</h3>';
+        if ( empty( $recent ) ) {
+            echo '<p class="description">' . esc_html__( 'No tags applied yet. They appear here as leads move through the lifecycle — stored by Smart CRM and pushed to ActiveCampaign.', 'smart-crm-pro' ) . '</p>';
+        } else {
+            echo '<table class="wp-list-table widefat fixed striped"><thead><tr>';
+            echo '<th>' . esc_html__( 'Lead', 'smart-crm-pro' ) . '</th><th>' . esc_html__( 'Stage', 'smart-crm-pro' ) . '</th><th>' . esc_html__( 'Tags', 'smart-crm-pro' ) . '</th><th>' . esc_html__( 'When', 'smart-crm-pro' ) . '</th>';
+            echo '</tr></thead><tbody>';
+            foreach ( $recent as $row ) {
+                $who  = trim( (string) ( $row['name'] ?? '' ) );
+                $who  = '' !== $who ? $who : (string) ( $row['email'] ?? ( '#' . (int) ( $row['id'] ?? 0 ) ) );
+                $tags = '';
+                foreach ( (array) ( $row['tags'] ?? array() ) as $t ) {
+                    $tags .= '<code style="background:#F3FCF4;border:1px solid #cdeccf;border-radius:3px;padding:1px 6px;margin:0 3px 3px 0;display:inline-block;">' . esc_html( $t ) . '</code>';
+                }
+                echo '<tr>';
+                echo '<td>' . esc_html( $who ) . '</td>';
+                echo '<td><code>' . esc_html( (string) ( $row['lifecycle'] ?? '' ) ) . '</code></td>';
+                echo '<td>' . $tags . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo '<td>' . esc_html( ! empty( $row['time'] ) ? human_time_diff( (int) $row['time'] ) . ' ' . __( 'ago', 'smart-crm-pro' ) : '' ) . '</td>';
+                echo '</tr>';
+            }
+            echo '</tbody></table>';
+        }
     }
 
     private function tabs(): array {

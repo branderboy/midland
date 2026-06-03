@@ -442,12 +442,21 @@ do_action( 'srp_job_completed', array(
             return '';
         };
 
+        $lead_id = (int) ( $get( 'id' ) ?: 0 );
+
+        // Smart CRM owns the tags — read the lead's segment + tags from it so the
+        // review is associated with the same data the CRM passes to ActiveCampaign.
+        $tags    = ( $lead_id && class_exists( 'SCRM_Pro_Tags' ) ) ? SCRM_Pro_Tags::get_lead_tags( $lead_id ) : array();
+        $segment = class_exists( 'SCRM_Pro_ActiveCampaign' ) ? SCRM_Pro_ActiveCampaign::get_instance()->lead_segment( $lead ) : '';
+
         return array(
             'name'    => sanitize_text_field( (string) $get( 'customer_name' ) ?: (string) $get( 'name' ) ),
             'email'   => sanitize_email( (string) $get( 'customer_email' ) ?: (string) $get( 'email' ) ),
             'phone'   => sanitize_text_field( (string) $get( 'customer_phone' ) ?: (string) $get( 'phone' ) ),
             'job_id'  => sanitize_text_field( (string) ( $get( 'job_id' ) ?: $get( 'id' ) ) ),
-            'lead_id' => (int) ( $get( 'id' ) ?: 0 ),
+            'lead_id' => $lead_id,
+            'segment' => sanitize_text_field( (string) $segment ),
+            'tags'    => array_map( 'sanitize_text_field', (array) $tags ),
         );
     }
 }
