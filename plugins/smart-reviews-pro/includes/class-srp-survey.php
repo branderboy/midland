@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   srp_survey_response        — public AJAX handler for the survey form.
  * Cron sends at most three spaced reminders if there's no response: the first
  * ~24h after the survey, the second ~48h after that, and a final one a few days
- * (~4) later. Reminders stop the moment the customer submits a score.
+ * (~5) later. Reminders stop the moment the customer submits a score.
  */
 class SRP_Survey {
 
@@ -442,7 +442,7 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
     /**
      * Cron (hourly): send spaced reminder emails to non-respondents. reminder1
      * goes ~24h after the survey; reminder2 ~48h after reminder1; reminder3 a
-     * few days (~4) after reminder2 (see the SRP_DB queries). Because each
+     * few days (~5) after reminder2 (see the SRP_DB queries). Because each
      * reminder's wait is measured from the previous reminder's timestamp, no two
      * reminders can ever go out in the same run, and there are at most three.
      */

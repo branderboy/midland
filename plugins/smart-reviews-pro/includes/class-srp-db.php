@@ -195,14 +195,14 @@ class SRP_DB {
 
     /**
      * Surveys that need their third (last) reminder: reminder2 went out at least
-     * 4 days ago, the customer still hasn't responded, and reminder3 hasn't been
+     * 5 days ago, the customer still hasn't responded, and reminder3 hasn't been
      * sent. Like reminder2, the wait is measured from the previous reminder
      * (reminder2_at), so it can never fire in the same cron run as reminder2.
      * This is the final nudge — there is no reminder4.
      */
     public static function get_pending_reminders_third() {
         global $wpdb;
-        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - 4 * DAY_IN_SECONDS );
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - 5 * DAY_IN_SECONDS );
         return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}srp_surveys
