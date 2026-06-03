@@ -16,10 +16,11 @@ class SFCO_Pro_Calendly {
         add_action( 'admin_init', array( $this, 'handle_save' ) );
         add_action( 'admin_init', array( $this, 'handle_connect' ) );
         add_action( 'rest_api_init', array( $this, 'register_webhook' ) );
-        // Auto-completion: Calendly has no "visit completed" event, so once a
-        // booking's scheduled time has passed we mark it completed ourselves —
-        // which tags the lead completed in Smart CRM and fires the Smart Reviews
-        // survey via the same signals the ServiceM8 path uses.
+        // Visit resolution: Calendly has no "visit happened" event, so once a
+        // booking's time passes we resolve the visit. Whether it counts as the
+        // paid service rendered (→ review + floor-care plan + AC completed flow)
+        // is decided by Smart CRM per segment/urgency; commercial estimates are
+        // recorded as "visited" and wait for ServiceM8 to report the paid job.
         add_action( self::CRON_COMPLETE, array( $this, 'complete_visit' ), 10, 1 );
     }
 
@@ -383,9 +384,9 @@ class SFCO_Pro_Calendly {
         do_action( 'sfco_lead_booked', $lead, $is_rebook );
 
         // Calendly never tells us the visit happened, so schedule our own
-        // completion shortly after the booked slot ends. complete_visit() only
-        // fires if the lead is still "booked" at that time (a cancellation
-        // clears it), then tags completed in CRM + triggers the review survey.
+        // resolution shortly after the booked slot ends. complete_visit() runs
+        // only if the lead is still "booked" then (a cancellation clears it) and
+        // either completes it (review + plan) or records a visit, per segment.
         $this->schedule_completion( (int) $lead->id, $end_time, $time );
 
         return $is_rebook ? 'marked_rebooked' : 'marked_booked';
@@ -498,10 +499,18 @@ class SFCO_Pro_Calendly {
     }
 
     /**
-     * Cron callback: mark a still-booked lead "completed". This is the Calendly
-     * equivalent of a ServiceM8 job-completed event — it fans out the same
-     * signals so Smart CRM applies the completed tag / advances the deal and
-     * Smart Reviews emails the NPS survey.
+     * Cron callback: resolve a still-booked Calendly visit once its slot passes.
+     *
+     * Calendly is the source of truth for the visit, but whether the visit IS
+     * the paid service depends on the lead. Residential visits go straight to a
+     * paid service; commercial visits are usually estimates (unless it's an
+     * emergency). Smart CRM owns segment/urgency, so it decides via the
+     * 'sfco_calendly_visit_is_completion' filter:
+     *   - completion  → status "completed" → review survey + floor-care plan.
+     *   - not (yet)   → status "visited"   → waits for ServiceM8 to report the
+     *                                        actual service rendered.
+     * If ServiceM8 already completed the job, the lead is no longer "booked" and
+     * this is a no-op.
      *
      * @param int $lead_id
      */
@@ -513,28 +522,40 @@ class SFCO_Pro_Calendly {
             return;
         }
         $old = strtolower( (string) ( $lead->status ?? '' ) );
-        // Only complete a visit that is still booked — a canceled lead (or one
-        // already completed by ServiceM8) must not be flipped.
         if ( 'booked' !== $old ) {
-            return;
+            return; // canceled, already visited, or already completed
         }
 
+        /**
+         * Does this Calendly visit count as the paid service rendered? Smart CRM
+         * answers authoritatively from segment + urgency. Default true so a
+         * residential-style install completes on the visit even without CRM.
+         *
+         * @param bool   $is_completion
+         * @param object $lead wp_sfco_leads row.
+         */
+        $is_completion = (bool) apply_filters( 'sfco_calendly_visit_is_completion', true, $lead );
+
+        $new = $is_completion ? 'completed' : 'visited';
         $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             $table,
-            array( 'status' => 'completed' ),
+            array( 'status' => $new ),
             array( 'id' => (int) $lead->id ),
             array( '%s' ),
             array( '%d' )
         );
-        $lead->status = 'completed';
+        $lead->status = $new;
 
-        /**
-         * Completion fan-out — identical to the ServiceM8 job-completed path:
-         *   - Smart CRM Pro: applies the completed tag + advances the AC deal.
-         *   - Smart Reviews: emails the NPS survey.
-         */
-        do_action( 'sfco_lead_status_changed', $lead, $old, 'completed' );
-        do_action( 'sfco_lead_completed', $lead );
+        do_action( 'sfco_lead_status_changed', $lead, $old, $new );
+        if ( $is_completion ) {
+            // The visit IS the service (residential / emergency): fire the same
+            // signals as the ServiceM8 job-completed path → review + floor plan.
+            do_action( 'sfco_lead_completed', $lead );
+        } else {
+            // Commercial estimate: record the visit; ServiceM8 will report the
+            // paid service later. No review/plan yet.
+            do_action( 'sfco_lead_visit_completed', $lead );
+        }
     }
 
     /**
@@ -635,13 +656,14 @@ class SFCO_Pro_Calendly {
                     : '<span style="display:inline-block;min-width:18px;color:#b32d2e;font-weight:700;">&#10005;</span>';
             };
             ?>
-            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:14px 18px;margin:0 0 20px;max-width:680px;">
-                <strong><?php esc_html_e( 'Booking → completion flow', 'smart-forms-pro' ); ?></strong>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:14px 18px;margin:0 0 20px;max-width:760px;">
+                <strong><?php esc_html_e( 'Visit → completion flow', 'smart-forms-pro' ); ?></strong>
                 <ul style="margin:8px 0 0;">
-                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Calendly booking marks the lead Booked (and a cancellation reverses it).', 'smart-forms-pro' ); ?></li>
-                    <li><?php echo $badge( $crm_on ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <strong>Smart CRM for Midland</strong> — <?php echo $crm_on ? esc_html__( 'connected: tags the lead completed and advances the deal.', 'smart-forms-pro' ) : esc_html__( 'not active — completed tagging will not run.', 'smart-forms-pro' ); ?></li>
-                    <li><?php echo $badge( $reviews_on ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <strong>Smart Reviews</strong> — <?php echo $reviews_on ? esc_html__( 'connected: emails the review survey when the visit completes.', 'smart-forms-pro' ) : esc_html__( 'not active — no review survey will send.', 'smart-forms-pro' ); ?></li>
-                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php printf( esc_html__( 'The visit auto-completes about %dh after its scheduled end (Calendly sends no "completed" event); canceled bookings are skipped.', 'smart-forms-pro' ), (int) self::COMPLETE_BUFFER_HOURS ); ?></li>
+                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Calendly booking marks the lead Booked; a cancellation reverses it.', 'smart-forms-pro' ); ?></li>
+                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php printf( esc_html__( 'About %dh after the slot ends, Smart CRM resolves the visit by segment:', 'smart-forms-pro' ), (int) self::COMPLETE_BUFFER_HOURS ); ?></li>
+                    <li style="margin-left:24px;"><?php esc_html_e( 'Residential or emergency → the visit IS the paid service → Completed → review survey + floor-care plan + AC completed flow.', 'smart-forms-pro' ); ?></li>
+                    <li style="margin-left:24px;"><?php esc_html_e( 'Commercial (non-emergency) → recorded as Visited; ServiceM8 reports the actual paid service later.', 'smart-forms-pro' ); ?></li>
+                    <li><?php echo $badge( $crm_on ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <strong>Smart CRM for Midland</strong> — <?php echo $crm_on ? esc_html__( 'connected: its segment/urgency rule drives the decision above.', 'smart-forms-pro' ) : esc_html__( 'not active — visits default to completed.', 'smart-forms-pro' ); ?></li>
                 </ul>
             </div>
 

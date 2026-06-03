@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart CRM
  * Description: Passthrough between Smart Forms and the integrations (ActiveCampaign, ServiceM8, Vapi, Google Calendar, Floor Care Plan). One sidebar entry: Smart CRM → Settings.
- * Version: 2.3.3
+ * Version: 2.3.4
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'SCRM_PRO_VERSION', '2.3.3' );
+define( 'SCRM_PRO_VERSION', '2.3.4' );
 define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
 

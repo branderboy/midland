@@ -122,16 +122,22 @@ class SCRM_Pro_Settings {
             __( 'Lead enters ActiveCampaign tagged with its segment and source.', 'smart-crm-pro' )
         );
         $stage(
-            __( 'Booked', 'smart-crm-pro' ),
-            __( 'Calendly booking / ServiceM8 quote accepted', 'smart-crm-pro' ),
+            __( 'Booked (visit scheduled)', 'smart-crm-pro' ),
+            __( 'Calendly booking', 'smart-crm-pro' ),
             array( 'midland-job-booked', 'midland-job-booked-{segment}', 'midland-onsite-booked-commercial' ),
-            __( 'Advances the ActiveCampaign deal to Booked and creates the ServiceM8 job.', 'smart-crm-pro' )
+            __( 'Advances the ActiveCampaign deal to Booked.', 'smart-crm-pro' )
         );
         $stage(
-            __( 'Completed', 'smart-crm-pro' ),
-            __( 'ServiceM8 job complete / Calendly visit time passed', 'smart-crm-pro' ),
+            __( 'Visited (commercial estimate)', 'smart-crm-pro' ),
+            __( 'Calendly visit passed for a commercial, non-emergency lead — an estimate, not yet a paid service', 'smart-crm-pro' ),
+            array( 'midland-visit-completed' ),
+            __( 'Does NOT trigger the review or floor-care plan — waits for ServiceM8 to report the paid job. Good for an AC "after your estimate" email flow.', 'smart-crm-pro' )
+        );
+        $stage(
+            __( 'Completed / service rendered', 'smart-crm-pro' ),
+            __( 'Residential or emergency Calendly visit, OR a ServiceM8 job completed', 'smart-crm-pro' ),
             array( 'midland-job-completed', 'midland-job-completed-{segment}', 'midland-floor-care-plan-offer' ),
-            __( 'Fires the Smart Reviews survey email and sends the floor-care plan.', 'smart-crm-pro' )
+            __( 'The real completion: fires the Smart Reviews survey email, sends the floor-care plan, and tags AC to start the post-job email flow.', 'smart-crm-pro' )
         );
         $stage(
             __( 'Canceled', 'smart-crm-pro' ),
