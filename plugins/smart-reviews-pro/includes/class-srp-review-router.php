@@ -49,7 +49,7 @@ class SRP_Review_Router {
 
         wp_mail(
             $survey->customer_email,
-            "Just a quick reminder — {$business}",
+            "Just a quick reminder from {$business}",
             $this->review_email_html( $name, $business, $gmb_url ),
             array( 'Content-Type: text/html; charset=UTF-8' )
         );
@@ -99,7 +99,7 @@ class SRP_Review_Router {
             return;
         }
 
-        $subject = "Would you share your experience? — {$business}";
+        $subject = "Would you share your experience with {$business}?";
         $body    = $this->review_email_html( $name, $business, $gmb_url );
 
         wp_mail( $email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
