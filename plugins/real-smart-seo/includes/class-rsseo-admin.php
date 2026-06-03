@@ -19,6 +19,8 @@ class RSSEO_Admin {
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
         add_action( 'wp_ajax_rsseo_apply_fix',   array( $this, 'ajax_apply_fix' ) );
         add_action( 'wp_ajax_rsseo_apply_all',   array( $this, 'ajax_apply_all' ) );
+        add_action( 'wp_ajax_rsseo_restore_fix', array( $this, 'ajax_restore_fix' ) );
+        add_action( 'wp_ajax_rsseo_restore_all', array( $this, 'ajax_restore_all' ) );
         add_action( 'wp_ajax_rsseo_test_api',    array( $this, 'ajax_test_api' ) );
         add_action( 'wp_ajax_rsseo_save_settings', array( $this, 'ajax_save_settings' ) );
         add_action( 'wp_ajax_rsseo_rename_scan',   array( $this, 'ajax_rename_scan' ) );
@@ -377,7 +379,10 @@ class RSSEO_Admin {
                 'applied'    => __( 'Fixed!', 'real-smart-seo' ),
                 'error'      => __( 'Error. Try again.', 'real-smart-seo' ),
                 'confirm_fix'=> __( 'Apply this fix to your site?', 'real-smart-seo' ),
-                'confirm_all'=> __( 'Apply ALL pending fixes? This will update your site content.', 'real-smart-seo' ),
+                'confirm_all'=> __( 'Apply ALL pending fixes? This will update your site content. Every change is backed up and can be reverted.', 'real-smart-seo' ),
+                'confirm_revert'     => __( 'Revert this fix to the previous value?', 'real-smart-seo' ),
+                'confirm_revert_all' => __( 'Revert ALL applied fixes back to their previous values?', 'real-smart-seo' ),
+                'reverting'  => __( 'Reverting...', 'real-smart-seo' ),
                 'analyzing'  => __( 'Analyzing... this may take 30–60 seconds.', 'real-smart-seo' ),
                 'auditing'   => __( 'Running audit...', 'real-smart-seo' ),
             ),
@@ -610,6 +615,36 @@ class RSSEO_Admin {
 
         $result = RSSEO_Fixer::apply_all( $report_id );
         wp_send_json_success( $result );
+    }
+
+    // ── AJAX: Revert (rollback) ────────────────────────────────────────────────
+
+    public function ajax_restore_fix() {
+        check_ajax_referer( 'rsseo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $fix_id = isset( $_POST['fix_id'] ) ? (int) $_POST['fix_id'] : 0;
+        if ( ! $fix_id ) {
+            wp_send_json_error( __( 'Invalid fix ID.', 'real-smart-seo' ) );
+        }
+        $result = RSSEO_Fixer::restore( $fix_id );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( $result->get_error_message() );
+        }
+        wp_send_json_success( array( 'message' => __( 'Reverted to the previous value.', 'real-smart-seo' ) ) );
+    }
+
+    public function ajax_restore_all() {
+        check_ajax_referer( 'rsseo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $report_id = isset( $_POST['report_id'] ) ? (int) $_POST['report_id'] : 0;
+        if ( ! $report_id ) {
+            wp_send_json_error( __( 'Invalid report ID.', 'real-smart-seo' ) );
+        }
+        wp_send_json_success( RSSEO_Fixer::restore_all( $report_id ) );
     }
 
     // ── AJAX: Test API Key ─────────────────────────────────────────────────────
