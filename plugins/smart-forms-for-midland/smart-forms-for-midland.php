@@ -2,13 +2,17 @@
 /**
  * Plugin Name: Midland Smart Forms
  * Description: Multi-form lead capture for Midland Floor Care — floor-care templates, per-form shortcodes, file uploads, automation, Smart CRM Pro sync, Resend email, Google Calendar, branding, analytics, team management. (Formerly Smart Forms Basic + Smart Forms PRO, combined into one.)
- * Version: 2.19.6
+ * Version: 2.19.7
+ * Author: Midland Floor Care
+ * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-forms-for-midland
  * Domain Path: /languages
  * Requires at least: 5.5
  * Requires PHP: 7.4
+ * Tested up to: 6.7
+ * Update URI: false
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Plugin constants. Internal SFCO_/SFCO_PRO_ prefixes preserved so all
 // existing class code keeps working with zero changes when we merged the
 // Pro plugin into this folder.
-define( 'SFCO_VERSION', '2.19.6' );
+define( 'SFCO_VERSION', '2.19.7' );
 define( 'SFCO_PLUGIN_FILE', __FILE__ );
 define( 'SFCO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SFCO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -85,6 +89,7 @@ class SFCO_Plugin {
         register_activation_hook( __FILE__, array( 'SFCO_Plugin', 'activate' ) );
         register_uninstall_hook(  __FILE__, array( 'SFCO_Plugin', 'uninstall' ) );
 
+        add_action( 'init', array( $this, 'load_textdomain' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
         // Defensive: run table creation on every load if the DB version
         // tag is missing or stale, so a plugin upgraded via the GitHub
@@ -92,6 +97,10 @@ class SFCO_Plugin {
         // still has every Pro table. dbDelta is idempotent — if the
         // table already exists at the current schema this is a no-op.
         add_action( 'plugins_loaded', array( $this, 'maybe_install_tables' ), 20 );
+    }
+
+    public function load_textdomain() {
+        load_plugin_textdomain( 'smart-forms-for-midland', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     }
 
     public function maybe_install_tables() {

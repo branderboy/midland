@@ -3,12 +3,16 @@
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
  * Version: 1.9.30
+ * Author: Midland Floor Care
+ * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-chat-ai
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ * Tested up to: 6.7
+ * Update URI: false
  */
 
 // Exit if accessed directly
@@ -56,7 +60,9 @@ class SCAI_Plugin {
         // Activation/Deactivation
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
-        
+
+        add_action('init', array($this, 'load_textdomain'));
+
         // Admin hooks
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
@@ -95,6 +101,10 @@ class SCAI_Plugin {
         // weren't getting through Meta's developer-app onboarding.
     }
     
+    public function load_textdomain() {
+        load_plugin_textdomain( 'smart-chat-ai', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+    }
+
     /**
      * Activation
      */
@@ -153,7 +163,9 @@ class SCAI_Plugin {
      * Deactivation
      */
     public function deactivate() {
-        // Nothing to clean up — no cron events, no license server pings.
+        // Clear the daily content-context refresh cron so it isn't orphaned in
+        // WP-Cron after deactivation.
+        wp_clear_scheduled_hook( 'scai_ctx_refresh' );
     }
     
     /**
@@ -421,7 +433,6 @@ class SCAI_Plugin {
             'whatsappGreeting' => get_option( 'smart_chat_whatsapp_greeting', "Hi! I'd like to ask about your services." ),
             'bookingUrl' => esc_url_raw( $booking_url ),
             'suggestions' => $suggestions,
-            'session_token' => '',
         ));
     }
     
@@ -466,16 +477,28 @@ class SCAI_Plugin {
      * one ongoing conversation. Hashed with the site's auth salt so the raw IP
      * isn't used directly as a key.
      */
-    private function session_id_for_ip() {
-        $ip = '';
-        if ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
-            $ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
-        }
-        if ( '' === $ip ) {
-            $ip = 'unknown';
-        }
+    /**
+     * Return a hashed representation of the visitor's IP, used both as a
+     * fallback session ID and as the IP-level rate-limit key. Centralised
+     * here so the rate limiter doesn't re-derive it independently.
+     *
+     * @return string 'ip_' followed by 32 hex chars.
+     */
+    private function hashed_ip() {
+        $ip   = ! empty( $_SERVER['REMOTE_ADDR'] )
+            ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
+            : 'unknown';
         $salt = function_exists( 'wp_salt' ) ? wp_salt( 'auth' ) : 'scai';
         return 'ip_' . substr( hash( 'sha256', $ip . '|' . $salt ), 0, 32 );
+    }
+
+    /**
+     * Derive a fallback session ID from the visitor's IP (hashed). Only used
+     * when the browser hasn't sent a token yet — e.g. on the very first
+     * message before the JS has stored a token in localStorage.
+     */
+    private function session_id_for_ip() {
+        return $this->hashed_ip();
     }
 
     public function ajax_send_message() {
@@ -485,32 +508,51 @@ class SCAI_Plugin {
 
         if ( '' === $message ) {
             wp_send_json_error( array( 'message' => __( 'Missing message.', 'smart-chat-ai' ) ) );
+            return;
         }
 
-        // Rate limit: max 30 messages per IP per hour. Keyed on the hashed-IP
-        // id (not the browser token) so it can't be bypassed by rotating the
-        // session token.
-        $rate_key   = 'scai_rl_' . substr( $this->session_id_for_ip(), 0, 24 );
-        $rate_count = (int) get_transient( $rate_key );
-        if ( $rate_count >= 30 ) {
+        // Session token: prefer the browser-supplied token (stored in
+        // localStorage by the widget JS so each browser gets its own
+        // conversation thread even on shared IPs / NAT).
+        // Fall back to the IP-derived ID only when no token is present,
+        // which happens on the very first request before JS has stored one.
+        $posted_token = isset( $_POST['session_id'] ) ? sanitize_text_field( wp_unslash( $_POST['session_id'] ) ) : '';
+        $is_browser_token = ( '' !== $posted_token && preg_match( '/^sc_[a-z0-9_]+$/i', $posted_token ) );
+        $session_id = $is_browser_token ? $posted_token : $this->session_id_for_ip();
+
+        // Rate limiting — two independent budgets:
+        //
+        // TOKEN (per-browser, 30/hr): the real per-user limit. Each visitor's
+        // localStorage token has its own counter. Clearing localStorage or
+        // opening incognito gives a fresh token but NOT a fresh IP counter,
+        // so an abuser cycling tokens is still caught by the IP ceiling.
+        //
+        // IP ceiling (per-IP, 200/hr): abuse-prevention backstop. Set high
+        // enough that legitimate shared-IP scenarios (office NAT, mobile
+        // carrier) are never affected in normal use, while a single host
+        // hammering the endpoint from many faked tokens is still blocked.
+        //
+        // The token limit is the binding throttle for real users.
+        // The IP ceiling is the backstop against token-cycling abuse.
+        // The two are independent — crossing one does NOT penalise the other.
+        $ip_hash  = $this->hashed_ip();                          // reuse helper, no re-derivation
+        $rate_ip  = 'scai_rate_ip_'  . $ip_hash;
+        $rate_tok = 'scai_rate_tok_' . substr( $session_id, 0, 40 );
+
+        $ip_count  = (int) get_transient( $rate_ip );
+        $tok_count = (int) get_transient( $rate_tok );
+
+        if ( $tok_count >= 30 ) {
             wp_send_json_error( array( 'message' => __( 'Too many messages. Please try again in a little while.', 'smart-chat-ai' ) ) );
             return;
         }
-        // Creates the transient with a 1-hour expiry on the first message.
-        set_transient( $rate_key, $rate_count + 1, HOUR_IN_SECONDS );
-
-        // Conversation thread id: a browser-local session token sent by the
-        // widget. When the browser hasn't stored one yet (empty / not a 32-char
-        // hex string) we mint a new token and return it so the JS can persist
-        // and reuse it. session_id_for_ip() stays as the hashed-IP fallback.
-        $session_token = isset( $_POST['session_token'] ) ? sanitize_text_field( wp_unslash( $_POST['session_token'] ) ) : '';
-        $new_token     = '';
-        if ( preg_match( '/^[a-f0-9]{32}$/', $session_token ) ) {
-            $session_id = $session_token;
-        } else {
-            $new_token  = bin2hex( random_bytes( 16 ) );
-            $session_id = $new_token;
+        if ( $ip_count >= 200 ) {
+            wp_send_json_error( array( 'message' => __( 'Too many messages from this network. Please try again later.', 'smart-chat-ai' ) ) );
+            return;
         }
+
+        set_transient( $rate_ip,  $ip_count  + 1, HOUR_IN_SECONDS );
+        set_transient( $rate_tok, $tok_count + 1, HOUR_IN_SECONDS );
         global $wpdb;
         $table = $wpdb->prefix . 'smart_chat_conversations';
 
@@ -557,10 +599,6 @@ class SCAI_Plugin {
             error_log( 'Smart Chat lead capture failed: ' . $e->getMessage() );
         }
 
-        // Hand the browser its session token so it can persist and reuse it.
-        if ( '' !== $new_token ) {
-            $response['session_id'] = $new_token;
-        }
         wp_send_json_success($response);
     }
 

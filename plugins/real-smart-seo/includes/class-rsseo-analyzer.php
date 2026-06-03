@@ -287,10 +287,12 @@ INSTRUCTIONS;
 
     /**
      * Convert inline markdown (**bold**, *italic*, `code`) to HTML.
+     * esc_html() is applied inside each callback so special characters in
+     * the captured text are escaped before the HTML tags are wrapped around
+     * them — avoids the double-encoding that happened when esc_html() ran on
+     * the whole string first (e.g. & in **this & that** rendered as &amp;).
      */
     private static function inline_markdown( $text ) {
-        // Escape only the captured content as each token is wrapped, so the
-        // tags we add aren't themselves escaped.
         // Bold: **text**
         $text = preg_replace_callback( '/\*\*(.+?)\*\*/s', function ( $m ) {
             return '<strong>' . esc_html( $m[1] ) . '</strong>';
@@ -303,7 +305,12 @@ INSTRUCTIONS;
         $text = preg_replace_callback( '/`(.+?)`/s', function ( $m ) {
             return '<code>' . esc_html( $m[1] ) . '</code>';
         }, $text );
-        // Escape any plain text that fell through while keeping the tags above.
-        return wp_kses( $text, array( 'strong' => array(), 'em' => array(), 'code' => array() ) );
+        // Escape any plain text not wrapped in a tag, then allow only the
+        // three tags we just produced.
+        return wp_kses( $text, array(
+            'strong' => array(),
+            'em'     => array(),
+            'code'   => array(),
+        ) );
     }
 }

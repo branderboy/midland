@@ -2,7 +2,7 @@
 Contributors: midland
 Tags: backup, github, deploy, git, sync
 Requires at least: 5.6
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.4
 Stable tag: 3.4.1
 License: GPL-2.0-or-later

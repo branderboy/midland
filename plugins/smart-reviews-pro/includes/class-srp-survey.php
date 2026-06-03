@@ -301,12 +301,17 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         SRP_DB::update_survey( $survey->id, array( 'feedback' => $feedback ) );
 
         // Notify owner.
-        $owner_email = get_option( 'admin_email' );
-        $business    = get_bloginfo( 'name' );
+        // Re-sanitize DB values for the email context: strip tags/control chars so
+        // a stored name or email can't inject headers or unexpected content.
+        $owner_email       = get_option( 'admin_email' );
+        $business          = wp_strip_all_tags( get_bloginfo( 'name' ) );
+        $safe_name         = sanitize_text_field( $survey->customer_name );
+        $safe_email        = sanitize_email( $survey->customer_email );
+        $safe_score        = absint( $survey->score );
         wp_mail(
             $owner_email,
-            "[{$business}] Private feedback received — score {$survey->score}/5",
-            "Customer: {$survey->customer_name} ({$survey->customer_email})\nScore: {$survey->score}/5\n\nFeedback:\n{$feedback}",
+            "[{$business}] Private feedback received — score {$safe_score}/5",
+            "Customer: {$safe_name} ({$safe_email})\nScore: {$safe_score}/5\n\nFeedback:\n{$feedback}",
             array( 'Content-Type: text/plain; charset=UTF-8' )
         );
 

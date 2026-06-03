@@ -21,6 +21,40 @@ class SRP_Review_Router {
 
     private function __construct() {
         add_action( 'srp_score_received', array( $this, 'route' ), 10, 3 );
+        // 48h nudge for happy customers who were sent a Google review request.
+        add_action( 'srp_review_reminder', array( $this, 'send_review_reminder' ), 10, 1 );
+    }
+
+    /**
+     * Reminder fired 48h after a Google-review request (scheduled in
+     * send_review_request). Re-sends the review ask to customers who were
+     * routed to GMB. Without click-tracking we can't know if they already
+     * reviewed, so this is a single, gentle follow-up.
+     *
+     * @param int $survey_id
+     */
+    public function send_review_reminder( $survey_id ) {
+        $survey = SRP_DB::get_survey( (int) $survey_id );
+        if ( ! $survey || 'gmb' !== $survey->route_type ) {
+            return; // Only nudge customers who got a Google review request.
+        }
+
+        $gmb_url = get_option( 'srp_gmb_review_url', '' );
+        if ( ! is_email( $survey->customer_email ) || ! $gmb_url ) {
+            return;
+        }
+
+        $business = get_bloginfo( 'name' );
+        $name     = $survey->customer_name ?: 'there';
+
+        wp_mail(
+            $survey->customer_email,
+            "Just a quick reminder — {$business}",
+            $this->review_email_html( $name, $business, $gmb_url ),
+            array( 'Content-Type: text/html; charset=UTF-8' )
+        );
+
+        SRP_DB::update_survey( (int) $survey_id, array( 'reminder1_at' => current_time( 'mysql' ) ) );
     }
 
     /**

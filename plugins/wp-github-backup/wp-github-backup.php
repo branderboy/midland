@@ -2,13 +2,17 @@
 /**
  * Plugin Name:       Midland GitHub Vault & Deploy
  * Description:       GitHub backup + deploy for Midland Floors (midlandfloors.com). Backs up WordPress content, DB, themes, plugins, and uploads to a GitHub repository; deploys page/post content from GitHub back into WordPress with automatic cache-purge and live-render verification. Includes a one-click "Register webhook on GitHub" connect flow and a synthetic test-ping for round-trip verification.
- * Version:           3.6.4
+ * Version:           3.6.5
+ * Author:            Midland Floor Care
+ * Author URI:        https://midlandfloors.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-github-backup
  * Domain Path:       /languages
  * Requires PHP:      7.4
  * Requires at least: 5.6
+ * Tested up to:      6.7
+ * Update URI:        false
  *
  * @package WPGitHubBackup
  */
@@ -17,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WGB_VERSION', '3.6.4' );
+define( 'WGB_VERSION', '3.6.5' );
 define( 'WGB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WGB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WGB_PLUGIN_FILE', __FILE__ );
@@ -136,6 +140,25 @@ function wgb_deactivate() {
 	}
 }
 register_deactivation_hook( __FILE__, 'wgb_deactivate' );
+
+/**
+ * Register the custom "weekly" cron recurrence. Core only ships hourly /
+ * twicedaily / daily, so without this the Weekly backup option silently
+ * scheduled nothing — wp_schedule_event() rejects an unknown recurrence.
+ */
+function wgb_cron_schedules( $schedules ) {
+	if ( ! is_array( $schedules ) ) {
+		$schedules = array();
+	}
+	if ( ! isset( $schedules['weekly'] ) ) {
+		$schedules['weekly'] = array(
+			'interval' => WEEK_IN_SECONDS,
+			'display'  => __( 'Once Weekly', 'wp-github-backup' ),
+		);
+	}
+	return $schedules;
+}
+add_filter( 'cron_schedules', 'wgb_cron_schedules' );
 
 /**
  * Self-heal a missing webhook secret on admin requests. Without this the

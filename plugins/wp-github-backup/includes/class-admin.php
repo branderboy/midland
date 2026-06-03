@@ -54,6 +54,7 @@ class WGB_Admin {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$raw = isset( $_POST['pairs'] ) ? wp_unslash( $_POST['pairs'] ) : '';
@@ -142,6 +143,7 @@ class WGB_Admin {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$github = $this->get_deploy_github();
@@ -170,6 +172,7 @@ class WGB_Admin {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		global $wpdb;
@@ -703,6 +706,7 @@ class WGB_Admin {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$runner = new WGB_Backup_Runner();
@@ -764,6 +768,7 @@ class WGB_Admin {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$this->process_settings_save();
@@ -779,6 +784,7 @@ class WGB_Admin {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$token        = WGB_Settings::get_token();
@@ -831,6 +837,7 @@ class WGB_Admin {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$backups = WGB_Restore::get_available_backups();
@@ -1050,6 +1057,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$github = $this->get_deploy_github();
@@ -1078,6 +1086,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$github = $this->get_deploy_github();
@@ -1102,6 +1111,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$history = WGB_Deployer::get_history( 20 );
@@ -1116,6 +1126,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$fields = array(
@@ -1153,6 +1164,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$secret = WGB_Settings::get_webhook_secret();
@@ -1216,6 +1228,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$token     = WGB_Settings::get_token();
@@ -1311,6 +1324,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		// Self-updater is disabled by default because writing executable
@@ -1600,6 +1614,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$post_type = isset( $_POST['post_type'] ) ? sanitize_key( $_POST['post_type'] ) : 'post';
@@ -1618,6 +1633,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
@@ -1641,6 +1657,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
@@ -1753,6 +1770,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 		check_ajax_referer( 'wgb_nonce', 'nonce' );
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
@@ -1780,6 +1798,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 		check_ajax_referer( 'wgb_nonce', 'nonce' );
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
@@ -1804,6 +1823,7 @@ https://example.com/another-old/|https://example.com/another-new/"></textarea>
 		check_ajax_referer( 'wgb_nonce', 'nonce' );
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'wp-github-backup' ) );
+			return;
 		}
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
