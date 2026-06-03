@@ -48,6 +48,12 @@ Set the option `srp_purge_on_uninstall` to `'1'` before deleting the plugin (e.g
 
 == Changelog ==
 
+= 1.5.1 =
+* Fixed reminder emails going out too close together: the second reminder now waits a full 48h after the first reminder actually sent (measured from reminder1_at, not the original send), so the two can never fire in the same cron run.
+* Fixed reminder timing skew on sites not set to UTC (thresholds now match the site-local timestamps stored on the survey row).
+* Fixed survey/reminder email display on iOS Mail: stopped automatic text inflation that blew up the copy and clipped the digits inside the 1–5 rating buttons; rating buttons now size to their content so they can't crop.
+* Cleaned up the survey subject line copy.
+
 = 1.3.0 =
 * Added deactivation hook to cancel scheduled cron reminders.
 * Added languages/ directory and .pot file for translation readiness.
