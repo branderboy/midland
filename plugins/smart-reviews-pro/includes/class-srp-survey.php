@@ -288,20 +288,38 @@ class SRP_Survey {
             for ( $i = 1; $i <= self::MAX_SCORE; $i++ ) {
                 $url = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
                 $bg  = 5 === $i ? self::STAR_5 : ( 4 === $i ? self::STAR_4 : ( $i === 3 ? self::STAR_OK : self::STAR_BAD ) );
-                $scores_html .= '<a href="' . esc_url( $url ) . '" style="display:inline-block;width:52px;height:52px;line-height:52px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
+                // Once a star is picked, make the choice unmistakable: enlarge + ring
+                // the selected button and fade the rest (they stay tappable to change it).
+                $extra = '';
+                if ( null !== $picked ) {
+                    $extra = ( $i === $picked )
+                        ? 'box-shadow:0 0 0 3px #0F1411;transform:scale(1.15);'
+                        : 'opacity:0.30;';
+                }
+                $scores_html .= '<a href="' . esc_url( $url ) . '" style="display:inline-block;width:52px;height:52px;line-height:52px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;' . $extra . '">' . $i . '&#9733;</a>';
             }
 
             $confirm_html = '';
             if ( null !== $picked ) {
                 $bg = 5 === $picked ? self::STAR_5 : ( 4 === $picked ? self::STAR_4 : ( $picked === 3 ? self::STAR_OK : self::STAR_BAD ) );
+                // Big gold filled/empty stars so the selected number is obvious.
+                $big_stars = '';
+                for ( $k = 1; $k <= self::MAX_SCORE; $k++ ) {
+                    $col = $k <= $picked ? '#FACC15' : '#D1D5DB';
+                    $big_stars .= '<span style="font-size:42px;line-height:1;color:' . $col . ';">&#9733;</span>';
+                }
                 $confirm_html = '
-<form method="post" action="' . esc_url( home_url( '/' ) ) . '" style="margin-top:24px;">
-  <input type="hidden" name="srp_survey" value="' . esc_attr( $token ) . '">
-  <input type="hidden" name="score" value="' . esc_attr( (string) $picked ) . '">
-  <input type="hidden" name="_srp_nonce" value="' . esc_attr( wp_create_nonce( 'srp_score_' . $token ) ) . '">
-  <p style="color:#0F1411;font-size:15px;margin:0 0 16px;">You picked <strong style="color:' . $bg . ';">' . esc_html( (string) $picked ) . ' / 5&#9733;</strong>. Tap submit to confirm.</p>
-  <button type="submit" style="background:' . esc_attr( self::brand_color() ) . ';color:#fff;border:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">Submit my rating</button>
-</form>';
+<div style="margin-top:28px;padding-top:24px;border-top:1px solid #eee;">
+  <div style="margin:0 0 10px;letter-spacing:2px;">' . $big_stars . '</div>
+  <p style="color:#0F1411;font-size:20px;font-weight:800;margin:0 0 4px;">' . esc_html__( 'You selected', 'smart-reviews-pro' ) . ' <span style="color:' . $bg . ';">' . esc_html( (string) $picked ) . ' / 5</span></p>
+  <p style="color:#6B7280;font-size:13px;margin:0 0 20px;">' . esc_html__( 'Not right? Tap a different star above.', 'smart-reviews-pro' ) . '</p>
+  <form method="post" action="' . esc_url( home_url( '/' ) ) . '" style="margin:0;">
+    <input type="hidden" name="srp_survey" value="' . esc_attr( $token ) . '">
+    <input type="hidden" name="score" value="' . esc_attr( (string) $picked ) . '">
+    <input type="hidden" name="_srp_nonce" value="' . esc_attr( wp_create_nonce( 'srp_score_' . $token ) ) . '">
+    <button type="submit" style="background:' . esc_attr( self::brand_color() ) . ';color:#fff;border:none;padding:14px 34px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;">' . sprintf( esc_html__( 'Submit my %d-star rating', 'smart-reviews-pro' ), (int) $picked ) . '</button>
+  </form>
+</div>';
             }
 
             $inner = '<h1 style="font-size:22px;margin:0 0 8px;color:#0F1411;">How was your experience?</h1>
