@@ -5,11 +5,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SFCO_Pro_Calendly {
 
+    /** One-time cron that auto-completes a visit after its scheduled time. */
+    const CRON_COMPLETE = 'sfco_pro_calendly_complete';
+
+    /** Hours after a booking's end time before it is auto-marked completed. */
+    const COMPLETE_BUFFER_HOURS = 2;
+
     public function __construct() {
         add_action( 'admin_menu', array( $this, 'add_menu' ), 32 );
         add_action( 'admin_init', array( $this, 'handle_save' ) );
         add_action( 'admin_init', array( $this, 'handle_connect' ) );
         add_action( 'rest_api_init', array( $this, 'register_webhook' ) );
+        // Auto-completion: Calendly has no "visit completed" event, so once a
+        // booking's scheduled time has passed we mark it completed ourselves —
+        // which tags the lead completed in Smart CRM and fires the Smart Reviews
+        // survey via the same signals the ServiceM8 path uses.
+        add_action( self::CRON_COMPLETE, array( $this, 'complete_visit' ), 10, 1 );
     }
 
     public function add_menu() {
@@ -232,6 +243,7 @@ class SFCO_Pro_Calendly {
         $email   = sanitize_email( (string) ( $payload['email'] ?? '' ) );
         $name    = sanitize_text_field( (string) ( $payload['name'] ?? '' ) );
         $time    = (string) ( $payload['scheduled_event']['start_time'] ?? '' );
+        $end     = (string) ( $payload['scheduled_event']['end_time'] ?? '' );
 
         $lead = $this->match_lead( $payload, $email );
         if ( ! $lead ) {
@@ -246,7 +258,7 @@ class SFCO_Pro_Calendly {
             $reason = sanitize_text_field( (string) ( $payload['cancellation']['reason'] ?? '' ) );
             $result = $this->mark_lead_canceled( $lead, $name, $email, $reason );
         } else {
-            $result = $this->mark_lead_booked( $lead, $time, $name, $email );
+            $result = $this->mark_lead_booked( $lead, $time, $name, $email, $end );
         }
 
         return new WP_REST_Response( array(
@@ -317,7 +329,7 @@ class SFCO_Pro_Calendly {
      * @param string $email Invitee email for the admin email.
      * @return string 'marked_booked' | 'already_booked' | 'already_completed'
      */
-    private function mark_lead_booked( $lead, $time = '', $name = '', $email = '' ) {
+    private function mark_lead_booked( $lead, $time = '', $name = '', $email = '', $end_time = '' ) {
         $current = strtolower( (string) ( $lead->status ?? '' ) );
         if ( 'completed' === $current ) {
             return 'already_completed';
@@ -370,6 +382,12 @@ class SFCO_Pro_Calendly {
          */
         do_action( 'sfco_lead_booked', $lead, $is_rebook );
 
+        // Calendly never tells us the visit happened, so schedule our own
+        // completion shortly after the booked slot ends. complete_visit() only
+        // fires if the lead is still "booked" at that time (a cancellation
+        // clears it), then tags completed in CRM + triggers the review survey.
+        $this->schedule_completion( (int) $lead->id, $end_time, $time );
+
         return $is_rebook ? 'marked_rebooked' : 'marked_booked';
     }
 
@@ -409,6 +427,9 @@ class SFCO_Pro_Calendly {
         );
         $lead->status = 'canceled';
 
+        // Drop the pending auto-completion — the visit is no longer happening.
+        $this->unschedule_completion( (int) $lead->id );
+
         // Notify the operator.
         $admin_email = get_option( 'admin_email' );
         wp_mail(
@@ -435,6 +456,85 @@ class SFCO_Pro_Calendly {
         do_action( 'sfco_lead_canceled', $lead, $reason );
 
         return 'marked_canceled';
+    }
+
+    /**
+     * Schedule a one-time auto-completion for a booked lead. Fires a couple of
+     * hours after the booking's scheduled end (falls back to the start time,
+     * then to "soon" if Calendly sent no time at all).
+     *
+     * @param int    $lead_id
+     * @param string $end_time   RFC3339 scheduled end_time, if present.
+     * @param string $start_time RFC3339 scheduled start_time, fallback.
+     */
+    private function schedule_completion( $lead_id, $end_time = '', $start_time = '' ) {
+        $this->unschedule_completion( $lead_id ); // never stack duplicates
+
+        $base = strtotime( $end_time ) ?: strtotime( $start_time );
+        $when = ( $base ?: time() ) + ( self::COMPLETE_BUFFER_HOURS * HOUR_IN_SECONDS );
+        if ( $when < time() + 300 ) {
+            $when = time() + 300; // always at least 5 min out
+        }
+
+        /**
+         * Allow tuning when a Calendly visit is considered complete.
+         *
+         * @param int $when    Unix timestamp the completion will fire.
+         * @param int $lead_id Lead row ID.
+         */
+        $when = (int) apply_filters( 'sfco_calendly_complete_at', $when, (int) $lead_id );
+
+        wp_schedule_single_event( $when, self::CRON_COMPLETE, array( (int) $lead_id ) );
+    }
+
+    /** Cancel a pending auto-completion for a lead (e.g. on cancellation). */
+    private function unschedule_completion( $lead_id ) {
+        $args = array( (int) $lead_id );
+        $ts   = wp_next_scheduled( self::CRON_COMPLETE, $args );
+        while ( $ts ) {
+            wp_unschedule_event( $ts, self::CRON_COMPLETE, $args );
+            $ts = wp_next_scheduled( self::CRON_COMPLETE, $args );
+        }
+    }
+
+    /**
+     * Cron callback: mark a still-booked lead "completed". This is the Calendly
+     * equivalent of a ServiceM8 job-completed event — it fans out the same
+     * signals so Smart CRM applies the completed tag / advances the deal and
+     * Smart Reviews emails the NPS survey.
+     *
+     * @param int $lead_id
+     */
+    public function complete_visit( $lead_id ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'sfco_leads';
+        $lead  = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $lead_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        if ( ! $lead ) {
+            return;
+        }
+        $old = strtolower( (string) ( $lead->status ?? '' ) );
+        // Only complete a visit that is still booked — a canceled lead (or one
+        // already completed by ServiceM8) must not be flipped.
+        if ( 'booked' !== $old ) {
+            return;
+        }
+
+        $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $table,
+            array( 'status' => 'completed' ),
+            array( 'id' => (int) $lead->id ),
+            array( '%s' ),
+            array( '%d' )
+        );
+        $lead->status = 'completed';
+
+        /**
+         * Completion fan-out — identical to the ServiceM8 job-completed path:
+         *   - Smart CRM Pro: applies the completed tag + advances the AC deal.
+         *   - Smart Reviews: emails the NPS survey.
+         */
+        do_action( 'sfco_lead_status_changed', $lead, $old, 'completed' );
+        do_action( 'sfco_lead_completed', $lead );
     }
 
     /**
@@ -525,6 +625,25 @@ class SFCO_Pro_Calendly {
                     <span style="display:inline-block;padding:4px 10px;background:#fef3c7;color:#92400e;border-radius:3px;font-weight:600;"><?php esc_html_e( 'Webhook not connected — add your API key and click Connect Calendly', 'smart-forms-pro' ); ?></span>
                 <?php endif; ?>
             </p>
+
+            <?php
+            $crm_on     = defined( 'SCRM_PRO_VERSION' );
+            $reviews_on = defined( 'SRP_VERSION' );
+            $badge      = function ( $on ) {
+                return $on
+                    ? '<span style="display:inline-block;min-width:18px;color:#166534;font-weight:700;">&#10003;</span>'
+                    : '<span style="display:inline-block;min-width:18px;color:#b32d2e;font-weight:700;">&#10005;</span>';
+            };
+            ?>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:14px 18px;margin:0 0 20px;max-width:680px;">
+                <strong><?php esc_html_e( 'Booking → completion flow', 'smart-forms-pro' ); ?></strong>
+                <ul style="margin:8px 0 0;">
+                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Calendly booking marks the lead Booked (and a cancellation reverses it).', 'smart-forms-pro' ); ?></li>
+                    <li><?php echo $badge( $crm_on ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <strong>Smart CRM for Midland</strong> — <?php echo $crm_on ? esc_html__( 'connected: tags the lead completed and advances the deal.', 'smart-forms-pro' ) : esc_html__( 'not active — completed tagging will not run.', 'smart-forms-pro' ); ?></li>
+                    <li><?php echo $badge( $reviews_on ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <strong>Smart Reviews</strong> — <?php echo $reviews_on ? esc_html__( 'connected: emails the review survey when the visit completes.', 'smart-forms-pro' ) : esc_html__( 'not active — no review survey will send.', 'smart-forms-pro' ); ?></li>
+                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php printf( esc_html__( 'The visit auto-completes about %dh after its scheduled end (Calendly sends no "completed" event); canceled bookings are skipped.', 'smart-forms-pro' ), (int) self::COMPLETE_BUFFER_HOURS ); ?></li>
+                </ul>
+            </div>
 
             <form method="post">
                 <?php wp_nonce_field( 'sfco_save_calendly', '_sfco_cal_nonce' ); ?>
