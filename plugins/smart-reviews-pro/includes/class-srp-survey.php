@@ -284,28 +284,78 @@ class SRP_Survey {
         $score    = $survey->score;
 
         if ( null === $score || '' === $score ) {
+            $nonce = wp_create_nonce( 'srp_score_' . $token );
+            $home  = esc_url( home_url( '/' ) );
+            $brand = esc_attr( self::brand_color() );
+            $colors = array( 1 => self::STAR_BAD, 2 => self::STAR_BAD, 3 => self::STAR_OK, 4 => self::STAR_4, 5 => self::STAR_5 );
+
+            // Star buttons are real links (?pick=N) so they still work without
+            // JavaScript — the server then renders the selected state. The inline
+            // script below upgrades this to instant, no-reload selection.
             $scores_html = '';
             for ( $i = 1; $i <= self::MAX_SCORE; $i++ ) {
-                $url = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
-                $bg  = 5 === $i ? self::STAR_5 : ( 4 === $i ? self::STAR_4 : ( $i === 3 ? self::STAR_OK : self::STAR_BAD ) );
-                $scores_html .= '<a href="' . esc_url( $url ) . '" style="display:inline-block;width:52px;height:52px;line-height:52px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
+                $url   = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
+                $extra = '';
+                if ( null !== $picked ) {
+                    $extra = ( $i === $picked )
+                        ? 'box-shadow:0 0 0 3px #0F1411;transform:scale(1.15);'
+                        : 'opacity:0.30;';
+                }
+                $scores_html .= '<a href="' . esc_url( $url ) . '" class="srp-star" data-score="' . $i . '" style="display:inline-block;width:56px;height:56px;line-height:56px;text-align:center;background:' . $colors[ $i ] . ';color:#fff;font-weight:bold;font-size:20px;border-radius:10px;text-decoration:none;margin:4px;transition:all .15s ease;' . $extra . '">' . $i . '&#9733;</a>';
             }
 
-            $confirm_html = '';
-            if ( null !== $picked ) {
-                $bg = 5 === $picked ? self::STAR_5 : ( 4 === $picked ? self::STAR_4 : ( $picked === 3 ? self::STAR_OK : self::STAR_BAD ) );
-                $confirm_html = '
-<form method="post" action="' . esc_url( home_url( '/' ) ) . '" style="margin-top:24px;">
-  <input type="hidden" name="srp_survey" value="' . esc_attr( $token ) . '">
-  <input type="hidden" name="score" value="' . esc_attr( (string) $picked ) . '">
-  <input type="hidden" name="_srp_nonce" value="' . esc_attr( wp_create_nonce( 'srp_score_' . $token ) ) . '">
-  <p style="color:#0F1411;font-size:15px;margin:0 0 16px;">You picked <strong style="color:' . $bg . ';">' . esc_html( (string) $picked ) . ' / 5&#9733;</strong>. Tap submit to confirm.</p>
-  <button type="submit" style="background:' . esc_attr( self::brand_color() ) . ';color:#fff;border:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">Submit my rating</button>
-</form>';
+            // Selection readout + submit. Visible immediately when a pick arrives via
+            // the email link (no-JS path); otherwise hidden until JS reveals it.
+            $show = ( null !== $picked );
+            $pk   = (int) $picked;
+            $big  = '';
+            for ( $k = 1; $k <= self::MAX_SCORE; $k++ ) {
+                $col  = ( $show && $k <= $pk ) ? '#FACC15' : '#D1D5DB';
+                $big .= '<span class="srp-big" data-k="' . $k . '" style="font-size:44px;line-height:1;color:' . $col . ';">&#9733;</span>';
             }
+            $confirm_html = '
+<div id="srp-confirm" style="margin-top:26px;padding-top:22px;border-top:1px solid #eee;' . ( $show ? '' : 'display:none;' ) . '">
+  <div id="srp-bigstars" style="margin:0 0 8px;letter-spacing:3px;">' . $big . '</div>
+  <p style="color:#0F1411;font-size:20px;font-weight:800;margin:0 0 4px;">You selected <span id="srp-num" style="color:' . self::brand_color() . ';">' . ( $show ? $pk : '' ) . '</span> / 5</p>
+  <p style="color:#6B7280;font-size:13px;margin:0 0 18px;">Tap a different star above to change it.</p>
+  <form method="post" action="' . $home . '" style="margin:0;">
+    <input type="hidden" name="srp_survey" value="' . esc_attr( $token ) . '">
+    <input type="hidden" id="srp-score" name="score" value="' . ( $show ? $pk : '' ) . '">
+    <input type="hidden" name="_srp_nonce" value="' . esc_attr( $nonce ) . '">
+    <button type="submit" style="background:' . $brand . ';color:#fff;border:none;padding:15px 36px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;">Submit my rating</button>
+  </form>
+</div>
+<script>
+(function(){
+  var stars=document.querySelectorAll(".srp-star"),
+      box=document.getElementById("srp-confirm"),
+      num=document.getElementById("srp-num"),
+      score=document.getElementById("srp-score"),
+      bigs=document.querySelectorAll(".srp-big");
+  if(!stars.length)return;
+  for(var i=0;i<stars.length;i++){
+    stars[i].addEventListener("click",function(e){
+      e.preventDefault();
+      var n=parseInt(this.getAttribute("data-score"),10),s,sel;
+      for(var j=0;j<stars.length;j++){
+        s=stars[j];sel=(s===this);
+        s.style.opacity=sel?"1":"0.30";
+        s.style.boxShadow=sel?"0 0 0 3px #0F1411":"none";
+        s.style.transform=sel?"scale(1.15)":"none";
+      }
+      for(var k=0;k<bigs.length;k++){
+        bigs[k].style.color=(parseInt(bigs[k].getAttribute("data-k"),10)<=n)?"#FACC15":"#D1D5DB";
+      }
+      num.textContent=n;score.value=n;
+      box.style.display="block";
+      if(box.scrollIntoView){box.scrollIntoView({behavior:"smooth",block:"nearest"});}
+    });
+  }
+})();
+</script>';
 
             $inner = '<h1 style="font-size:22px;margin:0 0 8px;color:#0F1411;">How was your experience?</h1>
-<p style="color:#4B5563;margin:0 0 32px;">1&#9733; = Poor &nbsp;&nbsp; 5&#9733; = Excellent</p>'
+<p style="color:#4B5563;margin:0 0 28px;">Tap a star to rate us — 1&#9733; = Poor, 5&#9733; = Excellent</p>'
                 . $scores_html . $confirm_html;
             echo self::page_shell( __( 'How did we do?', 'smart-reviews-pro' ), $inner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             return;
