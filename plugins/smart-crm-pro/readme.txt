@@ -62,6 +62,9 @@ Four segments: High-Value Quoted (quoted $2,500+ but didn't close), Recent Cold 
 
 == Changelog ==
 
+= 2.4.1 =
+* Completion is now driven solely by ServiceM8. Removed the ActiveCampaign bridge's Calendly visit-completion gate — Calendly only records that the service was scheduled (Booked), and ServiceM8 closing the job is the single source of the completed lifecycle (review survey + floor-care plan + AC completed flow).
+
 = 1.0.0 =
 * Initial release
 * Cold lead detection and scoring
