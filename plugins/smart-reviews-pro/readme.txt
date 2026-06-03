@@ -48,6 +48,10 @@ Set the option `srp_purge_on_uninstall` to `'1'` before deleting the plugin (e.g
 
 == Changelog ==
 
+= 1.5.2 =
+* Added a third (final) survey reminder, sent a few days (~5) after the second one for customers who still haven't responded. Cadence is now: survey → ~24h → ~48h → ~5 days, stopping the moment a score is submitted. Each reminder is spaced from the previous one, so no two ever send in the same cron run.
+* New reminder3_at column added automatically on existing installs (schema upgrade, no reactivation needed).
+
 = 1.5.1 =
 * Fixed reminder emails going out too close together: the second reminder now waits a full 48h after the first reminder actually sent (measured from reminder1_at, not the original send), so the two can never fire in the same cron run.
 * Fixed reminder timing skew on sites not set to UTC (thresholds now match the site-local timestamps stored on the survey row).

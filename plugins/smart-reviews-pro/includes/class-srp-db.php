@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SRP_DB {
 
-    const DB_VERSION = '1.1'; // bump when the schema below changes
+    const DB_VERSION = '1.2'; // bump when the schema below changes
 
     public static function create_tables() {
         global $wpdb;
@@ -29,6 +29,7 @@ class SRP_DB {
             responded_at   DATETIME      NULL,
             reminder1_at   DATETIME      NULL,
             reminder2_at   DATETIME      NULL,
+            reminder3_at   DATETIME      NULL,
             created_at     DATETIME      NOT NULL,
             PRIMARY KEY (id),
             KEY customer_email (customer_email),
@@ -187,6 +188,28 @@ class SRP_DB {
                 AND reminder1_at IS NOT NULL
                 AND reminder1_at < %s
                 AND reminder2_at IS NULL",
+                $threshold
+            )
+        );
+    }
+
+    /**
+     * Surveys that need their third (last) reminder: reminder2 went out at least
+     * 5 days ago, the customer still hasn't responded, and reminder3 hasn't been
+     * sent. Like reminder2, the wait is measured from the previous reminder
+     * (reminder2_at), so it can never fire in the same cron run as reminder2.
+     * This is the final nudge — there is no reminder4.
+     */
+    public static function get_pending_reminders_third() {
+        global $wpdb;
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - 5 * DAY_IN_SECONDS );
+        return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}srp_surveys
+                WHERE score IS NULL
+                AND reminder2_at IS NOT NULL
+                AND reminder2_at < %s
+                AND reminder3_at IS NULL",
                 $threshold
             )
         );

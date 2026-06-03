@@ -82,27 +82,9 @@ class SCRM_Pro_ActiveCampaign {
         // the booked-job tag fires.
         add_action( 'scrm_pro_job_created',      array( $this, 'on_job_created' ) );
 
-        // Calendly visit-completion gate. Calendly fires this when a booked
-        // visit's time has passed; Smart CRM decides whether that visit IS the
-        // paid service rendered (so it should trigger reviews / floor plan / AC
-        // completed flow) or just an estimate to record and wait on ServiceM8.
-        add_filter( 'sfco_calendly_visit_is_completion', array( $this, 'calendly_visit_is_completion' ), 10, 2 );
-    }
-
-    /**
-     * Whether a finished Calendly visit counts as the paid service rendered.
-     * Residential visits are the service; commercial visits are estimates
-     * unless it's an emergency (crew does the work on the spot).
-     *
-     * @param bool   $is_completion Incoming default.
-     * @param object $lead          wp_sfco_leads row.
-     * @return bool
-     */
-    public function calendly_visit_is_completion( $is_completion, $lead ) {
-        if ( 'commercial' === $this->lead_segment( $lead ) && ! $this->is_emergency( $lead ) ) {
-            return false;
-        }
-        return (bool) $is_completion;
+        // NOTE: completion is driven solely by ServiceM8 (the *_completed actions
+        // above). Calendly only records that the service was scheduled (Booked),
+        // so there is no Calendly visit-completion gate to hook here anymore.
     }
 
     public function on_job_created( $lead ) {

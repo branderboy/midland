@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Routes survey scores (1–5 star scale):
- * Score >= 4★ → Google review link (+ 2 follow-up reminders if not clicked)
+ * Score >= 4★ → Google review link (+ up to 3 follow-up reminders if not clicked)
  * Score < 4★  → private feedback form only, manager notified
  */
 class SRP_Review_Router {
