@@ -3,22 +3,24 @@
  * Plugin Name: Real Smart SEO
  * Plugin URI: https://tagglefish.com/real-smart-seo
  * Description: AI-powered SEO analysis, reporting, and auto-fix. Upload your Screaming Frog, GSC, GA, and PageSpeed data — get a full report, a prioritized plan, and one-click fixes.
- * Version: 1.0.0
- * Author: TaggleFish
- * Author URI: https://tagglefish.com
+ * Version: 1.0.1
+ * Author: Midland Floor Care
+ * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: real-smart-seo
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ * Tested up to: 6.7
+ * Update URI: false
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'RSSEO_VERSION',  '1.0.0' );
+define( 'RSSEO_VERSION',  '1.0.1' );
 define( 'RSSEO_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_URL',      plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_FILE',     __FILE__ );

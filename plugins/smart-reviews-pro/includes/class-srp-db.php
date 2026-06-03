@@ -47,6 +47,14 @@ class SRP_DB {
     }
 
     /**
+     * Fetch a survey row by its id. Returns null if missing.
+     */
+    public static function get_survey( $id ) {
+        global $wpdb;
+        return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}srp_surveys WHERE id = %d", (int) $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    }
+
+    /**
      * Resolve a HMAC-signed token "<id>.<sig>" to a survey row.
      * Returns null if the signature is invalid or the row is missing.
      */

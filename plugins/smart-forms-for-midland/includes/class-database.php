@@ -444,8 +444,18 @@ class SFCO_Database {
          * submission. The lead is already saved; downstream failures are logged
          * and swallowed so the visitor still gets a success response.
          */
+        // Listeners (Vapi, ops notifications, visit-draft, priority scoring,
+        // etc.) read journey fields like lead_intent / property_type /
+        // emergency_service directly off the payload. Those arrive as
+        // extra_fields (they aren't DB columns), so surface them at the top
+        // level here — real DB columns still win on any name clash.
+        $payload = $row;
+        if ( isset( $data['extra_fields'] ) && is_array( $data['extra_fields'] ) ) {
+            $payload = array_merge( $data['extra_fields'], $row );
+        }
+
         try {
-            do_action( 'sfco_lead_submitted', $lead_id, $row, self::get_form( $row['form_id'] ) );
+            do_action( 'sfco_lead_submitted', $lead_id, $payload, self::get_form( $row['form_id'] ) );
         } catch ( \Throwable $e ) {
             error_log( 'Smart Forms: sfco_lead_submitted listener failed for lead ' . $lead_id . ': ' . $e->getMessage() );
         }

@@ -111,6 +111,16 @@ class SCRM_Chat_Forms_Bridge {
         $lead_row  = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $sfco_lead_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $lead_data = $lead_row ? get_object_vars( $lead_row ) : $row + array( 'id' => $sfco_lead_id, 'form_id' => $row['form_id'] );
 
+        // Surface any stored extra fields (lead_intent, property_type, etc.) at
+        // the top level so journey listeners see the same shape as a normal
+        // form submission. DB columns win on any name clash.
+        if ( ! empty( $lead_data['extra_fields_json'] ) ) {
+            $extra = json_decode( (string) $lead_data['extra_fields_json'], true );
+            if ( is_array( $extra ) ) {
+                $lead_data = array_merge( $extra, $lead_data );
+            }
+        }
+
         $form = (object) array(
             'id'    => (int) $row['form_id'],
             'title' => __( 'Chat (AI)', 'smart-crm-pro' ),
