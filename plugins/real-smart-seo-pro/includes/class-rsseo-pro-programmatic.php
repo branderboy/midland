@@ -11,8 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RSSEO_Pro_Programmatic {
 
-    const CPT      = 'mfc_location';
-    const TAXONOMY = 'mfc_service';
+    const CPT          = 'mfc_location';
+    const TAXONOMY     = 'mfc_service';
+    const OPT_TEMPLATES = 'rsseo_prog_templates';
 
     private static $instance = null;
 
@@ -29,6 +30,7 @@ class RSSEO_Pro_Programmatic {
         add_action( 'admin_menu',       array( $this, 'add_menu' ), 28 );
         add_action( 'admin_init',       array( $this, 'handle_bulk_generate' ) );
         add_action( 'admin_init',       array( $this, 'handle_save_location' ) );
+        add_action( 'admin_init',       array( $this, 'handle_save_templates' ) );
         add_action( 'wp_head',          array( $this, 'output_location_schema' ) );
         add_filter( 'document_title_parts', array( $this, 'filter_location_title' ) );
         add_action( 'wp_head',          array( $this, 'output_location_meta' ), 2 );
@@ -78,6 +80,86 @@ class RSSEO_Pro_Programmatic {
         );
     }
 
+    /* ===================== Template builder ===================== */
+
+    /** Default page templates (used until the operator saves their own). */
+    private function default_templates() {
+        return array(
+            'title' => '{service} in {city}, {state} | {business}',
+            'meta'  => 'Expert {services} in {city}, {state}. {business} serves the DMV area — licensed, insured, same-day available. Free quote.',
+            'slug'  => '{service}-{city}-{state}',
+            'body'  => "<h2>Professional {service} in {city}, {state}</h2>\n"
+                . "<p>{business} proudly serves {city} and the surrounding {state} area with expert floor care — including {services}. Our certified technicians bring professional-grade equipment to your home or business.</p>\n"
+                . "<h3>Services available in {city}, {state}</h3>\n{services_list}\n"
+                . "<p>Ready to start? <a href=\"/contact/\">Request a free quote</a> or call {phone}. We serve {city} and every surrounding neighborhood in {state}.</p>",
+            'use_elementor' => 1,
+        );
+    }
+
+    /** Saved templates merged over the defaults. */
+    public function get_templates() {
+        $saved = get_option( self::OPT_TEMPLATES, array() );
+        return wp_parse_args( is_array( $saved ) ? $saved : array(), $this->default_templates() );
+    }
+
+    /**
+     * Substitute {city} {state} {service} {services} {services_list} {business}
+     * {phone} {year} in a template string.
+     */
+    public function render_template( $tpl, $city, $state, $services ) {
+        $services = array_values( array_filter( (array) $services ) );
+        $identity = get_option( 'rsseo_sameas_identity', array() );
+        $business = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+        $phone    = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '';
+        $primary  = ! empty( $services ) ? $services[0] : 'Floor Care';
+        $list      = ! empty( $services ) ? implode( ', ', $services ) : 'floor care services';
+
+        $list_html = '';
+        foreach ( $services as $svc ) {
+            $list_html .= '<li>' . esc_html( $svc ) . ' in ' . esc_html( $city ) . ', ' . esc_html( $state ) . '</li>';
+        }
+        $list_html = $list_html ? '<ul>' . $list_html . '</ul>' : '';
+
+        return strtr( (string) $tpl, array(
+            '{city}'          => $city,
+            '{state}'         => $state,
+            '{service}'       => $primary,
+            '{services}'      => $list,
+            '{services_list}' => $list_html,
+            '{business}'      => $business,
+            '{phone}'         => $phone,
+            '{year}'          => gmdate( 'Y' ),
+        ) );
+    }
+
+    /** Render the slug template into a safe, non-empty post slug. */
+    private function build_slug( $city, $state, $services ) {
+        $t    = $this->get_templates();
+        $slug = sanitize_title( $this->render_template( $t['slug'], $city, $state, $services ) );
+        return $slug ?: sanitize_title( $city . '-' . $state );
+    }
+
+    /** Save the page templates from the builder form. */
+    public function handle_save_templates() {
+        if ( ! isset( $_POST['rsseo_save_templates'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_rsseo_tpl_nonce'] ?? '' ) ), 'rsseo_prog_templates' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+        }
+        update_option( self::OPT_TEMPLATES, array(
+            'title'         => sanitize_text_field( wp_unslash( $_POST['tpl_title'] ?? '' ) ),
+            'meta'          => sanitize_text_field( wp_unslash( $_POST['tpl_meta'] ?? '' ) ),
+            'slug'          => sanitize_text_field( wp_unslash( $_POST['tpl_slug'] ?? '' ) ),
+            'body'          => wp_kses_post( wp_unslash( $_POST['tpl_body'] ?? '' ) ),
+            'use_elementor' => isset( $_POST['tpl_use_elementor'] ) ? 1 : 0,
+        ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=rsseo-programmatic&tpl_saved=1' ) );
+        exit;
+    }
+
+    /* ============================================================ */
+
     /**
      * Save or update a single location's meta (city, state, Wikipedia URL, service list).
      */
@@ -121,7 +203,7 @@ class RSSEO_Pro_Programmatic {
             $post_id = wp_insert_post( array(
                 'post_type'   => self::CPT,
                 'post_title'  => $city . ', ' . $state,
-                'post_name'   => sanitize_title( $city . '-' . $state ),
+                'post_name'   => $this->build_slug( $city, $state, $services ),
                 'post_status' => $status,
                 'post_content' => $this->generate_location_content( $city, $state, $services ),
             ) );
@@ -137,7 +219,9 @@ class RSSEO_Pro_Programmatic {
         update_post_meta( $post_id, '_mfc_wiki_url', $wiki_url );
         update_post_meta( $post_id, '_mfc_services', $services );
 
-        $this->apply_elementor_template( $post_id, $city, $state, $services );
+        if ( $this->get_templates()['use_elementor'] ) {
+            $this->apply_elementor_template( $post_id, $city, $state, $services );
+        }
 
         // Assign service terms.
         $term_ids = array();
@@ -179,6 +263,7 @@ class RSSEO_Pro_Programmatic {
         $raw_locations = sanitize_textarea_field( wp_unslash( $_POST['bulk_locations'] ?? '' ) );
         $bulk_services = isset( $_POST['bulk_services'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bulk_services'] ) ) : array();
         $status        = ( 'publish' === sanitize_key( wp_unslash( $_POST['bulk_status'] ?? 'draft' ) ) ) ? 'publish' : 'draft';
+        $use_elementor = (bool) $this->get_templates()['use_elementor'];
 
         // Quality guard: generating pages with no services = thin doorway pages.
         if ( empty( $bulk_services ) ) {
@@ -230,7 +315,7 @@ class RSSEO_Pro_Programmatic {
                 $post_id = wp_insert_post( array(
                     'post_type'    => self::CPT,
                     'post_title'   => $city . ', ' . $state,
-                    'post_name'    => sanitize_title( $city . '-' . strtolower( $state ) ),
+                    'post_name'    => $this->build_slug( $city, $state, $bulk_services ),
                     'post_status'  => $status,
                     'post_content' => $this->generate_location_content( $city, $state, $bulk_services ),
                 ) );
@@ -248,7 +333,9 @@ class RSSEO_Pro_Programmatic {
             }
             update_post_meta( $post_id, '_mfc_services', $bulk_services );
 
-            $this->apply_elementor_template( $post_id, $city, $state, $bulk_services );
+            if ( $use_elementor ) {
+                $this->apply_elementor_template( $post_id, $city, $state, $bulk_services );
+            }
 
             $term_ids = array();
             foreach ( $bulk_services as $service ) {
@@ -404,25 +491,9 @@ class RSSEO_Pro_Programmatic {
      * Generate template content for a location page.
      */
     private function generate_location_content( $city, $state, $services ) {
-        $business = get_bloginfo( 'name' );
-        $services_list = implode( ', ', $services );
-        $services_html = '';
-        foreach ( $services as $svc ) {
-            $services_html .= '<li>' . esc_html( $svc ) . ' in ' . esc_html( $city ) . ', ' . esc_html( $state ) . '</li>';
-        }
-
-        return "<h2>Professional Floor Care Services in {$city}, {$state}</h2>
-<p>{$business} proudly serves {$city} and the surrounding {$state} area with expert floor care services including {$services_list}. Our certified technicians bring professional-grade equipment directly to your home or business.</p>
-<h3>Services Available in {$city}, {$state}</h3>
-<ul>{$services_html}</ul>
-<h3>Why Choose {$business} in {$city}?</h3>
-<ul>
-<li>Licensed and insured for serving the DMV metro area</li>
-<li>Same-day and next-day appointments available</li>
-<li>Residential and commercial for no job too large or small</li>
-<li>Free estimates with upfront, transparent pricing</li>
-</ul>
-<p>Ready to get started? <a href=\"/contact/\">Request a free quote</a> or call us today. We serve {$city} and all surrounding neighborhoods in {$state}.</p>";
+        // Render the operator's body template (falls back to the default).
+        $t = $this->get_templates();
+        return $this->render_template( $t['body'], $city, $state, $services );
     }
 
     /**
@@ -820,9 +891,9 @@ class RSSEO_Pro_Programmatic {
         $city     = get_post_meta( $post_id, '_mfc_city', true );
         $state    = get_post_meta( $post_id, '_mfc_state', true );
         $services = get_post_meta( $post_id, '_mfc_services', true ) ?: array();
-        $primary  = $services[0] ?? 'Floor Care';
+        $t        = $this->get_templates();
 
-        $parts['title'] = $primary . ' in ' . $city . ', ' . $state;
+        $parts['title'] = wp_strip_all_tags( $this->render_template( $t['title'], $city, $state, $services ) );
         return $parts;
     }
 
@@ -838,10 +909,9 @@ class RSSEO_Pro_Programmatic {
         $city     = get_post_meta( $post_id, '_mfc_city', true );
         $state    = get_post_meta( $post_id, '_mfc_state', true );
         $services = get_post_meta( $post_id, '_mfc_services', true ) ?: array();
-        $business = get_option( 'rsseo_sameas_identity', array() )['business_name'] ?? get_bloginfo( 'name' );
+        $t        = $this->get_templates();
 
-        $svc_str = ! empty( $services ) ? implode( ', ', array_slice( $services, 0, 3 ) ) : 'floor care';
-        $desc    = "Expert {$svc_str} in {$city}, {$state}. {$business} serves the DMV area for licensed, insured, same-day available. Free quote.";
+        $desc = wp_strip_all_tags( $this->render_template( $t['meta'], $city, $state, $services ) );
 
         // Multibyte-safe truncate so a Spanish/French character at the boundary doesn't get half-chopped.
         $truncated = function_exists( 'mb_substr' ) ? mb_substr( $desc, 0, 160 ) : substr( $desc, 0, 160 );
@@ -853,8 +923,11 @@ class RSSEO_Pro_Programmatic {
         $generated      = isset( $_GET['generated'] ) ? absint( $_GET['generated'] ) : -1;
         $skipped        = isset( $_GET['skipped'] ) ? absint( $_GET['skipped'] ) : 0;
         $location_saved = isset( $_GET['location_saved'] );
+        $tpl_saved      = isset( $_GET['tpl_saved'] );
         $error          = isset( $_GET['error'] ) ? sanitize_key( $_GET['error'] ) : '';
         // phpcs:enable
+
+        $tpl = $this->get_templates();
 
         $default_services = array(
             'Carpet Cleaning',
@@ -903,6 +976,97 @@ class RSSEO_Pro_Programmatic {
                 ?>
                 <div class="notice notice-error is-dismissible"><p><?php echo esc_html( $msg ); ?></p></div>
             <?php endif; ?>
+
+            <?php if ( $tpl_saved ) : ?>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Page template saved. New pages use it; existing pages keep their content but pick up the title/meta template on the front end.', 'real-smart-seo-pro' ); ?></p></div>
+            <?php endif; ?>
+
+            <h2><?php esc_html_e( 'Page Template', 'real-smart-seo-pro' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Define how every generated page is built. Click a variable to insert it; the preview updates live.', 'real-smart-seo-pro' ); ?>
+                <br>
+                <?php
+                $vars = array( '{city}', '{state}', '{service}', '{services}', '{services_list}', '{business}', '{phone}', '{year}' );
+                foreach ( $vars as $v ) {
+                    echo '<code class="rsseo-var" style="cursor:pointer;margin:2px 4px 2px 0;display:inline-block;background:#eef;border:1px solid #ccd;border-radius:3px;padding:1px 6px;">' . esc_html( $v ) . '</code>';
+                }
+                ?>
+            </p>
+            <form method="post" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:18px 22px;margin-bottom:24px;">
+                <?php wp_nonce_field( 'rsseo_prog_templates', '_rsseo_tpl_nonce' ); ?>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="tpl_title"><?php esc_html_e( 'Title template', 'real-smart-seo-pro' ); ?></label></th>
+                        <td><input type="text" id="tpl_title" name="tpl_title" class="large-text rsseo-tpl" value="<?php echo esc_attr( $tpl['title'] ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="tpl_meta"><?php esc_html_e( 'Meta description template', 'real-smart-seo-pro' ); ?></label></th>
+                        <td><textarea id="tpl_meta" name="tpl_meta" rows="2" class="large-text rsseo-tpl"><?php echo esc_textarea( $tpl['meta'] ); ?></textarea>
+                            <p class="description"><?php esc_html_e( 'Trimmed to 160 characters on output.', 'real-smart-seo-pro' ); ?></p></td>
+                    </tr>
+                    <tr>
+                        <th><label for="tpl_slug"><?php esc_html_e( 'URL slug template', 'real-smart-seo-pro' ); ?></label></th>
+                        <td><input type="text" id="tpl_slug" name="tpl_slug" class="regular-text rsseo-tpl" value="<?php echo esc_attr( $tpl['slug'] ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="tpl_body"><?php esc_html_e( 'Body template (HTML)', 'real-smart-seo-pro' ); ?></label></th>
+                        <td><textarea id="tpl_body" name="tpl_body" rows="10" class="large-text code rsseo-tpl"><?php echo esc_textarea( $tpl['body'] ); ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><?php esc_html_e( 'Layout', 'real-smart-seo-pro' ); ?></th>
+                        <td><label><input type="checkbox" name="tpl_use_elementor" value="1" <?php checked( ! empty( $tpl['use_elementor'] ) ); ?>> <?php esc_html_e( 'Build pages with the Elementor Hero/Content/CTA layout (uncheck to use the HTML body template as the page content).', 'real-smart-seo-pro' ); ?></label></td>
+                    </tr>
+                    <tr>
+                        <th><?php esc_html_e( 'Live preview', 'real-smart-seo-pro' ); ?></th>
+                        <td>
+                            <div style="border:1px solid #ddd;border-radius:6px;padding:12px;background:#fafafa;">
+                                <div style="font-size:12px;color:#666;"><?php esc_html_e( 'Title', 'real-smart-seo-pro' ); ?></div>
+                                <div id="prev_title" style="color:#1a0dab;font-size:18px;margin-bottom:6px;"></div>
+                                <div id="prev_slug" style="color:#0a7d00;font-size:13px;margin-bottom:6px;"></div>
+                                <div id="prev_meta" style="color:#444;font-size:13px;margin-bottom:12px;"></div>
+                                <div style="font-size:12px;color:#666;border-top:1px solid #eee;padding-top:8px;"><?php esc_html_e( 'Body', 'real-smart-seo-pro' ); ?></div>
+                                <div id="prev_body" style="font-size:14px;"></div>
+                            </div>
+                            <p class="description"><?php esc_html_e( 'Sample data: Carpet Cleaning · Bethesda, MD.', 'real-smart-seo-pro' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+                <p><button type="submit" name="rsseo_save_templates" value="1" class="button button-primary"><?php esc_html_e( 'Save Template', 'real-smart-seo-pro' ); ?></button></p>
+            </form>
+
+            <script>
+            (function(){
+                var sample = {
+                    '{city}':'Bethesda', '{state}':'MD', '{service}':'Carpet Cleaning',
+                    '{services}':'Carpet Cleaning, Tile & Grout Cleaning, Hardwood Refinishing',
+                    '{services_list}':'<ul><li>Carpet Cleaning in Bethesda, MD</li><li>Tile &amp; Grout Cleaning in Bethesda, MD</li></ul>',
+                    '{business}':<?php echo wp_json_encode( get_bloginfo( 'name' ) ); ?>,
+                    '{phone}':'(240) 532-9097', '{year}':String(new Date().getFullYear())
+                };
+                function sub(str){ return String(str||'').replace(/\{[a-z_]+\}/g, function(m){ return (m in sample)?sample[m]:m; }); }
+                function slugify(str){ return sub(str).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+                function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+                function refresh(){
+                    var g=function(id){var e=document.getElementById(id);return e?e.value:'';};
+                    document.getElementById('prev_title').textContent = sub(g('tpl_title'));
+                    document.getElementById('prev_meta').textContent  = sub(g('tpl_meta')).slice(0,160);
+                    document.getElementById('prev_slug').textContent   = '<?php echo esc_js( trailingslashit( home_url( '/service-area/' ) ) ); ?>' + slugify(g('tpl_slug')) + '/';
+                    document.getElementById('prev_body').innerHTML     = sub(g('tpl_body'));
+                }
+                document.querySelectorAll('.rsseo-tpl').forEach(function(el){ el.addEventListener('input', refresh); });
+                document.querySelectorAll('.rsseo-var').forEach(function(c){
+                    c.addEventListener('click', function(){
+                        var body=document.getElementById('tpl_body');
+                        var t=document.activeElement;
+                        var target=(t && t.classList && t.classList.contains('rsseo-tpl'))?t:body;
+                        var s=target.selectionStart||target.value.length;
+                        target.value = target.value.slice(0,s) + c.textContent + target.value.slice(target.selectionEnd||s);
+                        target.focus(); refresh();
+                    });
+                });
+                refresh();
+            })();
+            </script>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
 
