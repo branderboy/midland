@@ -1,0 +1,3 @@
+# Locally-unzipped plugin builds for inspection — the committed source lives
+# in plugins/ and the packaged zips live in dist/, so these are throwaway.
+/dist/extracted/
