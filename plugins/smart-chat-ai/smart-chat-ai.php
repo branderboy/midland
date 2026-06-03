@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.30
+ * Version: 1.9.31
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.30');
+define('SCAI_VERSION', '1.9.31');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -520,39 +520,20 @@ class SCAI_Plugin {
         $is_browser_token = ( '' !== $posted_token && preg_match( '/^sc_[a-z0-9_]+$/i', $posted_token ) );
         $session_id = $is_browser_token ? $posted_token : $this->session_id_for_ip();
 
-        // Rate limiting — two independent budgets:
-        //
-        // TOKEN (per-browser, 30/hr): the real per-user limit. Each visitor's
-        // localStorage token has its own counter. Clearing localStorage or
-        // opening incognito gives a fresh token but NOT a fresh IP counter,
-        // so an abuser cycling tokens is still caught by the IP ceiling.
-        //
-        // IP ceiling (per-IP, 200/hr): abuse-prevention backstop. Set high
-        // enough that legitimate shared-IP scenarios (office NAT, mobile
-        // carrier) are never affected in normal use, while a single host
-        // hammering the endpoint from many faked tokens is still blocked.
-        //
-        // The token limit is the binding throttle for real users.
-        // The IP ceiling is the backstop against token-cycling abuse.
-        // The two are independent — crossing one does NOT penalise the other.
-        $ip_hash  = $this->hashed_ip();                          // reuse helper, no re-derivation
-        $rate_ip  = 'scai_rate_ip_'  . $ip_hash;
-        $rate_tok = 'scai_rate_tok_' . substr( $session_id, 0, 40 );
+        // Rate limit on the hashed IP — NOT the browser token. Keying on the
+        // localStorage token let a visitor reset their hourly quota just by
+        // clearing localStorage, opening incognito, or switching browsers. The
+        // hashed IP stays the same across all of those, so the 30/hr limit holds.
+        // ($session_id is still used below for conversation threading.)
+        $rate_key = 'scai_rate_ip_' . $this->session_id_for_ip();
+        $count    = (int) get_transient( $rate_key );
 
-        $ip_count  = (int) get_transient( $rate_ip );
-        $tok_count = (int) get_transient( $rate_tok );
-
-        if ( $tok_count >= 30 ) {
+        if ( $count >= 30 ) {
             wp_send_json_error( array( 'message' => __( 'Too many messages. Please try again in a little while.', 'smart-chat-ai' ) ) );
             return;
         }
-        if ( $ip_count >= 200 ) {
-            wp_send_json_error( array( 'message' => __( 'Too many messages from this network. Please try again later.', 'smart-chat-ai' ) ) );
-            return;
-        }
 
-        set_transient( $rate_ip,  $ip_count  + 1, HOUR_IN_SECONDS );
-        set_transient( $rate_tok, $tok_count + 1, HOUR_IN_SECONDS );
+        set_transient( $rate_key, $count + 1, HOUR_IN_SECONDS );
         global $wpdb;
         $table = $wpdb->prefix . 'smart_chat_conversations';
 
