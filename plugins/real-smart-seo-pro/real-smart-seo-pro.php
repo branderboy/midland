@@ -3,7 +3,7 @@
  * Plugin Name: Midland Smart SEO Pro
  * Plugin URI: https://midlandfloors.com/smart-seo-pro
  * Description: Full local SEO offense — sameAs entity identity, GSC cleanup, programmatic city × service pages, IndexNow + Rapid URL Indexer, schema, Google Trends, GMB, and AI-powered fixes.
- * Version: 1.6.0
+ * Version: 1.7.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'RSSEO_PRO_VERSION',        '1.6.0' );
+define( 'RSSEO_PRO_VERSION',        '1.7.0' );
 define( 'RSSEO_PRO_PATH',           plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_PRO_URL',            plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_PRO_FILE',           __FILE__ );
@@ -139,6 +139,7 @@ class RSSEO_Pro_Plugin {
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-sameas.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-gsc-cleanup.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-programmatic.php';
+        require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-internal-links.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-indexnow.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-speed.php';
         require_once RSSEO_PRO_PATH . 'includes/class-rsseo-pro-geogrid.php';
