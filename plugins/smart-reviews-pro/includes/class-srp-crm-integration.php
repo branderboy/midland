@@ -213,8 +213,7 @@ class SRP_CRM_Integration {
     public function render_page() {
         $trigger    = $this->get_trigger_status();
         $autofire   = (int) get_option( self::OPT_AUTOFIRE, 0 );
-        $sfco_on    = defined( 'SFCO_VERSION' );
-        $sfco_pro   = defined( 'SFCO_PRO_VERSION' );
+        $sfco_on    = defined( 'SFCO_VERSION' ); // Midland Smart Forms (merged Basic + Pro).
         $scrm_pro   = defined( 'SCRM_PRO_VERSION' );
         $has_table  = $this->leads_table_exists();
 
@@ -270,17 +269,12 @@ class SRP_CRM_Integration {
             <ul>
                 <li>
                     <?php echo $sfco_on ? '<span style="color:#0a8754;">&#10003;</span>' : '<span style="color:#d63638;">&#10005;</span>'; ?>
-                    <strong>Smart Forms for Contractors</strong>
+                    <strong>Smart Forms for Midland</strong>
                     <span style="color:#666;">— <?php echo $sfco_on ? esc_html__( 'active (lead source)', 'smart-reviews-pro' ) : esc_html__( 'not installed', 'smart-reviews-pro' ); ?></span>
                 </li>
                 <li>
-                    <?php echo $sfco_pro ? '<span style="color:#0a8754;">&#10003;</span>' : '<span style="color:#d63638;">&#10005;</span>'; ?>
-                    <strong>Smart Forms Pro</strong>
-                    <span style="color:#666;">— <?php echo $sfco_pro ? esc_html__( 'active', 'smart-reviews-pro' ) : esc_html__( 'not installed', 'smart-reviews-pro' ); ?></span>
-                </li>
-                <li>
                     <?php echo $scrm_pro ? '<span style="color:#0a8754;">&#10003;</span>' : '<span style="color:#d63638;">&#10005;</span>'; ?>
-                    <strong>Smart CRM Pro</strong>
+                    <strong>Smart CRM for Midland</strong>
                     <span style="color:#666;">— <?php echo $scrm_pro ? esc_html__( 'active', 'smart-reviews-pro' ) : esc_html__( 'not installed', 'smart-reviews-pro' ); ?></span>
                 </li>
             </ul>
@@ -340,7 +334,7 @@ class SRP_CRM_Integration {
             <hr>
             <h2><?php printf( esc_html__( 'Leads Ready to Survey (status = %s)', 'smart-reviews-pro' ), '<code>' . esc_html( $trigger ) . '</code>' ); ?></h2>
             <?php if ( ! $has_table ) : ?>
-                <p><em><?php esc_html_e( 'wp_sfco_leads table not found — install Smart Forms for Contractors first.', 'smart-reviews-pro' ); ?></em></p>
+                <p><em><?php esc_html_e( 'wp_sfco_leads table not found — install Smart Forms for Midland first.', 'smart-reviews-pro' ); ?></em></p>
             <?php elseif ( empty( $ready_leads ) ) : ?>
                 <p><em><?php esc_html_e( 'No leads waiting. They will appear here when their CRM status matches the trigger.', 'smart-reviews-pro' ); ?></em></p>
             <?php else : ?>
