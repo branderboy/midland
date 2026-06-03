@@ -147,11 +147,15 @@ class SRP_DB {
     }
 
     /**
-     * Surveys that need their first reminder (24h after send, no reminder1 yet).
+     * Surveys that need their first reminder: sent at least 24h ago, customer
+     * hasn't responded, no reminder1 yet. The threshold is built from
+     * current_time('mysql') because survey_sent_at is stored in site-local time
+     * (current_time('mysql')) — comparing it against a GMT threshold would skew
+     * the wait by the site's UTC offset.
      */
     public static function get_pending_reminders() {
         global $wpdb;
-        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - DAY_IN_SECONDS );
         return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}srp_surveys
@@ -165,18 +169,23 @@ class SRP_DB {
     }
 
     /**
-     * Surveys that need their second reminder (48h after send, reminder1 already gone, no reminder2 yet).
+     * Surveys that need their second (final) reminder: reminder1 actually went
+     * out at least 48h ago, the customer still hasn't responded, and reminder2
+     * hasn't been sent. Spacing is measured from reminder1_at (not survey_sent_at)
+     * so the two reminders can NEVER fire in the same cron run — even when the
+     * first reminder is delayed (e.g. cron downtime, or a survey that sat
+     * unanswered past 48h), the second still waits a full 48h after reminder1.
+     * This is the fix for customers getting both reminders back-to-back.
      */
     public static function get_pending_reminders_second() {
         global $wpdb;
-        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-48 hours' ) );
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - 2 * DAY_IN_SECONDS );
         return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}srp_surveys
                 WHERE score IS NULL
-                AND survey_sent_at IS NOT NULL
-                AND survey_sent_at < %s
                 AND reminder1_at IS NOT NULL
+                AND reminder1_at < %s
                 AND reminder2_at IS NULL",
                 $threshold
             )

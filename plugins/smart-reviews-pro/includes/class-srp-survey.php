@@ -8,7 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Hooks:
  *   srp_job_completed( $data ) — fire this from any plugin/theme to trigger the survey.
  *   srp_survey_response        — public AJAX handler for the survey form.
- * Cron fires reminders at 24h and 48h if no response.
+ * Cron sends at most two spaced reminders if there's no response: the first
+ * ~24h after the survey, the second ~48h after that first reminder. Reminders
+ * stop the moment the customer submits a score.
  */
 class SRP_Survey {
 
@@ -168,7 +170,7 @@ class SRP_Survey {
         $business  = self::business_name();
         $from_name = $data['name'] ? 'Hi ' . $data['name'] . ',' : 'Hi there,';
 
-        $subject = 'Tell us how did we do?';
+        $subject = 'How did we do? Tell us in 20 seconds';
         $body    = $this->survey_email_html( $from_name, $business, $survey_url, $token );
 
         $sent = wp_mail( $email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
@@ -191,13 +193,13 @@ class SRP_Survey {
         for ( $i = 1; $i <= self::MAX_SCORE; $i++ ) {
             $score_url    = add_query_arg( array( 'srp_survey' => $token, 'pick' => $i ), home_url( '/' ) );
             $bg           = 5 === $i ? self::STAR_5 : ( 4 === $i ? self::STAR_4 : ( $i === 3 ? self::STAR_OK : self::STAR_BAD ) );
-            $scores_html .= '<a href="' . esc_url( $score_url ) . '" style="display:inline-block;width:48px;height:48px;line-height:48px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
+            $scores_html .= '<a href="' . esc_url( $score_url ) . '" style="display:inline-block;min-width:22px;padding:15px 16px;text-align:center;background:' . $bg . ';color:#fff;font-weight:bold;font-size:18px;line-height:1;border-radius:8px;text-decoration:none;margin:3px;">' . $i . '&#9733;</a>';
         }
 
         return '<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f4f4f4;font-family:system-ui,-apple-system,sans-serif;">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="x-apple-disable-message-reformatting"><style>body,table,td,p,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-size-adjust:100%;}</style></head>
+<body style="margin:0;padding:0;width:100%;background:#f4f4f4;font-family:system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-size-adjust:100%;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
   <tr><td align="center" style="padding:40px 16px;">
     <table role="presentation" width="560" style="max-width:560px;width:100%;background:#fff;border-radius:12px;overflow:hidden;">
@@ -438,7 +440,10 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
     }
 
     /**
-     * Cron: send reminder emails at 24h (reminder1) and 48h (reminder2) for non-respondents.
+     * Cron (hourly): send spaced reminder emails to non-respondents. reminder1
+     * goes ~24h after the survey; reminder2 goes ~48h after reminder1 (see the
+     * SRP_DB queries). Because reminder2's wait is measured from reminder1_at,
+     * the two can never go out in the same run.
      */
     public function process_reminders() {
         $business = self::business_name();
@@ -472,8 +477,8 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
             : 'we are still hoping to hear from you';
 
         $brand = self::brand_color();
-        $body = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f4f4f4;font-family:system-ui,-apple-system,sans-serif;">
+        $body = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="x-apple-disable-message-reformatting"><style>body,table,td,p,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-size-adjust:100%;}</style></head>
+<body style="margin:0;padding:0;width:100%;background:#f4f4f4;font-family:system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-size-adjust:100%;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 16px;">
 <table role="presentation" width="560" style="max-width:560px;width:100%;background:#fff;border-radius:12px;overflow:hidden;">
 ' . self::brand_header_html() . '
