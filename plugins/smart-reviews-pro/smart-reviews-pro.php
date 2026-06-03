@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Reviews
  * Description: Midland-branded survey-gated review collection. A 1–5 star survey fires automatically after job completion (driven by sfco_lead_completed + sfco_lead_status_changed actions from Midland Smart Forms / Smart CRM). Score ≥4★ sends the Google review link + 2 follow-up reminders; score <4★ captures private feedback only and emails the manager — no public review request.
- * Version: 1.4.4
+ * Version: 1.4.5
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'SRP_VERSION', '1.4.4' );
+define( 'SRP_VERSION', '1.4.5' );
 define( 'SRP_PATH',    plugin_dir_path( __FILE__ ) );
 define( 'SRP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'SRP_FILE',    __FILE__ );
