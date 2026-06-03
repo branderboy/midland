@@ -350,18 +350,24 @@ class SCRM_Pro_Settings {
                 if ( '' === $key ) {
                     wp_send_json_error( array( 'message' => 'ServiceM8 API key not set.' ) );
                 }
+                // Use the SAME auth the real calls use (X-API-Key, not Bearer),
+                // so this test reflects whether the integration will actually work.
+                $headers = class_exists( 'SCRM_Pro_ServiceM8' )
+                    ? SCRM_Pro_ServiceM8::auth_headers( $key )
+                    : array( 'X-API-Key' => $key );
                 $r = wp_remote_get( 'https://api.servicem8.com/api_1.0/company.json', array(
-                    'headers' => array( 'Authorization' => 'Bearer ' . $key ),
+                    'headers' => $headers,
                     'timeout' => 12,
                 ) );
                 if ( is_wp_error( $r ) ) {
                     wp_send_json_error( array( 'message' => $r->get_error_message() ) );
                 }
-                $code = wp_remote_retrieve_response_code( $r );
+                $code = (int) wp_remote_retrieve_response_code( $r );
                 if ( $code >= 200 && $code < 300 ) {
                     wp_send_json_success( array( 'message' => 'ServiceM8 connected (HTTP ' . $code . ')' ) );
                 }
-                wp_send_json_error( array( 'message' => 'ServiceM8 returned HTTP ' . $code ) );
+                $body = wp_strip_all_tags( substr( (string) wp_remote_retrieve_body( $r ), 0, 200 ) );
+                wp_send_json_error( array( 'message' => 'ServiceM8 returned HTTP ' . $code . ( '' !== $body ? ': ' . $body : '' ) ) );
 
             case 'vapi':
                 $key = (string) get_option( SCRM_Pro_Vapi::OPT_API_KEY );

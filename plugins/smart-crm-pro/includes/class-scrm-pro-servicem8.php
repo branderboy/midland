@@ -429,7 +429,7 @@ class SCRM_Pro_ServiceM8 {
      * request. A 401 means the key is missing/invalid or the account plan has
      * no REST API access.
      */
-    private static function auth_headers( $api_key ) {
+    public static function auth_headers( $api_key ) {
         return array(
             'X-API-Key'     => $api_key,
             'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
