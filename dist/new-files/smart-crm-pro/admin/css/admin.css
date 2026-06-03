@@ -1,0 +1,11 @@
+.scrm-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin:20px 0}
+.scrm-stat-card{background:#fff;border:1px solid #ccd0d4;border-radius:6px;padding:20px;text-align:center}
+.scrm-stat-label{display:block;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.scrm-stat-value{display:block;font-size:26px;font-weight:700;color:#1d2327}
+.scrm-green{color:#00a32a}
+.scrm-segment-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin:20px 0}
+.scrm-segment-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:20px}
+.scrm-segment-card h3{margin:0 0 12px;font-size:16px}
+.scrm-segment-stats{display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;color:#555}
+.scrm-segment-stats strong{font-size:20px;color:#1d2327;display:block}
+@media(max-width:768px){.scrm-stats-grid{grid-template-columns:repeat(2,1fr)}.scrm-segment-grid{grid-template-columns:1fr}}

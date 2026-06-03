@@ -1,0 +1,138 @@
+=== Smart Chat AI ===
+Contributors: tagglefish
+Tags: chat, ai chat, chatbot, lead capture, openai, customer support, contractor chat
+Requires at least: 5.8
+Tested up to: 6.9
+Requires PHP: 7.4
+Stable tag: 1.9.15
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+AI-powered chat widget that captures leads 24/7. Answers customer questions, books appointments, and collects contact info using OpenAI.
+
+== Description ==
+
+**Smart Chat AI** adds an intelligent chat widget to your website that answers visitor questions, captures leads, and collects contact information around the clock.
+
+Powered by OpenAI (GPT-4, GPT-4o, GPT-3.5), the chat assistant responds naturally to customer questions about your services, pricing, and availability. When a visitor is ready, it captures their name, email, phone, and project details as a lead.
+
+**Features:**
+
+* AI chat widget on every page (configurable position and colors)
+* Lead capture with name, email, phone, project details
+* Conversation history stored and viewable in admin
+* Dashboard with lead stats and analytics
+* Email notifications when new leads are captured
+* Customizable AI personality (helpful, professional, friendly)
+* Business name and type configurable in settings
+* License key activation system
+
+**Perfect for:**
+
+Contractors, service businesses, agencies, and anyone who wants to capture leads outside business hours.
+
+= Third-Party Services =
+
+**OpenAI API (api.openai.com)**
+
+This plugin sends chat messages to the OpenAI API to generate AI responses. Your OpenAI API key is required and stored in the WordPress database.
+
+* [OpenAI Terms of Use](https://openai.com/policies/terms-of-use)
+* [OpenAI Privacy Policy](https://openai.com/policies/privacy-policy)
+* Data sent: chat messages, conversation history, business context
+
+**TaggleFish License Server (tagglefish.com)**
+
+This plugin validates license keys against the TaggleFish license server. Your site URL and admin email are sent during validation.
+
+* [TaggleFish Privacy Policy](https://tagglefish.com/privacy)
+
+== Installation ==
+
+1. Upload the plugin zip via Plugins > Add New > Upload Plugin
+2. Activate the plugin
+3. Go to Smart Chat AI > Settings and enter your OpenAI API key
+4. Go to Smart Chat AI > License and enter your license key
+5. Customize chat widget colors, position, and business info
+6. The chat widget appears on your site automatically
+
+== Frequently Asked Questions ==
+
+= Do I need an OpenAI API key? =
+
+Yes. Create one at platform.openai.com. The plugin uses your key to generate AI responses.
+
+= How much does OpenAI cost? =
+
+OpenAI charges per token. GPT-4o-mini is very affordable for chat. Most conversations cost less than $0.01.
+
+= Can I customize what the AI says? =
+
+Yes. Set your business name, type, and AI personality in Settings. The AI adapts its responses accordingly.
+
+== Changelog ==
+
+= 1.9.15 =
+* Restored the Leads tab (Midland Chat > Leads) so chat leads captured through the conversation are visible in the admin.
+
+= 1.9.14 =
+* Conversation capture hardened: the visitor message is saved before the AI call, and the AI call is guarded, so the conversation is always recorded even if the provider errors. Native lead capture (name/email/phone from the chat) still runs and emails + bridges the lead.
+
+= 1.9.13 =
+* Hardened: native lead capture is wrapped so a failing CRM/bridge hook can never break message sending (conversation always works)
+
+= 1.9.12 =
+* Native free-hand lead capture: the assistant just asks for name, email or phone, and what it's about (no form). Once shared, a chat lead is saved, bridged into Smart Forms/CRM, and an email notification is sent.
+* "Schedule a visit" still uses the Smart Form + Calendly; this is the lightweight callback/email path.
+
+= 1.9.11 =
+* Removed the chat's own lead system (Leads menu, lead capture, notifications, dashboard lead stats). Leads are captured by the embedded Smart Form instead.
+* Conversations page now shows the full transcript with a date and time on every message, and the session start/last-message timestamps.
+
+= 1.9.10 =
+* Chat scheduling uses the embedded form again so leads are captured (connected to the chat form); the Calendly "Pick a time" link is now offered after the form submits, not instead of it
+
+= 1.9.9 =
+* Booking link is now read from the embedded form's per-form setting (Smart Forms > edit form > Booking link), not a global chat setting; removed the Booking URL field from chat Settings
+
+= 1.9.8 =
+* Added a Booking URL (Calendly) field to Midland Chat > Settings so the link can be managed from the admin
+
+= 1.9.7 =
+* Scheduling in chat now shows a clean "Pick a time" Calendly button instead of the embedded form, avoiding the submit error and page redirect (set the URL in Settings, default https://calendly.com/justinc-mfc)
+* Prompt wording updated to point visitors to the booking link
+
+= 1.9.6 =
+* Form title inside the chat is now chat-sized (14px), the description smaller (12px)
+
+= 1.9.4 =
+* The chat window now auto-expands to its larger size when the booking form opens, and restores the previous size when the form closes
+
+= 1.9.3 =
+* Fixed the double-scrollbar when the booking form opens: the form now takes over the chat body so there is a single scroll area
+* Added an Enlarge button in the header to expand the chat window (and shrink it back)
+* Taller, viewport-aware window so the form fits without cramped nested scrolling
+
+= 1.9.2 =
+* Rewrote the default chat prompt: shorter replies, no dashes, no long-winded statements
+* When a visitor wants to schedule, the AI now points them to the booking form that opens in the chat instead of asking for name and phone in text
+* Cleaned up the post-submission confirmation message (no dash)
+
+= 1.9.1 =
+* Sitemap ingestion: try multiple sitemap URLs (configured, /wp-sitemap.xml, /sitemap_index.xml, /sitemap.xml) so the crawl works regardless of SEO plugin
+* Send a browser-like user-agent + XML Accept header and follow redirects, fixing "sitemap empty or unreachable" caused by hosts/WAFs blocking the default WordPress user-agent
+* Report the real failure reason per sitemap candidate (HTTP code, WP error, invalid XML)
+* Default the embedded Smart Forms "Schedule a Visit" form to form #1; still overridable in Settings
+
+= 1.0.0 =
+* Initial release
+* AI chat widget with OpenAI integration
+* Lead capture and management
+* Conversation history
+* Dashboard analytics
+* License activation
+
+== Upgrade Notice ==
+
+= 1.0.0 =
+Initial release.

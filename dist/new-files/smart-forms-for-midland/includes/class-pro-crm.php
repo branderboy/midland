@@ -1,0 +1,338 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+class SFCO_Pro_CRM {
+
+    public function __construct() {
+        add_action( 'admin_menu', array( $this, 'add_menu' ), 31 );
+        add_action( 'admin_init', array( $this, 'handle_save' ) );
+        add_action( 'wp_ajax_sfco_pro_test_crm', array( $this, 'ajax_test_connection' ) );
+        add_action( 'wp_ajax_sfco_pro_sync_lead', array( $this, 'ajax_sync_lead' ) );
+
+        // Auto-push every lead-capture form submission into ActiveCampaign
+        // (priority 20 so Smart CRM Pro's internal bridge at 10 finishes first).
+        add_action( 'sfco_lead_submitted', array( $this, 'on_lead_submitted' ), 20, 3 );
+    }
+
+    /**
+     * Bridge from the lead-capture form to ActiveCampaign. Fires on every
+     * submission saved by SFCO_Database::create_lead(). `sync_lead()` itself
+     * decides whether to push based on CRM mode + auto-sync flag.
+     */
+    public function on_lead_submitted( $lead_id, $row, $form ) {
+        unset( $form ); // form row not needed for the AC contact sync.
+
+        if ( empty( $row ) || ! is_array( $row ) ) {
+            return;
+        }
+
+        $lead = (object) $row;
+        if ( ! isset( $lead->id ) ) {
+            $lead->id = absint( $lead_id );
+        }
+
+        $this->sync_lead( $lead );
+    }
+
+    public function add_menu() {
+        add_submenu_page(
+            null,
+            esc_html__( 'CRM Integration', 'smart-forms-pro' ),
+            esc_html__( 'CRM Integration', 'smart-forms-pro' ),
+            'manage_options',
+            'sfco-crm',
+            array( $this, 'render_page' )
+        );
+    }
+
+    public function handle_save() {
+        if ( ! isset( $_POST['sfco_save_crm'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        $nonce = isset( $_POST['_sfco_crm_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_crm_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'sfco_save_crm' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+        }
+
+        $crm_mode = isset( $_POST['crm_mode'] ) ? sanitize_key( $_POST['crm_mode'] ) : 'none';
+        if ( ! in_array( $crm_mode, array( 'none', 'internal', 'external' ), true ) ) {
+            $crm_mode = 'none';
+        }
+
+        $api_key = isset( $_POST['crm_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['crm_api_key'] ) ) : '';
+        $api_url = isset( $_POST['crm_api_url'] ) ? esc_url_raw( wp_unslash( $_POST['crm_api_url'] ) ) : '';
+        $active  = isset( $_POST['crm_active'] ) ? 1 : 0;
+
+        if ( 'external' === $crm_mode && empty( $api_url ) ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=sfco-crm&error=missing_url' ) );
+            exit;
+        }
+
+        update_option( 'sfco_pro_crm_mode', $crm_mode );
+        update_option( 'sfco_pro_crm_active', $active );
+        update_option( 'sfco_pro_crm_api_url', untrailingslashit( $api_url ) );
+
+        if ( ! empty( $api_key ) ) {
+            update_option( 'sfco_pro_crm_api_key', $api_key );
+        }
+
+        wp_safe_redirect( admin_url( 'admin.php?page=sfco-crm&saved=1' ) );
+        exit;
+    }
+
+    public function ajax_test_connection() {
+        check_ajax_referer( 'sfco_pro_admin', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+        }
+
+        $api_key = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url = get_option( 'sfco_pro_crm_api_url', '' );
+
+        if ( empty( $api_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'No CRM configured.', 'smart-forms-pro' ) ) );
+        }
+
+        $result = $this->test_connection( $api_key, $api_url );
+
+        if ( $result['success'] ) {
+            wp_send_json_success( array( 'message' => $result['message'] ) );
+        } else {
+            wp_send_json_error( array( 'message' => $result['message'] ) );
+        }
+    }
+
+    private function test_connection( $api_key, $api_url ) {
+        if ( empty( $api_url ) ) {
+            return array( 'success' => false, 'message' => __( 'ActiveCampaign requires an API URL (e.g. https://your-account.api-us1.com).', 'smart-forms-pro' ) );
+        }
+
+        $response = wp_remote_get( untrailingslashit( $api_url ) . '/api/3/users/me', array(
+            'headers' => array(
+                'Api-Token' => $api_key,
+                'Accept'    => 'application/json',
+            ),
+            'timeout' => 10,
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            return array( 'success' => false, 'message' => $response->get_error_message() );
+        }
+
+        $code = wp_remote_retrieve_response_code( $response );
+
+        if ( 200 === $code ) {
+            return array( 'success' => true, 'message' => __( 'Connected to ActiveCampaign successfully!', 'smart-forms-pro' ) );
+        }
+
+        return array( 'success' => false, 'message' => sprintf( __( 'Connection failed (HTTP %d). Check your API key and URL.', 'smart-forms-pro' ), $code ) );
+    }
+
+    /**
+     * Push a lead to the connected CRM.
+     */
+    public function sync_lead( $lead ) {
+        $crm_mode = get_option( 'sfco_pro_crm_mode', 'none' );
+        if ( 'external' !== $crm_mode ) {
+            // Internal (Smart CRM Pro) reads wp_sfco_leads directly; "none" skips push.
+            return;
+        }
+
+        $api_key = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url = get_option( 'sfco_pro_crm_api_url', '' );
+        $active  = get_option( 'sfco_pro_crm_active', 0 );
+
+        if ( empty( $api_key ) || empty( $api_url ) || ! $active ) {
+            return;
+        }
+
+        $contact = array(
+            'name'         => $lead->customer_name ?? '',
+            'email'        => $lead->customer_email ?? '',
+            'phone'        => $lead->customer_phone ?? '',
+            'project_type' => $lead->project_type ?? '',
+            'timeline'     => $lead->timeline ?? '',
+            'zip_code'     => $lead->zip_code ?? '',
+            'notes'        => $lead->additional_notes ?? '',
+        );
+
+        if ( empty( $contact['email'] ) ) {
+            return;
+        }
+
+        $this->push_to_activecampaign( $api_url, $api_key, $contact );
+    }
+
+    private function push_to_activecampaign( $api_url, $api_key, $contact ) {
+        $name_parts = explode( ' ', $contact['name'], 2 );
+
+        $field_values = array();
+        if ( ! empty( $contact['project_type'] ) ) {
+            $field_values[] = array( 'field' => 'project_type', 'value' => $contact['project_type'] );
+        }
+        if ( ! empty( $contact['timeline'] ) ) {
+            $field_values[] = array( 'field' => 'timeline', 'value' => $contact['timeline'] );
+        }
+        if ( ! empty( $contact['zip_code'] ) ) {
+            $field_values[] = array( 'field' => 'zip_code', 'value' => $contact['zip_code'] );
+        }
+        if ( ! empty( $contact['notes'] ) ) {
+            $field_values[] = array( 'field' => 'notes', 'value' => $contact['notes'] );
+        }
+
+        $payload = array(
+            'contact' => array(
+                'email'     => $contact['email'],
+                'firstName' => $name_parts[0] ?? '',
+                'lastName'  => $name_parts[1] ?? '',
+                'phone'     => $contact['phone'],
+            ),
+        );
+
+        if ( ! empty( $field_values ) ) {
+            $payload['contact']['fieldValues'] = $field_values;
+        }
+
+        $endpoint = untrailingslashit( $api_url ) . '/api/3/contact/sync';
+        $response = wp_remote_post( $endpoint, array(
+            'headers' => array(
+                'Api-Token'    => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
+            ),
+            'body'    => wp_json_encode( $payload ),
+            'timeout' => 15,
+        ) );
+
+        if ( class_exists( 'SFCO_Pro_Log' ) ) {
+            if ( is_wp_error( $response ) ) {
+                SFCO_Pro_Log::record( 'crm', 'error', 'Transport: ' . $response->get_error_message(), null, null, $payload );
+            } else {
+                $code = (int) wp_remote_retrieve_response_code( $response );
+                $body = json_decode( wp_remote_retrieve_body( $response ), true );
+                $ok   = ( $code >= 200 && $code < 300 );
+                SFCO_Pro_Log::record( 'crm', $ok ? 'ok' : 'error', sprintf( 'ActiveCampaign sync HTTP %d', $code ), null, null, $payload, $body );
+            }
+        }
+    }
+
+    public function ajax_sync_lead() {
+        check_ajax_referer( 'sfco_pro_admin', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error();
+        }
+
+        $lead_id = isset( $_POST['lead_id'] ) ? absint( $_POST['lead_id'] ) : 0;
+        if ( ! $lead_id ) {
+            wp_send_json_error( array( 'message' => 'Invalid lead ID' ) );
+        }
+
+        global $wpdb;
+        $lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sfco_leads WHERE id = %d", $lead_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+        if ( ! $lead ) {
+            wp_send_json_error( array( 'message' => 'Lead not found' ) );
+        }
+
+        $this->sync_lead( $lead );
+        wp_send_json_success( array( 'message' => __( 'Lead synced to CRM.', 'smart-forms-pro' ) ) );
+    }
+
+    public function render_page() {
+        $crm_mode = get_option( 'sfco_pro_crm_mode', 'none' );
+        $api_key  = get_option( 'sfco_pro_crm_api_key', '' );
+        $api_url  = get_option( 'sfco_pro_crm_api_url', '' );
+        $active   = get_option( 'sfco_pro_crm_active', 0 );
+
+        $scrm_active = defined( 'SCRM_PRO_VERSION' );
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'CRM Integration', 'smart-forms-pro' ); ?></h1>
+
+            <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+            <?php if ( isset( $_GET['saved'] ) ) : ?>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'CRM settings saved.', 'smart-forms-pro' ); ?></p></div>
+            <?php endif; ?>
+
+            <form method="post">
+                <?php wp_nonce_field( 'sfco_save_crm', '_sfco_crm_nonce' ); ?>
+
+                <table class="form-table">
+                    <tr>
+                        <th><?php esc_html_e( 'CRM Mode', 'smart-forms-pro' ); ?></th>
+                        <td>
+                            <label style="display:block;margin-bottom:6px;">
+                                <input type="radio" name="crm_mode" value="none" <?php checked( $crm_mode, 'none' ); ?>>
+                                <strong><?php esc_html_e( 'None', 'smart-forms-pro' ); ?></strong>
+                                — <?php esc_html_e( 'Leads stay in Smart Forms only. No external sync.', 'smart-forms-pro' ); ?>
+                            </label>
+                            <label style="display:block;margin-bottom:6px;">
+                                <input type="radio" name="crm_mode" value="internal" <?php checked( $crm_mode, 'internal' ); ?>>
+                                <strong><?php esc_html_e( 'Use Smart CRM Pro (internal)', 'smart-forms-pro' ); ?></strong>
+                                <?php if ( $scrm_active ) : ?>
+                                    <span style="color:#00a32a;">&#10003; <?php esc_html_e( 'Detected & active', 'smart-forms-pro' ); ?></span>
+                                <?php else : ?>
+                                    <span style="color:#d63638;">&#10005; <?php esc_html_e( 'Not installed', 'smart-forms-pro' ); ?></span>
+                                <?php endif; ?>
+                                <p class="description" style="margin-left:24px;"><?php esc_html_e( 'Smart CRM Pro reads leads from wp_sfco_leads directly for reactivation campaigns. No push needed.', 'smart-forms-pro' ); ?></p>
+                            </label>
+                            <label style="display:block;">
+                                <input type="radio" name="crm_mode" value="external" <?php checked( $crm_mode, 'external' ); ?>>
+                                <strong><?php esc_html_e( 'ActiveCampaign', 'smart-forms-pro' ); ?></strong>
+                                — <?php esc_html_e( 'Push leads to ActiveCampaign as contacts.', 'smart-forms-pro' ); ?>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+
+                <div id="sfco-crm-external-section" style="<?php echo 'external' === $crm_mode ? '' : 'display:none;'; ?>">
+                <table class="form-table">
+                    <tr>
+                        <th><label for="crm_api_url"><?php esc_html_e( 'API URL', 'smart-forms-pro' ); ?></label></th>
+                        <td>
+                            <input type="url" name="crm_api_url" id="crm_api_url" class="regular-text" value="<?php echo esc_attr( $api_url ); ?>" placeholder="https://your-account.api-us1.com" required>
+                            <p class="description"><?php esc_html_e( 'ActiveCampaign account URL. Found in Settings → Developer.', 'smart-forms-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="crm_api_key"><?php esc_html_e( 'API Key', 'smart-forms-pro' ); ?></label></th>
+                        <td>
+                            <input type="password" name="crm_api_key" id="crm_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" placeholder="<?php esc_attr_e( 'Enter your API key...', 'smart-forms-pro' ); ?>">
+                            <button type="button" class="button" id="sfco-test-crm"><?php esc_html_e( 'Test Connection', 'smart-forms-pro' ); ?></button>
+                            <span id="sfco-crm-test-result"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><?php esc_html_e( 'Auto-Sync', 'smart-forms-pro' ); ?></th>
+                        <td>
+                            <label><input type="checkbox" name="crm_active" value="1" <?php checked( $active ); ?>> <?php esc_html_e( 'Automatically push new leads to CRM', 'smart-forms-pro' ); ?></label>
+                        </td>
+                    </tr>
+                </table>
+                </div>
+
+                <script>
+                (function(){
+                    var radios = document.querySelectorAll('input[name="crm_mode"]');
+                    var section = document.getElementById('sfco-crm-external-section');
+                    function sync(){
+                        var checked = document.querySelector('input[name="crm_mode"]:checked');
+                        section.style.display = ( checked && checked.value === 'external' ) ? '' : 'none';
+                    }
+                    radios.forEach(function(r){ r.addEventListener('change', sync); });
+                })();
+                </script>
+
+                <p class="submit">
+                    <button type="submit" name="sfco_save_crm" value="1" class="button button-primary"><?php esc_html_e( 'Save CRM Settings', 'smart-forms-pro' ); ?></button>
+                </p>
+            </form>
+        </div>
+        <?php
+    }
+}
+
+new SFCO_Pro_CRM();
