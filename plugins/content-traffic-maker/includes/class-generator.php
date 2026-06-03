@@ -1,7 +1,7 @@
 <?php
 /**
- * Content opportunity generator — builds the prompt from business settings and
- * asks Perplexity for a structured local-SEO traffic brief.
+ * Video brief generator — 6 videos: 3 commercial + 3 residential.
+ * Every video has a title. Language is simple and social-native.
  */
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -9,41 +9,74 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class CTM_Generator {
 
-    // Perplexity exposes an OpenAI-compatible chat-completions API; its
-    // search-grounded "sonar" models surface real local directories /
-    // associations, which is exactly what we want for backlink targets.
     const ENDPOINT = 'https://api.perplexity.ai/chat/completions';
 
-    /**
-     * The structured fields the AI must return, mapped to a human label used
-     * when we have to sanitize / fall back.
-     */
     public static function fields() {
         return array(
-            'guest_post_topic',
-            'why_traffic',
-            'publishing_target',
-            'headline',
-            'local_backlink',
-            'outreach_angle',
-            'gov_backlink',
-            'nonprofit_backlink',
-            'youtube_idea',
-            'youtube_residential',
-            'tiktok_seo',
-            'tiktok_viral',
-            'residential_offer_video',
-            'cta',
-            'priority_score',
+            // ── COMMERCIAL ─────────────────────────────────────────
+            'com_seo_keyword',
+            'com_seo_search_intent',
+            'com_seo_video_title',
+            'com_seo_hook',
+            'com_seo_cta',
+            'com_seo_difficulty',
+            'com_seo_priority',
+            'com_seo_example_title',
+            'com_seo_example_url',
+
+            'com_offer_video_title',
+            'com_offer_name',
+            'com_offer_audience',
+            'com_offer_hook',
+            'com_offer_cta',
+            'com_offer_priority',
+            'com_offer_example_title',
+            'com_offer_example_url',
+
+            'com_viral_video_title',
+            'com_viral_trending_format',
+            'com_viral_concept',
+            'com_viral_opening_shot',
+            'com_viral_trend_reason',
+            'com_viral_cta',
+            'com_viral_priority',
+            'com_viral_example_title',
+            'com_viral_example_url',
+
+            // ── RESIDENTIAL ────────────────────────────────────────
+            'res_seo_keyword',
+            'res_seo_search_intent',
+            'res_seo_video_title',
+            'res_seo_hook',
+            'res_seo_cta',
+            'res_seo_difficulty',
+            'res_seo_priority',
+            'res_seo_example_title',
+            'res_seo_example_url',
+
+            'res_offer_video_title',
+            'res_offer_name',
+            'res_offer_audience',
+            'res_offer_hook',
+            'res_offer_cta',
+            'res_offer_priority',
+            'res_offer_example_title',
+            'res_offer_example_url',
+
+            'res_viral_video_title',
+            'res_viral_trending_format',
+            'res_viral_concept',
+            'res_viral_opening_shot',
+            'res_viral_trend_reason',
+            'res_viral_cta',
+            'res_viral_priority',
+            'res_viral_example_title',
+            'res_viral_example_url',
+
+            'brief_date',
         );
     }
 
-    /**
-     * Generate a brief for the given settings.
-     *
-     * @param array $settings CTM_DB::get_settings()
-     * @return array|WP_Error Associative brief (see fields()) or error.
-     */
     public static function generate( $settings ) {
         $api_key = trim( (string) ( $settings['api_key'] ?? '' ) );
         if ( '' === $api_key ) {
@@ -54,32 +87,27 @@ class CTM_Generator {
 
         $body = array(
             'model'       => $model,
-            'temperature' => 0.7,
-            'max_tokens'  => 1300,
+            'temperature' => 0.4,
+            // 6 videos x ~9 multi-sentence fields = a large JSON object; 3500 was
+            // too small and truncated the trailing (residential) block, producing
+            // invalid JSON. Give the model enough room to finish.
+            'max_tokens'  => 7000,
             'messages'    => array(
-                array(
-                    'role'    => 'system',
-                    'content' => 'You are a local-SEO and content strategist for a floor-cleaning company. You return ONLY a single minified JSON object and nothing else — no prose, no markdown, no code fences. Every recommendation must be concrete and specific to the exact city, business type, and audience given. Prefer real, currently-existing local organizations, directories, and associations by name. No generic advice, no placeholders.',
-                ),
-                array(
-                    'role'    => 'user',
-                    'content' => self::build_prompt( $settings ),
-                ),
+                array( 'role' => 'system', 'content' => self::system_prompt() ),
+                array( 'role' => 'user',   'content' => self::build_prompt( $settings ) ),
             ),
         );
 
         $response = wp_remote_post( self::ENDPOINT, array(
-            'timeout' => 45,
+            'timeout' => 75,
             'headers' => array(
                 'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type'  => 'application/json',
             ),
-            'body'    => wp_json_encode( $body ),
+            'body' => wp_json_encode( $body ),
         ) );
 
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
+        if ( is_wp_error( $response ) ) return $response;
 
         $code = (int) wp_remote_retrieve_response_code( $response );
         $raw  = (string) wp_remote_retrieve_body( $response );
@@ -88,7 +116,7 @@ class CTM_Generator {
         if ( 200 !== $code ) {
             $msg = is_array( $data ) && ! empty( $data['error']['message'] )
                 ? $data['error']['message']
-                : sprintf( /* translators: %d: HTTP status */ __( 'Perplexity returned HTTP %d.', 'content-traffic-maker' ), $code );
+                : sprintf( __( 'Perplexity returned HTTP %d.', 'content-traffic-maker' ), $code );
             return new WP_Error( 'ctm_api_error', $msg );
         }
 
@@ -98,109 +126,252 @@ class CTM_Generator {
             return new WP_Error( 'ctm_bad_json', __( 'Perplexity did not return valid JSON. Try again.', 'content-traffic-maker' ) );
         }
 
+        // The real, grounded source URLs live in Perplexity's structured
+        // response (search_results / citations) — NOT reliably inside the JSON
+        // the model writes. Pull them out and use them to backfill any example
+        // slots the model left empty, so the brief always shows real examples.
+        $brief = self::merge_real_examples( $brief, self::extract_sources( $data ) );
+
         return self::sanitize_brief( $brief );
     }
 
     /**
-     * Pull a JSON object out of a model response that may include a ```json
-     * code fence or stray prose around it (Perplexity isn't guaranteed to
-     * return bare JSON like OpenAI's json_object mode).
+     * Collect the real sources Perplexity grounded its answer on.
+     * Newer API responses expose `search_results` (title + url); older ones
+     * expose a flat `citations` array of URL strings. Support both.
+     *
+     * @return array List of array{ url:string, title:string }.
      */
+    private static function extract_sources( $data ) {
+        $sources = array();
+
+        if ( ! empty( $data['search_results'] ) && is_array( $data['search_results'] ) ) {
+            foreach ( $data['search_results'] as $r ) {
+                $url = is_array( $r ) ? (string) ( $r['url'] ?? '' ) : '';
+                if ( '' === $url ) {
+                    continue;
+                }
+                $sources[] = array(
+                    'url'   => $url,
+                    'title' => is_array( $r ) ? (string) ( $r['title'] ?? '' ) : '',
+                );
+            }
+        }
+
+        if ( empty( $sources ) && ! empty( $data['citations'] ) && is_array( $data['citations'] ) ) {
+            foreach ( $data['citations'] as $url ) {
+                if ( is_string( $url ) && '' !== $url ) {
+                    $sources[] = array( 'url' => $url, 'title' => '' );
+                }
+            }
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Backfill empty *_example_url / *_example_title fields from the real
+     * sources, preferring video platforms (YouTube / TikTok) and never reusing
+     * the same URL twice.
+     */
+    private static function merge_real_examples( $brief, $sources ) {
+        if ( empty( $sources ) ) {
+            return $brief;
+        }
+
+        // Float YouTube/TikTok results to the front — they're the relevant
+        // "example videos to copy" for a short-form brief.
+        usort( $sources, function ( $a, $b ) {
+            return self::is_video_url( $b['url'] ) <=> self::is_video_url( $a['url'] );
+        } );
+
+        $url_keys = array(
+            'com_seo_example_url', 'com_offer_example_url', 'com_viral_example_url',
+            'res_seo_example_url', 'res_offer_example_url', 'res_viral_example_url',
+        );
+
+        $i = 0;
+        foreach ( $url_keys as $url_key ) {
+            $existing = trim( (string) ( $brief[ $url_key ] ?? '' ) );
+            if ( '' !== $existing ) {
+                continue; // Model already supplied a URL — keep it.
+            }
+            if ( ! isset( $sources[ $i ] ) ) {
+                break; // No more real sources to assign.
+            }
+            $src = $sources[ $i++ ];
+            $brief[ $url_key ] = $src['url'];
+
+            // If the matching example title is also empty, use the source title
+            // (or its host) so the example block actually renders.
+            $title_key = str_replace( '_url', '_title', $url_key );
+            if ( '' === trim( (string) ( $brief[ $title_key ] ?? '' ) ) ) {
+                $brief[ $title_key ] = '' !== $src['title']
+                    ? $src['title']
+                    : (string) wp_parse_url( $src['url'], PHP_URL_HOST );
+            }
+        }
+
+        return $brief;
+    }
+
+    /** True for YouTube / TikTok URLs. */
+    private static function is_video_url( $url ) {
+        return (int) (bool) preg_match( '~(youtube\.com|youtu\.be|tiktok\.com)~i', (string) $url );
+    }
+
+    private static function system_prompt() {
+        return 'You are a social media video strategist for a Washington DC floor and carpet cleaning company called Midland Floors.
+
+You write for TikTok and YouTube — NOT for blogs or corporate websites.
+
+TWO audiences:
+1. COMMERCIAL — DC property managers, office building managers, facility teams
+2. RESIDENTIAL — DC homeowners, renters, people selling their home
+
+LANGUAGE RULES (critical):
+- Write like a real person talking, not a marketer writing copy.
+- NO industry jargon: no "VCT", no "tile substrate", no "facility maintenance protocol".
+- Say "office floors" not "commercial flooring". Say "carpet" not "floor covering". Say "before and after" not "transformation reveal".
+- Video titles must sound like real TikTok captions or YouTube titles that get clicks from normal people.
+- BAD title: "VCT Strip and Wax Maintenance for DC Facility Managers"
+- GOOD title: "This DC Office Floor Hadnt Been Cleaned in 2 Years. Watch What Happened."
+- BAD hook: "As a property manager, floor maintenance is critical."
+- GOOD hook: "Your tenants notice the floors before anything else."
+- Offers must feel like real deals, not marketing speak.
+- BAD offer: "Commercial Floor Assessment Package"
+- GOOD offer: "Free floor cleaning quote for any DC office this week"
+
+EXAMPLES — for every *_example_url use a REAL TikTok or YouTube URL drawn from your live web search results for this query. Prefer youtube.com / youtu.be / tiktok.com links. Put the real video title in *_example_title. If you genuinely cannot find a matching real video, leave the URL empty and give a realistic title describing the type of video that performs well (the system will backfill a real source link automatically).
+
+Return ONLY a minified JSON object. No prose, no markdown, no code fences.';
+    }
+
+    public static function build_prompt( $settings ) {
+        $business = sanitize_text_field( (string) ( $settings['business_name'] ?? 'Midland Floors' ) );
+        $city     = sanitize_text_field( (string) ( $settings['target_city']   ?? 'Washington' ) );
+        $state    = sanitize_text_field( (string) ( $settings['target_state']  ?? 'DC' ) );
+        $today    = gmdate( 'F j, Y' );
+        $keys     = implode( ', ', self::fields() );
+
+        return "Today is {$today}. Business: {$business}, {$city} {$state}.
+
+Return JSON with EXACTLY these keys: {$keys}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMMERCIAL (com_* keys)
+Audience: DC office building managers, property managers
+Services: office floor cleaning, tile cleaning, waxing
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[COMMERCIAL SEO VIDEO]
+com_seo_keyword       — exact phrase someone types on YouTube/Google (plain words, not jargon)
+com_seo_search_intent — one sentence: who is this person and what problem are they trying to solve
+com_seo_video_title   — write like a YouTube title that gets clicks from normal people. Simple. Curious. Real.
+com_seo_hook          — first 8 words spoken on camera. Stops the scroll.
+com_seo_cta           — one specific action to take (call, DM, book online)
+com_seo_difficulty    — Easy / Medium / Hard to rank for
+com_seo_priority      — 1-10
+com_seo_example_title — title of a REAL video on TikTok or YouTube doing this type of content right now
+com_seo_example_url   — URL if you can verify it exists, otherwise empty string
+
+[COMMERCIAL OFFER VIDEO]
+com_offer_video_title  — plain social-media-style title (e.g. \"Free Floor Cleaning Quote for DC Offices This Week\")
+com_offer_name         — the actual offer in plain words
+com_offer_audience     — exact person this targets
+com_offer_hook         — opening line that creates urgency or stakes in plain language
+com_offer_cta          — specific CTA
+com_offer_priority     — 1-10
+com_offer_example_title — real example of a service offer video performing well on TikTok/YouTube
+com_offer_example_url   — URL if verifiable
+
+[COMMERCIAL VIRAL VIDEO]
+com_viral_video_title   — write the caption/title like it would go viral on TikTok. Emotional. Relatable.
+com_viral_trending_format — name the real trend this uses (e.g. \"before/after reveal\", \"satisfying clean\", \"secret nobody tells you\") — use your web search to confirm this format is active RIGHT NOW
+com_viral_concept       — what happens in the video in plain words
+com_viral_opening_shot  — describe the exact first frame in plain words
+com_viral_trend_reason  — why this format is working right now — name real evidence
+com_viral_cta           — specific CTA
+com_viral_priority      — 1-10
+com_viral_example_title — real viral video using this format right now
+com_viral_example_url   — URL if verifiable
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESIDENTIAL (res_* keys)
+Audience: DC homeowners, renters, people preparing to sell
+Services: carpet cleaning, carpet installation, home floor cleaning
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[RESIDENTIAL SEO VIDEO]
+res_seo_keyword       — exact phrase (e.g. \"carpet cleaning before selling home\")
+res_seo_search_intent — one sentence: who is searching and why
+res_seo_video_title   — plain YouTube/TikTok title normal people click
+res_seo_hook          — first 8 words on camera
+res_seo_cta           — specific CTA
+res_seo_difficulty    — Easy / Medium / Hard
+res_seo_priority      — 1-10
+res_seo_example_title — real example video performing on this topic
+res_seo_example_url   — URL if verifiable
+
+[RESIDENTIAL OFFER VIDEO]
+res_offer_video_title  — plain social title for the offer video
+res_offer_name         — the actual offer in plain language
+res_offer_audience     — exact person
+res_offer_hook         — opening line, plain language, urgency or stakes
+res_offer_cta          — specific CTA
+res_offer_priority     — 1-10
+res_offer_example_title — real example of a home service offer video
+res_offer_example_url   — URL if verifiable
+
+[RESIDENTIAL VIRAL VIDEO]
+res_viral_video_title   — TikTok-style caption. Relatable. Stops the scroll.
+res_viral_trending_format — real trend format active RIGHT NOW
+res_viral_concept       — what happens in plain words
+res_viral_opening_shot  — describe the exact first frame
+res_viral_trend_reason  — real evidence this format is working now
+res_viral_cta           — specific CTA
+res_viral_priority      — 1-10
+res_viral_example_title — real viral video using this format
+res_viral_example_url   — URL if verifiable
+
+brief_date: \"{$today}\"";
+    }
+
     private static function extract_json( $content ) {
         $content = trim( $content );
         $decoded = json_decode( $content, true );
-        if ( is_array( $decoded ) ) {
-            return $decoded;
-        }
-        // Strip code fences if present.
+        if ( is_array( $decoded ) ) return $decoded;
         $content = preg_replace( '/^```(?:json)?|```$/m', '', $content );
-        // Grab the outermost {...} block.
-        $start = strpos( $content, '{' );
-        $end   = strrpos( $content, '}' );
+        $start   = strpos( $content, '{' );
+        $end     = strrpos( $content, '}' );
         if ( false !== $start && false !== $end && $end > $start ) {
             $decoded = json_decode( substr( $content, $start, $end - $start + 1 ), true );
-            if ( is_array( $decoded ) ) {
-                return $decoded;
-            }
+            if ( is_array( $decoded ) ) return $decoded;
         }
         return null;
     }
 
-    /**
-     * Build the prompt from business settings.
-     */
-    public static function build_prompt( $settings ) {
-        $g = function( $k ) use ( $settings ) {
-            return sanitize_text_field( (string) ( $settings[ $k ] ?? '' ) );
-        };
-
-        $business = $g( 'business_name' );
-        $type     = $g( 'business_type' );
-        $city     = $g( 'target_city' );
-        $state    = $g( 'target_state' );
-        $audience = $g( 'target_audience' );
-        $service  = $g( 'main_service' );
-        $site     = esc_url_raw( (string) ( $settings['website_url'] ?? '' ) );
-        $freq     = ( 'daily' === ( $settings['frequency'] ?? 'weekly' ) ) ? "today's" : "this week's";
-
-        $keys = implode( ', ', self::fields() );
-
-        return "Business profile:\n"
-            . "- Name: {$business}\n"
-            . "- Type: {$type} (commercial & residential floor cleaning — strip & wax, VCT, tile & grout, carpet extraction)\n"
-            . "- City: {$city}\n"
-            . "- State: {$state}\n"
-            . "- Target audience: {$audience}\n"
-            . "- Main service: {$service}\n"
-            . "- Website: {$site}\n\n"
-            . "Produce {$freq} single best traffic brief for this exact business and city. "
-            . "Return a JSON object with EXACTLY these keys: {$keys}.\n\n"
-            . "GUEST POST guidance — pitch local business blogs, real estate blogs, property management sites, "
-            . "facility management sites, and cleaning-industry sites in {$city}, {$state}.\n"
-            . "BACKLINK guidance — choose from real, named targets in {$city}: local chambers of commerce, business "
-            . "directories, property manager / apartment associations (e.g. local BOMA, IREM, apartment councils), "
-            . "commercial real estate groups, school or vendor pages, nonprofit facility partners, and local "
-            . ".gov vendor/resource pages.\n"
-            . "VIDEO guidance — YouTube SEO titles like 'How often should commercial floors be cleaned?', "
-            . "'Best floor cleaning for office buildings in {$city}', 'Commercial floor stripping and waxing explained', "
-            . "'How to remove stains from VCT flooring', 'Residential floor cleaning before selling your home'. "
-            . "TikTok SEO: before/after floor cleaning, dirty grout transformations, VCT strip & wax process, carpet "
-            . "extraction walkthrough, floor-cleaning mistakes property managers make. Viral TikTok: "
-            . "'This floor looked destroyed until we cleaned it', 'POV: the tenant moved out and left the floors like this', "
-            . "'Watch this waxed floor come back to life', 'The dirtiest hallway we cleaned this month'.\n\n"
-            . "Field requirements (all specific to {$city}, {$state} and floor cleaning):\n"
-            . "- guest_post_topic: the single highest-value guest post topic to pitch (use the guest-post guidance).\n"
-            . "- why_traffic: one or two sentences on why it will drive traffic.\n"
-            . "- publishing_target: a realistic named local/niche site to publish it on.\n"
-            . "- headline: a click-worthy, keyword-bearing suggested headline.\n"
-            . "- local_backlink: a specific, real, named local backlink target in {$city} (use the backlink guidance).\n"
-            . "- outreach_angle: the outreach angle / reason they would link.\n"
-            . "- gov_backlink: a realistic .gov backlink idea (city/county vendor registration, gov facility/resource page).\n"
-            . "- nonprofit_backlink: a realistic local nonprofit backlink idea (facility partner, sponsorship, resource listing).\n"
-            . "- youtube_idea: a YouTube SEO video idea for the COMMERCIAL audience — include the target keyword and a title.\n"
-            . "- youtube_residential: a YouTube SEO video idea for the RESIDENTIAL audience (homeowners) about residential "
-            . "CARPET CLEANING or FLOOR INSTALLATION — include the keyword and a title.\n"
-            . "- tiktok_seo: a TikTok SEO video idea — include the keyword and a hook.\n"
-            . "- tiktok_viral: a viral TikTok video idea — include the hook and concept.\n"
-            . "- residential_offer_video: a short promotional/offer video idea for RESIDENTIAL customers about carpet cleaning "
-            . "or floor installation tied to a specific offer or seasonal hook (e.g. pre-sale carpet refresh, new-floor install "
-            . "special) — include the hook and the offer/CTA.\n"
-            . "- cta: one specific call-to-action to use this week.\n"
-            . "- priority_score: an integer 1-10 for how high-impact this brief is.\n\n"
-            . "Be direct and concrete. Name real local organizations where possible. No generic advice, no filler.";
-    }
-
-    /**
-     * Coerce the model output into a clean, expected shape.
-     */
     private static function sanitize_brief( $brief ) {
+        $int_fields = array(
+            'com_seo_priority', 'com_offer_priority', 'com_viral_priority',
+            'res_seo_priority', 'res_offer_priority', 'res_viral_priority',
+        );
+        $url_fields = array(
+            'com_seo_example_url', 'com_offer_example_url', 'com_viral_example_url',
+            'res_seo_example_url', 'res_offer_example_url', 'res_viral_example_url',
+        );
         $clean = array();
         foreach ( self::fields() as $key ) {
             $val = $brief[ $key ] ?? '';
-            if ( 'priority_score' === $key ) {
+            if ( in_array( $key, $int_fields, true ) ) {
                 $clean[ $key ] = max( 1, min( 10, (int) $val ) );
+            } elseif ( in_array( $key, $url_fields, true ) ) {
+                $clean[ $key ] = esc_url_raw( is_scalar( $val ) ? (string) $val : '' );
             } else {
-                $clean[ $key ] = sanitize_text_field( is_scalar( $val ) ? (string) $val : wp_json_encode( $val ) );
+                $text = is_scalar( $val ) ? (string) $val : wp_json_encode( $val );
+                // Strip Perplexity inline citation markers like [1] / [1][2].
+                $text = preg_replace( '/\s?\[\d+\]/', '', $text );
+                $clean[ $key ] = sanitize_textarea_field( $text );
             }
         }
         return $clean;
