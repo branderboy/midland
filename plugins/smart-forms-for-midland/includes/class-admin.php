@@ -871,6 +871,15 @@ class SFCO_Admin {
         
         wp_enqueue_style( 'sfco-admin', SFCO_PLUGIN_URL . 'assets/css/admin.css', array(), SFCO_VERSION );
         wp_enqueue_script( 'sfco-admin', SFCO_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery' ), SFCO_VERSION, true );
+
+        // Pro admin JS (CRM "Test Connection"/"Sync lead", team "Remove member").
+        // Previously this was never enqueued and sfcoProAdmin was never localized,
+        // so those buttons threw "sfcoProAdmin is not defined" and did nothing.
+        wp_enqueue_script( 'sfco-pro-admin', SFCO_PLUGIN_URL . 'assets/js/pro-admin.js', array( 'jquery' ), SFCO_VERSION, true );
+        wp_localize_script( 'sfco-pro-admin', 'sfcoProAdmin', array(
+            'ajaxurl' => admin_url( 'admin-ajax.php' ),
+            'nonce'   => wp_create_nonce( 'sfco_pro_admin' ),
+        ) );
     }
     
     public function render_leads_page() {

@@ -19,6 +19,8 @@ class RSSEO_Admin {
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
         add_action( 'wp_ajax_rsseo_apply_fix',   array( $this, 'ajax_apply_fix' ) );
         add_action( 'wp_ajax_rsseo_apply_all',   array( $this, 'ajax_apply_all' ) );
+        add_action( 'wp_ajax_rsseo_restore_fix', array( $this, 'ajax_restore_fix' ) );
+        add_action( 'wp_ajax_rsseo_restore_all', array( $this, 'ajax_restore_all' ) );
         add_action( 'wp_ajax_rsseo_test_api',    array( $this, 'ajax_test_api' ) );
         add_action( 'wp_ajax_rsseo_save_settings', array( $this, 'ajax_save_settings' ) );
         add_action( 'wp_ajax_rsseo_rename_scan',   array( $this, 'ajax_rename_scan' ) );
@@ -131,9 +133,12 @@ class RSSEO_Admin {
     private function render_pipeline_cta( string $current ): void {
         $scans         = RSSEO_Database::get_scans( 1 );
         $latest_scan   = ! empty( $scans ) ? $scans[0] : null;
-        $latest_report = $latest_scan ? RSSEO_Database::get_report( (int) $latest_scan->id ) : null;
+        // get_scans() joins the report row in as `report_id` — use that, NOT the
+        // scan id (get_report() keys on the report id).
+        $report_id     = (int) ( $latest_scan->report_id ?? 0 );
+        $latest_report = $report_id ? RSSEO_Database::get_report( $report_id ) : null;
         $has_report    = (bool) $latest_report;
-        $report_qs     = $latest_scan ? '&report_id=' . (int) $latest_scan->id : '';
+        $report_qs     = $report_id ? '&report_id=' . $report_id : '';
 
         $url = array(
             'scan'     => admin_url( 'admin.php?page=real-smart-seo&tab=scan' ),
@@ -340,7 +345,9 @@ class RSSEO_Admin {
         $has_key       = RSSEO_Settings::has_api_key();
         $scans         = RSSEO_Database::get_scans( 1 );
         $latest_scan   = ! empty( $scans ) ? $scans[0] : null;
-        $latest_report = $latest_scan ? RSSEO_Database::get_report( (int) $latest_scan->id ) : null;
+        // Use the report id joined in by get_scans(), not the scan id.
+        $report_id     = (int) ( $latest_scan->report_id ?? 0 );
+        $latest_report = $report_id ? RSSEO_Database::get_report( $report_id ) : null;
         $pending_fixes = 0;
         if ( $latest_report ) {
             $pending_fixes = max( 0, (int) $latest_report->fixes_available - (int) $latest_report->fixes_applied );
@@ -353,7 +360,7 @@ class RSSEO_Admin {
         $url_index    = admin_url( 'admin.php?page=real-smart-seo&tab=index' );
         $url_insights = admin_url( 'admin.php?page=real-smart-seo&tab=insights' );
         $url_settings = admin_url( 'admin.php?page=real-smart-seo&tab=settings' );
-        $url_report   = $latest_scan ? admin_url( 'admin.php?page=real-smart-seo&tab=repair&report_id=' . (int) $latest_scan->id ) : $url_repair;
+        $url_report   = $report_id ? admin_url( 'admin.php?page=real-smart-seo&tab=repair&report_id=' . $report_id ) : $url_repair;
 
         require RSSEO_PATH . 'includes/views/workflow.php';
     }
@@ -372,7 +379,10 @@ class RSSEO_Admin {
                 'applied'    => __( 'Fixed!', 'real-smart-seo' ),
                 'error'      => __( 'Error. Try again.', 'real-smart-seo' ),
                 'confirm_fix'=> __( 'Apply this fix to your site?', 'real-smart-seo' ),
-                'confirm_all'=> __( 'Apply ALL pending fixes? This will update your site content.', 'real-smart-seo' ),
+                'confirm_all'=> __( 'Apply ALL pending fixes? This will update your site content. Every change is backed up and can be reverted.', 'real-smart-seo' ),
+                'confirm_revert'     => __( 'Revert this fix to the previous value?', 'real-smart-seo' ),
+                'confirm_revert_all' => __( 'Revert ALL applied fixes back to their previous values?', 'real-smart-seo' ),
+                'reverting'  => __( 'Reverting...', 'real-smart-seo' ),
                 'analyzing'  => __( 'Analyzing... this may take 30–60 seconds.', 'real-smart-seo' ),
                 'auditing'   => __( 'Running audit...', 'real-smart-seo' ),
             ),
@@ -607,6 +617,36 @@ class RSSEO_Admin {
         wp_send_json_success( $result );
     }
 
+    // ── AJAX: Revert (rollback) ────────────────────────────────────────────────
+
+    public function ajax_restore_fix() {
+        check_ajax_referer( 'rsseo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $fix_id = isset( $_POST['fix_id'] ) ? (int) $_POST['fix_id'] : 0;
+        if ( ! $fix_id ) {
+            wp_send_json_error( __( 'Invalid fix ID.', 'real-smart-seo' ) );
+        }
+        $result = RSSEO_Fixer::restore( $fix_id );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( $result->get_error_message() );
+        }
+        wp_send_json_success( array( 'message' => __( 'Reverted to the previous value.', 'real-smart-seo' ) ) );
+    }
+
+    public function ajax_restore_all() {
+        check_ajax_referer( 'rsseo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $report_id = isset( $_POST['report_id'] ) ? (int) $_POST['report_id'] : 0;
+        if ( ! $report_id ) {
+            wp_send_json_error( __( 'Invalid report ID.', 'real-smart-seo' ) );
+        }
+        wp_send_json_success( RSSEO_Fixer::restore_all( $report_id ) );
+    }
+
     // ── AJAX: Test API Key ─────────────────────────────────────────────────────
 
     public function ajax_test_api() {
@@ -669,7 +709,7 @@ class RSSEO_Admin {
 
 
         if ( isset( $_POST['rsseo_max_tokens'] ) ) {
-            update_option( 'rsseo_max_tokens', min( 16000, max( 2000, (int) $_POST['rsseo_max_tokens'] ) ) );
+            update_option( 'rsseo_max_tokens', min( 16000, max( 2000, (int) wp_unslash( $_POST['rsseo_max_tokens'] ) ) ) );
         }
 
         if ( isset( $_POST['rsseo_business_profile'] ) && is_array( $_POST['rsseo_business_profile'] ) ) {

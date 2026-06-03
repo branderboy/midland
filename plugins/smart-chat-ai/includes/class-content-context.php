@@ -98,8 +98,8 @@ class SCAI_Content_Context {
 
         update_option( self::OPT_ENABLED,     isset( $_POST['ctx_enabled'] ) ? 1 : 0 );
         update_option( self::OPT_SITEMAP_URL, esc_url_raw( wp_unslash( $_POST['sitemap_url'] ?? '' ) ) );
-        update_option( self::OPT_PAGE_LIMIT,  max( 1, min( 200, (int) ( $_POST['page_limit'] ?? 30 ) ) ) );
-        update_option( self::OPT_CHARS_PER,   max( 200, min( 5000, (int) ( $_POST['chars_per_page'] ?? 1500 ) ) ) );
+        update_option( self::OPT_PAGE_LIMIT,  max( 1, min( 200, (int) wp_unslash( $_POST['page_limit'] ?? 30 ) ) ) );
+        update_option( self::OPT_CHARS_PER,   max( 200, min( 5000, (int) wp_unslash( $_POST['chars_per_page'] ?? 1500 ) ) ) );
 
         wp_safe_redirect( admin_url( 'admin.php?page=scai-content&saved=1' ) );
         exit;

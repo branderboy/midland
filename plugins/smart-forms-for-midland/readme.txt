@@ -86,6 +86,9 @@ Completely responsive. Looks professional on phones, tablets, and desktops.
 
 == Changelog ==
 
+= 2.19.10 =
+* Calendly now only records that the service was scheduled. A booking marks the lead Booked (and pushes to ServiceM8 + ActiveCampaign); a cancellation reverses it. Removed the timer that auto-marked a visit Completed after the slot passed — completion is now driven solely by ServiceM8 closing the job, so review surveys and floor-care plans no longer fire off a Calendly booking. Any completion events older builds had queued are swept out safely.
+
 = 2.19.6 =
 * Mass delete on the per-form Entries page too (checkboxes + Bulk actions > Delete permanently), matching the All Entries list.
 

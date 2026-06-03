@@ -1,21 +1,26 @@
 <?php
 /**
  * Plugin Name: Midland Smart Reviews
- * Description: Midland-branded survey-gated review collection. A 1–5 star survey fires automatically after job completion (driven by sfco_lead_completed + sfco_lead_status_changed actions from Midland Smart Forms / Smart CRM). Score ≥4★ sends the Google review link + 2 follow-up reminders; score <4★ captures private feedback only and emails the manager — no public review request.
- * Version: 1.3.0
+ * Description: Midland-branded survey-gated review collection. A 1–5 star survey fires automatically after job completion (driven by sfco_lead_completed + sfco_lead_status_changed actions from Midland Smart Forms / Smart CRM). Score ≥4★ sends the Google review link + up to 3 follow-up reminders; score <4★ captures private feedback only and emails the manager — no public review request.
+ * Version: 1.5.2
+ * Author: Midland Floor Care
+ * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: smart-reviews-pro
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
+ * Requires Plugins: smart-forms-for-midland
+ * Tested up to: 6.7
+ * Update URI: false
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'SRP_VERSION', '1.3.0' );
+define( 'SRP_VERSION', '1.5.2' );
 define( 'SRP_PATH',    plugin_dir_path( __FILE__ ) );
 define( 'SRP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'SRP_FILE',    __FILE__ );
@@ -33,6 +38,7 @@ class Smart_Reviews_Pro {
 
     private function __construct() {
         register_activation_hook( SRP_FILE, array( $this, 'activate' ) );
+        register_deactivation_hook( SRP_FILE, array( $this, 'deactivate' ) );
         add_action( 'plugins_loaded', array( $this, 'init' ) );
     }
 
@@ -41,9 +47,19 @@ class Smart_Reviews_Pro {
         SRP_DB::create_tables();
     }
 
+    public function deactivate() {
+        // Clear the hooks this plugin actually schedules. (The old code cleared
+        // 'srp_send_reminders', which is never registered, so the real cron
+        // events were left orphaned in WP-Cron.)
+        wp_clear_scheduled_hook( 'srp_cron_reminders' );  // hourly survey reminders
+        wp_clear_scheduled_hook( 'srp_crm_poll' );        // hourly CRM poll
+        wp_clear_scheduled_hook( 'srp_review_reminder' ); // 48h GMB review nudges
+    }
+
     public function init() {
         load_plugin_textdomain( 'smart-reviews-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
         $this->includes();
+        SRP_DB::maybe_upgrade(); // add new columns on existing installs without reactivation
         $this->boot();
     }
 

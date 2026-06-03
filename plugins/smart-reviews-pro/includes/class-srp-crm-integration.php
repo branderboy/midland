@@ -36,9 +36,15 @@ class SRP_CRM_Integration {
 
     private function __construct() {
         // Action-based integration — other plugins fire these and we react.
-        add_action( 'sfco_lead_completed',       array( $this, 'handle_completed_lead' ), 10, 1 );
-        add_action( 'sfco_lead_status_changed',  array( $this, 'handle_status_change' ), 10, 3 );
-        add_action( 'scrm_pro_job_completed',    array( $this, 'handle_completed_lead' ), 10, 1 );
+        // handle_completed_lead runs at priority 20 — AFTER SCRM_Pro_Tags
+        // (priority 15) has stored the completion tags — so normalize_lead()
+        // reads the freshly-written tag set (incl. midland-job-completed-*)
+        // rather than the stale pre-completion set. SCRM_Pro_Tags is hooked on
+        // these same two completion actions; the status-change path (below)
+        // funnels into handle_completed_lead too, so it shares the bump.
+        add_action( 'sfco_lead_completed',       array( $this, 'handle_completed_lead' ), 20, 1 );
+        add_action( 'sfco_lead_status_changed',  array( $this, 'handle_status_change' ), 20, 3 );
+        add_action( 'scrm_pro_job_completed',    array( $this, 'handle_completed_lead' ), 20, 1 );
 
         // Job opened in ServiceM8 — mark the lead as "survey pending" so
         // the admin page can distinguish jobs awaiting completion from
@@ -213,8 +219,7 @@ class SRP_CRM_Integration {
     public function render_page() {
         $trigger    = $this->get_trigger_status();
         $autofire   = (int) get_option( self::OPT_AUTOFIRE, 0 );
-        $sfco_on    = defined( 'SFCO_VERSION' );
-        $sfco_pro   = defined( 'SFCO_PRO_VERSION' );
+        $sfco_on    = defined( 'SFCO_VERSION' ); // Midland Smart Forms (merged Basic + Pro).
         $scrm_pro   = defined( 'SCRM_PRO_VERSION' );
         $has_table  = $this->leads_table_exists();
 
@@ -270,17 +275,12 @@ class SRP_CRM_Integration {
             <ul>
                 <li>
                     <?php echo $sfco_on ? '<span style="color:#0a8754;">&#10003;</span>' : '<span style="color:#d63638;">&#10005;</span>'; ?>
-                    <strong>Smart Forms for Contractors</strong>
+                    <strong>Smart Forms for Midland</strong>
                     <span style="color:#666;">— <?php echo $sfco_on ? esc_html__( 'active (lead source)', 'smart-reviews-pro' ) : esc_html__( 'not installed', 'smart-reviews-pro' ); ?></span>
                 </li>
                 <li>
-                    <?php echo $sfco_pro ? '<span style="color:#0a8754;">&#10003;</span>' : '<span style="color:#d63638;">&#10005;</span>'; ?>
-                    <strong>Smart Forms Pro</strong>
-                    <span style="color:#666;">— <?php echo $sfco_pro ? esc_html__( 'active', 'smart-reviews-pro' ) : esc_html__( 'not installed', 'smart-reviews-pro' ); ?></span>
-                </li>
-                <li>
                     <?php echo $scrm_pro ? '<span style="color:#0a8754;">&#10003;</span>' : '<span style="color:#d63638;">&#10005;</span>'; ?>
-                    <strong>Smart CRM Pro</strong>
+                    <strong>Smart CRM for Midland</strong>
                     <span style="color:#666;">— <?php echo $scrm_pro ? esc_html__( 'active', 'smart-reviews-pro' ) : esc_html__( 'not installed', 'smart-reviews-pro' ); ?></span>
                 </li>
             </ul>
@@ -340,7 +340,7 @@ class SRP_CRM_Integration {
             <hr>
             <h2><?php printf( esc_html__( 'Leads Ready to Survey (status = %s)', 'smart-reviews-pro' ), '<code>' . esc_html( $trigger ) . '</code>' ); ?></h2>
             <?php if ( ! $has_table ) : ?>
-                <p><em><?php esc_html_e( 'wp_sfco_leads table not found — install Smart Forms for Contractors first.', 'smart-reviews-pro' ); ?></em></p>
+                <p><em><?php esc_html_e( 'wp_sfco_leads table not found — install Smart Forms for Midland first.', 'smart-reviews-pro' ); ?></em></p>
             <?php elseif ( empty( $ready_leads ) ) : ?>
                 <p><em><?php esc_html_e( 'No leads waiting. They will appear here when their CRM status matches the trigger.', 'smart-reviews-pro' ); ?></em></p>
             <?php else : ?>
@@ -448,12 +448,21 @@ do_action( 'srp_job_completed', array(
             return '';
         };
 
+        $lead_id = (int) ( $get( 'id' ) ?: 0 );
+
+        // Smart CRM owns the tags — read the lead's segment + tags from it so the
+        // review is associated with the same data the CRM passes to ActiveCampaign.
+        $tags    = ( $lead_id && class_exists( 'SCRM_Pro_Tags' ) ) ? SCRM_Pro_Tags::get_lead_tags( $lead_id ) : array();
+        $segment = class_exists( 'SCRM_Pro_ActiveCampaign' ) ? SCRM_Pro_ActiveCampaign::get_instance()->lead_segment( $lead ) : '';
+
         return array(
             'name'    => sanitize_text_field( (string) $get( 'customer_name' ) ?: (string) $get( 'name' ) ),
             'email'   => sanitize_email( (string) $get( 'customer_email' ) ?: (string) $get( 'email' ) ),
             'phone'   => sanitize_text_field( (string) $get( 'customer_phone' ) ?: (string) $get( 'phone' ) ),
             'job_id'  => sanitize_text_field( (string) ( $get( 'job_id' ) ?: $get( 'id' ) ) ),
-            'lead_id' => (int) ( $get( 'id' ) ?: 0 ),
+            'lead_id' => $lead_id,
+            'segment' => sanitize_text_field( (string) $segment ),
+            'tags'    => array_map( 'sanitize_text_field', (array) $tags ),
         );
     }
 }

@@ -43,6 +43,12 @@
                 <?php esc_html_e( 'Apply All Fixes', 'real-smart-seo' ); ?>
             </button>
             <?php endif; ?>
+            <?php if ( (int) $report->fixes_applied > 0 ) : ?>
+            <button class="button rsseo-restore-all" data-report-id="<?php echo esc_attr( $report->id ); ?>">
+                <?php esc_html_e( 'Revert All Applied', 'real-smart-seo' ); ?>
+            </button>
+            <?php endif; ?>
+            <p class="description" style="margin-top:8px;"><?php esc_html_e( 'Every applied fix is backed up first — use “Revert” on any row (or “Revert All”) to restore the previous value. Expand “Review full diff” before applying content changes.', 'real-smart-seo' ); ?></p>
         </div>
 
         <table class="wp-list-table widefat fixed striped rsseo-table">
@@ -67,8 +73,19 @@
                 <tr class="<?php echo $fix->applied ? 'rsseo-fix--applied' : ''; ?>" id="rsseo-fix-<?php echo esc_attr( $fix->id ); ?>">
                     <td><?php echo $post_title ? esc_html( $post_title ) : '—'; ?></td>
                     <td><code><?php echo esc_html( $fix->fix_type ); ?></code></td>
-                    <td class="rsseo-fix-value"><?php echo esc_html( mb_strimwidth( $fix->old_value, 0, 80, '…' ) ); ?></td>
-                    <td class="rsseo-fix-value rsseo-fix-value--new"><?php echo esc_html( mb_strimwidth( $fix->new_value, 0, 80, '…' ) ); ?></td>
+                    <td class="rsseo-fix-value"><?php echo esc_html( mb_strimwidth( (string) $fix->old_value, 0, 80, '…' ) ); ?></td>
+                    <td class="rsseo-fix-value rsseo-fix-value--new">
+                        <?php echo esc_html( mb_strimwidth( (string) $fix->new_value, 0, 80, '…' ) ); ?>
+                        <details class="rsseo-diff" style="margin-top:6px;">
+                            <summary style="cursor:pointer;color:#2271b1;"><?php esc_html_e( 'Review full diff', 'real-smart-seo' ); ?></summary>
+                            <div style="margin-top:6px;">
+                                <div style="font-size:11px;color:#666;"><?php esc_html_e( 'Before', 'real-smart-seo' ); ?></div>
+                                <pre style="white-space:pre-wrap;background:#fff5f5;border:1px solid #f0c6c6;border-radius:4px;padding:6px;max-height:200px;overflow:auto;"><?php echo esc_html( (string) $fix->old_value ); ?></pre>
+                                <div style="font-size:11px;color:#666;margin-top:4px;"><?php esc_html_e( 'After', 'real-smart-seo' ); ?></div>
+                                <pre style="white-space:pre-wrap;background:#f3fcf4;border:1px solid #cdeccf;border-radius:4px;padding:6px;max-height:200px;overflow:auto;"><?php echo esc_html( (string) $fix->new_value ); ?></pre>
+                            </div>
+                        </details>
+                    </td>
                     <td>
                         <?php if ( $fix->applied ) : ?>
                             <span class="rsseo-status rsseo-status--complete"><?php esc_html_e( 'Applied', 'real-smart-seo' ); ?></span>
@@ -80,6 +97,10 @@
                         <?php if ( ! $fix->applied ) : ?>
                             <button class="button button-small rsseo-apply-fix" data-fix-id="<?php echo esc_attr( $fix->id ); ?>">
                                 <?php esc_html_e( 'Fix', 'real-smart-seo' ); ?>
+                            </button>
+                        <?php else : ?>
+                            <button class="button button-small rsseo-restore-fix" data-fix-id="<?php echo esc_attr( $fix->id ); ?>">
+                                <?php esc_html_e( 'Revert', 'real-smart-seo' ); ?>
                             </button>
                         <?php endif; ?>
                     </td>

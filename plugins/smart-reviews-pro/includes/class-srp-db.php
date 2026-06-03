@@ -5,16 +5,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SRP_DB {
 
+    const DB_VERSION = '1.2'; // bump when the schema below changes
+
     public static function create_tables() {
         global $wpdb;
         $charset = $wpdb->get_charset_collate();
 
+        // segment + tags carry the data Smart CRM passes through on completion,
+        // so each review is associated with the lead's CRM segment and tags.
         $surveys = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}srp_surveys (
             id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             customer_name  VARCHAR(200)  NOT NULL DEFAULT '',
             customer_email VARCHAR(200)  NOT NULL DEFAULT '',
             customer_phone VARCHAR(50)   NOT NULL DEFAULT '',
             job_id         VARCHAR(100)  NOT NULL DEFAULT '',
+            segment        VARCHAR(20)   NOT NULL DEFAULT '',
+            tags           TEXT          NULL,
             score          TINYINT       NULL,
             feedback       TEXT          NULL,
             routed         TINYINT(1)    NOT NULL DEFAULT 0,
@@ -23,6 +29,7 @@ class SRP_DB {
             responded_at   DATETIME      NULL,
             reminder1_at   DATETIME      NULL,
             reminder2_at   DATETIME      NULL,
+            reminder3_at   DATETIME      NULL,
             created_at     DATETIME      NOT NULL,
             PRIMARY KEY (id),
             KEY customer_email (customer_email),
@@ -32,6 +39,14 @@ class SRP_DB {
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $surveys );
+        update_option( 'srp_db_version', self::DB_VERSION );
+    }
+
+    /** Run dbDelta when the stored schema version is behind (adds new columns). */
+    public static function maybe_upgrade() {
+        if ( get_option( 'srp_db_version' ) !== self::DB_VERSION ) {
+            self::create_tables();
+        }
     }
 
     public static function insert_survey( $data ) {
@@ -44,6 +59,14 @@ class SRP_DB {
     public static function update_survey( $id, $data ) {
         global $wpdb;
         $wpdb->update( $wpdb->prefix . 'srp_surveys', $data, array( 'id' => $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    }
+
+    /**
+     * Fetch a survey row by its id. Returns null if missing.
+     */
+    public static function get_survey( $id ) {
+        global $wpdb;
+        return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}srp_surveys WHERE id = %d", (int) $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     }
 
     /**
@@ -125,11 +148,15 @@ class SRP_DB {
     }
 
     /**
-     * Surveys that need their first reminder (24h after send, no reminder1 yet).
+     * Surveys that need their first reminder: sent at least 24h ago, customer
+     * hasn't responded, no reminder1 yet. The threshold is built from
+     * current_time('mysql') because survey_sent_at is stored in site-local time
+     * (current_time('mysql')) — comparing it against a GMT threshold would skew
+     * the wait by the site's UTC offset.
      */
     public static function get_pending_reminders() {
         global $wpdb;
-        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - DAY_IN_SECONDS );
         return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}srp_surveys
@@ -143,19 +170,46 @@ class SRP_DB {
     }
 
     /**
-     * Surveys that need their second reminder (48h after send, reminder1 already gone, no reminder2 yet).
+     * Surveys that need their second (final) reminder: reminder1 actually went
+     * out at least 48h ago, the customer still hasn't responded, and reminder2
+     * hasn't been sent. Spacing is measured from reminder1_at (not survey_sent_at)
+     * so the two reminders can NEVER fire in the same cron run — even when the
+     * first reminder is delayed (e.g. cron downtime, or a survey that sat
+     * unanswered past 48h), the second still waits a full 48h after reminder1.
+     * This is the fix for customers getting both reminders back-to-back.
      */
     public static function get_pending_reminders_second() {
         global $wpdb;
-        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-48 hours' ) );
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - 2 * DAY_IN_SECONDS );
         return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}srp_surveys
                 WHERE score IS NULL
-                AND survey_sent_at IS NOT NULL
-                AND survey_sent_at < %s
                 AND reminder1_at IS NOT NULL
+                AND reminder1_at < %s
                 AND reminder2_at IS NULL",
+                $threshold
+            )
+        );
+    }
+
+    /**
+     * Surveys that need their third (last) reminder: reminder2 went out at least
+     * 5 days ago, the customer still hasn't responded, and reminder3 hasn't been
+     * sent. Like reminder2, the wait is measured from the previous reminder
+     * (reminder2_at), so it can never fire in the same cron run as reminder2.
+     * This is the final nudge — there is no reminder4.
+     */
+    public static function get_pending_reminders_third() {
+        global $wpdb;
+        $threshold = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'mysql' ) ) - 5 * DAY_IN_SECONDS );
+        return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}srp_surveys
+                WHERE score IS NULL
+                AND reminder2_at IS NOT NULL
+                AND reminder2_at < %s
+                AND reminder3_at IS NULL",
                 $threshold
             )
         );

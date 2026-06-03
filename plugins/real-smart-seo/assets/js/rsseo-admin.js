@@ -65,6 +65,55 @@
         });
     });
 
+    // Revert a single applied fix
+    $(document).on('click', '.rsseo-restore-fix', function() {
+        var $btn  = $(this);
+        var fixId = $btn.data('fix-id');
+
+        if (!confirm(str.confirm_revert || 'Revert this fix to the previous value?')) return;
+
+        $btn.prop('disabled', true).text(str.reverting || 'Reverting…');
+
+        $.post(ajaxUrl, {
+            action: 'rsseo_restore_fix',
+            nonce:  nonce,
+            fix_id: fixId
+        }, function(res) {
+            if (res.success) {
+                location.reload();
+            } else {
+                alert(res.data || str.error || 'Error. Try again.');
+                $btn.prop('disabled', false).text('Revert');
+            }
+        }).fail(function() {
+            alert(str.error || 'Error. Try again.');
+            $btn.prop('disabled', false).text('Revert');
+        });
+    });
+
+    // Revert ALL applied fixes for a report
+    $(document).on('click', '.rsseo-restore-all', function() {
+        var $btn     = $(this);
+        var reportId = $btn.data('report-id');
+
+        if (!confirm(str.confirm_revert_all || 'Revert ALL applied fixes back to their previous values?')) return;
+
+        $btn.prop('disabled', true).text(str.reverting || 'Reverting…');
+
+        $.post(ajaxUrl, {
+            action:    'rsseo_restore_all',
+            nonce:     nonce,
+            report_id: reportId
+        }, function(res) {
+            if (res.success) {
+                location.reload();
+            } else {
+                alert(res.data || str.error || 'Error. Try again.');
+                $btn.prop('disabled', false).text('Revert All Applied');
+            }
+        });
+    });
+
     // Test API connection
     $('#rsseo-test-api').on('click', function() {
         var $btn = $(this);

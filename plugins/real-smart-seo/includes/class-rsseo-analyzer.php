@@ -173,24 +173,37 @@ INSTRUCTIONS;
         // We split on " | " first, then strip the key=[…] wrapper for each segment.
         // This avoids the old \w+=\[…\] regex which broke on meta keys with hyphens,
         // values containing brackets, or AI output with minor whitespace variation.
+        $dropped = 0;
         preg_match_all( '/\*\*WP_FIX:\*\*\s*(.+)/i', $raw, $fix_matches );
         foreach ( $fix_matches[1] as $fix_line ) {
+            $fix_line = trim( $fix_line );
             $parts    = array();
-            $segments = preg_split( '/\s*\|\s*/', trim( $fix_line ) );
-            foreach ( $segments as $segment ) {
-                // Each segment looks like: key=[value]  (value may be empty or contain any chars)
+
+            // new_value is always last and may itself contain "|" or "[]" — capture
+            // everything after new_value= to end of line so it can't be truncated,
+            // then parse the remaining key=value segments normally.
+            if ( preg_match( '/new_value\s*=\s*(.*)$/i', $fix_line, $mm ) ) {
+                $val = trim( $mm[1] );
+                if ( '' !== $val && '[' === $val[0] && ']' === substr( $val, -1 ) ) {
+                    $val = substr( $val, 1, -1 );
+                }
+                $parts['new_value'] = $val;
+                $head = (string) preg_replace( '/\|\s*new_value\s*=.*$/i', '', $fix_line );
+            } else {
+                $head = $fix_line;
+            }
+
+            foreach ( preg_split( '/\s*\|\s*/', $head ) as $segment ) {
                 if ( preg_match( '/^([\w-]+)\s*=\s*\[?(.*?)\]?\s*$/', trim( $segment ), $m ) ) {
                     $parts[ strtolower( trim( $m[1] ) ) ] = trim( $m[2] );
                 }
             }
-            if ( ! empty( $parts['fix_type'] ) && isset( $parts['new_value'] ) && '' !== $parts['new_value'] ) {
-                $fixes[] = array(
-                    'post_id'   => isset( $parts['post_id'] ) ? (int) $parts['post_id'] : 0,
-                    'fix_type'  => sanitize_text_field( $parts['fix_type'] ),
-                    'field_key' => sanitize_text_field( $parts['field_key'] ?? $parts['fix_type'] ),
-                    'old_value' => $parts['old_value'] ?? '',
-                    'new_value' => $parts['new_value'],
-                );
+
+            $fix = self::validate_fix( $parts );
+            if ( $fix ) {
+                $fixes[] = $fix;
+            } else {
+                $dropped++;
             }
         }
 
@@ -198,7 +211,85 @@ INSTRUCTIONS;
             'counts'          => $counts,
             'fixes'           => $fixes,
             'fixes_available' => count( $fixes ),
+            'fixes_dropped'   => $dropped,
         );
+    }
+
+    /**
+     * Validate + normalize one parsed WP_FIX line before it becomes a writable
+     * fix. Returns a safe fix array, or null to drop a malformed/unsafe suggestion
+     * (the reviewer flagged the old parser for applying wrong fixes). Guarantees:
+     *   - fix_type is one of the four known types,
+     *   - the target post actually exists,
+     *   - field_key is allow-listed per type (never an arbitrary meta key),
+     *   - the new value is non-empty, sanitized, and length-capped.
+     */
+    private static function validate_fix( $parts ) {
+        $type = strtolower( sanitize_key( $parts['fix_type'] ?? '' ) );
+        if ( ! in_array( $type, array( 'title', 'meta_description', 'content', 'alt_text' ), true ) ) {
+            return null;
+        }
+
+        $post_id = isset( $parts['post_id'] ) ? (int) $parts['post_id'] : 0;
+        if ( $post_id <= 0 || ! get_post( $post_id ) ) {
+            return null; // must target a real post
+        }
+
+        $new = (string) ( $parts['new_value'] ?? '' );
+        if ( '' === trim( $new ) ) {
+            return null;
+        }
+
+        $key_in = sanitize_text_field( $parts['field_key'] ?? '' );
+
+        switch ( $type ) {
+            case 'title':
+                $allow = array( 'post_title', '_yoast_wpseo_title', 'rank_math_title', '_aioseo_title', '_seopress_titles_title' );
+                $field = in_array( $key_in, $allow, true ) ? $key_in : 'post_title';
+                $new   = self::trim_len( wp_strip_all_tags( $new ), 200 );
+                break;
+
+            case 'meta_description':
+                // No safe default — we can't guess which SEO plugin owns the field.
+                $allow = array( '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc' );
+                if ( ! in_array( $key_in, $allow, true ) ) {
+                    return null;
+                }
+                $field = $key_in;
+                $new   = self::trim_len( wp_strip_all_tags( $new ), 320 );
+                break;
+
+            case 'content':
+                $field = 'post_content';
+                $new   = wp_kses_post( $new );
+                break;
+
+            case 'alt_text':
+                $field = '_wp_attachment_image_alt';
+                $new   = self::trim_len( wp_strip_all_tags( $new ), 300 );
+                break;
+
+            default:
+                return null;
+        }
+
+        if ( '' === trim( (string) $new ) ) {
+            return null;
+        }
+
+        return array(
+            'post_id'   => $post_id,
+            'fix_type'  => $type,
+            'field_key' => $field,
+            'old_value' => (string) ( $parts['old_value'] ?? '' ),
+            'new_value' => $new,
+        );
+    }
+
+    /** Multibyte-safe length cap. */
+    private static function trim_len( $str, $max ) {
+        $str = (string) $str;
+        return function_exists( 'mb_substr' ) ? mb_substr( $str, 0, $max ) : substr( $str, 0, $max );
     }
 
     /**
@@ -287,10 +378,12 @@ INSTRUCTIONS;
 
     /**
      * Convert inline markdown (**bold**, *italic*, `code`) to HTML.
+     * esc_html() is applied inside each callback so special characters in
+     * the captured text are escaped before the HTML tags are wrapped around
+     * them — avoids the double-encoding that happened when esc_html() ran on
+     * the whole string first (e.g. & in **this & that** rendered as &amp;).
      */
     private static function inline_markdown( $text ) {
-        // Escape only the captured content as each token is wrapped, so the
-        // tags we add aren't themselves escaped.
         // Bold: **text**
         $text = preg_replace_callback( '/\*\*(.+?)\*\*/s', function ( $m ) {
             return '<strong>' . esc_html( $m[1] ) . '</strong>';
@@ -303,7 +396,12 @@ INSTRUCTIONS;
         $text = preg_replace_callback( '/`(.+?)`/s', function ( $m ) {
             return '<code>' . esc_html( $m[1] ) . '</code>';
         }, $text );
-        // Escape any plain text that fell through while keeping the tags above.
-        return wp_kses( $text, array( 'strong' => array(), 'em' => array(), 'code' => array() ) );
+        // Escape any plain text not wrapped in a tag, then allow only the
+        // three tags we just produced.
+        return wp_kses( $text, array(
+            'strong' => array(),
+            'em'     => array(),
+            'code'   => array(),
+        ) );
     }
 }

@@ -81,6 +81,10 @@ class SCRM_Pro_ActiveCampaign {
         // into AC with the 'booked' lifecycle so deal stage advances and
         // the booked-job tag fires.
         add_action( 'scrm_pro_job_created',      array( $this, 'on_job_created' ) );
+
+        // NOTE: completion is driven solely by ServiceM8 (the *_completed actions
+        // above). Calendly only records that the service was scheduled (Booked),
+        // so there is no Calendly visit-completion gate to hook here anymore.
     }
 
     public function on_job_created( $lead ) {
