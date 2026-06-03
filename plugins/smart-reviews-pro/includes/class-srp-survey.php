@@ -23,7 +23,9 @@ class SRP_Survey {
     const DEFAULT_BUSINESS   = 'Midland Floors';
     const DEFAULT_COLOR      = '#43A94B'; // Midland primary green.
     const DEFAULT_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=ChIJ59SJ6ue7t4kRIVMYpQVYY6Y';
-    const DEFAULT_LOGO_URL   = 'https://raw.githubusercontent.com/branderboy/midland/main/images/midland-logo-white.png';
+    // Hosted on the live (public) site so it actually loads in customer inboxes —
+    // the GitHub repo is private, so raw.githubusercontent URLs 404 in email.
+    const DEFAULT_LOGO_URL   = 'https://midlandfloors.com/wp-content/uploads/2026/05/midland-small-logo-16.png';
 
     /** Customer-facing business name — never the long SEO site title. */
     public static function business_name() {
@@ -48,29 +50,29 @@ class SRP_Survey {
         return '' !== $url ? $url : self::DEFAULT_REVIEW_URL;
     }
 
-    /** Shared branded header row (white logo on the brand color) for emails. */
+    /** Shared branded header row: dark logo on a white band with a green accent rule. */
     public static function brand_header_html() {
         $logo  = self::logo_url();
         $name  = self::business_name();
         $color = self::brand_color();
         $inner = $logo
-            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="44" style="height:44px;width:auto;max-width:240px;border:0;display:inline-block;">'
-            : '<span style="color:#fff;font-size:20px;font-weight:700;">' . esc_html( $name ) . '</span>';
-        return '<tr><td style="background:' . esc_attr( $color ) . ';padding:22px;text-align:center;">' . $inner . '</td></tr>';
+            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="46" style="height:46px;width:auto;max-width:260px;border:0;display:inline-block;">'
+            : '<span style="color:#0F1411;font-size:20px;font-weight:700;">' . esc_html( $name ) . '</span>';
+        return '<tr><td style="background:#ffffff;padding:22px;text-align:center;border-bottom:3px solid ' . esc_attr( $color ) . ';">' . $inner . '</td></tr>';
     }
 
-    /** Full standalone branded page shell (logo header on brand color + white card). */
+    /** Full standalone branded page shell: dark logo on a white header + white card. */
     public static function page_shell( $title, $inner_html ) {
         $color = self::brand_color();
         $logo  = self::logo_url();
         $name  = self::business_name();
         $head  = $logo
-            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="40" style="height:40px;width:auto;max-width:220px;border:0;">'
-            : '<span style="color:#fff;font-size:18px;font-weight:700;">' . esc_html( $name ) . '</span>';
+            ? '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( $name ) . '" height="42" style="height:42px;width:auto;max-width:240px;border:0;">'
+            : '<span style="color:#0F1411;font-size:18px;font-weight:700;">' . esc_html( $name ) . '</span>';
         return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . esc_html( $title ) . '</title></head>
 <body style="margin:0;padding:40px 16px;background:#F3FCF4;font-family:system-ui,-apple-system,sans-serif;text-align:center;">
 <div style="max-width:540px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 16px rgba(14,47,20,.10);">
-  <div style="background:' . esc_attr( $color ) . ';padding:22px;">' . $head . '</div>
+  <div style="background:#ffffff;padding:22px;border-bottom:3px solid ' . esc_attr( $color ) . ';">' . $head . '</div>
   <div style="padding:36px 32px;">' . $inner_html . '</div>
 </div>
 </body></html>';
@@ -146,7 +148,7 @@ class SRP_Survey {
         $business  = self::business_name();
         $from_name = $data['name'] ? 'Hi ' . $data['name'] . ',' : 'Hi there,';
 
-        $subject = "How did we do? — {$business}";
+        $subject = 'Tell us how did we do?';
         $body    = $this->survey_email_html( $from_name, $business, $survey_url, $token );
 
         $sent = wp_mail( $email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
@@ -392,8 +394,8 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         $name  = $survey->customer_name ?: 'there';
 
         $subject = 1 === $which
-            ? "Quick reminder — how did {$business} do?"
-            : "Last chance to share your feedback — {$business}";
+            ? 'Quick reminder, how did we do?'
+            : 'Last chance to share your feedback';
 
         $intro = 1 === $which
             ? 'we sent you a quick survey yesterday'

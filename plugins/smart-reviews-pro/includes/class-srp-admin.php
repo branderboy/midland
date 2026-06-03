@@ -219,10 +219,10 @@ class SRP_Admin {
                     <tr>
                         <th><label for="logo_url"><?php esc_html_e( 'Logo URL', 'smart-reviews-pro' ); ?></label></th>
                         <td>
-                            <input type="text" id="logo_url" name="logo_url" class="large-text" value="<?php echo esc_attr( $logo_url ); ?>" placeholder="https://...">
-                            <p class="description"><?php esc_html_e( 'White/transparent PNG, shown on the brand-color header. Paste a Media Library URL to override the default.', 'smart-reviews-pro' ); ?></p>
+                            <input type="text" id="logo_url" name="logo_url" class="large-text" value="<?php echo esc_attr( $logo_url ); ?>" placeholder="https://yoursite.com/wp-content/uploads/logo.png">
+                            <p class="description"><?php esc_html_e( 'Your logo, shown on a white header in emails. Must be hosted on a public URL (e.g. your Media Library) — private repo links will not load in inboxes.', 'smart-reviews-pro' ); ?></p>
                             <?php if ( $logo_url ) : ?>
-                                <p><img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-height:48px;background:<?php echo esc_attr( $brand_color ); ?>;padding:8px 12px;border-radius:6px;"></p>
+                                <p><img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-height:48px;background:#fff;border:1px solid #e5e7eb;padding:8px 12px;border-radius:6px;"></p>
                             <?php endif; ?>
                         </td>
                     </tr>
