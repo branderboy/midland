@@ -231,12 +231,18 @@ class RSSEO_Fixer {
                 return true;
 
             default:
-                // Generic meta update.
-                if ( $post_id > 0 && $field_key ) {
+                // Generic meta update — but only to known SEO meta keys, never an
+                // arbitrary field. Stops a malformed fix from clobbering meta like
+                // _thumbnail_id or _wp_page_template.
+                $allow = array(
+                    '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc',
+                    '_yoast_wpseo_title', 'rank_math_title', '_aioseo_title', '_seopress_titles_title',
+                );
+                if ( $post_id > 0 && $field_key && in_array( $field_key, $allow, true ) ) {
                     update_post_meta( $post_id, $field_key, sanitize_textarea_field( $new_value ) );
                     return true;
                 }
-                return new WP_Error( 'unknown_fix_type', __( 'Unknown fix type.', 'real-smart-seo' ) );
+                return new WP_Error( 'unknown_fix_type', __( 'Unsupported fix — skipped for safety.', 'real-smart-seo' ) );
         }
     }
 
