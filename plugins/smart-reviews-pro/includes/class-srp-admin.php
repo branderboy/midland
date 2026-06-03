@@ -49,6 +49,11 @@ class SRP_Admin {
         update_option( 'srp_threshold',      min( SRP_Survey::MAX_SCORE, max( 1, absint( $_POST['score_threshold'] ?? SRP_Survey::THRESHOLD ) ) ) );
         update_option( 'srp_owner_email',    sanitize_email( wp_unslash( $_POST['owner_email'] ?? '' ) ) );
 
+        // Branding (mirrors Midland Chat: business name / brand color / logo).
+        update_option( 'srp_business_name', sanitize_text_field( wp_unslash( $_POST['business_name'] ?? '' ) ) );
+        update_option( 'srp_brand_color',   sanitize_hex_color( wp_unslash( $_POST['brand_color'] ?? '' ) ) ?: SRP_Survey::DEFAULT_COLOR );
+        update_option( 'srp_logo_url',      esc_url_raw( wp_unslash( $_POST['logo_url'] ?? '' ) ) );
+
         wp_safe_redirect( admin_url( 'admin.php?page=srp-settings&saved=1' ) );
         exit;
     }
@@ -165,10 +170,17 @@ class SRP_Admin {
     }
 
     public function render_settings() {
-        $gmb_url    = get_option( 'srp_gmb_review_url', '' );
+        // Pre-fill the review URL with the verified Midland link when none is set,
+        // so review routing works out of the box.
+        $gmb_url    = SRP_Survey::review_url();
         $threshold  = (int) get_option( 'srp_threshold', SRP_Survey::THRESHOLD );
         if ( $threshold < 1 || $threshold > SRP_Survey::MAX_SCORE ) { $threshold = SRP_Survey::THRESHOLD; } // heal a stale 0–10 value
         $owner_email = get_option( 'srp_owner_email', get_option( 'admin_email' ) );
+
+        // Branding.
+        $business_name = SRP_Survey::business_name();
+        $brand_color   = SRP_Survey::brand_color();
+        $logo_url      = SRP_Survey::logo_url();
 
         // phpcs:disable WordPress.Security.NonceVerification.Recommended
         $saved = isset( $_GET['saved'] );
@@ -191,10 +203,34 @@ class SRP_Admin {
                 <?php wp_nonce_field( 'srp_save_settings', '_srp_settings_nonce' ); ?>
                 <table class="form-table">
                     <tr>
+                        <th><label for="business_name"><?php esc_html_e( 'Business Name', 'smart-reviews-pro' ); ?></label></th>
+                        <td>
+                            <input type="text" id="business_name" name="business_name" class="regular-text" value="<?php echo esc_attr( $business_name ); ?>" placeholder="Midland Floors">
+                            <p class="description"><?php esc_html_e( 'Shown in survey/review emails and subject lines. Set this to your brand name — not the long SEO site title.', 'smart-reviews-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="brand_color"><?php esc_html_e( 'Brand Color', 'smart-reviews-pro' ); ?></label></th>
+                        <td>
+                            <input type="color" id="brand_color" name="brand_color" value="<?php echo esc_attr( $brand_color ); ?>">
+                            <p class="description"><?php esc_html_e( 'Used for email headers, buttons, and the review link. Default: Midland green #43A94B.', 'smart-reviews-pro' ); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="logo_url"><?php esc_html_e( 'Logo URL', 'smart-reviews-pro' ); ?></label></th>
+                        <td>
+                            <input type="text" id="logo_url" name="logo_url" class="large-text" value="<?php echo esc_attr( $logo_url ); ?>" placeholder="https://...">
+                            <p class="description"><?php esc_html_e( 'White/transparent PNG, shown on the brand-color header. Paste a Media Library URL to override the default.', 'smart-reviews-pro' ); ?></p>
+                            <?php if ( $logo_url ) : ?>
+                                <p><img src="<?php echo esc_url( $logo_url ); ?>" alt="" style="max-height:48px;background:<?php echo esc_attr( $brand_color ); ?>;padding:8px 12px;border-radius:6px;"></p>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <tr>
                         <th><label for="gmb_review_url"><?php esc_html_e( 'Google Review URL', 'smart-reviews-pro' ); ?></label></th>
                         <td>
-                            <input type="url" id="gmb_review_url" name="gmb_review_url" class="large-text" value="<?php echo esc_attr( $gmb_url ); ?>" placeholder="https://g.page/r/YOURPLACEID/review">
-                            <p class="description"><?php esc_html_e( 'From Google Business Profile → Get more reviews → copy link. Customers scoring ≥ threshold are sent here.', 'smart-reviews-pro' ); ?></p>
+                            <input type="url" id="gmb_review_url" name="gmb_review_url" class="large-text" value="<?php echo esc_attr( $gmb_url ); ?>" placeholder="https://search.google.com/local/writereview?placeid=...">
+                            <p class="description"><?php esc_html_e( 'Pre-filled with the verified Midland Google review link. Customers scoring ≥ threshold are sent here. Save to confirm.', 'smart-reviews-pro' ); ?></p>
                         </td>
                     </tr>
                     <tr>

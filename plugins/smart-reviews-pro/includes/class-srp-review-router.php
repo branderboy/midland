@@ -39,12 +39,12 @@ class SRP_Review_Router {
             return; // Only nudge customers who got a Google review request.
         }
 
-        $gmb_url = get_option( 'srp_gmb_review_url', '' );
+        $gmb_url = SRP_Survey::review_url();
         if ( ! is_email( $survey->customer_email ) || ! $gmb_url ) {
             return;
         }
 
-        $business = get_bloginfo( 'name' );
+        $business = SRP_Survey::business_name();
         $name     = $survey->customer_name ?: 'there';
 
         wp_mail(
@@ -90,8 +90,8 @@ class SRP_Review_Router {
      * Send the GMB review request email to a happy customer.
      */
     private function send_review_request( $survey_id, $survey ) {
-        $gmb_url  = get_option( 'srp_gmb_review_url', '' );
-        $business = get_bloginfo( 'name' );
+        $gmb_url  = SRP_Survey::review_url();
+        $business = SRP_Survey::business_name();
         $name     = $survey->customer_name ?: 'there';
         $email    = $survey->customer_email;
 
@@ -109,20 +109,19 @@ class SRP_Review_Router {
     }
 
     private function review_email_html( $name, $business, $gmb_url ) {
-        return '<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f4f4f4;font-family:system-ui,sans-serif;">
+        $brand = SRP_Survey::brand_color();
+        return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:system-ui,-apple-system,sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
   <tr><td align="center" style="padding:40px 16px;">
-    <table role="presentation" width="560" style="max-width:560px;background:#fff;border-radius:12px;overflow:hidden;">
-      <tr><td style="background:#1a1a2e;padding:24px;text-align:center;">
-        <p style="margin:0;color:#fff;font-size:18px;font-weight:600;">' . esc_html( $business ) . '</p>
-      </td></tr>
+    <table role="presentation" width="560" style="max-width:560px;width:100%;background:#fff;border-radius:12px;overflow:hidden;">
+      ' . SRP_Survey::brand_header_html() . '
       <tr><td style="padding:40px 32px;text-align:center;">
         <div style="font-size:48px;margin-bottom:16px;">&#11088;</div>
-        <h1 style="font-size:22px;margin:0 0 16px;">Thank you, ' . esc_html( $name ) . '!</h1>
-        <p style="color:#555;margin:0 0 28px;font-size:15px;">We\'re so glad we exceeded your expectations. If you have 60 seconds, a Google review would mean the world to our small business — and helps other local homeowners find us.</p>
-        <a href="' . esc_url( $gmb_url ) . '" target="_blank" style="display:inline-block;background:#4285F4;color:#fff;padding:16px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;">Leave Us a Google Review &#8594;</a>
-        <p style="color:#aaa;font-size:13px;margin:32px 0 0;">No account required if you use Gmail. Thank you again for trusting us with your home.</p>
+        <h1 style="font-size:22px;margin:0 0 16px;color:#0F1411;">Thank you, ' . esc_html( $name ) . '!</h1>
+        <p style="color:#4B5563;margin:0 0 28px;font-size:15px;">We\'re so glad we exceeded your expectations. If you have 60 seconds, a Google review would mean the world to our small business — and helps other local homeowners find us.</p>
+        <a href="' . esc_url( $gmb_url ) . '" target="_blank" style="display:inline-block;background:' . esc_attr( $brand ) . ';color:#fff;padding:16px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;">Leave Us a Google Review &#8594;</a>
+        <p style="color:#9aa39c;font-size:13px;margin:32px 0 0;">No account required if you use Gmail. Thank you again for trusting us with your floors.</p>
       </td></tr>
       <tr><td style="background:#f9f9f9;padding:16px;text-align:center;">
         <p style="margin:0;font-size:12px;color:#bbb;">' . esc_html( $business ) . '</p>
@@ -138,7 +137,7 @@ class SRP_Review_Router {
      */
     private function notify_owner_low_score( $survey ) {
         $owner_email = get_option( 'srp_owner_email', get_option( 'admin_email' ) );
-        $business    = get_bloginfo( 'name' );
+        $business    = SRP_Survey::business_name();
         $score       = (int) $survey->score;
 
         wp_mail(
