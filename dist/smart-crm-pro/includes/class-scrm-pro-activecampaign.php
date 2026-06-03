@@ -1,0 +1,1125 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+/**
+ * Smart CRM Pro → ActiveCampaign bridge.
+ *
+ * When a lead's status changes to "completed" (typically from the ServiceM8
+ * webhook) we sync the contact to ActiveCampaign with a tag like
+ * "midland-job-completed" so AC's own automation flows can fire (welcome,
+ * upsell, reactivation series, etc.).
+ *
+ * Settings: Smart CRM Pro > ActiveCampaign
+ */
+class SCRM_Pro_ActiveCampaign {
+
+    const OPT_API_URL    = 'scrm_pro_ac_api_url';
+    const OPT_API_KEY    = 'scrm_pro_ac_api_key';
+    const OPT_TAG        = 'scrm_pro_ac_tag';
+    const OPT_ENABLED    = 'scrm_pro_ac_enabled';
+    const OPT_LAST_PUSH  = 'scrm_pro_ac_last_push';
+    // Deal pipeline — AC is the sales-pipeline master per Midland's playbook.
+    // Each Smart Forms submission creates a contact + a Deal that progresses
+    // through pipeline stages on lifecycle events (SM8 quote sent, job won, etc.).
+    const OPT_DEAL_ENABLED   = 'scrm_pro_ac_deal_enabled';
+    const OPT_PIPELINE_ID    = 'scrm_pro_ac_pipeline_id';   // AC "group" (pipeline) ID
+    const OPT_DEAL_OWNER     = 'scrm_pro_ac_deal_owner';     // AC user ID of the deal owner
+    const OPT_DEAL_CURRENCY  = 'scrm_pro_ac_deal_currency';
+    const OPT_STAGE_NEW      = 'scrm_pro_ac_stage_new';
+    const OPT_STAGE_QUOTED   = 'scrm_pro_ac_stage_quoted';
+    const OPT_STAGE_BOOKED   = 'scrm_pro_ac_stage_booked';
+    const OPT_STAGE_WON      = 'scrm_pro_ac_stage_won';
+    const OPT_STAGE_LOST     = 'scrm_pro_ac_stage_lost';
+    // Task types created by the one-click setup. Each is a "dealTaskType" in AC.
+    const OPT_TASK_NEW       = 'scrm_pro_ac_task_new';      // call-within-24h
+    const OPT_TASK_QUOTED    = 'scrm_pro_ac_task_quoted';   // follow-up-on-quote
+    const OPT_TASK_BOOKED    = 'scrm_pro_ac_task_booked';   // confirm-appointment
+    const OPT_TASK_WON       = 'scrm_pro_ac_task_won';      // send-nps-and-thanks
+    const OPT_TASK_LOST      = 'scrm_pro_ac_task_lost';     // schedule-reactivation
+    // Auto-create a deal task on every stage transition (fallback so tasks
+    // always appear even if the operator hasn't built AC automations yet).
+    const OPT_AUTO_TASKS     = 'scrm_pro_ac_auto_tasks';
+
+    private static $instance = null;
+
+    public static function get_instance() {
+        if ( null === self::$instance ) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    private function __construct() {
+        add_action( 'admin_menu',                array( $this, 'add_menu' ), 41 );
+        add_action( 'admin_init',                array( $this, 'handle_save' ) );
+        add_action( 'admin_init',                array( $this, 'handle_test' ) );
+        // One-click pipeline setup + blueprint export. These handlers existed
+        // but were never hooked, so the feature was unreachable. Buttons that
+        // post scrm_setup_ac_pipeline / scrm_export_ac_blueprint are rendered
+        // on the AC settings page.
+        add_action( 'admin_init',                array( $this, 'handle_setup_pipeline' ) );
+        add_action( 'admin_init',                array( $this, 'handle_export_blueprint' ) );
+
+        // Booking conversion. Fired by the Calendly webhook (SFCO_Pro_Calendly)
+        // when an invitee.created event maps to a lead — this is the "booked"
+        // conversion. Pushes the contact to AC with the midland-job-booked tag
+        // and advances the AC deal to the Booked stage.
+        add_action( 'sfco_lead_booked',          array( $this, 'on_lead_booked' ), 10, 2 );
+
+        // Cancellation — invitee.canceled in Calendly reverses the booking:
+        // apply the canceled tag and move the deal off the Booked stage.
+        add_action( 'sfco_lead_canceled',        array( $this, 'on_lead_canceled' ) );
+
+        // Lifecycle events when a job actually completes.
+        add_action( 'sfco_lead_status_changed',  array( $this, 'on_status_changed' ), 10, 3 );
+        add_action( 'sfco_lead_completed',       array( $this, 'on_lead_completed' ) );
+        add_action( 'scrm_pro_job_completed',    array( $this, 'on_lead_completed' ) );
+
+        // Job moved from Quote to active in ServiceM8 — push the contact
+        // into AC with the 'booked' lifecycle so deal stage advances and
+        // the booked-job tag fires.
+        add_action( 'scrm_pro_job_created',      array( $this, 'on_job_created' ) );
+    }
+
+    public function on_job_created( $lead ) {
+        $this->push_lead( $lead, 'booked' );
+    }
+
+    /**
+     * Booking conversion — fired by the Calendly webhook via sfco_lead_booked
+     * with the lead row (status already = booked). On a re-book (a previously
+     * canceled lead booking again) clear the stale midland-job-canceled tags
+     * first so they don't sit on the contact alongside the fresh booked tag.
+     */
+    public function on_lead_booked( $lead, $is_rebook = false ) {
+        if ( $is_rebook ) {
+            $this->remove_canceled_tags( $lead );
+        }
+        $this->push_lead( $lead, 'booked' );
+    }
+
+    /**
+     * Remove the midland-job-canceled* tags from a contact. Used when a
+     * canceled lead re-books so cancellation-triggered automations don't keep
+     * a stale tag. Best-effort: looks the contact up by email, then deletes
+     * each canceled tag association if present.
+     */
+    private function remove_canceled_tags( $lead ) {
+        if ( ! get_option( self::OPT_ENABLED, 0 ) ) {
+            return;
+        }
+        $api_url = (string) get_option( self::OPT_API_URL, '' );
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+        if ( '' === $api_url || '' === $api_key ) {
+            return;
+        }
+        $email = sanitize_email( $this->get_field( $lead, array( 'customer_email', 'email' ) ) );
+        if ( ! is_email( $email ) ) {
+            return;
+        }
+
+        $segment      = $this->lead_segment( $lead );
+        $is_emergency  = $this->is_emergency( $lead );
+        $canceled_tags = $this->tags_for( 'canceled', $segment, $is_emergency );
+
+        foreach ( $canceled_tags as $tag ) {
+            $this->remove_tag( $api_url, $api_key, $email, $tag );
+        }
+    }
+
+    /**
+     * Cancellation — fired by the Calendly webhook via sfco_lead_canceled
+     * with the lead row (status already = canceled). Tags the contact and
+     * moves the deal off the Booked stage to Lost.
+     */
+    public function on_lead_canceled( $lead ) {
+        $this->push_lead( $lead, 'canceled' );
+    }
+
+    public function add_menu() {
+        // Registered with null parent so the page is reachable for legacy
+        // bookmarks but does not appear as a sidebar entry. The Settings
+        // hub renders this module inside its ActiveCampaign tab.
+        add_submenu_page(
+            null,
+            esc_html__( 'ActiveCampaign', 'smart-crm-pro' ),
+            esc_html__( 'ActiveCampaign', 'smart-crm-pro' ),
+            'manage_options',
+            'scrm-pro-activecampaign',
+            array( $this, 'render_page' )
+        );
+    }
+
+    public function on_status_changed( $lead, $old_status, $new_status ) {
+        if ( 'completed' !== strtolower( (string) $new_status ) ) {
+            return;
+        }
+        $this->push_lead( $lead, 'completed' );
+    }
+
+    public function on_lead_completed( $lead ) {
+        $this->push_lead( $lead, 'completed' );
+    }
+
+    /**
+     * Lead categorization is two independent axes — segment (commercial vs
+     * residential) and urgency (emergency vs normal). Treating them as one
+     * enum buried commercial-emergency leads under the "emergency" branch and
+     * stopped the Floor Care Plan flow from firing for them. The split below
+     * keeps each axis pure so AC tags can compose them.
+     *
+     * Filters:
+     *   - scrm_pro_lead_segment( 'commercial'|'residential', $lead )
+     *   - scrm_pro_lead_emergency( bool, $lead )
+     *   - scrm_pro_lead_category( 'commercial'|'residential'|'emergency', $lead )
+     *     (kept for backward compat; returns 'emergency' if urgency=emergency,
+     *     else the segment)
+     */
+    public function lead_segment( $lead ) {
+        $explicit = strtolower( (string) $this->get_field( $lead, array( 'segment', 'lead_segment' ) ) );
+        if ( in_array( $explicit, array( 'commercial', 'residential' ), true ) ) {
+            return apply_filters( 'scrm_pro_lead_segment', $explicit, $lead );
+        }
+
+        // Some forms reuse the legacy "category" field for segment.
+        $legacy = strtolower( (string) $this->get_field( $lead, array( 'category', 'job_category', 'lead_category' ) ) );
+        if ( in_array( $legacy, array( 'commercial', 'residential' ), true ) ) {
+            return apply_filters( 'scrm_pro_lead_segment', $legacy, $lead );
+        }
+
+        $project_type = strtolower( (string) $this->get_field( $lead, array( 'project_type', 'service_type' ) ) );
+        $message      = strtolower( (string) $this->get_field( $lead, array( 'message' ) ) );
+
+        $commercial_re = '/\b(commercial|business|office|retail|warehouse|industrial|hoa|property[ -]?manag)/i';
+        if ( preg_match( $commercial_re, $project_type ) || preg_match( $commercial_re, $message ) ) {
+            return apply_filters( 'scrm_pro_lead_segment', 'commercial', $lead );
+        }
+
+        return apply_filters( 'scrm_pro_lead_segment', 'residential', $lead );
+    }
+
+    public function is_emergency( $lead ) {
+        $explicit = strtolower( (string) $this->get_field( $lead, array( 'urgency', 'is_emergency' ) ) );
+        if ( in_array( $explicit, array( 'emergency', 'urgent', '1', 'true', 'yes' ), true ) ) {
+            return apply_filters( 'scrm_pro_lead_emergency', true, $lead );
+        }
+
+        // Legacy single-axis "category" of "emergency" still flips the flag.
+        $legacy = strtolower( (string) $this->get_field( $lead, array( 'category', 'job_category', 'lead_category' ) ) );
+        if ( 'emergency' === $legacy ) {
+            return apply_filters( 'scrm_pro_lead_emergency', true, $lead );
+        }
+
+        $timeline = strtolower( (string) $this->get_field( $lead, array( 'timeline' ) ) );
+        $message  = strtolower( (string) $this->get_field( $lead, array( 'message' ) ) );
+
+        $emergency_re = '/\b(emergency|urgent|asap|same[ -]?day|24[ -]?h(our)?s?|right[ -]now|today)\b/i';
+        if ( preg_match( $emergency_re, $timeline ) || preg_match( $emergency_re, $message ) ) {
+            return apply_filters( 'scrm_pro_lead_emergency', true, $lead );
+        }
+
+        return apply_filters( 'scrm_pro_lead_emergency', false, $lead );
+    }
+
+    /**
+     * Backward-compatible single-string category. New code should call
+     * lead_segment() and is_emergency() directly so a commercial-emergency lead
+     * isn't reduced to just "emergency".
+     */
+    public function categorize_lead( $lead ) {
+        $category = $this->is_emergency( $lead ) ? 'emergency' : $this->lead_segment( $lead );
+        return apply_filters( 'scrm_pro_lead_category', $category, $lead );
+    }
+
+    /**
+     * Identify where the lead came from. Checks explicit columns first, then
+     * pulls from extra_fields_json (which the chat → forms bridge stamps
+     * with lead_source=chat). Returns a slug suitable for tag composition
+     * (chat, form, phone, …) or '' when unknown.
+     */
+    public function lead_source( $lead ) {
+        $explicit = strtolower( (string) $this->get_field( $lead, array( 'lead_source', 'source' ) ) );
+        if ( '' !== $explicit ) {
+            return sanitize_key( $explicit );
+        }
+
+        $extra = (string) $this->get_field( $lead, array( 'extra_fields_json' ) );
+        if ( '' !== $extra ) {
+            $decoded = json_decode( $extra, true );
+            if ( is_array( $decoded ) ) {
+                $from_extra = strtolower( (string) ( $decoded['lead_source'] ?? $decoded['source'] ?? '' ) );
+                if ( '' !== $from_extra ) {
+                    return sanitize_key( $from_extra );
+                }
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Map (lifecycle, segment, emergency) to the AC tags that should be applied.
+     * Operators fully control the actual flow on the AC side; this only emits
+     * the trigger-tag the flows listen for. Floor Care Plan offer is COMMERCIAL
+     * only — residential completions don't get it.
+     */
+    public function tags_for( $lifecycle, $segment, $is_emergency ) {
+        $segment     = in_array( $segment, array( 'commercial', 'residential' ), true ) ? $segment : 'residential';
+        $is_emergency = (bool) $is_emergency;
+
+        $tags = array();
+        switch ( $lifecycle ) {
+            // The four customer segments the operator wants automations
+            // for. Each tag drives a separate AC automation:
+            //   1. New leads               → welcome + nurture series
+            //   2. Cold clients            → win-back series
+            //   3. Emergency-without-plan  → plan upsell series
+            //   4. Monthly plan subscriber → VIP + retention series
+            case 'new_lead':
+                $tags[] = 'midland-segment-new-lead';
+                $tags[] = 'midland-segment-new-lead-' . $segment;
+                if ( $is_emergency ) {
+                    $tags[] = 'midland-segment-new-lead-emergency';
+                }
+                break;
+
+            case 'cold':
+                $tags[] = 'midland-segment-cold-reactivation';
+                $tags[] = 'midland-segment-cold-reactivation-' . $segment;
+                break;
+
+            case 'emergency_no_plan':
+                // Customer who got an emergency job done but never signed a
+                // floor care plan. Highest-value upsell target.
+                $tags[] = 'midland-segment-emergency-no-plan';
+                $tags[] = 'midland-segment-emergency-no-plan-' . $segment;
+                break;
+
+            case 'plan_active':
+                // Active monthly subscriber. VIP comms, plan upgrades,
+                // referral asks.
+                $tags[] = 'midland-segment-monthly-plan-active';
+                $tags[] = 'midland-segment-monthly-plan-active-' . $segment;
+                break;
+
+            case 'booked':
+                $tags[] = 'midland-job-booked-' . $segment;
+                if ( 'commercial' === $segment ) {
+                    $tags[] = 'midland-onsite-booked-commercial';
+                }
+                if ( $is_emergency ) {
+                    $tags[] = 'midland-job-booked-emergency';
+                    $tags[] = 'midland-job-booked-' . $segment . '-emergency';
+                }
+                break;
+
+            case 'canceled':
+                $tags[] = 'midland-job-canceled';
+                $tags[] = 'midland-job-canceled-' . $segment;
+                if ( $is_emergency ) {
+                    $tags[] = 'midland-job-canceled-emergency';
+                }
+                break;
+
+            case 'completed':
+                $tags[] = 'midland-job-completed-' . $segment;
+                if ( $is_emergency ) {
+                    $tags[] = 'midland-job-completed-emergency';
+                    $tags[] = 'midland-job-completed-' . $segment . '-emergency';
+                }
+                if ( 'commercial' === $segment ) {
+                    $tags[] = 'midland-floor-care-plan-offer';
+                    if ( $is_emergency ) {
+                        $tags[] = 'midland-floor-care-plan-offer-emergency';
+                    }
+                }
+                break;
+        }
+        return apply_filters( 'scrm_pro_ac_tags', $tags, $lifecycle, $segment, $is_emergency );
+    }
+
+    /**
+     * Public entry point so other modules can push a contact into AC
+     * tagged with one of the four customer segments. Used by:
+     *   - Smart Forms bridge on first submission   → 'new_lead'
+     *   - Reactivation engine daily cron           → 'cold'
+     *   - Job-completed without plan handler       → 'emergency_no_plan'
+     *   - Floor Care Plan activation               → 'plan_active'
+     *
+     * @param mixed  $lead    Object or array — Smart Forms lead row.
+     * @param string $segment new_lead | cold | emergency_no_plan | plan_active
+     */
+    public function sync_segment( $lead, $segment ) {
+        $allowed = array( 'new_lead', 'cold', 'emergency_no_plan', 'plan_active' );
+        if ( ! in_array( $segment, $allowed, true ) ) {
+            return;
+        }
+        $this->push_lead( $lead, $segment );
+    }
+
+    /**
+     * Push a lead to ActiveCampaign with category-aware tags + booking metadata
+     * as fieldValues so AC flows can personalize.
+     *
+     * @param mixed  $lead       Object or array.
+     * @param string $lifecycle  'booked' or 'completed'.
+     */
+    private function push_lead( $lead, $lifecycle = 'completed' ) {
+        if ( ! get_option( self::OPT_ENABLED, 0 ) ) {
+            return;
+        }
+        $api_url = (string) get_option( self::OPT_API_URL, '' );
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+        if ( '' === $api_url || '' === $api_key ) {
+            return;
+        }
+
+        $email = sanitize_email( $this->get_field( $lead, array( 'customer_email', 'email' ) ) );
+        if ( ! is_email( $email ) ) {
+            return;
+        }
+        $name  = (string) $this->get_field( $lead, array( 'customer_name', 'name' ) );
+        $phone = (string) $this->get_field( $lead, array( 'customer_phone', 'phone' ) );
+
+        $segment      = $this->lead_segment( $lead );
+        $is_emergency = $this->is_emergency( $lead );
+        $category     = $is_emergency ? 'emergency' : $segment; // legacy field for AC
+
+        $name_parts = explode( ' ', trim( $name ), 2 );
+
+        // Forward booking metadata as AC fieldValues so flows can render
+        // "you booked carpet cleaning at 1500 sqft on Tuesday" without us
+        // pre-templating it. AC just needs the contact field to exist with
+        // matching field name — which is operator-side setup.
+        $field_values = array();
+        $forward = array(
+            'project_type'         => array( 'project_type', 'service_type' ),
+            'timeline'             => array( 'timeline' ),
+            'zip_code'             => array( 'zip_code', 'zip' ),
+            'square_footage'       => array( 'square_footage', 'sqft', 'square_feet' ),
+            'floor_type'           => array( 'floor_type', 'flooring' ),
+            'frequency'            => array( 'frequency', 'cleaning_frequency' ),
+            'job_id'               => array( 'job_id', 'id' ),
+            'midland_category'     => array(),
+            'midland_segment'      => array(),
+            'midland_is_emergency' => array(),
+            'floor_care_plan_url'  => array( 'floor_care_plan_url' ),
+        );
+
+        foreach ( $forward as $ac_field => $sources ) {
+            if ( 'midland_category' === $ac_field ) {
+                $value = $category;
+            } elseif ( 'midland_segment' === $ac_field ) {
+                $value = $segment;
+            } elseif ( 'midland_is_emergency' === $ac_field ) {
+                $value = $is_emergency ? '1' : '0';
+            } else {
+                $value = (string) $this->get_field( $lead, $sources );
+            }
+            if ( '' !== $value ) {
+                $field_values[] = array( 'field' => $ac_field, 'value' => $value );
+            }
+        }
+
+        $contact = array(
+            'email'     => $email,
+            'firstName' => $name_parts[0] ?? '',
+            'lastName'  => $name_parts[1] ?? '',
+            'phone'     => $phone,
+        );
+        if ( ! empty( $field_values ) ) {
+            $contact['fieldValues'] = $field_values;
+        }
+
+        $response = wp_remote_post( untrailingslashit( $api_url ) . '/api/3/contact/sync', array(
+            'headers' => array(
+                'Api-Token'    => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
+            ),
+            'body'    => wp_json_encode( array( 'contact' => $contact ) ),
+            'timeout' => 15,
+        ) );
+
+        $contact_id = null;
+        if ( ! is_wp_error( $response ) ) {
+            $body       = json_decode( wp_remote_retrieve_body( $response ), true );
+            $contact_id = isset( $body['contact']['id'] ) ? (int) $body['contact']['id'] : null;
+        }
+
+        // Deal pipeline (AC owns the sales pipeline). Create a deal on first
+        // push, then progress its stage on later lifecycle events via the
+        // existing $lifecycle param: booked→Quoted/Booked, completed→Won.
+        if ( $contact_id && get_option( self::OPT_DEAL_ENABLED, 0 ) ) {
+            $existing_deal = $this->get_field( $lead, array( 'deal_id' ) );
+            if ( '' === $existing_deal ) {
+                $deal_id  = $this->create_deal( $api_url, $api_key, $contact_id, $lead, $lifecycle );
+                // $lead may be an object (Calendly/SM8 path) or array (forms
+                // bridge) — use get_field() so deal_id persists either way.
+                $lead_row_id = (int) $this->get_field( $lead, array( 'id' ) );
+                if ( $deal_id && $lead_row_id > 0 ) {
+                    global $wpdb;
+                    $table = $wpdb->prefix . 'sfco_leads';
+                    // Guard the write — not every install's sfco_leads has a
+                    // deal_id column, and an unguarded update throws a DB error
+                    // on each push.
+                    $has_column = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                        "SHOW COLUMNS FROM {$table} LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                        'deal_id'
+                    ) );
+                    if ( $has_column ) {
+                        $wpdb->update( $table, array( 'deal_id' => $deal_id ), array( 'id' => $lead_row_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                    }
+                }
+                // Fire the matching task on first deal creation.
+                if ( $deal_id ) {
+                    $this->maybe_create_deal_task( $api_url, $api_key, $deal_id, $lifecycle );
+                }
+            } else {
+                $stage_id = $this->stage_id_for_lifecycle( $lifecycle );
+                if ( $stage_id ) {
+                    $this->update_deal_stage( $api_url, $api_key, $existing_deal, $stage_id, $lifecycle );
+                }
+            }
+        }
+
+        $tags = $this->tags_for( $lifecycle, $segment, $is_emergency );
+
+        // Append a source tag (midland-source-chat, midland-source-form, ...)
+        // so AC automations can branch on where the lead came from. Source
+        // lives in either an explicit lead_source / source field on the row
+        // or inside extra_fields_json.
+        $source = $this->lead_source( $lead );
+        if ( '' !== $source ) {
+            $tags[] = 'midland-source-' . $source;
+        }
+
+        if ( $contact_id ) {
+            foreach ( $tags as $tag ) {
+                $this->apply_tag( $api_url, $api_key, $contact_id, $tag );
+            }
+        }
+
+        update_option( self::OPT_LAST_PUSH, array(
+            'at'           => time(),
+            'email'        => $email,
+            'lifecycle'    => $lifecycle,
+            'segment'      => $segment,
+            'is_emergency' => $is_emergency ? 1 : 0,
+            'category'     => $category, // legacy, kept for the admin label
+            'tags'         => $tags,
+            'ok'           => $contact_id ? 1 : 0,
+        ) );
+
+        do_action( 'scrm_pro_ac_pushed', $lead, $lifecycle, $segment, $is_emergency, $contact_id, $tags );
+    }
+
+    private function apply_tag( $api_url, $api_key, $contact_id, $tag_name ) {
+        $api_url = untrailingslashit( $api_url );
+        $headers = array(
+            'Api-Token'    => $api_key,
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+        );
+
+        // Look up tag id (or create).
+        $lookup = wp_remote_get( $api_url . '/api/3/tags?search=' . rawurlencode( $tag_name ), array(
+            'headers' => $headers,
+            'timeout' => 10,
+        ) );
+        $tag_id = null;
+        if ( ! is_wp_error( $lookup ) ) {
+            $body = json_decode( wp_remote_retrieve_body( $lookup ), true );
+            foreach ( (array) ( $body['tags'] ?? array() ) as $t ) {
+                if ( strtolower( (string) ( $t['tag'] ?? '' ) ) === strtolower( $tag_name ) ) {
+                    $tag_id = (int) $t['id'];
+                    break;
+                }
+            }
+        }
+
+        if ( ! $tag_id ) {
+            $create = wp_remote_post( $api_url . '/api/3/tags', array(
+                'headers' => $headers,
+                'timeout' => 10,
+                'body'    => wp_json_encode( array( 'tag' => array( 'tag' => $tag_name, 'tagType' => 'contact' ) ) ),
+            ) );
+            if ( ! is_wp_error( $create ) ) {
+                $body   = json_decode( wp_remote_retrieve_body( $create ), true );
+                $tag_id = isset( $body['tag']['id'] ) ? (int) $body['tag']['id'] : null;
+            }
+        }
+        if ( ! $tag_id ) {
+            return;
+        }
+
+        wp_remote_post( $api_url . '/api/3/contactTags', array(
+            'headers' => $headers,
+            'timeout' => 10,
+            'body'    => wp_json_encode( array(
+                'contactTag' => array( 'contact' => (int) $contact_id, 'tag' => (int) $tag_id ),
+            ) ),
+        ) );
+    }
+
+    /**
+     * Remove a tag from a contact (by email). Resolves contact id → tag id →
+     * the contactTag association id, then DELETEs the association. Best-effort:
+     * returns silently if the contact, tag, or association doesn't exist (the
+     * tag was never applied, nothing to remove).
+     */
+    private function remove_tag( $api_url, $api_key, $email, $tag_name ) {
+        $api_url = untrailingslashit( $api_url );
+        $headers = array(
+            'Api-Token'    => $api_key,
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+        );
+
+        // Resolve the contact id by email.
+        $lookup = wp_remote_get( $api_url . '/api/3/contacts?email=' . rawurlencode( $email ), array(
+            'headers' => $headers,
+            'timeout' => 10,
+        ) );
+        if ( is_wp_error( $lookup ) ) {
+            return;
+        }
+        $body       = json_decode( wp_remote_retrieve_body( $lookup ), true );
+        $contact_id = isset( $body['contacts'][0]['id'] ) ? (int) $body['contacts'][0]['id'] : 0;
+        if ( $contact_id <= 0 ) {
+            return;
+        }
+
+        // Resolve the tag id by name.
+        $tag_lookup = wp_remote_get( $api_url . '/api/3/tags?search=' . rawurlencode( $tag_name ), array(
+            'headers' => $headers,
+            'timeout' => 10,
+        ) );
+        if ( is_wp_error( $tag_lookup ) ) {
+            return;
+        }
+        $tbody  = json_decode( wp_remote_retrieve_body( $tag_lookup ), true );
+        $tag_id = 0;
+        foreach ( (array) ( $tbody['tags'] ?? array() ) as $t ) {
+            if ( strtolower( (string) ( $t['tag'] ?? '' ) ) === strtolower( $tag_name ) ) {
+                $tag_id = (int) $t['id'];
+                break;
+            }
+        }
+        if ( $tag_id <= 0 ) {
+            return;
+        }
+
+        // Find the contactTag association id for (contact, tag) and delete it.
+        $assoc = wp_remote_get( $api_url . '/api/3/contacts/' . $contact_id . '/contactTags', array(
+            'headers' => $headers,
+            'timeout' => 10,
+        ) );
+        if ( is_wp_error( $assoc ) ) {
+            return;
+        }
+        $abody = json_decode( wp_remote_retrieve_body( $assoc ), true );
+        foreach ( (array) ( $abody['contactTags'] ?? array() ) as $ct ) {
+            if ( (int) ( $ct['tag'] ?? 0 ) === $tag_id ) {
+                $ct_id = (int) ( $ct['id'] ?? 0 );
+                if ( $ct_id > 0 ) {
+                    wp_remote_request( $api_url . '/api/3/contactTags/' . $ct_id, array(
+                        'method'  => 'DELETE',
+                        'headers' => $headers,
+                        'timeout' => 10,
+                    ) );
+                }
+                break;
+            }
+        }
+    }
+
+    // ── AC Deal pipeline helpers ─────────────────────────────────────────────
+
+    /**
+     * Map our lifecycle string → configured AC stage ID. Returns 0 if the
+     * stage isn't configured (caller should skip the API call).
+     */
+    private function stage_id_for_lifecycle( $lifecycle ) {
+        switch ( $lifecycle ) {
+            case 'completed': return (int) get_option( self::OPT_STAGE_WON,    0 );
+            case 'booked':    return (int) get_option( self::OPT_STAGE_BOOKED, 0 );
+            case 'quoted':    return (int) get_option( self::OPT_STAGE_QUOTED, 0 );
+            case 'canceled':  return (int) get_option( self::OPT_STAGE_LOST,   0 );
+            case 'lost':      return (int) get_option( self::OPT_STAGE_LOST,   0 );
+            case 'new':
+            default:          return (int) get_option( self::OPT_STAGE_NEW,    0 );
+        }
+    }
+
+    /**
+     * Estimate the deal value from the lead row. Prefer the operator-set
+     * estimated_cost_max, fall back to sqft * a per-service rate, finally 0.
+     */
+    private function deal_value_for( $lead ) {
+        $max = (float) $this->get_field( $lead, array( 'estimated_cost_max' ) );
+        if ( $max > 0 ) return $max;
+        $sqft = (int) $this->get_field( $lead, array( 'square_footage' ) );
+        if ( $sqft > 0 ) {
+            $service = strtolower( (string) $this->get_field( $lead, array( 'project_type' ) ) );
+            $rate = 0.30; // residential carpet baseline
+            if ( str_contains( $service, 'commercial' ) || str_contains( $service, 'stripping' ) ) $rate = 0.45;
+            if ( str_contains( $service, 'concrete' ) ) $rate = 1.20;
+            if ( str_contains( $service, 'water' ) )    $rate = 3.50;
+            return round( $sqft * $rate, 2 );
+        }
+        return 0;
+    }
+
+    /**
+     * Create a deal in ActiveCampaign tied to the contact. Returns the new
+     * deal ID (string) on success, or '' on failure.
+     */
+    private function create_deal( $api_url, $api_key, $contact_id, $lead, $lifecycle ) {
+        $pipeline = (int) get_option( self::OPT_PIPELINE_ID, 0 );
+        $stage    = $this->stage_id_for_lifecycle( $lifecycle );
+        if ( ! $pipeline || ! $stage ) return '';
+
+        $value_dollars = $this->deal_value_for( $lead );
+        $value_cents   = (int) round( $value_dollars * 100 ); // AC stores deal value in cents
+        $currency      = strtolower( (string) get_option( self::OPT_DEAL_CURRENCY, 'usd' ) );
+        $owner         = (int) get_option( self::OPT_DEAL_OWNER, 0 );
+
+        $name    = (string) $this->get_field( $lead, array( 'customer_name', 'name' ) );
+        $service = (string) $this->get_field( $lead, array( 'project_type' ) );
+        $title   = trim( ( $name ?: 'New Lead' ) . ' — ' . ( $service ?: 'Smart Forms' ) );
+
+        $deal = array(
+            'contact'  => (int) $contact_id,
+            'title'    => $title,
+            'value'    => $value_cents,
+            'currency' => $currency,
+            'group'    => $pipeline,
+            'stage'    => $stage,
+            'status'   => 0, // 0=open
+        );
+        if ( $owner > 0 ) $deal['owner'] = $owner;
+
+        $response = wp_remote_post( untrailingslashit( $api_url ) . '/api/3/deals', array(
+            'headers' => array(
+                'Api-Token'    => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
+            ),
+            'body'    => wp_json_encode( array( 'deal' => $deal ) ),
+            'timeout' => 15,
+        ) );
+        if ( is_wp_error( $response ) ) return '';
+        $code = (int) wp_remote_retrieve_response_code( $response );
+        if ( $code < 200 || $code >= 300 ) return '';
+        $body = json_decode( wp_remote_retrieve_body( $response ), true );
+        return isset( $body['deal']['id'] ) ? (string) $body['deal']['id'] : '';
+    }
+
+    /**
+     * Advance an existing deal to a new stage. No-op if stage_id is 0.
+     * Also creates the matching task on the deal when auto-tasks is enabled.
+     */
+    private function update_deal_stage( $api_url, $api_key, $deal_id, $stage_id, $lifecycle = '' ) {
+        $deal_id  = (string) $deal_id;
+        $stage_id = (int) $stage_id;
+        if ( '' === $deal_id || $stage_id <= 0 ) return;
+        wp_remote_request( untrailingslashit( $api_url ) . '/api/3/deals/' . rawurlencode( $deal_id ), array(
+            'method'  => 'PUT',
+            'headers' => array(
+                'Api-Token'    => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
+            ),
+            'body'    => wp_json_encode( array( 'deal' => array( 'stage' => $stage_id ) ) ),
+            'timeout' => 15,
+        ) );
+        if ( '' !== $lifecycle ) {
+            $this->maybe_create_deal_task( $api_url, $api_key, $deal_id, $lifecycle );
+        }
+    }
+
+    /**
+     * Map our lifecycle → configured task-type ID (mirror of stage map).
+     */
+    private function task_type_for_lifecycle( $lifecycle ) {
+        switch ( $lifecycle ) {
+            case 'completed': return (int) get_option( self::OPT_TASK_WON,    0 );
+            case 'booked':    return (int) get_option( self::OPT_TASK_BOOKED, 0 );
+            case 'quoted':    return (int) get_option( self::OPT_TASK_QUOTED, 0 );
+            case 'canceled':  return (int) get_option( self::OPT_TASK_LOST,   0 );
+            case 'lost':      return (int) get_option( self::OPT_TASK_LOST,   0 );
+            case 'new':
+            default:          return (int) get_option( self::OPT_TASK_NEW,    0 );
+        }
+    }
+
+    /**
+     * Create a task on the deal via /api/3/dealTasks. Runs only when
+     * OPT_AUTO_TASKS is enabled (default on). Operator can turn this off
+     * if their AC automations are creating the tasks themselves.
+     *
+     * Tasks land with note "(auto-created by Smart CRM)" so an AC
+     * automation can de-dupe by checking task note text if needed.
+     */
+    private function maybe_create_deal_task( $api_url, $api_key, $deal_id, $lifecycle ) {
+        if ( ! get_option( self::OPT_AUTO_TASKS, 1 ) ) return;
+        $task_type_id = $this->task_type_for_lifecycle( $lifecycle );
+        if ( $task_type_id <= 0 ) return;
+        $owner = (int) get_option( self::OPT_DEAL_OWNER, 0 );
+        $task = array(
+            'dealtasktype' => $task_type_id,
+            'relid'        => (string) $deal_id,
+            'reltype'      => 'Deal',
+            'note'         => '(auto-created by Smart CRM on ' . $lifecycle . ' stage transition)',
+        );
+        if ( $owner > 0 ) $task['user'] = $owner;
+        wp_remote_post( untrailingslashit( $api_url ) . '/api/3/dealTasks', array(
+            'headers' => array(
+                'Api-Token'    => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
+            ),
+            'body'    => wp_json_encode( array( 'dealTask' => $task ) ),
+            'timeout' => 15,
+        ) );
+    }
+
+    private function get_field( $source, array $keys ) {
+        foreach ( $keys as $key ) {
+            if ( is_array( $source ) && isset( $source[ $key ] ) && '' !== $source[ $key ] ) {
+                return $source[ $key ];
+            }
+            if ( is_object( $source ) && isset( $source->$key ) && '' !== $source->$key ) {
+                return $source->$key;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * One-click "Set up Midland pipeline" — creates the deal pipeline + 5
+     * stages in ActiveCampaign via the API and auto-fills all the IDs into
+     * our settings. Only fires when the operator clicks the button on the
+     * AC settings page (admin_init form post).
+     */
+    public function handle_setup_pipeline() {
+        if ( ! isset( $_POST['scrm_setup_ac_pipeline'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $nonce = isset( $_POST['_scrm_ac_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_scrm_ac_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'scrm_save_ac' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-crm-pro' ) );
+        }
+
+        $api_url = (string) get_option( self::OPT_API_URL, '' );
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+        if ( '' === $api_url || '' === $api_key ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&pipeline=fail&err=' . urlencode( 'Save your AC API URL + key first.' ) ) );
+            exit;
+        }
+
+        $base = untrailingslashit( $api_url );
+        $headers = array(
+            'Api-Token'    => $api_key,
+            'Content-Type' => 'application/json',
+            'Accept'       => 'application/json',
+        );
+
+        // 1. Discover the current user — that's the deal owner default.
+        $owner_id = 0;
+        $me = wp_remote_get( $base . '/api/3/users/me', array( 'headers' => $headers, 'timeout' => 15 ) );
+        if ( ! is_wp_error( $me ) ) {
+            $body = json_decode( wp_remote_retrieve_body( $me ), true );
+            $owner_id = isset( $body['user']['id'] ) ? (int) $body['user']['id'] : 0;
+        }
+
+        // 2. Create the pipeline ("dealGroup" in AC's API).
+        $currency = strtolower( (string) get_option( self::OPT_DEAL_CURRENCY, 'usd' ) );
+        $pipe_resp = wp_remote_post( $base . '/api/3/dealGroups', array(
+            'headers' => $headers,
+            'timeout' => 15,
+            'body'    => wp_json_encode( array( 'dealGroup' => array(
+                'title'    => 'Midland Sales Pipeline',
+                'currency' => $currency,
+            ) ) ),
+        ) );
+        if ( is_wp_error( $pipe_resp ) ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&pipeline=fail&err=' . urlencode( $pipe_resp->get_error_message() ) ) );
+            exit;
+        }
+        $pipe_body = json_decode( wp_remote_retrieve_body( $pipe_resp ), true );
+        $pipeline_id = isset( $pipe_body['dealGroup']['id'] ) ? (int) $pipe_body['dealGroup']['id'] : 0;
+        if ( ! $pipeline_id ) {
+            $msg = isset( $pipe_body['errors'][0]['title'] ) ? $pipe_body['errors'][0]['title'] : 'Pipeline create failed.';
+            wp_safe_redirect( admin_url( 'admin.php?page=scrm-pro-activecampaign&pipeline=fail&err=' . urlencode( $msg ) ) );
+            exit;
+        }
+
+        // 3. Create the 5 stages, in order. Capture each returned ID and
+        //    persist it into the matching OPT_STAGE_* option.
+        $stages = array(
+            array( 'opt' => self::OPT_STAGE_NEW,    'title' => 'New Lead',   'order' => 1, 'color' => '#6b7280' ),
+            array( 'opt' => self::OPT_STAGE_QUOTED, 'title' => 'Quote Sent', 'order' => 2, 'color' => '#3b82f6' ),
+            array( 'opt' => self::OPT_STAGE_BOOKED, 'title' => 'Booked',     'order' => 3, 'color' => '#f59e0b' ),
+            array( 'opt' => self::OPT_STAGE_WON,    'title' => 'Won',        'order' => 4, 'color' => '#10b981' ),
+            array( 'opt' => self::OPT_STAGE_LOST,   'title' => 'Lost',       'order' => 5, 'color' => '#ef4444' ),
+        );
+        $created = 0;
+        foreach ( $stages as $s ) {
+            $resp = wp_remote_post( $base . '/api/3/dealStages', array(
+                'headers' => $headers,
+                'timeout' => 15,
+                'body'    => wp_json_encode( array( 'dealStage' => array(
+                    'title'        => $s['title'],
+                    'group'        => (string) $pipeline_id,
+                    'order'        => $s['order'],
+                    'color'        => $s['color'],
+                    'card_region1' => 'contact-name',
+                    'card_region2' => 'deal-title',
+                    'card_region3' => 'deal-value',
+                    'card_region4' => 'deal-owner-avatar',
+                    'card_region5' => 'next-action',
+                ) ) ),
+            ) );
+            if ( ! is_wp_error( $resp ) ) {
+                $body = json_decode( wp_remote_retrieve_body( $resp ), true );
+                $stage_id = isset( $body['dealStage']['id'] ) ? (int) $body['dealStage']['id'] : 0;
+                if ( $stage_id > 0 ) {
+                    update_option( $s['opt'], $stage_id );
+                    $created++;
+                }
+            }
+        }
+
+        // 4. Create deal task types — one per stage. Operator can build
+        //    AC automations that auto-create a task of the matching type
+        //    when a deal lands at that stage. We persist the IDs so the
+        //    plugin can also fire the task creation directly later.
+        $tasks = array(
+            array( 'opt' => self::OPT_TASK_NEW,    'title' => 'Call new lead within 24 hours', 'days' => 1 ),
+            array( 'opt' => self::OPT_TASK_QUOTED, 'title' => 'Follow up on quote',            'days' => 3 ),
+            array( 'opt' => self::OPT_TASK_BOOKED, 'title' => 'Confirm appointment 24h before','days' => 1 ),
+            array( 'opt' => self::OPT_TASK_WON,    'title' => 'Send NPS + thank-you',          'days' => 1 ),
+            array( 'opt' => self::OPT_TASK_LOST,   'title' => 'Schedule reactivation in 90 days','days' => 90 ),
+        );
+        $tasks_created = 0;
+        foreach ( $tasks as $t ) {
+            $resp = wp_remote_post( $base . '/api/3/dealTaskTypes', array(
+                'headers' => $headers,
+                'timeout' => 15,
+                'body'    => wp_json_encode( array( 'dealTasktype' => array(
+                    'title'           => $t['title'],
+                    'description'     => 'Auto-created by Smart CRM for the Midland pipeline.',
+                    'duedate_setting' => 'Days',
+                    'duedate_after'   => $t['days'],
+                ) ) ),
+            ) );
+            if ( ! is_wp_error( $resp ) ) {
+                $body = json_decode( wp_remote_retrieve_body( $resp ), true );
+                $task_id = isset( $body['dealTasktype']['id'] ) ? (int) $body['dealTasktype']['id'] : 0;
+                if ( $task_id > 0 ) {
+                    update_option( $t['opt'], $task_id );
+                    $tasks_created++;
+                }
+            }
+        }
+
+        // 5. Persist pipeline + owner + flip the deal-pipeline toggle on.
+        update_option( self::OPT_PIPELINE_ID,   $pipeline_id );
+        if ( $owner_id ) update_option( self::OPT_DEAL_OWNER, $owner_id );
+        update_option( self::OPT_DEAL_ENABLED,  1 );
+
+        $args = array(
+            'page'        => 'scrm-pro-activecampaign',
+            'pipeline'    => 'ok',
+            'pipeline_id' => $pipeline_id,
+            'stages'      => $created,
+            'tasks'       => $tasks_created,
+        );
+        wp_safe_redirect( admin_url( 'admin.php?' . http_build_query( $args ) ) );
+        exit;
+    }
+
+    /**
+     * Download a JSON blueprint of the current AC pipeline configuration.
+     * Not natively importable into ActiveCampaign (AC doesn't ship a
+     * pipeline-import UI), but useful as backup, audit log, or for
+     * re-running setup on another install. Reads only the IDs we
+     * stored after handle_setup_pipeline; doesn't touch AC's API.
+     */
+    public function handle_export_blueprint() {
+        if ( ! isset( $_POST['scrm_export_ac_blueprint'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $nonce = isset( $_POST['_scrm_ac_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_scrm_ac_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'scrm_save_ac' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-crm-pro' ) );
+        }
+        $blueprint = array(
+            'name'         => 'Midland Sales Pipeline',
+            'currency'     => (string) get_option( self::OPT_DEAL_CURRENCY, 'usd' ),
+            'pipeline_id'  => (int) get_option( self::OPT_PIPELINE_ID, 0 ),
+            'owner_id'     => (int) get_option( self::OPT_DEAL_OWNER, 0 ),
+            'exported_at'  => gmdate( 'c' ),
+            'site_url'     => home_url(),
+            'stages'       => array(
+                'new'    => (int) get_option( self::OPT_STAGE_NEW, 0 ),
+                'quoted' => (int) get_option( self::OPT_STAGE_QUOTED, 0 ),
+                'booked' => (int) get_option( self::OPT_STAGE_BOOKED, 0 ),
+                'won'    => (int) get_option( self::OPT_STAGE_WON, 0 ),
+                'lost'   => (int) get_option( self::OPT_STAGE_LOST, 0 ),
+            ),
+            'task_types'   => array(
+                'new'    => (int) get_option( self::OPT_TASK_NEW, 0 ),
+                'quoted' => (int) get_option( self::OPT_TASK_QUOTED, 0 ),
+                'booked' => (int) get_option( self::OPT_TASK_BOOKED, 0 ),
+                'won'    => (int) get_option( self::OPT_TASK_WON, 0 ),
+                'lost'   => (int) get_option( self::OPT_TASK_LOST, 0 ),
+            ),
+            'note' => 'Generated by Midland Smart CRM. Re-importing into a different AC account requires running the "Set up Midland pipeline" button on that install (this file is for documentation + restore).',
+        );
+        $filename = 'midland-ac-pipeline-' . gmdate( 'Y-m-d' ) . '.json';
+        nocache_headers();
+        header( 'Content-Type: application/json' );
+        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+        echo wp_json_encode( $blueprint, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+        exit;
+    }
+
+    public function handle_save() {
+        if ( ! isset( $_POST['scrm_save_ac'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $nonce = isset( $_POST['_scrm_ac_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_scrm_ac_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'scrm_save_ac' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-crm-pro' ) );
+        }
+
+        // SSRF guard: the AC base URL is used in every outbound request with
+        // the API key attached. Reject anything that isn't https or that
+        // resolves to a loopback/private/reserved host (e.g. cloud metadata at
+        // 169.254.169.254, localhost) before persisting it.
+        $api_url = untrailingslashit( esc_url_raw( wp_unslash( $_POST['ac_api_url'] ?? '' ) ) );
+        if ( '' !== $api_url ) {
+            $scheme = strtolower( (string) wp_parse_url( $api_url, PHP_URL_SCHEME ) );
+            if ( 'https' !== $scheme || ! wp_http_validate_url( $api_url ) ) {
+                wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&saved=0&err=' . rawurlencode( 'ActiveCampaign API URL must be a public https:// address.' ) ) );
+                exit;
+            }
+        }
+        update_option( self::OPT_API_URL, $api_url );
+        update_option( self::OPT_API_KEY, sanitize_text_field( wp_unslash( $_POST['ac_api_key'] ?? '' ) ) );
+        update_option( self::OPT_TAG,     sanitize_text_field( wp_unslash( $_POST['ac_tag'] ?? 'midland-job-completed' ) ) );
+        update_option( self::OPT_ENABLED, isset( $_POST['ac_enabled'] ) ? 1 : 0 );
+
+        // Deal pipeline settings (AC owns the sales pipeline).
+        update_option( self::OPT_DEAL_ENABLED,  isset( $_POST['ac_deal_enabled'] ) ? 1 : 0 );
+        update_option( self::OPT_PIPELINE_ID,   absint( $_POST['ac_pipeline_id']   ?? 0 ) );
+        update_option( self::OPT_DEAL_OWNER,    absint( $_POST['ac_deal_owner']    ?? 0 ) );
+        update_option( self::OPT_DEAL_CURRENCY, sanitize_text_field( wp_unslash( $_POST['ac_deal_currency'] ?? 'usd' ) ) );
+        update_option( self::OPT_STAGE_NEW,    absint( $_POST['ac_stage_new']    ?? 0 ) );
+        update_option( self::OPT_STAGE_QUOTED, absint( $_POST['ac_stage_quoted'] ?? 0 ) );
+        update_option( self::OPT_STAGE_BOOKED, absint( $_POST['ac_stage_booked'] ?? 0 ) );
+        update_option( self::OPT_STAGE_WON,    absint( $_POST['ac_stage_won']    ?? 0 ) );
+        update_option( self::OPT_STAGE_LOST,   absint( $_POST['ac_stage_lost']   ?? 0 ) );
+        update_option( self::OPT_AUTO_TASKS,   isset( $_POST['ac_auto_tasks'] ) ? 1 : 0 );
+
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&saved=1' ) );
+        exit;
+    }
+
+    public function handle_test() {
+        if ( ! isset( $_POST['scrm_test_ac'] ) || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        $nonce = isset( $_POST['_scrm_ac_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_scrm_ac_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'scrm_save_ac' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'smart-crm-pro' ) );
+        }
+
+        $api_url = (string) get_option( self::OPT_API_URL, '' );
+        $api_key = (string) get_option( self::OPT_API_KEY, '' );
+
+        if ( '' === $api_url || '' === $api_key ) {
+            wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&test=missing' ) );
+            exit;
+        }
+
+        $response = wp_remote_get( $api_url . '/api/3/users/me', array(
+            'headers' => array( 'Api-Token' => $api_key, 'Accept' => 'application/json' ),
+            'timeout' => 10,
+        ) );
+
+        $code = is_wp_error( $response ) ? 0 : (int) wp_remote_retrieve_response_code( $response );
+        $key  = 200 === $code ? 'ok' : 'fail';
+        wp_safe_redirect( admin_url( 'admin.php?page=smart-crm&tab=activecampaign&test=' . $key ) );
+        exit;
+    }
+
+    public function render_page() {
+        $api_url  = (string) get_option( self::OPT_API_URL, '' );
+        $api_key  = (string) get_option( self::OPT_API_KEY, '' );
+        $tag      = (string) get_option( self::OPT_TAG, 'midland-job-completed' );
+        $enabled  = (int) get_option( self::OPT_ENABLED, 0 );
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+        $saved    = isset( $_GET['saved'] );
+        $test     = isset( $_GET['test'] ) ? sanitize_key( $_GET['test'] ) : '';
+        // phpcs:enable
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'ActiveCampaign', 'smart-crm-pro' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Pushes contacts and tags to ActiveCampaign. Your AC automations handle the rest.', 'smart-crm-pro' ); ?></p>
+
+            <?php if ( $saved ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-crm-pro' ); ?></p></div><?php endif; ?>
+            <?php if ( 'ok' === $test ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Connected to ActiveCampaign.', 'smart-crm-pro' ); ?></p></div><?php endif; ?>
+            <?php if ( 'fail' === $test ) : ?><div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'ActiveCampaign rejected the credentials. Check the API URL and key.', 'smart-crm-pro' ); ?></p></div><?php endif; ?>
+            <?php if ( 'missing' === $test ) : ?><div class="notice notice-warning is-dismissible"><p><?php esc_html_e( 'Save the API URL and key first, then test.', 'smart-crm-pro' ); ?></p></div><?php endif; ?>
+
+            <form method="post">
+                <?php wp_nonce_field( 'scrm_save_ac', '_scrm_ac_nonce' ); ?>
+                <table class="form-table">
+                    <tr>
+                        <th><label for="ac_enabled"><?php esc_html_e( 'Enable Sync', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <label><input type="checkbox" id="ac_enabled" name="ac_enabled" value="1" <?php checked( $enabled ); ?>> <?php esc_html_e( 'Push contacts to ActiveCampaign on job completion.', 'smart-crm-pro' ); ?></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ac_api_url"><?php esc_html_e( 'API URL', 'smart-crm-pro' ); ?></label></th>
+                        <td><input type="url" id="ac_api_url" name="ac_api_url" class="regular-text" value="<?php echo esc_attr( $api_url ); ?>" placeholder="https://your-account.api-us1.com"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="ac_api_key"><?php esc_html_e( 'API Key', 'smart-crm-pro' ); ?></label></th>
+                        <td><input type="password" id="ac_api_key" name="ac_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th><label for="ac_tag"><?php esc_html_e( 'Trigger Tag', 'smart-crm-pro' ); ?></label></th>
+                        <td>
+                            <input type="text" id="ac_tag" name="ac_tag" class="regular-text" value="<?php echo esc_attr( $tag ); ?>">
+                            <p class="description"><?php esc_html_e( 'Applied to the contact when a job completes. Use this as the trigger in your AC automations.', 'smart-crm-pro' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <p class="submit">
+                    <button type="submit" name="scrm_save_ac" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'smart-crm-pro' ); ?></button>
+                    <button type="submit" name="scrm_test_ac" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Test Connection', 'smart-crm-pro' ); ?></button>
+                </p>
+
+                <hr>
+                <h2><?php esc_html_e( 'Midland Pipeline', 'smart-crm-pro' ); ?></h2>
+                <p class="description" style="max-width:640px;"><?php esc_html_e( 'Create the Midland deal pipeline and its stages in ActiveCampaign and auto-fill the stage/task IDs above, or export the current configuration as a JSON blueprint. Save your AC API URL + key first.', 'smart-crm-pro' ); ?></p>
+                <p class="submit">
+                    <button type="submit" name="scrm_setup_ac_pipeline" value="1" class="button"><?php esc_html_e( 'Set up Midland pipeline', 'smart-crm-pro' ); ?></button>
+                    <button type="submit" name="scrm_export_ac_blueprint" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Export blueprint (JSON)', 'smart-crm-pro' ); ?></button>
+                </p>
+            </form>
+        </div>
+        <?php
+    }
+}
+
+SCRM_Pro_ActiveCampaign::get_instance();
