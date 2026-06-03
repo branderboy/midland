@@ -79,9 +79,116 @@ class RSSEO_Fixer {
     }
 
     /**
+     * Snapshot the CURRENT live value before a fix overwrites it, so the change
+     * is reversible. Stored per-fix (autoload off) and read back by restore().
+     */
+    private static function capture_backup( $fix ) {
+        $post_id = (int) $fix->post_id;
+        if ( $post_id <= 0 ) {
+            return;
+        }
+        switch ( $fix->fix_type ) {
+            case 'title':
+                $value = get_post_field( 'post_title', $post_id );
+                break;
+            case 'content':
+                $value = get_post_field( 'post_content', $post_id );
+                break;
+            case 'alt_text':
+                $value = get_post_meta( $post_id, '_wp_attachment_image_alt', true );
+                break;
+            case 'meta_description':
+            default:
+                $value = $fix->field_key ? get_post_meta( $post_id, $fix->field_key, true ) : '';
+                break;
+        }
+        update_option( 'rsseo_fix_backup_' . (int) $fix->id, array(
+            'value'   => $value,
+            'time'    => time(),
+            'type'    => $fix->fix_type,
+            'field'   => $fix->field_key,
+            'post_id' => $post_id,
+        ), false );
+    }
+
+    /**
+     * Restore a single applied fix from its backup and mark it un-applied.
+     *
+     * @param int $fix_id
+     * @return true|WP_Error
+     */
+    public static function restore( $fix_id ) {
+        $backup = get_option( 'rsseo_fix_backup_' . (int) $fix_id, null );
+        if ( ! is_array( $backup ) ) {
+            return new WP_Error( 'no_backup', __( 'No backup is available for this fix — it cannot be reverted automatically.', 'real-smart-seo' ) );
+        }
+        $post_id = (int) $backup['post_id'];
+        if ( $post_id <= 0 ) {
+            return new WP_Error( 'bad_backup', __( 'Backup is missing its target post.', 'real-smart-seo' ) );
+        }
+
+        switch ( $backup['type'] ) {
+            case 'title':
+                $result = wp_update_post( array( 'ID' => $post_id, 'post_title' => $backup['value'] ), true );
+                break;
+            case 'content':
+                $result = wp_update_post( array( 'ID' => $post_id, 'post_content' => $backup['value'] ), true );
+                break;
+            case 'alt_text':
+                update_post_meta( $post_id, '_wp_attachment_image_alt', $backup['value'] );
+                $result = true;
+                break;
+            default:
+                if ( ! empty( $backup['field'] ) ) {
+                    update_post_meta( $post_id, $backup['field'], $backup['value'] );
+                }
+                $result = true;
+                break;
+        }
+        if ( is_wp_error( $result ) ) {
+            return $result;
+        }
+
+        global $wpdb;
+        $wpdb->update( $wpdb->prefix . 'rsseo_fixes', array( 'applied' => 0 ), array( 'id' => (int) $fix_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $fix = $wpdb->get_row( $wpdb->prepare( "SELECT report_id FROM {$wpdb->prefix}rsseo_fixes WHERE id = %d", (int) $fix_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        if ( $fix ) {
+            $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}rsseo_reports SET fixes_applied = GREATEST(0, fixes_applied - 1) WHERE id = %d", (int) $fix->report_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        }
+        delete_option( 'rsseo_fix_backup_' . (int) $fix_id );
+        return true;
+    }
+
+    /**
+     * Revert every applied fix in a report.
+     *
+     * @param int $report_id
+     * @return array [ 'restored' => int, 'errors' => array ]
+     */
+    public static function restore_all( $report_id ) {
+        $restored = 0;
+        $errors   = array();
+        foreach ( RSSEO_Database::get_fixes( $report_id ) as $fix ) {
+            if ( ! $fix->applied ) {
+                continue;
+            }
+            $result = self::restore( $fix->id );
+            if ( is_wp_error( $result ) ) {
+                $errors[] = $fix->id . ': ' . $result->get_error_message();
+            } else {
+                $restored++;
+            }
+        }
+        return array( 'restored' => $restored, 'errors' => $errors );
+    }
+
+    /**
      * Execute the actual WordPress update for a fix row.
      */
     private static function apply_fix( $fix ) {
+        // Snapshot the live value first so every applied fix is reversible.
+        self::capture_backup( $fix );
+
         $post_id   = (int) $fix->post_id;
         $fix_type  = $fix->fix_type;
         $field_key = $fix->field_key;
@@ -124,12 +231,18 @@ class RSSEO_Fixer {
                 return true;
 
             default:
-                // Generic meta update.
-                if ( $post_id > 0 && $field_key ) {
+                // Generic meta update — but only to known SEO meta keys, never an
+                // arbitrary field. Stops a malformed fix from clobbering meta like
+                // _thumbnail_id or _wp_page_template.
+                $allow = array(
+                    '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc',
+                    '_yoast_wpseo_title', 'rank_math_title', '_aioseo_title', '_seopress_titles_title',
+                );
+                if ( $post_id > 0 && $field_key && in_array( $field_key, $allow, true ) ) {
                     update_post_meta( $post_id, $field_key, sanitize_textarea_field( $new_value ) );
                     return true;
                 }
-                return new WP_Error( 'unknown_fix_type', __( 'Unknown fix type.', 'real-smart-seo' ) );
+                return new WP_Error( 'unknown_fix_type', __( 'Unsupported fix — skipped for safety.', 'real-smart-seo' ) );
         }
     }
 

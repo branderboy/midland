@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Real Smart SEO
- * Plugin URI: https://tagglefish.com/real-smart-seo
- * Description: AI-powered SEO analysis, reporting, and auto-fix. Upload your Screaming Frog, GSC, GA, and PageSpeed data — get a full report, a prioritized plan, and one-click fixes.
- * Version: 1.0.1
+ * Plugin Name: Midland Smart SEO
+ * Plugin URI: https://midlandfloors.com/smart-seo
+ * Description: Midland's all-in-one local SEO suite — audit, reporting and one-click auto-fixes (with full diff review + rollback), programmatic city × service pages, internal-link suggestions, keyword clustering, content briefs, schema, GSC cleanup, IndexNow, geo-grid and rank tracking. One plugin, no add-ons.
+ * Version: 2.0.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -20,10 +20,17 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'RSSEO_VERSION',  '1.0.1' );
+define( 'RSSEO_VERSION',  '2.0.0' );
 define( 'RSSEO_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_URL',      plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_FILE',     __FILE__ );
+
+// The former "Pro" add-on is now bundled into this single plugin. These aliases
+// keep the merged modules (which were written against RSSEO_PRO_*) working as-is.
+define( 'RSSEO_PRO_VERSION', RSSEO_VERSION );
+define( 'RSSEO_PRO_PATH',    RSSEO_PATH );
+define( 'RSSEO_PRO_URL',     RSSEO_URL );
+define( 'RSSEO_PRO_FILE',    RSSEO_FILE );
 
 class RSSEO_Plugin {
 
@@ -39,20 +46,42 @@ class RSSEO_Plugin {
     private function __construct() {
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
         add_action( 'plugins_loaded', array( $this, 'init' ) );
+        add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
+    }
+
+    /** 'weekly' interval used by the Geo-Grid and AI-Rank modules. */
+    public function add_cron_schedules( $schedules ) {
+        if ( ! isset( $schedules['weekly'] ) ) {
+            $schedules['weekly'] = array(
+                'interval' => WEEK_IN_SECONDS,
+                'display'  => __( 'Once Weekly', 'real-smart-seo' ),
+            );
+        }
+        return $schedules;
     }
 
     public function activate() {
         require_once RSSEO_PATH . 'includes/class-rsseo-database.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-database.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-geogrid.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-ai-rank.php';
         RSSEO_Database::create_tables();
+        RSSEO_Pro_Database::create_tables();
+        RSSEO_Pro_Geogrid::create_tables();
+        RSSEO_Pro_AI_Rank::create_tables();
+        flush_rewrite_rules();
     }
 
     public function init() {
         load_plugin_textdomain( 'real-smart-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
         $this->includes();
         $this->init_classes();
+        add_action( 'admin_init',        array( $this, 'maybe_upgrade_db' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_brand_layout' ) );
     }
 
     private function includes() {
+        // Core engine.
         require_once RSSEO_PATH . 'includes/class-rsseo-database.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-settings.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-claude-api.php';
@@ -61,10 +90,60 @@ class RSSEO_Plugin {
         require_once RSSEO_PATH . 'includes/class-rsseo-fixer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-crawler.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-admin.php';
+
+        // Bundled modules (formerly the Pro add-on).
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-license.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-database.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-dataforseo.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-schema.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-analyzer.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-fixer.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-crawler.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-admin.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-sameas.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-gsc-cleanup.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-programmatic.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-internal-links.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-clusters.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-content-brief.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-indexnow.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-speed.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-geogrid.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-ai-rank.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-backlinks.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-pro-growth-digest.php';
     }
 
     private function init_classes() {
         RSSEO_Admin::get_instance();
+        // Bundled modules self-initialize via get_instance() at file scope; the
+        // admin shell + crawler need an explicit nudge (as in the old Pro boot).
+        if ( class_exists( 'RSSEO_Pro_Admin' ) ) {
+            RSSEO_Pro_Admin::get_instance();
+        }
+        if ( class_exists( 'RSSEO_Pro_Crawler' ) && method_exists( 'RSSEO_Pro_Crawler', 'register' ) ) {
+            RSSEO_Pro_Crawler::register();
+        }
+    }
+
+    /** Idempotent table create/upgrade on in-place updates (no reactivation). */
+    public function maybe_upgrade_db() {
+        if ( get_option( 'rsseo_db_version' ) === RSSEO_VERSION ) {
+            return;
+        }
+        if ( class_exists( 'RSSEO_Database' ) )     { RSSEO_Database::create_tables(); }
+        if ( class_exists( 'RSSEO_Pro_Database' ) ) { RSSEO_Pro_Database::create_tables(); }
+        if ( class_exists( 'RSSEO_Pro_Geogrid' ) )  { RSSEO_Pro_Geogrid::create_tables(); }
+        if ( class_exists( 'RSSEO_Pro_AI_Rank' ) )  { RSSEO_Pro_AI_Rank::create_tables(); }
+        flush_rewrite_rules();
+        update_option( 'rsseo_db_version', RSSEO_VERSION );
+    }
+
+    /** Brand layout CSS for hand-built + programmatic pages. */
+    public function enqueue_brand_layout() {
+        if ( file_exists( RSSEO_PATH . 'assets/css/brand-layout.css' ) ) {
+            wp_enqueue_style( 'midland-brand-layout', RSSEO_URL . 'assets/css/brand-layout.css', array(), RSSEO_VERSION );
+        }
     }
 }
 
