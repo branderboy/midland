@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Hooks:
  *   srp_job_completed( $data ) — fire this from any plugin/theme to trigger the survey.
  *   srp_survey_response        — public AJAX handler for the survey form.
- * Cron sends at most two spaced reminders if there's no response: the first
- * ~24h after the survey, the second ~48h after that first reminder. Reminders
- * stop the moment the customer submits a score.
+ * Cron sends at most three spaced reminders if there's no response: the first
+ * ~24h after the survey, the second ~48h after that, and a final one a few days
+ * (~4) later. Reminders stop the moment the customer submits a score.
  */
 class SRP_Survey {
 
@@ -441,9 +441,10 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
 
     /**
      * Cron (hourly): send spaced reminder emails to non-respondents. reminder1
-     * goes ~24h after the survey; reminder2 goes ~48h after reminder1 (see the
-     * SRP_DB queries). Because reminder2's wait is measured from reminder1_at,
-     * the two can never go out in the same run.
+     * goes ~24h after the survey; reminder2 ~48h after reminder1; reminder3 a
+     * few days (~4) after reminder2 (see the SRP_DB queries). Because each
+     * reminder's wait is measured from the previous reminder's timestamp, no two
+     * reminders can ever go out in the same run, and there are at most three.
      */
     public function process_reminders() {
         $business = self::business_name();
@@ -457,6 +458,11 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
             $this->send_reminder( $survey, $business, 2 );
             SRP_DB::update_survey( $survey->id, array( 'reminder2_at' => current_time( 'mysql' ) ) );
         }
+
+        foreach ( (array) SRP_DB::get_pending_reminders_third() as $survey ) {
+            $this->send_reminder( $survey, $business, 3 );
+            SRP_DB::update_survey( $survey->id, array( 'reminder3_at' => current_time( 'mysql' ) ) );
+        }
     }
 
     private function send_reminder( $survey, $business, $which ) {
@@ -468,13 +474,20 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         $url   = add_query_arg( array( 'srp_survey' => $token ), home_url( '/' ) );
         $name  = $survey->customer_name ?: 'there';
 
-        $subject = 1 === $which
-            ? 'Quick reminder, how did we do?'
-            : 'Last chance to share your feedback';
-
-        $intro = 1 === $which
-            ? 'we sent you a quick survey yesterday'
-            : 'we are still hoping to hear from you';
+        switch ( (int) $which ) {
+            case 1:
+                $subject = 'Quick reminder, how did we do?';
+                $intro   = 'we sent you a quick survey a day ago';
+                break;
+            case 2:
+                $subject = 'Still curious how we did?';
+                $intro   = 'we are still hoping to hear from you';
+                break;
+            default: // 3 — final nudge
+                $subject = 'Last chance to share your feedback';
+                $intro   = 'this is our last note, but we would still love your feedback';
+                break;
+        }
 
         $brand = self::brand_color();
         $body = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="x-apple-disable-message-reformatting"><style>body,table,td,p,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-size-adjust:100%;}</style></head>
