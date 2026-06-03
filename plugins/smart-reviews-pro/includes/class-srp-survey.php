@@ -149,11 +149,14 @@ class SRP_Survey {
             return;
         }
 
+        $tags = isset( $data['tags'] ) ? (array) $data['tags'] : array();
         $survey_id = SRP_DB::insert_survey( array(
             'customer_name'  => sanitize_text_field( $data['name'] ?? '' ),
             'customer_email' => $email,
             'customer_phone' => sanitize_text_field( $data['phone'] ?? '' ),
             'job_id'         => sanitize_text_field( $data['job_id'] ?? '' ),
+            'segment'        => sanitize_text_field( $data['segment'] ?? '' ),
+            'tags'           => $tags ? implode( ',', array_map( 'sanitize_text_field', $tags ) ) : '',
             'survey_sent_at' => current_time( 'mysql' ),
         ) );
 

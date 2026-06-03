@@ -5,16 +5,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SRP_DB {
 
+    const DB_VERSION = '1.1'; // bump when the schema below changes
+
     public static function create_tables() {
         global $wpdb;
         $charset = $wpdb->get_charset_collate();
 
+        // segment + tags carry the data Smart CRM passes through on completion,
+        // so each review is associated with the lead's CRM segment and tags.
         $surveys = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}srp_surveys (
             id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             customer_name  VARCHAR(200)  NOT NULL DEFAULT '',
             customer_email VARCHAR(200)  NOT NULL DEFAULT '',
             customer_phone VARCHAR(50)   NOT NULL DEFAULT '',
             job_id         VARCHAR(100)  NOT NULL DEFAULT '',
+            segment        VARCHAR(20)   NOT NULL DEFAULT '',
+            tags           TEXT          NULL,
             score          TINYINT       NULL,
             feedback       TEXT          NULL,
             routed         TINYINT(1)    NOT NULL DEFAULT 0,
@@ -32,6 +38,14 @@ class SRP_DB {
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $surveys );
+        update_option( 'srp_db_version', self::DB_VERSION );
+    }
+
+    /** Run dbDelta when the stored schema version is behind (adds new columns). */
+    public static function maybe_upgrade() {
+        if ( get_option( 'srp_db_version' ) !== self::DB_VERSION ) {
+            self::create_tables();
+        }
     }
 
     public static function insert_survey( $data ) {

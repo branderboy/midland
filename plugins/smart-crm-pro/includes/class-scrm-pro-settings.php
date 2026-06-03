@@ -71,8 +71,118 @@ class SCRM_Pro_Settings {
         exit;
     }
 
+    /**
+     * "Tags & Flow" overview — shows the lifecycle tags Smart CRM applies and
+     * which systems each leg connects to (Smart Forms, ActiveCampaign,
+     * ServiceM8, Smart Reviews, Floor Care Plan), with live connection state.
+     */
+    private function render_tags_overview() {
+        $ac_on      = '' !== (string) get_option( 'scrm_pro_ac_api_url', '' ) && '' !== (string) get_option( 'scrm_pro_ac_api_key', '' );
+        $sm8_on     = '' !== (string) get_option( 'scrm_pro_sm8_api_key', '' );
+        $reviews_on = defined( 'SRP_VERSION' );
+        $forms_on   = defined( 'SFCO_VERSION' );
+        $plan_on    = class_exists( 'SCRM_Pro_Floor_Care_Plan' );
+
+        $badge = function ( $on, $label, $note ) {
+            $color = $on ? '#2F8137' : '#b32d2e';
+            $mark  = $on ? '&#10003;' : '&#10005;';
+            return '<li style="margin:0 0 6px;"><span style="color:' . $color . ';font-weight:700;">' . $mark . '</span> <strong>' . esc_html( $label ) . '</strong> — ' . esc_html( $note ) . '</li>';
+        };
+
+        echo '<h2>' . esc_html__( 'Tags & Flow', 'smart-crm-pro' ) . '</h2>';
+        echo '<p class="description">' . esc_html__( 'Smart CRM applies lifecycle tags to each lead and fans the event out to the connected systems. Tags are applied to the contact in ActiveCampaign; "completed" also triggers the Smart Reviews survey and the floor-care plan.', 'smart-crm-pro' ) . '</p>';
+
+        echo '<h3 style="margin-top:18px;">' . esc_html__( 'Connections', 'smart-crm-pro' ) . '</h3><ul style="margin:0 0 8px;">';
+        echo $badge( $forms_on,   'Smart Forms for Midland', $forms_on   ? 'lead source connected' : 'not active' );                       // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $badge( $ac_on,      'ActiveCampaign',          $ac_on      ? 'tags are applied to contacts' : 'API URL/key not set — tags will not sync' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $badge( $sm8_on,     'ServiceM8',               $sm8_on     ? 'job create + completion polling' : 'API key not set' );        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $badge( $reviews_on, 'Smart Reviews',           $reviews_on ? 'emails the survey on completion' : 'not active' );             // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $badge( $plan_on,    'Floor Care Plan',         $plan_on    ? 'sends the plan/offer on completion' : 'not available' );       // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo '</ul>';
+
+        $stage = function ( $title, $trigger, $tags, $effects ) {
+            echo '<div style="border:1px solid #e2e8f0;border-radius:6px;padding:12px 16px;margin:10px 0;">';
+            echo '<strong>' . esc_html( $title ) . '</strong> <span class="description">— ' . esc_html( $trigger ) . '</span>';
+            echo '<div style="margin:8px 0 0;">';
+            foreach ( $tags as $t ) {
+                echo '<code style="display:inline-block;background:#F3FCF4;border:1px solid #cdeccf;border-radius:3px;padding:2px 7px;margin:2px 4px 2px 0;">' . esc_html( $t ) . '</code>';
+            }
+            echo '</div>';
+            if ( $effects ) {
+                echo '<p class="description" style="margin:8px 0 0;">' . esc_html( $effects ) . '</p>';
+            }
+            echo '</div>';
+        };
+
+        echo '<h3 style="margin-top:18px;">' . esc_html__( 'Lifecycle', 'smart-crm-pro' ) . '</h3>';
+        $stage(
+            __( 'New lead', 'smart-crm-pro' ),
+            __( 'form / chat submission', 'smart-crm-pro' ),
+            array( 'midland-segment-new-lead', 'midland-segment-new-lead-{segment}', 'midland-source-{form|chat|calendly}' ),
+            __( 'Lead enters ActiveCampaign tagged with its segment and source.', 'smart-crm-pro' )
+        );
+        $stage(
+            __( 'Booked (visit scheduled)', 'smart-crm-pro' ),
+            __( 'Calendly booking', 'smart-crm-pro' ),
+            array( 'midland-job-booked', 'midland-job-booked-{segment}', 'midland-onsite-booked-commercial' ),
+            __( 'Advances the ActiveCampaign deal to Booked.', 'smart-crm-pro' )
+        );
+        $stage(
+            __( 'Visited (commercial estimate)', 'smart-crm-pro' ),
+            __( 'Calendly visit passed for a commercial, non-emergency lead — an estimate, not yet a paid service', 'smart-crm-pro' ),
+            array( 'midland-visit-completed' ),
+            __( 'Does NOT trigger the review or floor-care plan — waits for ServiceM8 to report the paid job. Good for an AC "after your estimate" email flow.', 'smart-crm-pro' )
+        );
+        $stage(
+            __( 'Completed / service rendered', 'smart-crm-pro' ),
+            __( 'Residential or emergency Calendly visit, OR a ServiceM8 job completed', 'smart-crm-pro' ),
+            array( 'midland-job-completed', 'midland-job-completed-{segment}', 'midland-floor-care-plan-offer' ),
+            __( 'The real completion: fires the Smart Reviews survey email, sends the floor-care plan, and tags AC to start the post-job email flow.', 'smart-crm-pro' )
+        );
+        $stage(
+            __( 'Canceled', 'smart-crm-pro' ),
+            __( 'Calendly cancellation', 'smart-crm-pro' ),
+            array( 'midland-job-canceled', 'midland-job-canceled-{segment}' ),
+            __( 'Reverses the booked tags and moves the deal off Booked.', 'smart-crm-pro' )
+        );
+
+        // Recent tag activity — proof the CRM is the tag owner, visible even
+        // when ActiveCampaign is off (tags are stored locally regardless).
+        $recent = class_exists( 'SCRM_Pro_Tags' ) ? SCRM_Pro_Tags::recent( 25 ) : array();
+        echo '<h3 style="margin-top:20px;">' . esc_html__( 'Recent tag activity', 'smart-crm-pro' ) . '</h3>';
+        if ( empty( $recent ) ) {
+            echo '<p class="description">' . esc_html__( 'No tags applied yet. They appear here as leads move through the lifecycle — stored by Smart CRM and pushed to ActiveCampaign.', 'smart-crm-pro' ) . '</p>';
+        } else {
+            echo '<table class="wp-list-table widefat fixed striped"><thead><tr>';
+            echo '<th>' . esc_html__( 'Lead', 'smart-crm-pro' ) . '</th><th>' . esc_html__( 'Stage', 'smart-crm-pro' ) . '</th><th>' . esc_html__( 'Tags', 'smart-crm-pro' ) . '</th><th>' . esc_html__( 'When', 'smart-crm-pro' ) . '</th>';
+            echo '</tr></thead><tbody>';
+            foreach ( $recent as $row ) {
+                $who  = trim( (string) ( $row['name'] ?? '' ) );
+                $who  = '' !== $who ? $who : (string) ( $row['email'] ?? ( '#' . (int) ( $row['id'] ?? 0 ) ) );
+                $tags = '';
+                foreach ( (array) ( $row['tags'] ?? array() ) as $t ) {
+                    $tags .= '<code style="background:#F3FCF4;border:1px solid #cdeccf;border-radius:3px;padding:1px 6px;margin:0 3px 3px 0;display:inline-block;">' . esc_html( $t ) . '</code>';
+                }
+                echo '<tr>';
+                echo '<td>' . esc_html( $who ) . '</td>';
+                echo '<td><code>' . esc_html( (string) ( $row['lifecycle'] ?? '' ) ) . '</code></td>';
+                echo '<td>' . $tags . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo '<td>' . esc_html( ! empty( $row['time'] ) ? human_time_diff( (int) $row['time'] ) . ' ' . __( 'ago', 'smart-crm-pro' ) : '' ) . '</td>';
+                echo '</tr>';
+            }
+            echo '</tbody></table>';
+        }
+    }
+
     private function tabs(): array {
         return array(
+            'tags' => array(
+                'label'  => __( 'Tags & Flow', 'smart-crm-pro' ),
+                'render' => function () {
+                    $this->render_tags_overview();
+                },
+                'test'   => null,
+            ),
             'activecampaign' => array(
                 'label'  => __( 'ActiveCampaign', 'smart-crm-pro' ),
                 'render' => function () {
@@ -138,9 +248,9 @@ class SCRM_Pro_Settings {
         }
         $tabs    = $this->tabs();
         // phpcs:ignore WordPress.Security.NonceVerification
-        $current = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'activecampaign';
+        $current = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'tags';
         if ( ! isset( $tabs[ $current ] ) ) {
-            $current = 'activecampaign';
+            $current = 'tags';
         }
         $tab_url = function ( $slug ) {
             return add_query_arg( array( 'page' => self::PAGE, 'tab' => $slug ), admin_url( 'admin.php' ) );

@@ -422,6 +422,23 @@ class SCRM_Pro_ServiceM8 {
     // ─── Outbound: CRM → ServiceM8 (create job from a lead) ──────────────────
 
     /**
+     * Auth headers for the ServiceM8 REST API. ServiceM8 private-app API keys
+     * authenticate via the X-API-Key header (the documented method); we also
+     * send HTTP Basic for older accounts that accepted the key as the Basic
+     * username. Sending both is harmless and lets either scheme satisfy the
+     * request. A 401 means the key is missing/invalid or the account plan has
+     * no REST API access.
+     */
+    private static function auth_headers( $api_key ) {
+        return array(
+            'X-API-Key'     => $api_key,
+            'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json',
+        );
+    }
+
+    /**
      * Push a Smart Forms lead into ServiceM8 as a new job. Returns the SM8
      * job UUID on success, WP_Error on failure. Stamps the returned job UUID
      * back onto the sfco_leads row so subsequent webhooks (job_started,
@@ -477,11 +494,7 @@ class SCRM_Pro_ServiceM8 {
 
         $response = wp_remote_post( self::SM8_API_BASE . 'job.json', array(
             'timeout' => 30,
-            'headers' => array(
-                'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
-                'Content-Type'  => 'application/json',
-                'Accept'        => 'application/json',
-            ),
+            'headers' => self::auth_headers( $api_key ),
             'body'    => wp_json_encode( $job ),
         ) );
 
@@ -490,7 +503,8 @@ class SCRM_Pro_ServiceM8 {
         }
         $code = (int) wp_remote_retrieve_response_code( $response );
         if ( $code < 200 || $code >= 300 ) {
-            return new WP_Error( 'scrm_sm8_http', sprintf( 'ServiceM8 returned HTTP %d', $code ), array( 'body' => wp_remote_retrieve_body( $response ) ) );
+            $body = (string) wp_remote_retrieve_body( $response );
+            return new WP_Error( 'scrm_sm8_http', sprintf( 'ServiceM8 returned HTTP %d: %s', $code, wp_strip_all_tags( substr( $body, 0, 200 ) ) ), array( 'body' => $body ) );
         }
 
         // SM8 returns the UUID in a header (x-record-uuid) for POSTs.
@@ -597,10 +611,7 @@ class SCRM_Pro_ServiceM8 {
 
         $response = wp_remote_get( self::SM8_API_BASE . 'job/' . rawurlencode( $job_id ) . '.json', array(
             'timeout' => 15,
-            'headers' => array(
-                'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
-                'Accept'        => 'application/json',
-            ),
+            'headers' => self::auth_headers( $api_key ),
         ) );
         if ( is_wp_error( $response ) ) {
             return false;
@@ -685,11 +696,7 @@ class SCRM_Pro_ServiceM8 {
 
         $response = wp_remote_post( self::SM8_API_BASE . 'jobactivity.json', array(
             'timeout' => 30,
-            'headers' => array(
-                'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
-                'Content-Type'  => 'application/json',
-                'Accept'        => 'application/json',
-            ),
+            'headers' => self::auth_headers( $api_key ),
             'body'    => wp_json_encode( $payload ),
         ) );
 
@@ -698,7 +705,8 @@ class SCRM_Pro_ServiceM8 {
         }
         $code = (int) wp_remote_retrieve_response_code( $response );
         if ( $code < 200 || $code >= 300 ) {
-            return new WP_Error( 'scrm_sm8_http', sprintf( 'ServiceM8 returned HTTP %d', $code ), array( 'body' => wp_remote_retrieve_body( $response ) ) );
+            $body = (string) wp_remote_retrieve_body( $response );
+            return new WP_Error( 'scrm_sm8_http', sprintf( 'ServiceM8 returned HTTP %d: %s', $code, wp_strip_all_tags( substr( $body, 0, 200 ) ) ), array( 'body' => $body ) );
         }
 
         $headers      = wp_remote_retrieve_headers( $response );
