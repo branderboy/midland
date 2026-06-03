@@ -36,9 +36,15 @@ class SRP_CRM_Integration {
 
     private function __construct() {
         // Action-based integration — other plugins fire these and we react.
-        add_action( 'sfco_lead_completed',       array( $this, 'handle_completed_lead' ), 10, 1 );
-        add_action( 'sfco_lead_status_changed',  array( $this, 'handle_status_change' ), 10, 3 );
-        add_action( 'scrm_pro_job_completed',    array( $this, 'handle_completed_lead' ), 10, 1 );
+        // handle_completed_lead runs at priority 20 — AFTER SCRM_Pro_Tags
+        // (priority 15) has stored the completion tags — so normalize_lead()
+        // reads the freshly-written tag set (incl. midland-job-completed-*)
+        // rather than the stale pre-completion set. SCRM_Pro_Tags is hooked on
+        // these same two completion actions; the status-change path (below)
+        // funnels into handle_completed_lead too, so it shares the bump.
+        add_action( 'sfco_lead_completed',       array( $this, 'handle_completed_lead' ), 20, 1 );
+        add_action( 'sfco_lead_status_changed',  array( $this, 'handle_status_change' ), 20, 3 );
+        add_action( 'scrm_pro_job_completed',    array( $this, 'handle_completed_lead' ), 20, 1 );
 
         // Job opened in ServiceM8 — mark the lead as "survey pending" so
         // the admin page can distinguish jobs awaiting completion from

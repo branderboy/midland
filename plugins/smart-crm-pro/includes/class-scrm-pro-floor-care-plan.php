@@ -88,47 +88,6 @@ class SCRM_Pro_Floor_Care_Plan {
         return $robots;
     }
 
-    /**
-     * Wrap the plan content in a minimal email-safe HTML shell with the
-     * Midland mint hero band on top, the CPT URL as a "view in browser"
-     * link, and the (240) 532-9097 CTA at the bottom.
-     */
-    private function build_plan_email_html( string $name, string $plan_content, string $plan_url, bool $is_emergency = false ): string {
-        $greeting = $name ? sprintf( 'Hi %s,', esc_html( $name ) ) : 'Hi,';
-        $view_url = esc_url( $plan_url );
-        $eyebrow  = $is_emergency
-            ? 'After your emergency service'
-            : 'Your personalized plan';
-        $intro = $is_emergency
-            ? 'Glad we got you back up and running. Now that the emergency is handled, here\'s a Floor Care Plan tailored to what we did and to what we saw on-site — designed to prevent the next one.'
-            : 'Thanks for reaching out. Below is a Floor Care Plan tailored to what you submitted. It outlines what we\'d recommend, how often we\'d visit, and what the investment looks like.';
-
-        return ''
-            . '<!doctype html><html><body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#0F1411;">'
-            . '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f3f4f6;padding:24px 0;"><tr><td align="center">'
-            . '<table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;">'
-            . '<tr><td style="background:#F3FCF4;padding:32px 28px;text-align:center;">'
-            . '<div style="color:#2F8137;font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">' . esc_html( $eyebrow ) . '</div>'
-            . '<h1 style="margin:0;color:#0F1411;font-size:30px;line-height:1.15;font-weight:800;">Midland Floor Care Plan</h1>'
-            . '</td></tr>'
-            . '<tr><td style="padding:28px;font-size:16px;line-height:1.6;color:#1d2933;">'
-            . '<p>' . $greeting . '</p>'
-            . '<p>' . esc_html( $intro ) . '</p>'
-            . '<p>If anything looks off, just reply to this email and we\'ll adjust before the visit.</p>'
-            . '<div style="border-top:1px solid #e2e8f0;margin:24px 0;"></div>'
-            . $plan_content
-            . '<p style="margin-top:24px;text-align:center;"><a href="' . $view_url . '" style="background:#43A94B;color:#fff;padding:14px 24px;border-radius:6px;text-decoration:none;font-weight:700;display:inline-block;">View in browser</a></p>'
-            . '</td></tr>'
-            . '<tr><td style="background:#0E2F14;color:#fff;padding:24px 28px;text-align:center;">'
-            . '<div style="color:#7CCE8E;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Questions?</div>'
-            . '<a href="tel:2405329097" style="color:#fff;font-size:22px;font-weight:800;text-decoration:none;">(240) 532-9097</a><br>'
-            . '<span style="color:#cfe4d6;font-size:13px;">support@midlandfloors.com · DC · Maryland · Northern Virginia</span>'
-            . '</td></tr>'
-            . '</table>'
-            . '</td></tr></table>'
-            . '</body></html>';
-    }
-
     public function on_status_changed( $lead, $old_status, $new_status ) {
         if ( 'completed' !== strtolower( (string) $new_status ) ) {
             return;
@@ -210,24 +169,10 @@ class SCRM_Pro_Floor_Care_Plan {
 
         $url = get_permalink( $post_id );
 
-        // Email the personalized plan to the customer. wp_mail's headers
-        // array sets HTML content type + From + Reply-To; Smart Forms'
-        // pre_wp_mail filter routes this through Resend's HTTPS API so
-        // delivery doesn't depend on cPanel SMTP. The plan content is
-        // already trusted HTML produced by render_plan() so it embeds
-        // directly in the email body.
-        $subject = sprintf(
-            $is_emergency
-                ? __( 'After your emergency service — your Midland Floor Care Plan', 'smart-crm-pro' )
-                : __( 'Your Midland Floor Care Plan', 'smart-crm-pro' ),
-            $name
-        );
-        $headers = array(
-            'Content-Type: text/html; charset=UTF-8',
-            'From: Midland Floors <support@midlandfloors.com>',
-            'Reply-To: Midland Floors <support@midlandfloors.com>',
-        );
-        wp_mail( $email, $subject, $this->build_plan_email_html( $name, $content, $url, $is_emergency ), $headers );
+        // NOTE: the WP side does NOT email the plan to the customer. AC owns the
+        // post-job email — it reads floor_care_plan_url (set below) as a
+        // fieldValue and links to the plan from its flow. Sending here too would
+        // double-email the customer the same plan.
 
         // Decorate the lead so the AC bridge picks up the URL as a fieldValue.
         // Objects in PHP are passed by handle through do_action, so this mutation
