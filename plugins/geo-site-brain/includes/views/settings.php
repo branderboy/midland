@@ -40,7 +40,31 @@ $selected     = GSB_Settings::indexed_post_types();
 			</tr>
 		</table>
 
-		<h2><?php esc_html_e( 'Vector storage', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'Advanced — optional', 'geo-site-brain' ); ?></span></h2>
+		<h2><?php esc_html_e( 'AI engines for live probing', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'optional', 'geo-site-brain' ); ?></span></h2>
+		<p class="description"><?php esc_html_e( 'Add a key for any engine to probe the real model on the AI Visibility screen and see exactly how it describes your business. Without these, that screen shows estimates. (ChatGPT uses your OpenAI key above.)', 'geo-site-brain' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="gsb_anthropic"><?php esc_html_e( 'Anthropic (Claude) key', 'geo-site-brain' ); ?></label></th>
+				<td><input type="password" id="gsb_anthropic" name="<?php echo esc_attr( $o . 'anthropic_api_key' ); ?>" value="" autocomplete="new-password" class="regular-text"
+					placeholder="<?php echo '' !== trim( (string) GSB_Settings::get( 'anthropic_api_key' ) ) ? esc_attr__( '•••••••• (saved — leave blank to keep)', 'geo-site-brain' ) : 'sk-ant-…'; ?>" /></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_gemini"><?php esc_html_e( 'Google Gemini key', 'geo-site-brain' ); ?></label></th>
+				<td><input type="password" id="gsb_gemini" name="<?php echo esc_attr( $o . 'gemini_api_key' ); ?>" value="" autocomplete="new-password" class="regular-text"
+					placeholder="<?php echo '' !== trim( (string) GSB_Settings::get( 'gemini_api_key' ) ) ? esc_attr__( '•••••••• (saved — leave blank to keep)', 'geo-site-brain' ) : 'AIza…'; ?>" /></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_perplexity"><?php esc_html_e( 'Perplexity key', 'geo-site-brain' ); ?></label></th>
+				<td><input type="password" id="gsb_perplexity" name="<?php echo esc_attr( $o . 'perplexity_api_key' ); ?>" value="" autocomplete="new-password" class="regular-text"
+					placeholder="<?php echo '' !== trim( (string) GSB_Settings::get( 'perplexity_api_key' ) ) ? esc_attr__( '•••••••• (saved — leave blank to keep)', 'geo-site-brain' ) : 'pplx-…'; ?>" />
+					<p class="description"><?php esc_html_e( 'Perplexity is web-grounded, so it best reflects real AI-search visibility.', 'geo-site-brain' ); ?></p></td>
+			</tr>
+		</table>
+
+		<details class="gsb-advanced">
+		<summary><?php esc_html_e( 'Advanced — storage & indexing (optional)', 'geo-site-brain' ); ?></summary>
+
+		<h2><?php esc_html_e( 'Vector storage', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'optional', 'geo-site-brain' ); ?></span></h2>
 		<p class="description">
 			<strong><?php esc_html_e( 'By default, embeddings are stored locally in your WordPress database — no external service, no server extensions, nothing to install.', 'geo-site-brain' ); ?></strong>
 			<?php esc_html_e( 'Neon (serverless Postgres + pgvector) is an optional upgrade for very large sites. If it is off or unreachable, GEO Site Brain uses the local store automatically, so the plugin always works.', 'geo-site-brain' ); ?>
@@ -100,8 +124,10 @@ $selected     = GSB_Settings::indexed_post_types();
 			</tr>
 		</table>
 
+		</details>
+
 		<h2><?php esc_html_e( 'Business context', 'geo-site-brain' ); ?></h2>
-		<p class="description"><?php esc_html_e( 'Used by the scoring and recommendations engines to judge entity, service and location coverage.', 'geo-site-brain' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Tells the engine who you are. Used to map your services, service areas and AI visibility.', 'geo-site-brain' ); ?></p>
 		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row"><label for="gsb_biz"><?php esc_html_e( 'Business name', 'geo-site-brain' ); ?></label></th>
@@ -114,6 +140,47 @@ $selected     = GSB_Settings::indexed_post_types();
 			<tr>
 				<th scope="row"><label for="gsb_loc"><?php esc_html_e( 'Service locations', 'geo-site-brain' ); ?></label></th>
 				<td><textarea id="gsb_loc" name="<?php echo esc_attr( $o . 'business_locations' ); ?>" rows="5" class="large-text" placeholder="<?php esc_attr_e( "One per line, e.g.\nWashington DC\nBethesda\nArlington", 'geo-site-brain' ); ?>"><?php echo esc_textarea( GSB_Settings::get( 'business_locations' ) ); ?></textarea></td>
+			</tr>
+		</table>
+
+		<h2><?php esc_html_e( 'Competitors', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'optional', 'geo-site-brain' ); ?></span></h2>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="gsb_comp"><?php esc_html_e( 'Competitor websites', 'geo-site-brain' ); ?></label></th>
+				<td><textarea id="gsb_comp" name="<?php echo esc_attr( $o . 'competitor_urls' ); ?>" rows="4" class="large-text" placeholder="https://competitor-one.com&#10;https://competitor-two.com"><?php echo esc_textarea( GSB_Settings::get( 'competitor_urls' ) ); ?></textarea>
+					<p class="description"><?php esc_html_e( 'One homepage URL per line (up to 5). Analysed on the Competitors screen.', 'geo-site-brain' ); ?></p></td>
+			</tr>
+		</table>
+
+		<h2><?php esc_html_e( 'Monitoring & alerts', 'geo-site-brain' ); ?></h2>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Weekly email digest', 'geo-site-brain' ); ?></th>
+				<td><label><input type="checkbox" name="<?php echo esc_attr( $o . 'enable_digest' ); ?>" value="1" <?php checked( 1, (int) GSB_Settings::get( 'enable_digest' ) ); ?> />
+					<?php esc_html_e( 'Email me my AI Visibility score each week, and alert me when it drops', 'geo-site-brain' ); ?></label></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_digest_email"><?php esc_html_e( 'Send digest to', 'geo-site-brain' ); ?></label></th>
+				<td><input type="email" id="gsb_digest_email" name="<?php echo esc_attr( $o . 'digest_email' ); ?>" value="<?php echo esc_attr( GSB_Settings::get( 'digest_email' ) ); ?>" class="regular-text" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" />
+					<button type="button" class="button" id="gsb-send-digest"><?php esc_html_e( 'Send test now', 'geo-site-brain' ); ?></button>
+					<span class="gsb-test-result" data-for="digest"></span></td>
+			</tr>
+		</table>
+
+		<h2><?php esc_html_e( 'White-label (for agencies)', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'optional', 'geo-site-brain' ); ?></span></h2>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="gsb_agency"><?php esc_html_e( 'Agency / brand name', 'geo-site-brain' ); ?></label></th>
+				<td><input type="text" id="gsb_agency" name="<?php echo esc_attr( $o . 'agency_name' ); ?>" value="<?php echo esc_attr( GSB_Settings::get( 'agency_name' ) ); ?>" class="regular-text" />
+					<p class="description"><?php esc_html_e( 'Shown on client-facing Reports.', 'geo-site-brain' ); ?></p></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_logo"><?php esc_html_e( 'Logo URL', 'geo-site-brain' ); ?></label></th>
+				<td><input type="url" id="gsb_logo" name="<?php echo esc_attr( $o . 'agency_logo' ); ?>" value="<?php echo esc_attr( GSB_Settings::get( 'agency_logo' ) ); ?>" class="regular-text" placeholder="https://…/logo.png" /></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_report_contact"><?php esc_html_e( 'Report footer / contact', 'geo-site-brain' ); ?></label></th>
+				<td><textarea id="gsb_report_contact" name="<?php echo esc_attr( $o . 'report_contact' ); ?>" rows="2" class="large-text"><?php echo esc_textarea( GSB_Settings::get( 'report_contact' ) ); ?></textarea></td>
 			</tr>
 		</table>
 

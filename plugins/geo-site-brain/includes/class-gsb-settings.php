@@ -22,6 +22,13 @@ class GSB_Settings {
 		return array(
 			'openai_api_key'    => '',
 			'chat_model'        => 'gpt-4o-mini',
+			// Optional keys for LIVE per-engine probing (Visibility screen).
+			'anthropic_api_key' => '',
+			'gemini_api_key'    => '',
+			'perplexity_api_key'=> '',
+			'anthropic_model'   => 'claude-3-5-haiku-latest',
+			'gemini_model'      => 'gemini-1.5-flash',
+			'perplexity_model'  => 'sonar',
 			'neon_enabled'      => 0,
 			'neon_dsn'          => '',          // postgresql://user:pass@host/db?sslmode=require
 			'post_types'        => array( 'page', 'post' ),
@@ -32,6 +39,13 @@ class GSB_Settings {
 			'business_name'     => '',
 			'business_locations'=> '',          // newline-separated cities/regions
 			'core_services'     => '',          // newline-separated services
+			// Phase 3 — competitors, monitoring, white-label.
+			'competitor_urls'   => '',          // newline-separated competitor homepages
+			'enable_digest'     => 0,
+			'digest_email'      => '',
+			'agency_name'       => '',
+			'agency_logo'       => '',
+			'report_contact'    => '',
 		);
 	}
 
@@ -83,6 +97,18 @@ class GSB_Settings {
 	/** Core services as an array of trimmed strings. */
 	public static function services() {
 		return self::lines( (string) self::get( 'core_services' ) );
+	}
+
+	/** Competitor homepage URLs as an array. */
+	public static function competitor_urls() {
+		$out = array();
+		foreach ( self::lines( (string) self::get( 'competitor_urls' ) ) as $u ) {
+			$u = esc_url_raw( $u );
+			if ( $u ) {
+				$out[] = $u;
+			}
+		}
+		return array_slice( array_unique( $out ), 0, 5 );
 	}
 
 	private static function lines( $text ) {

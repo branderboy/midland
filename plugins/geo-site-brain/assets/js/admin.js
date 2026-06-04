@@ -44,9 +44,15 @@
 				setBar( pct, GSB.strings.scanning + ' ' + p.done + ' / ' + total );
 				refreshStats();
 				if ( p.complete ) {
-					// Embed, then rebuild recs so duplicate/overlap detection
-					// (which needs vectors) runs against the fresh embeddings.
-					embedLoop( function () { post( 'gsb_rebuild_recs' ); } );
+					// Embed, then build the business understanding (entities,
+					// knowledge graph, AI visibility, fix queue) from real vectors.
+					setBar( pct, GSB.strings.embedding );
+					embedLoop( function () {
+						setBar( 100, GSB.strings.understanding || 'Building knowledge…' );
+						post( 'gsb_finalize' ).always( function () {
+							setBar( 100, GSB.strings.done );
+						} );
+					} );
 				} else {
 					scanLoop( total );
 				}
@@ -127,6 +133,135 @@
 		var $li = $( this ).closest( '.gsb-rec' );
 		post( 'gsb_rec_status', { id: $li.data( 'id' ), status: $( this ).data( 'status' ) } ).always( function () {
 			$li.slideUp( 150, function () { $( this ).remove(); } );
+		} );
+	} );
+
+	/* --------------------------------------------------------- apply a fix */
+
+	$( document ).on( 'click', '.gsb-apply-fix', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this );
+		var $li = $btn.closest( '.gsb-rec' );
+		var $result = $li.find( '.gsb-fix-result' );
+		$btn.prop( 'disabled', true ).text( '…' );
+		post( 'gsb_apply_fix', { id: $li.data( 'id' ) } ).done( function ( res ) {
+			if ( res && res.success ) {
+				var html = $( '<span></span>' ).text( res.data.message );
+				$result.empty().addClass( 'gsb-ok' ).append( html );
+				if ( res.data.edit_url ) {
+					$result.append( ' ' ).append( $( '<a class="button button-small"></a>' ).attr( 'href', res.data.edit_url ).text( 'Open editor' ) );
+				}
+				if ( ! res.data.manual ) {
+					$btn.text( 'Applied ✓' );
+					$li.addClass( 'gsb-applied' );
+				} else {
+					$btn.prop( 'disabled', false ).text( 'Apply Fix' );
+				}
+			} else {
+				$result.addClass( 'gsb-bad' ).text( ( res && res.data && res.data.message ) || GSB.strings.error );
+				$btn.prop( 'disabled', false ).text( 'Apply Fix' );
+			}
+		} ).fail( function () {
+			$result.addClass( 'gsb-bad' ).text( GSB.strings.error );
+			$btn.prop( 'disabled', false ).text( 'Apply Fix' );
+		} );
+	} );
+
+	/* ------------------------------------------------- live per-engine probe */
+
+	$( document ).on( 'click', '.gsb-probe', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this );
+		var engine = $btn.data( 'engine' );
+		var $status = $( '.gsb-probe-status[data-engine="' + engine + '"]' ).text( GSB.strings.thinking ).removeClass( 'gsb-bad' );
+		$btn.prop( 'disabled', true );
+		post( 'gsb_probe', { engine: engine } ).done( function ( res ) {
+			if ( res && res.success ) {
+				$status.text( GSB.strings.done );
+				location.reload();
+			} else {
+				$status.addClass( 'gsb-bad' ).text( ( res && res.data && res.data.message ) || GSB.strings.error );
+				$btn.prop( 'disabled', false );
+			}
+		} ).fail( function () {
+			$status.addClass( 'gsb-bad' ).text( GSB.strings.error );
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
+	$( '#gsb-probe-all' ).on( 'click', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this ).prop( 'disabled', true ).text( GSB.strings.thinking );
+		post( 'gsb_probe', { engine: 'all' } ).done( function ( res ) {
+			if ( res && res.success ) {
+				location.reload();
+			} else {
+				$btn.prop( 'disabled', false ).text( 'Run live probe on all engines' );
+				alert( ( res && res.data && res.data.message ) || GSB.strings.error );
+			}
+		} ).fail( function () {
+			$btn.prop( 'disabled', false ).text( 'Run live probe on all engines' );
+		} );
+	} );
+
+	/* ------------------------------------------------------- competitors */
+
+	$( '#gsb-run-competitors' ).on( 'click', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this ).prop( 'disabled', true );
+		var $st = $( '#gsb-comp-status' ).text( GSB.strings.thinking ).removeClass( 'gsb-bad' );
+		post( 'gsb_run_competitors' ).done( function ( res ) {
+			if ( res && res.success ) {
+				$st.text( GSB.strings.done );
+				location.reload();
+			} else {
+				$st.addClass( 'gsb-bad' ).text( ( res && res.data && res.data.message ) || GSB.strings.error );
+				$btn.prop( 'disabled', false );
+			}
+		} ).fail( function () {
+			$st.addClass( 'gsb-bad' ).text( GSB.strings.error );
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
+	/* ----------------------------------------------------- send test digest */
+
+	$( '#gsb-send-digest' ).on( 'click', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this ).prop( 'disabled', true );
+		var $out = $( '.gsb-test-result[data-for="digest"]' ).text( '…' ).removeClass( 'gsb-ok gsb-bad' );
+		post( 'gsb_send_digest' ).done( function ( res ) {
+			if ( res && res.success ) {
+				$out.addClass( 'gsb-ok' ).text( res.data.message );
+			} else {
+				$out.addClass( 'gsb-bad' ).text( ( res && res.data && res.data.message ) || GSB.strings.error );
+			}
+		} ).fail( function () {
+			$out.addClass( 'gsb-bad' ).text( GSB.strings.error );
+		} ).always( function () {
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
+	/* ----------------------------------------------- AI visibility narrative */
+
+	$( document ).on( 'click', '.gsb-narrative', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this );
+		var engine = $btn.data( 'engine' );
+		var $out = $( '.gsb-narrative-out[data-engine="' + engine + '"]' );
+		$out.text( GSB.strings.thinking );
+		$btn.prop( 'disabled', true );
+		post( 'gsb_narrative', { engine: engine } ).done( function ( res ) {
+			if ( res && res.success ) {
+				$out.text( res.data.narrative );
+			} else {
+				$out.text( ( res && res.data && res.data.message ) || GSB.strings.error );
+			}
+		} ).fail( function () {
+			$out.text( GSB.strings.error );
+		} ).always( function () {
+			$btn.prop( 'disabled', false );
 		} );
 	} );
 

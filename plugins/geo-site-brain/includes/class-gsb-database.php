@@ -71,13 +71,81 @@ class GSB_Database {
 			priority varchar(10) DEFAULT 'medium',
 			title varchar(255) DEFAULT NULL,
 			detail longtext DEFAULT NULL,
+			impact varchar(10) DEFAULT 'medium',
+			reason text DEFAULT NULL,
+			difficulty varchar(10) DEFAULT 'medium',
+			fix_action varchar(40) DEFAULT 'manual',
+			fix_payload longtext DEFAULT NULL,
 			status varchar(20) DEFAULT 'open',
 			source varchar(20) DEFAULT 'heuristic',
+			applied_at datetime DEFAULT NULL,
 			created_at datetime DEFAULT NULL,
 			PRIMARY KEY (id),
 			KEY post_id (post_id),
 			KEY rec_type (rec_type),
 			KEY status (status)
+		) {$charset};" );
+
+		$entities = self::table( 'entities' );
+		dbDelta( "CREATE TABLE {$entities} (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			entity_type varchar(30) DEFAULT NULL,
+			name varchar(255) DEFAULT NULL,
+			slug varchar(191) DEFAULT NULL,
+			description longtext DEFAULT NULL,
+			attributes longtext DEFAULT NULL,
+			confidence int DEFAULT 50,
+			status varchar(20) DEFAULT 'found',
+			source_post_id bigint(20) DEFAULT 0,
+			created_at datetime DEFAULT NULL,
+			updated_at datetime DEFAULT NULL,
+			PRIMARY KEY (id),
+			UNIQUE KEY type_slug (entity_type, slug),
+			KEY entity_type (entity_type),
+			KEY status (status)
+		) {$charset};" );
+
+		$rels = self::table( 'relationships' );
+		dbDelta( "CREATE TABLE {$rels} (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			from_id bigint(20) NOT NULL DEFAULT 0,
+			to_id bigint(20) NOT NULL DEFAULT 0,
+			rel_type varchar(40) DEFAULT NULL,
+			strength int DEFAULT 50,
+			status varchar(20) DEFAULT 'found',
+			evidence_post_id bigint(20) DEFAULT 0,
+			created_at datetime DEFAULT NULL,
+			PRIMARY KEY (id),
+			KEY from_id (from_id),
+			KEY to_id (to_id),
+			KEY rel_type (rel_type)
+		) {$charset};" );
+
+		$vis = self::table( 'visibility' );
+		dbDelta( "CREATE TABLE {$vis} (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			engine varchar(20) DEFAULT NULL,
+			visibility_score int DEFAULT 0,
+			confidence_score int DEFAULT 0,
+			knowledge_score int DEFAULT 0,
+			recommendation_score int DEFAULT 0,
+			summary longtext DEFAULT NULL,
+			details longtext DEFAULT NULL,
+			computed_at datetime DEFAULT NULL,
+			PRIMARY KEY (id),
+			UNIQUE KEY engine (engine)
+		) {$charset};" );
+
+		$comp = self::table( 'competitors' );
+		dbDelta( "CREATE TABLE {$comp} (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			url varchar(191) DEFAULT NULL,
+			name varchar(255) DEFAULT NULL,
+			snapshot longtext DEFAULT NULL,
+			ai_score int DEFAULT 0,
+			scored_at datetime DEFAULT NULL,
+			PRIMARY KEY (id),
+			UNIQUE KEY url (url)
 		) {$charset};" );
 
 		$logs = self::table( 'logs' );
@@ -309,6 +377,11 @@ class GSB_Database {
 			'priority'   => $data['priority'] ?? 'medium',
 			'title'      => $data['title'] ?? '',
 			'detail'     => $data['detail'] ?? '',
+			'impact'     => $data['impact'] ?? ( $data['priority'] ?? 'medium' ),
+			'reason'     => $data['reason'] ?? '',
+			'difficulty' => $data['difficulty'] ?? 'medium',
+			'fix_action' => $data['fix_action'] ?? 'manual',
+			'fix_payload'=> isset( $data['fix_payload'] ) ? wp_json_encode( $data['fix_payload'] ) : null,
 			'status'     => 'open',
 			'source'     => $data['source'] ?? 'heuristic',
 			'created_at' => current_time( 'mysql' ),
@@ -316,11 +389,25 @@ class GSB_Database {
 		return (int) $wpdb->insert_id;
 	}
 
+	public static function get_recommendation( $id ) {
+		global $wpdb;
+		$table = self::table( 'recommendations' );
+		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	public static function mark_recommendation_applied( $id ) {
+		global $wpdb;
+		$wpdb->update( self::table( 'recommendations' ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			array( 'status' => 'done', 'applied_at' => current_time( 'mysql' ) ),
+			array( 'id' => (int) $id )
+		);
+	}
+
 	public static function get_recommendations( $status = 'open' ) {
 		global $wpdb;
 		$table = self::table( 'recommendations' );
 		return $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			"SELECT * FROM {$table} WHERE status = %s ORDER BY FIELD(priority,'high','medium','low'), id DESC",
+			"SELECT * FROM {$table} WHERE status = %s ORDER BY FIELD(impact,'critical','high','medium','low'), FIELD(priority,'high','medium','low'), id DESC",
 			$status
 		) );
 	}
@@ -354,5 +441,162 @@ class GSB_Database {
 			wp_json_encode( $value ),
 			current_time( 'mysql' )
 		) );
+	}
+
+	/* ------------------------------------------------------------- entities */
+
+	/** Upsert an entity keyed by (entity_type, slug). Returns the entity id. */
+	public static function upsert_entity( array $data ) {
+		global $wpdb;
+		$table = self::table( 'entities' );
+		$now   = current_time( 'mysql' );
+		$slug  = sanitize_title( $data['slug'] ?? $data['name'] ?? '' );
+
+		$existing = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"SELECT id FROM {$table} WHERE entity_type = %s AND slug = %s",
+			$data['entity_type'],
+			$slug
+		) );
+
+		$row = array(
+			'entity_type'    => $data['entity_type'],
+			'name'           => $data['name'] ?? '',
+			'slug'           => $slug,
+			'description'    => $data['description'] ?? '',
+			'attributes'     => isset( $data['attributes'] ) ? wp_json_encode( $data['attributes'] ) : null,
+			'confidence'     => (int) ( $data['confidence'] ?? 50 ),
+			'status'         => $data['status'] ?? 'found',
+			'source_post_id' => (int) ( $data['source_post_id'] ?? 0 ),
+			'updated_at'     => $now,
+		);
+		if ( $existing ) {
+			$wpdb->update( $table, $row, array( 'id' => $existing ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return (int) $existing;
+		}
+		$row['created_at'] = $now;
+		$wpdb->insert( $table, $row ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (int) $wpdb->insert_id;
+	}
+
+	public static function get_entities( $type = null, $status = null ) {
+		global $wpdb;
+		$table = self::table( 'entities' );
+		$where = array(); $args = array();
+		if ( $type )   { $where[] = 'entity_type = %s'; $args[] = $type; }
+		if ( $status ) { $where[] = 'status = %s'; $args[] = $status; }
+		$sql = "SELECT * FROM {$table}";
+		if ( $where ) {
+			$sql .= ' WHERE ' . implode( ' AND ', $where );
+		}
+		$sql .= ' ORDER BY entity_type, name';
+		if ( $args ) {
+			return $wpdb->get_results( $wpdb->prepare( $sql, $args ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL
+		}
+		return $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	public static function entity_counts() {
+		global $wpdb;
+		$table = self::table( 'entities' );
+		$rows  = $wpdb->get_results( "SELECT entity_type, COUNT(*) c FROM {$table} WHERE status IN ('found','inferred') GROUP BY entity_type" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$out = array();
+		foreach ( $rows as $r ) {
+			$out[ $r->entity_type ] = (int) $r->c;
+		}
+		return $out;
+	}
+
+	public static function clear_entities() {
+		global $wpdb;
+		$wpdb->query( 'TRUNCATE TABLE ' . self::table( 'entities' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( 'TRUNCATE TABLE ' . self::table( 'relationships' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/* -------------------------------------------------------- relationships */
+
+	public static function add_relationship( $from_id, $to_id, $rel_type, $strength = 50, $status = 'found', $evidence_post_id = 0 ) {
+		global $wpdb;
+		$wpdb->insert( self::table( 'relationships' ), array( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			'from_id'          => (int) $from_id,
+			'to_id'            => (int) $to_id,
+			'rel_type'         => $rel_type,
+			'strength'         => (int) $strength,
+			'status'           => $status,
+			'evidence_post_id' => (int) $evidence_post_id,
+			'created_at'       => current_time( 'mysql' ),
+		) );
+		return (int) $wpdb->insert_id;
+	}
+
+	public static function get_relationships( $rel_type = null ) {
+		global $wpdb;
+		$table = self::table( 'relationships' );
+		if ( $rel_type ) {
+			return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE rel_type = %s", $rel_type ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		}
+		return $wpdb->get_results( "SELECT * FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/* ---------------------------------------------------------- visibility */
+
+	public static function save_visibility( $engine, array $scores, $summary, array $details ) {
+		global $wpdb;
+		$table = self::table( 'visibility' );
+		$now   = current_time( 'mysql' );
+		$existing = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE engine = %s", $engine ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row = array(
+			'engine'               => $engine,
+			'visibility_score'     => (int) ( $scores['visibility'] ?? 0 ),
+			'confidence_score'     => (int) ( $scores['confidence'] ?? 0 ),
+			'knowledge_score'      => (int) ( $scores['knowledge'] ?? 0 ),
+			'recommendation_score' => (int) ( $scores['recommendation'] ?? 0 ),
+			'summary'              => (string) $summary,
+			'details'              => wp_json_encode( $details ),
+			'computed_at'          => $now,
+		);
+		if ( $existing ) {
+			$wpdb->update( $table, $row, array( 'id' => $existing ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		} else {
+			$wpdb->insert( $table, $row ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		}
+	}
+
+	public static function get_visibility() {
+		global $wpdb;
+		$table = self::table( 'visibility' );
+		return $wpdb->get_results( "SELECT * FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/* --------------------------------------------------------- competitors */
+
+	public static function save_competitor( $url, $name, array $snapshot, $ai_score ) {
+		global $wpdb;
+		$table = self::table( 'competitors' );
+		$now   = current_time( 'mysql' );
+		$existing = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE url = %s", $url ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row = array(
+			'url'       => $url,
+			'name'      => $name,
+			'snapshot'  => wp_json_encode( $snapshot ),
+			'ai_score'  => (int) $ai_score,
+			'scored_at' => $now,
+		);
+		if ( $existing ) {
+			$wpdb->update( $table, $row, array( 'id' => $existing ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return (int) $existing;
+		}
+		$wpdb->insert( $table, $row ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (int) $wpdb->insert_id;
+	}
+
+	public static function get_competitors() {
+		global $wpdb;
+		$table = self::table( 'competitors' );
+		return $wpdb->get_results( "SELECT * FROM {$table} ORDER BY ai_score DESC" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	public static function delete_competitor( $id ) {
+		global $wpdb;
+		$wpdb->delete( self::table( 'competitors' ), array( 'id' => (int) $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 }

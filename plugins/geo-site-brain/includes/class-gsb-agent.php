@@ -49,27 +49,29 @@ class GSB_Agent {
 		}
 
 		$sources = $this->sources_from_matches( $matches );
+		$graph   = $this->graph_context();
 
-		if ( empty( $matches ) ) {
+		if ( empty( $matches ) && '' === $graph ) {
 			return array(
-				'answer'  => __( "I couldn't find anything in the indexed site content for that. Try running a full scan first, or this may be a topic the site doesn't cover yet (a Recommended addition).", 'geo-site-brain' ),
+				'answer'  => __( "There's no business knowledge yet. Scan your website first, then ask again.", 'geo-site-brain' ),
 				'sources' => array(),
 				'backend' => $backend,
 				'used_ai' => false,
 			);
 		}
 
-		// No model available → return the grounded retrieval directly.
+		// No model available → return the grounded knowledge directly.
 		if ( ! $openai->has_key() ) {
 			return array(
-				'answer'  => $this->retrieval_only_answer( $matches ),
+				'answer'  => ( $graph ? $graph . "\n\n" : '' ) . ( $matches ? $this->retrieval_only_answer( $matches ) : '' ),
 				'sources' => $sources,
 				'backend' => $backend,
 				'used_ai' => false,
 			);
 		}
 
-		$context = $this->build_context( $matches );
+		// The graph (business-level facts) leads; retrieved page passages support it.
+		$context = trim( $graph . "\n\n" . $this->build_context( $matches ) );
 		$answer  = $openai->chat( array(
 			array( 'role' => 'system', 'content' => $this->system_prompt() ),
 			array( 'role' => 'user', 'content' => "QUESTION:\n{$question}\n\nSITE CONTEXT (retrieved chunks):\n{$context}" ),
@@ -110,6 +112,57 @@ STRICT RULES — follow exactly:
    • Recommended addition — gaps, improvements, or content that is NOT on the site yet but should be. Mark these clearly as recommendations, never as existing facts.
 4. Be concrete and concise. When you reference a page, name it.
 5. If asked for things like 'what services does the site offer', list only services evidenced in the context.";
+	}
+
+	/**
+	 * A compact, business-language summary of the knowledge graph that leads
+	 * every answer, so the agent reasons about the business — not raw pages.
+	 */
+	private function graph_context() {
+		if ( ! class_exists( 'GSB_Database' ) ) {
+			return '';
+		}
+		$lines = array();
+
+		$biz = GSB_Database::get_entities( 'business' );
+		if ( $biz ) {
+			$b = $biz[0];
+			$lines[] = 'BUSINESS: ' . $b->name . ( $b->description ? ' — ' . wp_strip_all_tags( $b->description ) : '' );
+		}
+
+		$svc_found = $this->entity_names( 'service', array( 'found', 'inferred' ) );
+		if ( $svc_found ) {
+			$lines[] = 'SERVICES (found on site): ' . implode( ', ', $svc_found );
+		}
+		$svc_missing = $this->entity_names( 'service', array( 'recommended' ) );
+		if ( $svc_missing ) {
+			$lines[] = 'SERVICES (not on site yet / recommended): ' . implode( ', ', $svc_missing );
+		}
+		$loc_found = $this->entity_names( 'location', array( 'found', 'inferred' ) );
+		if ( $loc_found ) {
+			$lines[] = 'SERVICE AREAS (found): ' . implode( ', ', $loc_found );
+		}
+		$loc_missing = $this->entity_names( 'location', array( 'recommended' ) );
+		if ( $loc_missing ) {
+			$lines[] = 'SERVICE AREAS (recommended): ' . implode( ', ', $loc_missing );
+		}
+
+		$counts = GSB_Database::entity_counts();
+		$lines[] = sprintf( 'KNOWLEDGE: %d FAQs, %d testimonials, %d authors, %d case studies on file.',
+			(int) ( $counts['faq'] ?? 0 ), (int) ( $counts['testimonial'] ?? 0 ),
+			(int) ( $counts['author'] ?? 0 ), (int) ( $counts['case_study'] ?? 0 ) );
+
+		return empty( $lines ) ? '' : "BUSINESS KNOWLEDGE GRAPH:\n" . implode( "\n", $lines );
+	}
+
+	private function entity_names( $type, $statuses ) {
+		$out = array();
+		foreach ( GSB_Database::get_entities( $type ) as $e ) {
+			if ( in_array( $e->status, $statuses, true ) ) {
+				$out[] = $e->name;
+			}
+		}
+		return array_slice( $out, 0, 40 );
 	}
 
 	private function build_context( $matches ) {

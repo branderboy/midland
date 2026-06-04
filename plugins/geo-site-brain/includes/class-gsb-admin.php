@@ -35,10 +35,16 @@ class GSB_Admin {
 			'gsb_start_scan'   => 'ajax_start_scan',
 			'gsb_scan_step'    => 'ajax_scan_step',
 			'gsb_embed_step'   => 'ajax_embed_step',
+			'gsb_finalize'     => 'ajax_finalize',
 			'gsb_progress'     => 'ajax_progress',
 			'gsb_reindex_post' => 'ajax_reindex_post',
 			'gsb_rebuild_recs' => 'ajax_rebuild_recs',
 			'gsb_rec_status'   => 'ajax_rec_status',
+			'gsb_apply_fix'    => 'ajax_apply_fix',
+			'gsb_narrative'    => 'ajax_narrative',
+			'gsb_probe'        => 'ajax_probe',
+			'gsb_run_competitors' => 'ajax_run_competitors',
+			'gsb_send_digest'  => 'ajax_send_digest',
 			'gsb_test_openai'  => 'ajax_test_openai',
 			'gsb_test_neon'    => 'ajax_test_neon',
 			'gsb_chat'         => 'ajax_chat',
@@ -64,12 +70,16 @@ class GSB_Admin {
 		// Ask → Setup — instead of developer nouns. Slugs are unchanged so links,
 		// bookmarks and AJAX keep working.
 		$pages = array(
-			'geo-site-brain'      => array( __( 'Site Brain', 'geo-site-brain' ), 'view_dashboard' ),
-			'gsb-scan'            => array( __( 'Scan Site', 'geo-site-brain' ), 'view_scan' ),
-			'gsb-scores'          => array( __( 'GEO Scorecard', 'geo-site-brain' ), 'view_scores' ),
+			'geo-site-brain'      => array( __( 'Dashboard', 'geo-site-brain' ), 'view_dashboard' ),
+			'gsb-knowledge-graph' => array( __( 'Knowledge Graph', 'geo-site-brain' ), 'view_knowledge_graph' ),
+			'gsb-scan'            => array( __( 'Scan Website', 'geo-site-brain' ), 'view_scan' ),
+			'gsb-visibility'      => array( __( 'AI Visibility Gaps', 'geo-site-brain' ), 'view_visibility' ),
 			'gsb-recommendations' => array( __( 'Fix Queue', 'geo-site-brain' ), 'view_recommendations' ),
-			'gsb-chat'            => array( __( 'Ask the Site', 'geo-site-brain' ), 'view_chat' ),
-			'gsb-settings'        => array( __( 'Setup', 'geo-site-brain' ), 'view_settings' ),
+			'gsb-chat'            => array( __( 'Ask My Website', 'geo-site-brain' ), 'view_chat' ),
+			'gsb-competitors'     => array( __( 'Competitors', 'geo-site-brain' ), 'view_competitors' ),
+			'gsb-reports'         => array( __( 'Reports', 'geo-site-brain' ), 'view_reports' ),
+			'gsb-scores'          => array( __( 'Page Scorecard', 'geo-site-brain' ), 'view_scores' ),
+			'gsb-settings'        => array( __( 'Settings', 'geo-site-brain' ), 'view_settings' ),
 		);
 		foreach ( $pages as $slug => $cfg ) {
 			add_submenu_page( 'geo-site-brain', $cfg[0], $cfg[0], self::CAP, $slug, array( $this, $cfg[1] ) );
@@ -84,9 +94,15 @@ class GSB_Admin {
 		// Secrets: preserve the stored value when the field is submitted empty so
 		// saving the form doesn't wipe a configured key.
 		register_setting( self::GROUP, $o . 'openai_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
+		register_setting( self::GROUP, $o . 'anthropic_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
+		register_setting( self::GROUP, $o . 'gemini_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
+		register_setting( self::GROUP, $o . 'perplexity_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
 		register_setting( self::GROUP, $o . 'neon_dsn', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
 
 		register_setting( self::GROUP, $o . 'chat_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'anthropic_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'gemini_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'perplexity_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
 		register_setting( self::GROUP, $o . 'neon_enabled', array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
 		register_setting( self::GROUP, $o . 'post_types', array( 'type' => 'array', 'sanitize_callback' => array( $this, 'sanitize_post_types' ) ) );
 		register_setting( self::GROUP, $o . 'chunk_max_chars', array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
@@ -96,6 +112,14 @@ class GSB_Admin {
 		register_setting( self::GROUP, $o . 'business_name', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
 		register_setting( self::GROUP, $o . 'business_locations', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
 		register_setting( self::GROUP, $o . 'core_services', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+
+		// Phase 3 — competitors, monitoring, white-label.
+		register_setting( self::GROUP, $o . 'competitor_urls', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+		register_setting( self::GROUP, $o . 'enable_digest', array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+		register_setting( self::GROUP, $o . 'digest_email', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_email' ) );
+		register_setting( self::GROUP, $o . 'agency_name', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'agency_logo', array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
+		register_setting( self::GROUP, $o . 'report_contact', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
 	}
 
 	/**
@@ -128,13 +152,16 @@ class GSB_Admin {
 		}
 		wp_enqueue_style( 'gsb-admin', GSB_PLUGIN_URL . 'assets/css/admin.css', array(), GSB_VERSION );
 		wp_enqueue_script( 'gsb-admin', GSB_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery' ), GSB_VERSION, true );
+		// Knowledge-graph map renderer (dependency-free; no-ops without #gsb-graph).
+		wp_enqueue_script( 'gsb-graph', GSB_PLUGIN_URL . 'assets/js/graph.js', array(), GSB_VERSION, true );
 		wp_localize_script( 'gsb-admin', 'GSB', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( self::NONCE ),
 			'strings' => array(
-				'scanning'  => __( 'Scanning…', 'geo-site-brain' ),
-				'embedding' => __( 'Generating embeddings…', 'geo-site-brain' ),
-				'done'      => __( 'Done.', 'geo-site-brain' ),
+				'scanning'      => __( 'Reading your website…', 'geo-site-brain' ),
+				'embedding'     => __( 'Building knowledge…', 'geo-site-brain' ),
+				'understanding' => __( 'Mapping your business…', 'geo-site-brain' ),
+				'done'          => __( 'Done.', 'geo-site-brain' ),
 				'thinking'  => __( 'Thinking…', 'geo-site-brain' ),
 				'error'     => __( 'Something went wrong.', 'geo-site-brain' ),
 			),
@@ -194,8 +221,81 @@ class GSB_Admin {
 
 	public function ajax_rebuild_recs() {
 		$this->guard();
-		GSB_Recommendations::rebuild();
+		GSB_Knowledge_Graph::rebuild_all();
 		wp_send_json_success( array( 'count' => count( GSB_Database::get_recommendations( 'open' ) ) ) );
+	}
+
+	/**
+	 * Post-scan "understanding" pass: build entities, graph, visibility + fixes.
+	 */
+	public function ajax_finalize() {
+		$this->guard();
+		GSB_Knowledge_Graph::rebuild_all();
+		wp_send_json_success( array(
+			'entities' => array_sum( GSB_Database::entity_counts() ),
+			'fixes'    => count( GSB_Database::get_recommendations( 'open' ) ),
+		) );
+	}
+
+	public function ajax_apply_fix() {
+		$this->guard();
+		$id  = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+		$res = GSB_Fixes::apply( $id );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( $res );
+	}
+
+	/**
+	 * Run a live probe against a real model (or all engines that have keys).
+	 */
+	public function ajax_probe() {
+		$this->guard();
+		$engine = isset( $_POST['engine'] ) ? sanitize_key( wp_unslash( $_POST['engine'] ) ) : '';
+		if ( 'all' === $engine ) {
+			$n = GSB_Visibility::probe_all();
+			if ( 0 === $n ) {
+				wp_send_json_error( array( 'message' => __( 'No engine keys configured. Add at least one in Settings.', 'geo-site-brain' ) ) );
+			}
+			wp_send_json_success( array( 'probed' => $n ) );
+		}
+		$res = GSB_Visibility::probe( $engine );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( $res );
+	}
+
+	public function ajax_run_competitors() {
+		$this->guard();
+		if ( empty( GSB_Settings::competitor_urls() ) ) {
+			wp_send_json_error( array( 'message' => __( 'Add competitor URLs in Settings first.', 'geo-site-brain' ) ) );
+		}
+		$n = GSB_Competitors::run();
+		wp_send_json_success( array( 'analysed' => $n ) );
+	}
+
+	public function ajax_send_digest() {
+		$this->guard();
+		$res = GSB_Monitor::send_digest( true );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( array( 'message' => __( 'Digest email sent.', 'geo-site-brain' ) ) );
+	}
+
+	public function ajax_narrative() {
+		$this->guard();
+		$engine = isset( $_POST['engine'] ) ? sanitize_key( wp_unslash( $_POST['engine'] ) ) : '';
+		if ( ! in_array( $engine, GSB_Visibility::ENGINES, true ) ) {
+			wp_send_json_error( array( 'message' => __( 'Unknown engine.', 'geo-site-brain' ) ) );
+		}
+		$res = GSB_Visibility::narrative( $engine );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( array( 'narrative' => $res ) );
 	}
 
 	public function ajax_rec_status() {
@@ -241,10 +341,14 @@ class GSB_Admin {
 	/* --------------------------------------------------------------- views */
 
 	public function view_dashboard() { $this->render( 'dashboard' ); }
+	public function view_knowledge_graph() { $this->render( 'knowledge-graph' ); }
 	public function view_scan() { $this->render( 'scan' ); }
+	public function view_visibility() { $this->render( 'visibility' ); }
 	public function view_scores() { $this->render( 'scores' ); }
 	public function view_recommendations() { $this->render( 'recommendations' ); }
 	public function view_chat() { $this->render( 'chat' ); }
+	public function view_competitors() { $this->render( 'competitors' ); }
+	public function view_reports() { $this->render( 'reports' ); }
 	public function view_settings() { $this->render( 'settings' ); }
 
 	private function render( $view ) {
