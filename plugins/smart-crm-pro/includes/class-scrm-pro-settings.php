@@ -265,6 +265,18 @@ class SCRM_Pro_Settings {
                 <?php endforeach; ?>
             </h2>
 
+            <details style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:12px 18px;margin:16px 0;">
+                <summary style="cursor:pointer;font-weight:600;color:#0F1411;"><?php esc_html_e( 'Integrations map — where does each setting live?', 'smart-crm-pro' ); ?></summary>
+                <div style="margin-top:10px;font-size:13px;line-height:1.7;color:#334155;">
+                    <p style="margin:0 0 8px;"><strong><?php esc_html_e( 'Leads come IN through Smart Forms; this CRM pushes them OUT to your tools.', 'smart-crm-pro' ); ?></strong></p>
+                    <p style="margin:0 0 4px;"><strong><?php esc_html_e( 'Configured here (Smart CRM):', 'smart-crm-pro' ); ?></strong> <?php esc_html_e( 'ActiveCampaign, ServiceM8, Vapi, Google Calendar, Floor Care Plan.', 'smart-crm-pro' ); ?></p>
+                    <p style="margin:0 0 8px;"><strong><?php esc_html_e( 'Configured in Smart Forms:', 'smart-crm-pro' ); ?></strong> <?php esc_html_e( 'Web forms, Calendly, Resend (form emails).', 'smart-crm-pro' ); ?>
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=smart-forms-settings&tab=calendly' ) ); ?>"><?php esc_html_e( 'Open the Calendly tab →', 'smart-crm-pro' ); ?></a>
+                    </p>
+                    <p style="margin:0;color:#64748b;"><?php esc_html_e( 'Flow: a web form or Calendly booking → Smart Forms saves the lead → Smart CRM pushes it to ActiveCampaign, ServiceM8, Vapi, and Google Calendar. When ServiceM8 marks the job complete it calls back here and fires the Smart Reviews survey.', 'smart-crm-pro' ); ?></p>
+                </div>
+            </details>
+
             <?php if ( ! empty( $tabs[ $current ]['test'] ) ) : ?>
                 <div style="background:#fff;border:1px solid #d6e6dc;border-radius:6px;padding:14px 18px;margin:16px 0;display:flex;align-items:center;gap:12px;">
                     <strong style="color:#0F1411;"><?php esc_html_e( 'Test connection', 'smart-crm-pro' ); ?></strong>
