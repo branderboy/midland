@@ -4,7 +4,7 @@ Tags: geo, aeo, seo, embeddings, openai, neon, pgvector, ai, schema, recommendat
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,14 @@ key, Neon connection string) are stored privately and never returned to the
 browser.
 
 == Changelog ==
+
+= 2.3.0 =
+* REST API (read-only) under gsb/v1: summary, visibility, scores, fixes,
+  entities, competitors. Authenticate as a logged-in admin or with the plugin
+  API key (Authorization: Bearer, or X-GSB-Key).
+* Outbound webhooks: signed (HMAC-SHA256) JSON POSTs on visibility.updated,
+  visibility.drop and fix.applied — so external tools are notified when your AI
+  visibility drops. API key + signing secret managed in Settings.
 
 = 2.2.0 =
 * Competitive GEO: add competitor website URLs and analyse how AI-legible they

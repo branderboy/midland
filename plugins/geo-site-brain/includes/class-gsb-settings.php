@@ -46,6 +46,11 @@ class GSB_Settings {
 			'agency_name'       => '',
 			'agency_logo'       => '',
 			'report_contact'    => '',
+			// REST API + webhooks.
+			'api_key'           => '',
+			'webhooks_enabled'  => 0,
+			'webhook_urls'      => '',
+			'webhook_secret'    => '',
 		);
 	}
 
@@ -113,5 +118,37 @@ class GSB_Settings {
 
 	private static function lines( $text ) {
 		return array_values( array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', $text ) ) ) );
+	}
+
+	/* ----------------------------------------------- API key + webhook secret */
+
+	/** The REST API key, generated lazily on first use. */
+	public static function api_key() {
+		$key = trim( (string) self::get( 'api_key' ) );
+		if ( '' === $key ) {
+			$key = self::regenerate_api_key();
+		}
+		return $key;
+	}
+
+	public static function regenerate_api_key() {
+		$key = 'gsb_' . wp_generate_password( 40, false, false );
+		self::set( 'api_key', $key );
+		return $key;
+	}
+
+	/** The webhook signing secret, generated lazily on first use. */
+	public static function webhook_secret() {
+		$s = trim( (string) self::get( 'webhook_secret' ) );
+		if ( '' === $s ) {
+			$s = self::regenerate_webhook_secret();
+		}
+		return $s;
+	}
+
+	public static function regenerate_webhook_secret() {
+		$s = wp_generate_password( 48, false, false );
+		self::set( 'webhook_secret', $s );
+		return $s;
 	}
 }

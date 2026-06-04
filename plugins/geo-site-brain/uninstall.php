@@ -29,6 +29,7 @@ $options = array(
 	'gsb_anthropic_model', 'gsb_gemini_model', 'gsb_perplexity_model',
 	'gsb_competitor_urls', 'gsb_enable_digest', 'gsb_digest_email',
 	'gsb_agency_name', 'gsb_agency_logo', 'gsb_report_contact',
+	'gsb_api_key', 'gsb_webhooks_enabled', 'gsb_webhook_urls', 'gsb_webhook_secret',
 );
 foreach ( $options as $opt ) {
 	delete_option( $opt );

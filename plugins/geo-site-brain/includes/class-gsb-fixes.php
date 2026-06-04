@@ -197,6 +197,19 @@ class GSB_Fixes {
 		}
 		$payload = json_decode( (string) $rec->fix_payload, true ) ?: array();
 
+		$result = self::dispatch( $rec, $payload );
+		if ( ! is_wp_error( $result ) && empty( $result['manual'] ) ) {
+			GSB_Webhooks::fire( 'fix.applied', array(
+				'id'     => (int) $rec->id,
+				'title'  => $rec->title,
+				'action' => $rec->fix_action,
+			) );
+		}
+		return $result;
+	}
+
+	private static function dispatch( $rec, $payload ) {
+		$id = (int) $rec->id;
 		switch ( $rec->fix_action ) {
 			case 'create_service_page':
 				return self::do_create_page( $id, $payload, 'service' );

@@ -32,6 +32,9 @@ class GSB_Knowledge_Graph {
 		GSB_Fixes::generate();
 
 		GSB_Database::set_state( 'last_understanding', current_time( 'mysql' ) );
+		// Notify external tools (fires visibility.updated, and visibility.drop
+		// when the score falls past the threshold).
+		GSB_Webhooks::fire_visibility();
 		GSB_Logger::info( 'graph', 'Knowledge graph rebuilt.' );
 	}
 

@@ -224,6 +224,24 @@
 		} );
 	} );
 
+	/* ------------------------------------------- regenerate API key / secret */
+
+	$( document ).on( 'click', '.gsb-regen-key', function ( e ) {
+		e.preventDefault();
+		if ( ! window.confirm( 'Regenerate this value? Any tool using the old one will stop working.' ) ) {
+			return;
+		}
+		var $btn = $( this ).prop( 'disabled', true );
+		var target = $btn.data( 'target' );
+		post( 'gsb_regen_key', { which: $btn.data( 'which' ) } ).done( function ( res ) {
+			if ( res && res.success ) {
+				$( '#' + target ).val( res.data.value );
+			}
+		} ).always( function () {
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
 	/* ----------------------------------------------------- send test digest */
 
 	$( '#gsb-send-digest' ).on( 'click', function ( e ) {

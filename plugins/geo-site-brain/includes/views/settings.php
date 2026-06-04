@@ -184,6 +184,45 @@ $selected     = GSB_Settings::indexed_post_types();
 			</tr>
 		</table>
 
+		<h2><?php esc_html_e( 'API & webhooks (for developers)', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'optional', 'geo-site-brain' ); ?></span></h2>
+		<p class="description"><?php esc_html_e( 'Read your AI-visibility data from external tools, and get notified when your score drops.', 'geo-site-brain' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><?php esc_html_e( 'REST base URL', 'geo-site-brain' ); ?></th>
+				<td><code><?php echo esc_html( rest_url( 'gsb/v1/' ) ); ?></code>
+					<p class="description"><?php esc_html_e( 'Endpoints: summary · visibility · scores · fixes · entities · competitors', 'geo-site-brain' ); ?></p></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_api_key"><?php esc_html_e( 'API key', 'geo-site-brain' ); ?></label></th>
+				<td>
+					<input type="text" id="gsb_api_key" class="large-text code" readonly value="<?php echo esc_attr( GSB_Settings::api_key() ); ?>" onclick="this.select()" />
+					<button type="button" class="button gsb-regen-key" data-which="api" data-target="gsb_api_key"><?php esc_html_e( 'Regenerate', 'geo-site-brain' ); ?></button>
+					<p class="description"><?php esc_html_e( 'Send as a header: Authorization: Bearer <key>  (or X-GSB-Key: <key>). Logged-in admins are also authorised.', 'geo-site-brain' ); ?></p>
+				</td>
+			</tr>
+		</table>
+
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Enable webhooks', 'geo-site-brain' ); ?></th>
+				<td><label><input type="checkbox" name="<?php echo esc_attr( $o . 'webhooks_enabled' ); ?>" value="1" <?php checked( 1, (int) GSB_Settings::get( 'webhooks_enabled' ) ); ?> />
+					<?php esc_html_e( 'POST events to the URLs below', 'geo-site-brain' ); ?></label>
+					<p class="description"><?php esc_html_e( 'Events: visibility.updated, visibility.drop, fix.applied. Each request is signed with HMAC-SHA256 in the X-GSB-Signature header.', 'geo-site-brain' ); ?></p></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_webhook_urls"><?php esc_html_e( 'Webhook URLs', 'geo-site-brain' ); ?></label></th>
+				<td><textarea id="gsb_webhook_urls" name="<?php echo esc_attr( $o . 'webhook_urls' ); ?>" rows="3" class="large-text" placeholder="https://hooks.zapier.com/…&#10;https://your-app.com/webhooks/gsb"><?php echo esc_textarea( GSB_Settings::get( 'webhook_urls' ) ); ?></textarea></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_webhook_secret"><?php esc_html_e( 'Signing secret', 'geo-site-brain' ); ?></label></th>
+				<td>
+					<input type="text" id="gsb_webhook_secret" class="large-text code" readonly value="<?php echo esc_attr( GSB_Settings::webhook_secret() ); ?>" onclick="this.select()" />
+					<button type="button" class="button gsb-regen-key" data-which="webhook" data-target="gsb_webhook_secret"><?php esc_html_e( 'Regenerate', 'geo-site-brain' ); ?></button>
+					<p class="description"><?php esc_html_e( 'Verify a webhook by computing HMAC-SHA256 of the raw body with this secret and comparing to X-GSB-Signature.', 'geo-site-brain' ); ?></p>
+				</td>
+			</tr>
+		</table>
+
 		<?php submit_button(); ?>
 	</form>
 </div>
