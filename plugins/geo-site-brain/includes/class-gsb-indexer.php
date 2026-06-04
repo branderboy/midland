@@ -11,10 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class GSB_Indexer {
 
-	const STATE_QUEUE  = 'scan_queue';   // remaining post ids
+	const STATE_QUEUE  = 'scan_queue';   // remaining post ids (admin progress bar)
 	const STATE_TOTAL  = 'scan_total';
 	const STATE_DONE   = 'scan_done';
 	const STATE_LAST   = 'last_full_reindex';
+
+	// Cron reindex runs on its own queue so it never collides with a manual
+	// admin scan, and is time-boxed + resumable so it can't time out the host.
+	const STATE_CRON_QUEUE = 'cron_queue';
+	const STATE_CRON_PHASE = 'cron_phase';
+	const CRON_TIME_BUDGET = 20; // seconds of work per cron tick
 
 	/** @var GSB_Indexer|null */
 	private static $instance = null;
@@ -33,9 +39,10 @@ class GSB_Indexer {
 		add_action( 'before_delete_post', array( $this, 'on_delete_post' ) );
 		add_action( 'wp_trash_post', array( $this, 'on_delete_post' ) );
 
-		// Async single-post index + weekly full reindex.
+		// Async single-post index + weekly full reindex (+ its resumable continuation).
 		add_action( GSB_CRON_POST, array( $this, 'index_post' ) );
 		add_action( GSB_CRON_REINDEX, array( $this, 'run_weekly_reindex' ) );
+		add_action( GSB_CRON_CONTINUE, array( $this, 'process_reindex_queue' ) );
 	}
 
 	/* --------------------------------------------------------------- lifecycle */
@@ -275,27 +282,76 @@ class GSB_Indexer {
 
 	/* ----------------------------------------------------------------- cron */
 
+	/**
+	 * Weekly entry point. Kicks off (or resets) the resumable reindex queue,
+	 * then processes the first time-boxed slice.
+	 */
 	public function run_weekly_reindex() {
 		if ( ! (int) GSB_Settings::get( 'weekly_reindex', 1 ) ) {
 			return;
 		}
-		// Walk every post inline (cron has no UI to drive batches). Each call is
-		// guarded so one bad post can't abort the run.
-		$ids = GSB_Scanner::all_post_ids();
-		foreach ( $ids as $pid ) {
-			try {
-				$this->index_post( $pid );
-			} catch ( \Throwable $e ) {
-				GSB_Logger::error( 'cron', sprintf( 'Reindex of #%d failed: %s', $pid, $e->getMessage() ) );
+		// Start fresh: prime the cron queue and mark the scan phase.
+		GSB_Database::set_state( self::STATE_CRON_QUEUE, GSB_Scanner::all_post_ids() );
+		GSB_Database::set_state( self::STATE_CRON_PHASE, 'scan' );
+		$this->process_reindex_queue();
+	}
+
+	/**
+	 * Process one time-boxed slice of the cron reindex, then reschedule itself
+	 * until the queue drains. This keeps each request short so large sites or
+	 * limited shared hosting never hit max_execution_time / memory limits.
+	 */
+	public function process_reindex_queue() {
+		$phase = (string) GSB_Database::get_state( self::STATE_CRON_PHASE, '' );
+		if ( '' === $phase ) {
+			return; // nothing in progress
+		}
+
+		$start = microtime( true );
+
+		if ( 'scan' === $phase ) {
+			$queue = (array) GSB_Database::get_state( self::STATE_CRON_QUEUE, array() );
+			// index_post() embeds that post's chunks inline, so the scan phase
+			// also produces embeddings — no separate embed phase needed.
+			while ( ! empty( $queue ) && ( microtime( true ) - $start ) < self::CRON_TIME_BUDGET ) {
+				$pid = array_shift( $queue );
+				try {
+					$this->index_post( $pid );
+				} catch ( \Throwable $e ) {
+					GSB_Logger::error( 'cron', sprintf( 'Reindex of #%d failed: %s', $pid, $e->getMessage() ) );
+				}
 			}
+			GSB_Database::set_state( self::STATE_CRON_QUEUE, array_values( $queue ) );
+
+			if ( ! empty( $queue ) ) {
+				$this->reschedule_continue();
+				return;
+			}
+			// Scan complete → move to recommendations.
+			$phase = 'recs';
+			GSB_Database::set_state( self::STATE_CRON_PHASE, 'recs' );
 		}
-		// Make sure any remaining chunks get embedded.
-		$guard = 0;
-		while ( $this->embed_pending() > 0 && $guard < 200 ) {
-			$guard++;
+
+		if ( 'recs' === $phase ) {
+			// Mop up any chunks still awaiting embedding within the time budget.
+			while ( ( microtime( true ) - $start ) < self::CRON_TIME_BUDGET && $this->embed_pending() > 0 ) {
+				// keep embedding
+			}
+			$stats = GSB_Database::chunk_stats();
+			if ( $stats['chunks'] > $stats['embedded'] && GSB_Settings::has_openai() ) {
+				$this->reschedule_continue(); // more embeddings to do
+				return;
+			}
+			GSB_Recommendations::rebuild();
+			GSB_Database::set_state( self::STATE_LAST, current_time( 'mysql' ) );
+			GSB_Database::set_state( self::STATE_CRON_PHASE, '' ); // done
+			GSB_Logger::info( 'cron', 'Weekly reindex complete.' );
 		}
-		GSB_Recommendations::rebuild();
-		GSB_Database::set_state( self::STATE_LAST, current_time( 'mysql' ) );
-		GSB_Logger::info( 'cron', 'Weekly reindex complete.' );
+	}
+
+	private function reschedule_continue() {
+		if ( ! wp_next_scheduled( GSB_CRON_CONTINUE ) ) {
+			wp_schedule_single_event( time() + 60, GSB_CRON_CONTINUE );
+		}
 	}
 }

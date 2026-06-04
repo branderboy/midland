@@ -12,7 +12,7 @@ $logs     = GSB_Logger::recent( 25 );
 $has_ai   = GSB_Settings::has_openai();
 ?>
 <div class="wrap gsb-wrap">
-	<h1><?php esc_html_e( 'Scan / Re-index', 'geo-site-brain' ); ?></h1>
+	<h1><?php esc_html_e( 'Scan Site', 'geo-site-brain' ); ?></h1>
 
 	<?php if ( ! $has_ai ) : ?>
 		<div class="notice notice-warning inline"><p>

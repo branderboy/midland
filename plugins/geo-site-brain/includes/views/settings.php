@@ -15,7 +15,8 @@ $all_types    = get_post_types( array( 'public' => true ), 'objects' );
 $selected     = GSB_Settings::indexed_post_types();
 ?>
 <div class="wrap gsb-wrap">
-	<h1><?php esc_html_e( 'GEO Site Brain — Settings', 'geo-site-brain' ); ?></h1>
+	<h1><?php esc_html_e( 'Setup', 'geo-site-brain' ); ?></h1>
+	<p class="gsb-sub"><?php esc_html_e( 'The only thing you need to get started is an OpenAI key. Everything else is optional.', 'geo-site-brain' ); ?></p>
 
 	<form method="post" action="options.php">
 		<?php settings_fields( GSB_Admin::GROUP ); ?>

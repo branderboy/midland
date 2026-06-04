@@ -70,3 +70,16 @@
 .gsb-chat-form { display: flex; gap: 8px; align-items: flex-end; }
 .gsb-chat-form textarea { flex: 1; }
 .gsb-test-result { margin-left: 8px; font-weight: 600; }
+
+/* Dashboard: get-started + status */
+.gsb-getstarted { border-left: 4px solid #2271b1; }
+.gsb-steps { margin: 0; padding: 0; list-style: none; }
+.gsb-steps li { padding: 12px 0; border-top: 1px solid #f0f0f1; }
+.gsb-steps li:first-child { border-top: 0; }
+.gsb-steps li.done { opacity: .65; }
+.gsb-steps li strong { display: inline-block; min-width: 130px; }
+.gsb-steps .button { margin-left: 10px; }
+.gsb-score-card .gsb-score-num { font-weight: 800; }
+.gsb-status-row { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #f0f0f1; }
+.gsb-status-row:first-of-type { border-top: 0; }
+.gsb-setup-status { max-width: 640px; }

@@ -52,21 +52,24 @@ class GSB_Admin {
 
 	public function menu() {
 		add_menu_page(
-			__( 'GEO Site Brain', 'geo-site-brain' ),
-			__( 'GEO Site Brain', 'geo-site-brain' ),
+			__( 'Site Brain', 'geo-site-brain' ),
+			__( 'Site Brain', 'geo-site-brain' ),
 			self::CAP,
 			'geo-site-brain',
 			array( $this, 'view_dashboard' ),
 			'dashicons-superhero',
 			58
 		);
+		// Labelled as a product loop — Understand → Scan → Scorecard → Fix →
+		// Ask → Setup — instead of developer nouns. Slugs are unchanged so links,
+		// bookmarks and AJAX keep working.
 		$pages = array(
-			'geo-site-brain'          => array( __( 'Dashboard', 'geo-site-brain' ), 'view_dashboard' ),
-			'gsb-scan'                => array( __( 'Scan / Re-index', 'geo-site-brain' ), 'view_scan' ),
-			'gsb-scores'              => array( __( 'Scores', 'geo-site-brain' ), 'view_scores' ),
-			'gsb-recommendations'     => array( __( 'Recommendations', 'geo-site-brain' ), 'view_recommendations' ),
-			'gsb-chat'                => array( __( 'Agent Chat', 'geo-site-brain' ), 'view_chat' ),
-			'gsb-settings'            => array( __( 'Settings', 'geo-site-brain' ), 'view_settings' ),
+			'geo-site-brain'      => array( __( 'Site Brain', 'geo-site-brain' ), 'view_dashboard' ),
+			'gsb-scan'            => array( __( 'Scan Site', 'geo-site-brain' ), 'view_scan' ),
+			'gsb-scores'          => array( __( 'GEO Scorecard', 'geo-site-brain' ), 'view_scores' ),
+			'gsb-recommendations' => array( __( 'Fix Queue', 'geo-site-brain' ), 'view_recommendations' ),
+			'gsb-chat'            => array( __( 'Ask the Site', 'geo-site-brain' ), 'view_chat' ),
+			'gsb-settings'        => array( __( 'Setup', 'geo-site-brain' ), 'view_settings' ),
 		);
 		foreach ( $pages as $slug => $cfg ) {
 			add_submenu_page( 'geo-site-brain', $cfg[0], $cfg[0], self::CAP, $slug, array( $this, $cfg[1] ) );
@@ -159,9 +162,9 @@ class GSB_Admin {
 		$this->guard();
 		$per  = isset( $_POST['per'] ) ? absint( $_POST['per'] ) : 3;
 		$prog = GSB_Indexer::get_instance()->scan_step( $per );
-		if ( ! empty( $prog['complete'] ) ) {
-			GSB_Recommendations::rebuild();
-		}
+		// Recommendations are rebuilt once after embeddings finish (see the JS
+		// scan loop), so duplicate/overlap detection runs against real vectors.
+		// Rebuilding here too would be wasted work and produce stale overlaps.
 		wp_send_json_success( $prog );
 	}
 

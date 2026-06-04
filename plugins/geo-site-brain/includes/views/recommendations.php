@@ -15,7 +15,7 @@ foreach ( $recs as $rec ) {
 }
 ?>
 <div class="wrap gsb-wrap">
-	<h1><?php esc_html_e( 'Recommendations', 'geo-site-brain' ); ?></h1>
+	<h1><?php esc_html_e( 'Fix Queue', 'geo-site-brain' ); ?></h1>
 	<p class="gsb-sub">
 		<?php esc_html_e( 'Prioritised GEO / AEO / SEO actions derived from your scores and content gaps.', 'geo-site-brain' ); ?>
 		<button id="gsb-rebuild-recs" class="button button-secondary"><?php esc_html_e( 'Rebuild', 'geo-site-brain' ); ?></button>

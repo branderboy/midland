@@ -21,6 +21,9 @@ class GSB_Vector_Store {
 
 	const NEON_TABLE = 'gsb_chunks';
 
+	// Above this many local embeddings, nudge the admin toward Neon.
+	const LOCAL_SEARCH_WARN = 5000;
+
 	/** @var PDO|null */
 	private $pdo = null;
 	private $schema_ready = false;
@@ -275,6 +278,19 @@ class GSB_Vector_Store {
 	private function search_local( array $query_vec, $k ) {
 		global $wpdb;
 		$table = GSB_Database::table( 'chunks' );
+
+		// The local backend ranks in PHP, so it must read every embedded row.
+		// That's fine for small/medium sites but gets heavy on large ones — warn
+		// (throttled) and point to Neon rather than silently straining the host.
+		$count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE embedded = 1" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $count > self::LOCAL_SEARCH_WARN && ! get_transient( 'gsb_local_scale_warned' ) ) {
+			set_transient( 'gsb_local_scale_warned', 1, DAY_IN_SECONDS );
+			GSB_Logger::warning( 'search', sprintf(
+				'Local vector search is ranking %d embeddings in PHP. For better performance at this scale, enable Neon (pgvector) in Settings.',
+				$count
+			) );
+		}
+
 		$rows  = $wpdb->get_results( "SELECT id, post_id, url, content_type, section_type, chunk_text, embedding FROM {$table} WHERE embedded = 1 AND embedding IS NOT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$qnorm = $this->norm( $query_vec );

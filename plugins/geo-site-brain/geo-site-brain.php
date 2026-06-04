@@ -31,6 +31,7 @@ define( 'GSB_EMBED_DIM', 1536 );
 
 // Cron hooks.
 define( 'GSB_CRON_REINDEX', 'gsb_weekly_reindex' );
+define( 'GSB_CRON_CONTINUE', 'gsb_reindex_continue' );
 define( 'GSB_CRON_POST', 'gsb_index_post' );
 
 /**
@@ -100,6 +101,7 @@ final class GSB_Plugin {
 
 	public function deactivate() {
 		wp_clear_scheduled_hook( GSB_CRON_REINDEX );
+		wp_clear_scheduled_hook( GSB_CRON_CONTINUE );
 	}
 }
 
