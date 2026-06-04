@@ -1,23 +1,34 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
-<div class="wrap rsseo-wrap">
-    <h1><?php esc_html_e( 'Real Smart SEO', 'real-smart-seo' ); ?></h1>
+<?php
+// Rendered inside the Command Center shell (RSSEO_Admin::render_tabbed_page),
+// which already provides the .wrap, the page <h1>, and the tab nav — so this
+// view emits inner content only (no second .wrap / duplicate heading).
+$url_setup   = admin_url( 'admin.php?page=real-smart-seo&tab=setup' );
+$url_scan    = admin_url( 'admin.php?page=real-smart-seo&tab=scan' );
+$url_reports = admin_url( 'admin.php?page=real-smart-seo&tab=reports' );
+?>
+<div class="rsseo-dashboard">
 
     <?php if ( ! $has_key ) : ?>
     <div class="rsseo-notice rsseo-notice--warning">
         <strong><?php esc_html_e( 'Setup required:', 'real-smart-seo' ); ?></strong>
         <?php esc_html_e( 'Add your Perplexity API key in', 'real-smart-seo' ); ?>
-        <a href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-settings' ) ); ?>"><?php esc_html_e( 'Settings', 'real-smart-seo' ); ?></a>
-        <?php esc_html_e( 'to start analyzing your site.', 'real-smart-seo' ); ?>
+        <a href="<?php echo esc_url( $url_setup ); ?>"><?php esc_html_e( 'Setup', 'real-smart-seo' ); ?></a>
+        <?php esc_html_e( 'before you run a scan.', 'real-smart-seo' ); ?>
     </div>
     <?php endif; ?>
+
+    <p class="rsseo-dashboard__lede">
+        <?php esc_html_e( 'Your local SEO loop: set up → scan → prioritize → fix → build → index → measure. Start a scan, then work the Opportunities and Fix Queue tabs.', 'real-smart-seo' ); ?>
+    </p>
 
     <div class="rsseo-cards">
 
         <div class="rsseo-card rsseo-card--action">
-            <h2><?php esc_html_e( 'Run a New Analysis', 'real-smart-seo' ); ?></h2>
-            <p><?php esc_html_e( 'Upload your Screaming Frog, GSC, GA, and PageSpeed data to get a full report with fixes.', 'real-smart-seo' ); ?></p>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-new-scan' ) ); ?>" class="button button-primary button-large">
-                <?php esc_html_e( 'Start New Scan', 'real-smart-seo' ); ?>
+            <h2><?php esc_html_e( 'Scan your site', 'real-smart-seo' ); ?></h2>
+            <p><?php esc_html_e( 'Crawl your pages (or upload Screaming Frog / GSC / GA / PageSpeed data) to surface issues and opportunities with one-click fixes.', 'real-smart-seo' ); ?></p>
+            <a href="<?php echo esc_url( $url_scan ); ?>" class="button button-primary button-large">
+                <?php esc_html_e( 'Scan My Site →', 'real-smart-seo' ); ?>
             </a>
         </div>
 
@@ -95,7 +106,7 @@
                 <td><span class="rsseo-status rsseo-status--<?php echo esc_attr( $scan->status ); ?>"><?php echo esc_html( $scan->status ); ?></span></td>
                 <td>
                     <?php if ( $scan->report_id ) : ?>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-reports&report_id=' . $scan->report_id ) ); ?>" class="button button-small">
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=reports&report_id=' . $scan->report_id ) ); ?>" class="button button-small">
                             <?php esc_html_e( 'View Report', 'real-smart-seo' ); ?>
                         </a>
                     <?php endif; ?>

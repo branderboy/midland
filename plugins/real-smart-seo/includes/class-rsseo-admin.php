@@ -60,15 +60,25 @@ class RSSEO_Admin {
     }
 
     private function get_active_tab() {
-        $allowed = array( 'workflow', 'scan', 'analyze', 'repair', 'index', 'insights', 'settings' );
-        $tab     = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'workflow'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $allowed = array( 'dashboard', 'setup', 'scan', 'opportunities', 'fixqueue', 'pagebuilder', 'indexing', 'reports' );
+        $tab     = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'dashboard'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-        // Map legacy slugs onto the new vocabulary so old bookmarks work.
-        $alias = array( 'audit' => 'scan', 'reports' => 'repair', 'report' => 'repair' );
+        // Map the old + legacy slugs onto the Command Center vocabulary so
+        // existing bookmarks, redirects, and in-page CTAs keep resolving.
+        $alias = array(
+            'workflow' => 'dashboard',
+            'audit'    => 'scan',
+            'analyze'  => 'opportunities',
+            'repair'   => 'fixqueue',
+            'report'   => 'reports',
+            'index'    => 'indexing',
+            'insights' => 'reports',
+            'settings' => 'setup',
+        );
         if ( isset( $alias[ $tab ] ) ) {
             $tab = $alias[ $tab ];
         }
-        return in_array( $tab, $allowed, true ) ? $tab : 'workflow';
+        return in_array( $tab, $allowed, true ) ? $tab : 'dashboard';
     }
 
     public function render_tabbed_page() {
@@ -82,13 +92,14 @@ class RSSEO_Admin {
         // Insights = rankings, AI Rank, Geo-Grid (Pro). Free users see a
         //            "what is this" panel pointing at the Pro upgrade.
         $tabs = array(
-            'workflow' => __( 'Workflow', 'real-smart-seo' ),
-            'scan'     => __( 'Scan',     'real-smart-seo' ),
-            'analyze'  => __( 'Analyze',  'real-smart-seo' ),
-            'repair'   => __( 'Reports',  'real-smart-seo' ),
-            'index'    => __( 'Index',    'real-smart-seo' ),
-            'insights' => __( 'Insights', 'real-smart-seo' ),
-            'settings' => __( 'Settings', 'real-smart-seo' ),
+            'dashboard'     => __( 'Dashboard', 'real-smart-seo' ),
+            'setup'         => __( 'Setup', 'real-smart-seo' ),
+            'scan'          => __( 'Site Scan', 'real-smart-seo' ),
+            'opportunities' => __( 'Opportunities', 'real-smart-seo' ),
+            'fixqueue'      => __( 'Fix Queue', 'real-smart-seo' ),
+            'pagebuilder'   => __( 'Page Builder', 'real-smart-seo' ),
+            'indexing'      => __( 'Indexing', 'real-smart-seo' ),
+            'reports'       => __( 'Reports', 'real-smart-seo' ),
         );
 
         echo '<div class="wrap rsseo-wrap">';
@@ -104,22 +115,23 @@ class RSSEO_Admin {
 
         echo '<div class="rsseo-tab-content rsseo-tab-content--' . esc_attr( $active ) . '">';
         switch ( $active ) {
-            case 'scan':     $this->page_site_audit(); break;
-            case 'analyze':  $this->page_new_scan();   break;
-            case 'repair':   $this->page_reports();    break;
-            case 'index':    $this->page_index();      break;
-            case 'insights': $this->page_insights();   break;
-            case 'settings': $this->page_settings();   break;
-            case 'workflow':
+            case 'setup':         $this->page_settings();        break;
+            case 'scan':          $this->page_site_audit();      break;
+            case 'opportunities': $this->page_new_scan();        break;
+            case 'fixqueue':      $this->page_fix_queue();       break;
+            case 'pagebuilder':   $this->page_pagebuilder();     break;
+            case 'indexing':      $this->page_index();           break;
+            case 'reports':       $this->page_reports_archive(); break;
+            case 'dashboard':
             default:
-                $this->page_workflow();
+                $this->page_dashboard();
                 break;
         }
         // Pipeline CTA — every tab IN THE PIPELINE ends with a "Next: X →" so
         // the user always knows the one button to click after finishing here.
         // Settings + Workflow + Reports (archive) are excluded — they aren't
         // pipeline steps. Reports is just history; its empty state stands alone.
-        if ( ! in_array( $active, array( 'workflow', 'settings', 'repair' ), true ) ) {
+        if ( ! in_array( $active, array( 'dashboard', 'setup', 'reports' ), true ) ) {
             $this->render_pipeline_cta( $active );
         }
         echo '</div></div>';
@@ -141,36 +153,34 @@ class RSSEO_Admin {
         $report_qs     = $report_id ? '&report_id=' . $report_id : '';
 
         $url = array(
-            'scan'     => admin_url( 'admin.php?page=real-smart-seo&tab=scan' ),
-            'analyze'  => admin_url( 'admin.php?page=real-smart-seo&tab=analyze' . $report_qs ),
-            'repair'   => admin_url( 'admin.php?page=real-smart-seo&tab=repair' . $report_qs ),
-            'index'    => admin_url( 'admin.php?page=real-smart-seo&tab=index' ),
-            'insights' => admin_url( 'admin.php?page=real-smart-seo&tab=insights' ),
+            'scan'          => admin_url( 'admin.php?page=real-smart-seo&tab=scan' ),
+            'opportunities' => admin_url( 'admin.php?page=real-smart-seo&tab=opportunities' . $report_qs ),
+            'fixqueue'      => admin_url( 'admin.php?page=real-smart-seo&tab=fixqueue' . $report_qs ),
+            'indexing'      => admin_url( 'admin.php?page=real-smart-seo&tab=indexing' ),
+            'reports'       => admin_url( 'admin.php?page=real-smart-seo&tab=reports' ),
         );
 
         $cta = array( 'label' => '', 'href' => '', 'hint' => '' );
 
         switch ( $current ) {
             case 'scan':
+                $cta = array( 'label' => __( 'Find Opportunities →', 'real-smart-seo' ), 'href' => $url['opportunities'], 'hint' => __( 'Turn the scan into a prioritized list of fixes and content opportunities.', 'real-smart-seo' ) );
+                break;
+            case 'opportunities':
                 $cta = $has_report
-                    ? array( 'label' => __( 'Continue to Analyze →', 'real-smart-seo' ), 'href' => $url['analyze'], 'hint' => __( 'Next: paste your scan data and let Perplexity Sonar turn it into prioritized fixes.', 'real-smart-seo' ) )
-                    : array( 'label' => __( 'Continue to Analyze →', 'real-smart-seo' ), 'href' => $url['analyze'], 'hint' => __( 'After running a scan, paste the data into Analyze for AI fixes.', 'real-smart-seo' ) );
+                    ? array( 'label' => __( 'Go to Fix Queue →', 'real-smart-seo' ), 'href' => $url['fixqueue'], 'hint' => __( 'Review each recommended fix, preview the before/after, and apply.', 'real-smart-seo' ) )
+                    : array( 'label' => __( 'Run a scan first →', 'real-smart-seo' ), 'href' => $url['scan'], 'hint' => __( 'Opportunities need scan data. Start with Site Scan.', 'real-smart-seo' ) );
                 break;
-            case 'analyze':
+            case 'fixqueue':
                 $cta = $has_report
-                    ? array( 'label' => __( 'Continue to Index →', 'real-smart-seo' ), 'href' => $url['index'], 'hint' => __( 'After applying fixes, ping Google + Bing so the new content gets recrawled fast.', 'real-smart-seo' ) )
-                    : array( 'label' => __( 'Run a Scan first →', 'real-smart-seo' ), 'href' => $url['scan'], 'hint' => __( 'Analyze needs scan data. Start with a Site Audit on the Scan tab.', 'real-smart-seo' ) );
+                    ? array( 'label' => __( 'Continue to Indexing →', 'real-smart-seo' ), 'href' => $url['indexing'], 'hint' => __( 'Once fixes are applied, push the updated URLs to Google + Bing so they get recrawled fast.', 'real-smart-seo' ) )
+                    : array( 'label' => __( 'Find Opportunities first →', 'real-smart-seo' ), 'href' => $url['opportunities'], 'hint' => __( 'No fixes queued yet. Generate them on the Opportunities tab.', 'real-smart-seo' ) );
                 break;
-            case 'repair':
-                $cta = $has_report
-                    ? array( 'label' => __( 'Continue to Index →', 'real-smart-seo' ), 'href' => $url['index'], 'hint' => __( 'Once your fixes are applied, push the updated URLs to Google so the changes get re-crawled.', 'real-smart-seo' ) )
-                    : array( 'label' => __( 'Run an Analysis first →', 'real-smart-seo' ), 'href' => $url['analyze'], 'hint' => __( 'No fixes to apply yet. Generate them on the Analyze tab.', 'real-smart-seo' ) );
+            case 'pagebuilder':
+                $cta = array( 'label' => __( 'Continue to Indexing →', 'real-smart-seo' ), 'href' => $url['indexing'], 'hint' => __( 'After building pages, submit them to search engines so they get indexed.', 'real-smart-seo' ) );
                 break;
-            case 'index':
-                $cta = array( 'label' => __( 'View Insights →', 'real-smart-seo' ), 'href' => $url['insights'], 'hint' => __( 'After re-indexing, track rankings, backlinks, and AI-recommended optimization strategies in Insights.', 'real-smart-seo' ) );
-                break;
-            case 'insights':
-                $cta = array( 'label' => __( 'Start a new Scan →', 'real-smart-seo' ), 'href' => $url['scan'], 'hint' => __( 'Run the loop again — fresh scan, fresh AI analysis, fresh fixes.', 'real-smart-seo' ) );
+            case 'indexing':
+                $cta = array( 'label' => __( 'View Reports →', 'real-smart-seo' ), 'href' => $url['reports'], 'hint' => __( 'Track what changed — issues fixed, pages built, URLs submitted — and the next recommended action.', 'real-smart-seo' ) );
                 break;
         }
 
@@ -475,6 +485,143 @@ class RSSEO_Admin {
         // every new submission, so this query naturally caps at 10 rows.
         $scans = RSSEO_Database::get_scans( 100 );
         require RSSEO_PATH . 'includes/views/reports-list.php';
+    }
+
+    // ── Page: Fix Queue ──────────────────────────────────────────────────────
+
+    /**
+     * Fix Queue — the recommended fixes for the most recent (or selected)
+     * analysis, with preview / apply / rollback. Phase 5 turns the report-detail
+     * table into prioritized action cards; for now it reuses the existing fix
+     * table so nothing is lost during the transition.
+     */
+    public function page_fix_queue() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $report_id = isset( $_GET['report_id'] ) ? (int) $_GET['report_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( ! $report_id ) {
+            // Fall back to the latest analysis so the queue is never empty by accident.
+            $scans     = RSSEO_Database::get_scans( 1 );
+            $report_id = (int) ( ! empty( $scans ) ? ( $scans[0]->report_id ?? 0 ) : 0 );
+        }
+        $report = $report_id ? RSSEO_Database::get_report( $report_id ) : null;
+        if ( $report ) {
+            $fixes = RSSEO_Database::get_fixes( $report_id );
+            require RSSEO_PATH . 'includes/views/report-detail.php';
+            return;
+        }
+        echo '<div class="rsseo-empty">';
+        echo '<h2>' . esc_html__( 'No fixes queued yet', 'real-smart-seo' ) . '</h2>';
+        echo '<p>' . esc_html__( 'Run a site scan and generate opportunities — recommended fixes will land here ready to preview and apply.', 'real-smart-seo' ) . '</p>';
+        echo '<a class="button button-primary button-large" href="' . esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=scan' ) ) . '">' . esc_html__( 'Run a Site Scan →', 'real-smart-seo' ) . '</a>';
+        echo '</div>';
+    }
+
+    // ── Page: Reports (archive + measure) ────────────────────────────────────
+
+    /**
+     * Reports — history of past analyses plus the measurement tools (rankings,
+     * geo-grid, backlinks). Single-report drill-down still works via ?report_id.
+     */
+    public function page_reports_archive() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+
+        // Single report drill-down (kept for ?report_id deep links).
+        if ( isset( $_GET['report_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $report_id = (int) $_GET['report_id']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $report    = RSSEO_Database::get_report( $report_id );
+            if ( $report ) {
+                $fixes = RSSEO_Database::get_fixes( $report_id );
+                require RSSEO_PATH . 'includes/views/report-detail.php';
+                return;
+            }
+        }
+
+        // Measurement tools — the rankings/backlinks that used to hide on the
+        // old "Insights" tab now live here, where you measure what changed.
+        $has_pro = defined( 'RSSEO_PRO_VERSION' );
+        if ( $has_pro ) {
+            echo '<h2>' . esc_html__( 'Tracking & Measurement', 'real-smart-seo' ) . '</h2>';
+            echo '<div class="rsseo-insights-grid">';
+
+            echo '<div class="rsseo-insights-card"><h3>' . esc_html__( 'Keyword Rankings', 'real-smart-seo' ) . '</h3>';
+            echo '<p>' . esc_html__( 'Where you rank for each target keyword across Google, Bing, and AI search engines.', 'real-smart-seo' ) . '</p>';
+            echo '<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=rsseo-ai-rank' ) ) . '">' . esc_html__( 'Open AI Rank →', 'real-smart-seo' ) . '</a></div>';
+
+            echo '<div class="rsseo-insights-card"><h3>' . esc_html__( 'Local Rank Grid', 'real-smart-seo' ) . '</h3>';
+            echo '<p>' . esc_html__( 'Local Falcon-style map-pack rank measured at a grid of points around your business.', 'real-smart-seo' ) . '</p>';
+            echo '<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=rsseo-geogrid' ) ) . '">' . esc_html__( 'Open Geo-Grid →', 'real-smart-seo' ) . '</a></div>';
+
+            echo '<div class="rsseo-insights-card rsseo-insights-card--wide"><h3>' . esc_html__( 'Backlinks', 'real-smart-seo' ) . '</h3>';
+            echo '<p>' . esc_html__( 'Inbound link profile, gained / lost links, and toxic-link warnings.', 'real-smart-seo' ) . '</p>';
+            if ( has_action( 'rsseo_render_backlinks_panel' ) ) {
+                do_action( 'rsseo_render_backlinks_panel' );
+            }
+            echo '</div>';
+
+            echo '</div>';
+            echo '<hr style="margin:28px 0;">';
+        }
+
+        echo '<h2>' . esc_html__( 'Analysis History', 'real-smart-seo' ) . '</h2>';
+        $scans = RSSEO_Database::get_scans( 100 );
+        require RSSEO_PATH . 'includes/views/reports-list.php';
+    }
+
+    // ── Page: Page Builder ────────────────────────────────────────────────────
+
+    /**
+     * Page Builder — surfaces the page-generation tools as a first-class step
+     * instead of burying them in hidden Pro submenus. Programmatic city×service
+     * pages are the primary builder; clusters + content briefs support it.
+     */
+    public function page_pagebuilder() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $cards = array(
+            array(
+                'slug'    => 'rsseo-programmatic',
+                'title'   => __( 'Programmatic City × Service Pages', 'real-smart-seo' ),
+                'desc'    => __( 'Generate a landing page for every service in every city you serve — pick services, cities, template, tone, and CTA, then publish as draft or live.', 'real-smart-seo' ),
+                'cta'     => __( 'Open Page Builder →', 'real-smart-seo' ),
+                'primary' => true,
+            ),
+            array(
+                'slug'    => 'rsseo-clusters',
+                'title'   => __( 'Topic Clusters', 'real-smart-seo' ),
+                'desc'    => __( 'Group your target keywords into topic clusters so each page targets one clear intent instead of competing with itself.', 'real-smart-seo' ),
+                'cta'     => __( 'Build Clusters →', 'real-smart-seo' ),
+                'primary' => false,
+            ),
+            array(
+                'slug'    => 'rsseo-content-brief',
+                'title'   => __( 'Content Briefs', 'real-smart-seo' ),
+                'desc'    => __( 'Generate an AI writer brief for any keyword — headings, questions to answer, entities to mention — before you build the page.', 'real-smart-seo' ),
+                'cta'     => __( 'Create a Brief →', 'real-smart-seo' ),
+                'primary' => false,
+            ),
+        );
+        echo '<div class="rsseo-pagebuilder">';
+        echo '<h2>' . esc_html__( 'Page Builder', 'real-smart-seo' ) . '</h2>';
+        echo '<p>' . esc_html__( 'Build the local pages that win the map pack: a dedicated page for each service in each city you serve. Plan the topics, brief the content, then generate the pages.', 'real-smart-seo' ) . '</p>';
+        echo '<div class="rsseo-insights-grid">';
+        foreach ( $cards as $c ) {
+            echo '<div class="rsseo-insights-card">';
+            echo '<h3>' . esc_html( $c['title'] ) . '</h3>';
+            echo '<p>' . esc_html( $c['desc'] ) . '</p>';
+            printf(
+                '<a class="button %1$s" href="%2$s">%3$s</a>',
+                $c['primary'] ? 'button-primary' : 'button-secondary',
+                esc_url( admin_url( 'admin.php?page=' . $c['slug'] ) ),
+                esc_html( $c['cta'] )
+            );
+            echo '</div>';
+        }
+        echo '</div></div>';
     }
 
     // ── Page: Settings ─────────────────────────────────────────────────────────

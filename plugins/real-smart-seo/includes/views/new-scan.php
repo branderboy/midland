@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
-<div class="wrap rsseo-wrap">
-    <h1><?php esc_html_e( 'New SEO Scan', 'real-smart-seo' ); ?></h1>
+<div class="rsseo-tabview">
+    <h2><?php esc_html_e( 'New SEO Scan', 'real-smart-seo' ); ?></h2>
 
     <?php if ( isset( $_GET['error'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
         <div class="rsseo-notice rsseo-notice--error">

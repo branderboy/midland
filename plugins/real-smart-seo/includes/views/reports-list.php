@@ -31,7 +31,7 @@ $source_meta = array(
     'dfs'   => array( 'DataForSEO', 'dfs'      ),
 );
 ?>
-<div class="wrap rsseo-wrap">
+<div class="rsseo-tabview">
 
     <h2 style="margin-top:0;"><?php esc_html_e( 'Reports archive', 'real-smart-seo' ); ?></h2>
 
