@@ -115,7 +115,7 @@ class RSSEO_Admin {
 
         echo '<div class="rsseo-tab-content rsseo-tab-content--' . esc_attr( $active ) . '">';
         switch ( $active ) {
-            case 'setup':         $this->page_settings();        break;
+            case 'setup':         $this->page_setup();           break;
             case 'scan':          $this->page_site_audit();      break;
             case 'opportunities': $this->page_new_scan();        break;
             case 'fixqueue':      $this->page_fix_queue();       break;
@@ -624,6 +624,28 @@ class RSSEO_Admin {
         echo '</div></div>';
     }
 
+    // ── Page: Setup ──────────────────────────────────────────────────────────
+
+    /**
+     * Setup — the pre-flight. Shows a Ready / Missing / Needs Attention
+     * readiness panel, then the unified business profile + API key + model in
+     * one form, so the operator configures everything before entering the loop
+     * (no more "hit Scan, then discover you need a key").
+     */
+    public function page_setup() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $readiness  = RSSEO_Profile::readiness();
+        $overall    = RSSEO_Profile::overall_status();
+        $profile    = RSSEO_Profile::get();
+        $has_key    = RSSEO_Settings::has_api_key();
+        $model      = RSSEO_Settings::get_model();
+        $max_tokens = RSSEO_Settings::get_max_tokens();
+        $has_pro    = defined( 'RSSEO_PRO_VERSION' );
+        require RSSEO_PATH . 'includes/views/setup.php';
+    }
+
     // ── Page: Settings ─────────────────────────────────────────────────────────
 
     public function page_settings() {
@@ -860,15 +882,17 @@ class RSSEO_Admin {
         }
 
         if ( isset( $_POST['rsseo_business_profile'] ) && is_array( $_POST['rsseo_business_profile'] ) ) {
-            $raw     = wp_unslash( $_POST['rsseo_business_profile'] );
-            $profile = array(
-                'name'          => isset( $raw['name'] )          ? sanitize_text_field( $raw['name'] )          : '',
-                'category'      => isset( $raw['category'] )      ? sanitize_text_field( $raw['category'] )      : '',
-                'gmb_url'       => isset( $raw['gmb_url'] )       ? esc_url_raw( $raw['gmb_url'] )                : '',
-                'service_areas' => isset( $raw['service_areas'] ) ? sanitize_textarea_field( $raw['service_areas'] ) : '',
-                'competitors'   => isset( $raw['competitors'] )   ? sanitize_textarea_field( $raw['competitors'] )   : '',
-            );
-            update_option( 'rsseo_business_profile', $profile );
+            $raw = wp_unslash( $_POST['rsseo_business_profile'] );
+            // Persist through the unified profile model (it sanitises and also
+            // mirrors back into the legacy rsseo_business_profile option).
+            RSSEO_Profile::save( array(
+                'business_name' => $raw['name']          ?? '',
+                'category'      => $raw['category']      ?? '',
+                'services'      => $raw['services']      ?? '',
+                'cities'        => $raw['service_areas'] ?? '',
+                'gbp_url'       => $raw['gmb_url']        ?? '',
+                'competitors'   => $raw['competitors']   ?? '',
+            ) );
         }
 
         wp_send_json_success( array( 'message' => __( 'Settings saved.', 'real-smart-seo' ) ) );

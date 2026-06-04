@@ -83,6 +83,7 @@ class RSSEO_Plugin {
     private function includes() {
         // Core engine.
         require_once RSSEO_PATH . 'includes/class-rsseo-status.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-profile.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-database.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-settings.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-claude-api.php';
