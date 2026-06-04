@@ -149,11 +149,11 @@ if ( ! $has_key ) {
             <h3><?php esc_html_e( 'Next: Pro cleanups', 'real-smart-seo' ); ?></h3>
             <p><?php esc_html_e( 'After repairs, run the Pro modules to consolidate the win — GSC error cleanup, Schema, IndexNow ping, Programmatic city × service pages, AI Rank tracking.', 'real-smart-seo' ); ?></p>
             <p>
-                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-gsc' ) ); ?>"><?php esc_html_e( 'GSC Cleanup', 'real-smart-seo' ); ?></a>
-                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-schema' ) ); ?>"><?php esc_html_e( 'Schema', 'real-smart-seo' ); ?></a>
-                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-programmatic' ) ); ?>"><?php esc_html_e( 'Programmatic Pages', 'real-smart-seo' ); ?></a>
-                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-indexnow' ) ); ?>"><?php esc_html_e( 'IndexNow', 'real-smart-seo' ); ?></a>
-                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-ai-rank' ) ); ?>"><?php esc_html_e( 'AI Rank', 'real-smart-seo' ); ?></a>
+                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-gsc-cleanup' ) ); ?>"><?php esc_html_e( 'GSC Cleanup', 'real-smart-seo' ); ?></a>
+                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-sameas' ) ); ?>"><?php esc_html_e( 'Schema', 'real-smart-seo' ); ?></a>
+                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-programmatic' ) ); ?>"><?php esc_html_e( 'Programmatic Pages', 'real-smart-seo' ); ?></a>
+                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow' ) ); ?>"><?php esc_html_e( 'IndexNow', 'real-smart-seo' ); ?></a>
+                <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-ai-rank' ) ); ?>"><?php esc_html_e( 'AI Rank', 'real-smart-seo' ); ?></a>
             </p>
         </div>
     <?php endif; ?>

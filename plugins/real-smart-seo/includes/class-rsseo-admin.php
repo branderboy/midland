@@ -205,7 +205,7 @@ class RSSEO_Admin {
                     <h3><?php esc_html_e( 'IndexNow Ping', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Tell Bing, Yandex, Seznam, and Naver about new + updated URLs the moment they change. No waiting on a crawl schedule.', 'real-smart-seo' ); ?></p>
                     <?php if ( $has_pro ) : ?>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-indexnow' ) ); ?>"><?php esc_html_e( 'Configure IndexNow →', 'real-smart-seo' ); ?></a>
+                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow' ) ); ?>"><?php esc_html_e( 'Configure IndexNow →', 'real-smart-seo' ); ?></a>
                     <?php else :
                         $this->pro_upsell( __( 'IndexNow', 'real-smart-seo' ), __( 'Bing/Yandex/Seznam/Naver get a notification the moment any post is published, edited, or trashed. Critical for time-sensitive content like job postings.', 'real-smart-seo' ) );
                     endif; ?>
@@ -215,7 +215,7 @@ class RSSEO_Admin {
                     <h3><?php esc_html_e( 'GSC Coverage Cleanup', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Auto-resolve Search Console errors — duplicate canonicals, soft 404s, "discovered but not indexed" pages.', 'real-smart-seo' ); ?></p>
                     <?php if ( $has_pro ) : ?>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-gsc' ) ); ?>"><?php esc_html_e( 'GSC Cleanup →', 'real-smart-seo' ); ?></a>
+                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-gsc-cleanup' ) ); ?>"><?php esc_html_e( 'GSC Cleanup →', 'real-smart-seo' ); ?></a>
                     <?php else :
                         $this->pro_upsell( __( 'GSC Cleanup', 'real-smart-seo' ), __( 'Bulk-fix duplicate canonicals, soft 404s, and "Discovered but not indexed" pages from your GSC Coverage report.', 'real-smart-seo' ) );
                     endif; ?>
@@ -225,7 +225,7 @@ class RSSEO_Admin {
                     <h3><?php esc_html_e( 'Rapid URL Indexer', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Force-index stubborn URLs via third-party indexing services (paid). Optional — useful for fresh programmatic pages.', 'real-smart-seo' ); ?></p>
                     <?php if ( $has_pro ) : ?>
-                        <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-indexnow#rapid' ) ); ?>"><?php esc_html_e( 'Setup →', 'real-smart-seo' ); ?></a>
+                        <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow#rapid' ) ); ?>"><?php esc_html_e( 'Setup →', 'real-smart-seo' ); ?></a>
                     <?php else :
                         $this->pro_upsell( __( 'Rapid URL Indexer', 'real-smart-seo' ), __( 'Optional paid integration with third-party indexers for stubborn URLs Google won\'t crawl on its own.', 'real-smart-seo' ) );
                     endif; ?>
@@ -281,7 +281,7 @@ class RSSEO_Admin {
                     <h3><?php esc_html_e( 'Keyword Rankings', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Track positions for your target keywords across Google, Bing, and AI search engines.', 'real-smart-seo' ); ?></p>
                     <?php if ( $has_pro ) : ?>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-ai-rank' ) ); ?>"><?php esc_html_e( 'Open AI Rank', 'real-smart-seo' ); ?></a>
+                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-ai-rank' ) ); ?>"><?php esc_html_e( 'Open AI Rank', 'real-smart-seo' ); ?></a>
                     <?php else :
                         $this->pro_upsell( __( 'AI Rank Tracking', 'real-smart-seo' ), __( 'Daily check of where you rank for every target keyword on Google + Bing + ChatGPT + Perplexity. History charts so you can prove the work.', 'real-smart-seo' ) );
                     endif; ?>
@@ -291,7 +291,7 @@ class RSSEO_Admin {
                     <h3><?php esc_html_e( 'Local Rank Grid (Local Falcon-style)', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Map-pack rank measured at a grid of geographic points around your business — same idea as Local Falcon. See heat-map style coverage of where you rank #1 vs. where you fall off.', 'real-smart-seo' ); ?></p>
                     <?php if ( $has_pro ) : ?>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-geogrid' ) ); ?>"><?php esc_html_e( 'Open Geo-Grid →', 'real-smart-seo' ); ?></a>
+                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-geogrid' ) ); ?>"><?php esc_html_e( 'Open Geo-Grid →', 'real-smart-seo' ); ?></a>
                     <?php else :
                         $this->pro_upsell( __( 'Geo-Grid Tracking', 'real-smart-seo' ), __( 'Local Falcon costs $30/mo per location. This module does it sitewide with DataForSEO pay-as-you-go (~$0.50 per grid scan).', 'real-smart-seo' ) );
                     endif; ?>
@@ -311,8 +311,8 @@ class RSSEO_Admin {
                     <h3><?php esc_html_e( 'Indexing', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Google Search Console coverage — indexed / not indexed / errors. Ping new and updated URLs to Bing & Yandex via IndexNow.', 'real-smart-seo' ); ?></p>
                     <?php if ( $has_pro ) : ?>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-gsc' ) ); ?>"><?php esc_html_e( 'GSC Cleanup', 'real-smart-seo' ); ?></a>
-                        <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-pro-indexnow' ) ); ?>"><?php esc_html_e( 'IndexNow', 'real-smart-seo' ); ?></a>
+                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-gsc-cleanup' ) ); ?>"><?php esc_html_e( 'GSC Cleanup', 'real-smart-seo' ); ?></a>
+                        <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow' ) ); ?>"><?php esc_html_e( 'IndexNow', 'real-smart-seo' ); ?></a>
                     <?php else :
                         $this->pro_upsell( __( 'GSC Cleanup + IndexNow', 'real-smart-seo' ), __( 'Auto-resolves Search Console coverage errors and pings Bing + Yandex on every change — new pages get crawled in minutes instead of days.', 'real-smart-seo' ) );
                     endif; ?>
