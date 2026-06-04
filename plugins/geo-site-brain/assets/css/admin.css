@@ -1,0 +1,72 @@
+/* GEO Site Brain — admin styles */
+.gsb-wrap .gsb-sub { color: #50575e; max-width: 720px; }
+.gsb-wrap h1 .dashicons { font-size: 28px; height: 28px; width: 28px; vertical-align: text-bottom; color: #2271b1; }
+
+.gsb-cards { display: flex; flex-wrap: wrap; gap: 16px; margin: 18px 0; }
+.gsb-card { background: #fff; border: 1px solid #dcdcde; border-radius: 8px; padding: 18px 22px; min-width: 160px; flex: 1; }
+.gsb-card-num, .gsb-score-num { font-size: 30px; font-weight: 700; line-height: 1.1; color: #1d2327; }
+.gsb-score-num { font-size: 44px; color: #2271b1; }
+.gsb-card-label { color: #50575e; margin-top: 4px; font-size: 13px; }
+
+.gsb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 1100px) { .gsb-grid { grid-template-columns: 1fr; } }
+.gsb-panel { background: #fff; border: 1px solid #dcdcde; border-radius: 8px; padding: 18px 22px; margin: 0 0 18px; }
+.gsb-panel h2 { margin-top: 0; }
+
+.gsb-ok { color: #00794b; font-weight: 600; }
+.gsb-bad { color: #b32d2e; font-weight: 600; }
+.gsb-muted { color: #787c82; font-size: 12px; word-break: break-all; }
+
+/* Score pills */
+.gsb-pill { display: inline-block; min-width: 34px; text-align: center; padding: 2px 8px; border-radius: 999px; color: #fff; font-weight: 700; }
+.gsb-pill-good { background: #00794b; }
+.gsb-pill-ok   { background: #2271b1; }
+.gsb-pill-warn { background: #b26200; }
+.gsb-pill-bad  { background: #b32d2e; }
+
+/* Progress bar */
+.gsb-progress { margin: 16px 0; max-width: 520px; }
+.gsb-progress-label { margin-bottom: 6px; font-weight: 600; }
+.gsb-bar { background: #e9e9ed; border-radius: 999px; height: 16px; overflow: hidden; }
+.gsb-bar.small { height: 8px; }
+.gsb-bar-fill { background: #2271b1; height: 100%; width: 0; transition: width .25s ease; }
+
+/* Sub-scores */
+.gsb-subscores { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 24px; padding: 8px 0; }
+@media (max-width: 900px) { .gsb-subscores { grid-template-columns: 1fr; } }
+.gsb-subscore-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.gsb-notes { margin-top: 4px; }
+
+/* Recommendations */
+.gsb-recs { margin: 0; }
+.gsb-rec { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid #f0f0f1; }
+.gsb-rec:first-child { border-top: 0; }
+.gsb-rec-body { flex: 1; }
+.gsb-rec-title { font-weight: 600; }
+.gsb-rec-detail { color: #50575e; margin-top: 3px; }
+.gsb-rec-actions { white-space: nowrap; }
+.gsb-prio { text-transform: uppercase; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; color: #fff; }
+.gsb-prio-high { background: #b32d2e; }
+.gsb-prio-medium { background: #b26200; }
+.gsb-prio-low { background: #646970; }
+.gsb-count { background: #f0f0f1; border-radius: 999px; padding: 1px 10px; font-size: 12px; color: #50575e; font-weight: 600; vertical-align: middle; }
+
+/* Log levels */
+.gsb-level { font-weight: 600; text-transform: uppercase; font-size: 11px; }
+.gsb-level-error { color: #b32d2e; }
+.gsb-level-warning { color: #b26200; }
+.gsb-level-info { color: #50575e; }
+
+/* Chat */
+.gsb-chat { max-width: 880px; }
+.gsb-chat-samples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.gsb-chat-log { background: #fff; border: 1px solid #dcdcde; border-radius: 8px; padding: 12px; min-height: 160px; max-height: 540px; overflow-y: auto; margin-bottom: 12px; }
+.gsb-msg { margin: 10px 0; padding: 10px 14px; border-radius: 8px; }
+.gsb-msg-user { background: #f0f6fc; border: 1px solid #c5d9ed; }
+.gsb-msg-agent { background: #f6f7f7; border: 1px solid #e0e0e0; white-space: pre-wrap; }
+.gsb-msg-agent .gsb-sources { margin-top: 10px; font-size: 12px; color: #50575e; white-space: normal; }
+.gsb-msg-agent .gsb-sources a { text-decoration: none; }
+.gsb-backend-tag { display: inline-block; font-size: 11px; color: #787c82; margin-top: 6px; }
+.gsb-chat-form { display: flex; gap: 8px; align-items: flex-end; }
+.gsb-chat-form textarea { flex: 1; }
+.gsb-test-result { margin-left: 8px; font-weight: 600; }
