@@ -167,6 +167,43 @@
 		} );
 	} );
 
+	/* ------------------------------------------------- live per-engine probe */
+
+	$( document ).on( 'click', '.gsb-probe', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this );
+		var engine = $btn.data( 'engine' );
+		var $status = $( '.gsb-probe-status[data-engine="' + engine + '"]' ).text( GSB.strings.thinking ).removeClass( 'gsb-bad' );
+		$btn.prop( 'disabled', true );
+		post( 'gsb_probe', { engine: engine } ).done( function ( res ) {
+			if ( res && res.success ) {
+				$status.text( GSB.strings.done );
+				location.reload();
+			} else {
+				$status.addClass( 'gsb-bad' ).text( ( res && res.data && res.data.message ) || GSB.strings.error );
+				$btn.prop( 'disabled', false );
+			}
+		} ).fail( function () {
+			$status.addClass( 'gsb-bad' ).text( GSB.strings.error );
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
+	$( '#gsb-probe-all' ).on( 'click', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this ).prop( 'disabled', true ).text( GSB.strings.thinking );
+		post( 'gsb_probe', { engine: 'all' } ).done( function ( res ) {
+			if ( res && res.success ) {
+				location.reload();
+			} else {
+				$btn.prop( 'disabled', false ).text( 'Run live probe on all engines' );
+				alert( ( res && res.data && res.data.message ) || GSB.strings.error );
+			}
+		} ).fail( function () {
+			$btn.prop( 'disabled', false ).text( 'Run live probe on all engines' );
+		} );
+	} );
+
 	/* ----------------------------------------------- AI visibility narrative */
 
 	$( document ).on( 'click', '.gsb-narrative', function ( e ) {

@@ -40,6 +40,27 @@ $selected     = GSB_Settings::indexed_post_types();
 			</tr>
 		</table>
 
+		<h2><?php esc_html_e( 'AI engines for live probing', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'optional', 'geo-site-brain' ); ?></span></h2>
+		<p class="description"><?php esc_html_e( 'Add a key for any engine to probe the real model on the AI Visibility screen and see exactly how it describes your business. Without these, that screen shows estimates. (ChatGPT uses your OpenAI key above.)', 'geo-site-brain' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="gsb_anthropic"><?php esc_html_e( 'Anthropic (Claude) key', 'geo-site-brain' ); ?></label></th>
+				<td><input type="password" id="gsb_anthropic" name="<?php echo esc_attr( $o . 'anthropic_api_key' ); ?>" value="" autocomplete="new-password" class="regular-text"
+					placeholder="<?php echo '' !== trim( (string) GSB_Settings::get( 'anthropic_api_key' ) ) ? esc_attr__( '•••••••• (saved — leave blank to keep)', 'geo-site-brain' ) : 'sk-ant-…'; ?>" /></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_gemini"><?php esc_html_e( 'Google Gemini key', 'geo-site-brain' ); ?></label></th>
+				<td><input type="password" id="gsb_gemini" name="<?php echo esc_attr( $o . 'gemini_api_key' ); ?>" value="" autocomplete="new-password" class="regular-text"
+					placeholder="<?php echo '' !== trim( (string) GSB_Settings::get( 'gemini_api_key' ) ) ? esc_attr__( '•••••••• (saved — leave blank to keep)', 'geo-site-brain' ) : 'AIza…'; ?>" /></td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="gsb_perplexity"><?php esc_html_e( 'Perplexity key', 'geo-site-brain' ); ?></label></th>
+				<td><input type="password" id="gsb_perplexity" name="<?php echo esc_attr( $o . 'perplexity_api_key' ); ?>" value="" autocomplete="new-password" class="regular-text"
+					placeholder="<?php echo '' !== trim( (string) GSB_Settings::get( 'perplexity_api_key' ) ) ? esc_attr__( '•••••••• (saved — leave blank to keep)', 'geo-site-brain' ) : 'pplx-…'; ?>" />
+					<p class="description"><?php esc_html_e( 'Perplexity is web-grounded, so it best reflects real AI-search visibility.', 'geo-site-brain' ); ?></p></td>
+			</tr>
+		</table>
+
 		<details class="gsb-advanced">
 		<summary><?php esc_html_e( 'Advanced — storage & indexing (optional)', 'geo-site-brain' ); ?></summary>
 

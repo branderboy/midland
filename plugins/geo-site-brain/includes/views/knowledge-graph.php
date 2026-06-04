@@ -43,6 +43,48 @@ $has_entities = array_sum( $counts ) > 0;
 		<?php endforeach; ?>
 	</div>
 
+	<?php
+	// Build the interactive map data: business at the centre, services and
+	// locations around it, with the found/weak coverage links between them.
+	$g_nodes = array();
+	$g_links = array();
+	$biz_rows = GSB_Database::get_entities( 'business' );
+	if ( $biz_rows ) {
+		$g_nodes[] = array( 'id' => 'b', 'label' => $biz_rows[0]->name, 'type' => 'business', 'status' => 'found' );
+	}
+	foreach ( array_slice( $matrix['services'], 0, 40 ) as $s ) {
+		$g_nodes[] = array( 'id' => 's' . $s->id, 'label' => $s->name, 'type' => 'service', 'status' => $s->status );
+		if ( $biz_rows ) {
+			$g_links[] = array( 'source' => 'b', 'target' => 's' . $s->id, 'status' => 'found' );
+		}
+	}
+	foreach ( array_slice( $matrix['locations'], 0, 40 ) as $l ) {
+		$g_nodes[] = array( 'id' => 'l' . $l->id, 'label' => $l->name, 'type' => 'location', 'status' => $l->status );
+		if ( $biz_rows ) {
+			$g_links[] = array( 'source' => 'b', 'target' => 'l' . $l->id, 'status' => 'found' );
+		}
+	}
+	// Service↔Location coverage links (only drawn when present, to avoid clutter).
+	foreach ( GSB_Database::get_relationships( 'offered_in' ) as $r ) {
+		if ( 'recommended' === $r->status ) {
+			continue;
+		}
+		$st = ( 'found' === $r->status && (int) $r->strength < 70 ) ? 'weak' : 'found';
+		$g_links[] = array( 'source' => 's' . (int) $r->from_id, 'target' => 'l' . (int) $r->to_id, 'status' => $st );
+	}
+	?>
+
+	<div class="gsb-panel">
+		<h2><?php esc_html_e( 'Business map', 'geo-site-brain' ); ?></h2>
+		<p class="gsb-muted"><?php esc_html_e( 'Drag nodes to explore. Dim nodes are recommended additions not yet on your site.', 'geo-site-brain' ); ?>
+			<span class="gsb-legend"><span class="gsb-dot" style="background:#1d2327"></span> <?php esc_html_e( 'business', 'geo-site-brain' ); ?></span>
+			<span class="gsb-legend"><span class="gsb-dot" style="background:#2271b1"></span> <?php esc_html_e( 'service', 'geo-site-brain' ); ?></span>
+			<span class="gsb-legend"><span class="gsb-dot" style="background:#00794b"></span> <?php esc_html_e( 'location', 'geo-site-brain' ); ?></span>
+		</p>
+		<div id="gsb-graph" class="gsb-graph"></div>
+		<script type="application/json" id="gsb-graph-data"><?php echo wp_json_encode( array( 'nodes' => $g_nodes, 'links' => $g_links ) ); ?></script>
+	</div>
+
 	<div class="gsb-panel">
 		<h2><?php esc_html_e( 'Service × Location coverage', 'geo-site-brain' ); ?></h2>
 		<p class="gsb-muted"><?php esc_html_e( 'Each cell shows whether AI can connect a service to a location.', 'geo-site-brain' ); ?>

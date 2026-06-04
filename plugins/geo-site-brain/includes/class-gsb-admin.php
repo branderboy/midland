@@ -42,6 +42,7 @@ class GSB_Admin {
 			'gsb_rec_status'   => 'ajax_rec_status',
 			'gsb_apply_fix'    => 'ajax_apply_fix',
 			'gsb_narrative'    => 'ajax_narrative',
+			'gsb_probe'        => 'ajax_probe',
 			'gsb_test_openai'  => 'ajax_test_openai',
 			'gsb_test_neon'    => 'ajax_test_neon',
 			'gsb_chat'         => 'ajax_chat',
@@ -90,9 +91,15 @@ class GSB_Admin {
 		// Secrets: preserve the stored value when the field is submitted empty so
 		// saving the form doesn't wipe a configured key.
 		register_setting( self::GROUP, $o . 'openai_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
+		register_setting( self::GROUP, $o . 'anthropic_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
+		register_setting( self::GROUP, $o . 'gemini_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
+		register_setting( self::GROUP, $o . 'perplexity_api_key', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
 		register_setting( self::GROUP, $o . 'neon_dsn', array( 'type' => 'string', 'sanitize_callback' => array( $this, 'keep_secret' ) ) );
 
 		register_setting( self::GROUP, $o . 'chat_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'anthropic_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'gemini_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'perplexity_model', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
 		register_setting( self::GROUP, $o . 'neon_enabled', array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
 		register_setting( self::GROUP, $o . 'post_types', array( 'type' => 'array', 'sanitize_callback' => array( $this, 'sanitize_post_types' ) ) );
 		register_setting( self::GROUP, $o . 'chunk_max_chars', array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
@@ -134,6 +141,8 @@ class GSB_Admin {
 		}
 		wp_enqueue_style( 'gsb-admin', GSB_PLUGIN_URL . 'assets/css/admin.css', array(), GSB_VERSION );
 		wp_enqueue_script( 'gsb-admin', GSB_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery' ), GSB_VERSION, true );
+		// Knowledge-graph map renderer (dependency-free; no-ops without #gsb-graph).
+		wp_enqueue_script( 'gsb-graph', GSB_PLUGIN_URL . 'assets/js/graph.js', array(), GSB_VERSION, true );
 		wp_localize_script( 'gsb-admin', 'GSB', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( self::NONCE ),
@@ -221,6 +230,26 @@ class GSB_Admin {
 		$this->guard();
 		$id  = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 		$res = GSB_Fixes::apply( $id );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( $res );
+	}
+
+	/**
+	 * Run a live probe against a real model (or all engines that have keys).
+	 */
+	public function ajax_probe() {
+		$this->guard();
+		$engine = isset( $_POST['engine'] ) ? sanitize_key( wp_unslash( $_POST['engine'] ) ) : '';
+		if ( 'all' === $engine ) {
+			$n = GSB_Visibility::probe_all();
+			if ( 0 === $n ) {
+				wp_send_json_error( array( 'message' => __( 'No engine keys configured. Add at least one in Settings.', 'geo-site-brain' ) ) );
+			}
+			wp_send_json_success( array( 'probed' => $n ) );
+		}
+		$res = GSB_Visibility::probe( $engine );
 		if ( is_wp_error( $res ) ) {
 			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
 		}

@@ -4,7 +4,7 @@ Tags: geo, aeo, seo, embeddings, openai, neon, pgvector, ai, schema, recommendat
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,15 @@ key, Neon connection string) are stored privately and never returned to the
 browser.
 
 == Changelog ==
+
+= 2.1.0 =
+* Live per-engine probing: add a Claude, Gemini or Perplexity key (ChatGPT uses
+  your OpenAI key) to probe the real models on the AI Visibility screen. Scores
+  are derived from each model's actual answer vs your knowledge graph, with a
+  Live / Estimated badge and "it identified / it missed" breakdown.
+* Interactive business map on the Knowledge Graph screen — a dependency-free,
+  draggable node-and-edge graph of your business, services and locations (no
+  external library or CDN).
 
 = 2.0.0 =
 * Product refactor into an AI Visibility Command Center. New navigation:

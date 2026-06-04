@@ -186,6 +186,165 @@ class GSB_Visibility {
 		return $s;
 	}
 
+	/* --------------------------------------------------- LIVE per-engine probe */
+
+	/**
+	 * Probe a real AI model: give it the business knowledge and ask, in
+	 * structured JSON, what it can identify and what it can't. Scores are then
+	 * derived from the model's ACTUAL answer (not a simulation) — measuring how
+	 * understandable the business is to that specific engine. Marks the result
+	 * "live" so the UI can distinguish it.
+	 *
+	 * @return array|WP_Error details on success.
+	 */
+	public static function probe( $engine ) {
+		if ( ! in_array( $engine, self::ENGINES, true ) ) {
+			return new WP_Error( 'gsb_engine', __( 'Unknown engine.', 'geo-site-brain' ) );
+		}
+		if ( ! GSB_AI_Providers::has_key( $engine ) ) {
+			return new WP_Error( 'gsb_no_key', sprintf( __( 'Add a %s API key in Settings to run a live probe.', 'geo-site-brain' ), self::engine_label( $engine ) ) );
+		}
+
+		$profile = self::business_profile_text();
+		$label   = self::engine_label( $engine );
+		$system  = "You are {$label}. A user is asking you about a local business. Using ONLY the business knowledge provided, respond with a single JSON object and nothing else, with these keys:\n"
+			. '{"description": "2-3 sentence description as you would tell a user", "services": ["..."], "locations": ["..."], "can_answer_questions": true/false, "has_trust_signals": true/false, "has_differentiators": true/false, "cannot_determine": ["..."]}'
+			. "\nDo not invent anything not supported by the knowledge. If something is unclear, put it in cannot_determine.";
+
+		$raw = GSB_AI_Providers::chat( $engine, $system, $profile, 700 );
+		if ( is_wp_error( $raw ) ) {
+			return $raw;
+		}
+		if ( null === $raw ) {
+			return new WP_Error( 'gsb_no_key', __( 'No key for this engine.', 'geo-site-brain' ) );
+		}
+
+		$parsed = self::parse_json( (string) $raw );
+		if ( ! is_array( $parsed ) ) {
+			// Model didn't return clean JSON — keep the prose as the narrative and
+			// fall back to deterministic scores so the card still updates.
+			$signals = self::signals( null );
+			$scores  = self::scores_for( $engine, $signals );
+			GSB_Database::save_visibility( $engine, $scores, trim( (string) $raw ), array(
+				'live'      => true,
+				'checklist' => self::checklist( $signals ),
+				'parsed'    => false,
+			) );
+			self::record_history();
+			return array( 'live' => true, 'summary' => trim( (string) $raw ) );
+		}
+
+		// Ground truth from our own knowledge graph.
+		$graph_services  = self::names( 'service' );
+		$graph_locations = self::names( 'location' );
+
+		$id_services  = self::clean_list( $parsed['services'] ?? array() );
+		$id_locations = self::clean_list( $parsed['locations'] ?? array() );
+
+		$recall_s = self::recall( $graph_services, $id_services );
+		$recall_l = self::recall( $graph_locations, $id_locations );
+		$coverage = (int) round( 100 * ( ( $recall_s + $recall_l ) / 2 ) );
+
+		$desc   = trim( (string) ( $parsed['description'] ?? '' ) );
+		$cannot = self::clean_list( $parsed['cannot_determine'] ?? array() );
+		$can_q  = ! empty( $parsed['can_answer_questions'] );
+		$trust  = ! empty( $parsed['has_trust_signals'] );
+		$diff   = ! empty( $parsed['has_differentiators'] );
+
+		$scores = array(
+			'visibility'     => (int) round( 0.4 * $coverage + 0.15 * ( $desc ? 100 : 0 ) + 0.15 * ( $can_q ? 100 : 0 ) + 0.15 * ( $trust ? 100 : 0 ) + 0.15 * ( $diff ? 100 : 0 ) ),
+			'confidence'     => max( 0, 100 - min( 100, count( $cannot ) * 20 ) ),
+			'knowledge'      => $coverage,
+			'recommendation' => (int) round( 0.4 * ( $trust ? 100 : 0 ) + 0.3 * ( $diff ? 100 : 0 ) + 0.3 * ( $can_q ? 100 : 0 ) ),
+		);
+
+		$missing_services  = array_values( array_diff( array_map( 'strtolower', $graph_services ), array_map( 'strtolower', $id_services ) ) );
+		$missing_locations = array_values( array_diff( array_map( 'strtolower', $graph_locations ), array_map( 'strtolower', $id_locations ) ) );
+
+		$summary = $desc;
+		if ( $cannot ) {
+			$summary .= "\n\n" . __( "Can't determine: ", 'geo-site-brain' ) . implode( ', ', $cannot );
+		}
+
+		GSB_Database::save_visibility( $engine, $scores, $summary, array(
+			'live'              => true,
+			'parsed'            => true,
+			'identified_services'  => $id_services,
+			'identified_locations' => $id_locations,
+			'missing_services'  => $missing_services,
+			'missing_locations' => $missing_locations,
+			'cannot_determine'  => $cannot,
+			'checklist'         => array(
+				'what_you_do'      => '' !== $desc,
+				'service_areas'    => ! empty( $id_locations ),
+				'expertise'        => count( $id_services ) >= 2,
+				'trust_signals'    => $trust,
+				'differentiators'  => $diff,
+				'authority'        => self::found_count( 'author' ) >= 1,
+				'answer_questions' => $can_q,
+			),
+		) );
+		self::record_history();
+
+		GSB_Logger::info( 'visibility', sprintf( 'Live probe complete for %s (visibility %d).', $label, $scores['visibility'] ) );
+		return array( 'live' => true, 'summary' => $summary, 'scores' => $scores );
+	}
+
+	/** Probe every engine that has a key. Returns count probed. */
+	public static function probe_all() {
+		$n = 0;
+		foreach ( GSB_AI_Providers::live_engines() as $engine ) {
+			$res = self::probe( $engine );
+			if ( ! is_wp_error( $res ) ) {
+				$n++;
+			}
+		}
+		return $n;
+	}
+
+	private static function parse_json( $raw ) {
+		$raw = preg_replace( '/```[a-z]*\s*/i', '', $raw );
+		$raw = str_replace( '```', '', $raw );
+		if ( preg_match( '/\{.*\}/s', $raw, $m ) ) {
+			$raw = $m[0];
+		}
+		$data = json_decode( trim( $raw ), true );
+		return is_array( $data ) ? $data : null;
+	}
+
+	private static function clean_list( $list ) {
+		if ( ! is_array( $list ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $list as $v ) {
+			$v = trim( wp_strip_all_tags( (string) $v ) );
+			if ( '' !== $v ) {
+				$out[] = $v;
+			}
+		}
+		return array_values( array_unique( $out ) );
+	}
+
+	/** Fraction of ground-truth items the model reproduced (substring match). */
+	private static function recall( $truth, $found ) {
+		if ( empty( $truth ) ) {
+			return empty( $found ) ? 1.0 : 1.0;
+		}
+		$found_l = array_map( 'strtolower', $found );
+		$hit = 0;
+		foreach ( $truth as $t ) {
+			$t_l = strtolower( $t );
+			foreach ( $found_l as $f ) {
+				if ( false !== strpos( $f, $t_l ) || false !== strpos( $t_l, $f ) ) {
+					$hit++;
+					break;
+				}
+			}
+		}
+		return $hit / count( $truth );
+	}
+
 	/* ----------------------------------------------------- on-demand narrative */
 
 	/**

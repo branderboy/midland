@@ -22,6 +22,13 @@ class GSB_Settings {
 		return array(
 			'openai_api_key'    => '',
 			'chat_model'        => 'gpt-4o-mini',
+			// Optional keys for LIVE per-engine probing (Visibility screen).
+			'anthropic_api_key' => '',
+			'gemini_api_key'    => '',
+			'perplexity_api_key'=> '',
+			'anthropic_model'   => 'claude-3-5-haiku-latest',
+			'gemini_model'      => 'gemini-1.5-flash',
+			'perplexity_model'  => 'sonar',
 			'neon_enabled'      => 0,
 			'neon_dsn'          => '',          // postgresql://user:pass@host/db?sslmode=require
 			'post_types'        => array( 'page', 'post' ),
