@@ -57,6 +57,19 @@ class RSSEO_Pro_AI_Rank {
     }
 
     public function maybe_schedule_cron() {
+        $queries = (array) get_option( 'rsseo_pro_ai_rank_queries', array() );
+        $has_key = ( class_exists( 'RSSEO_Settings' ) && RSSEO_Settings::has_api_key() )
+            || '' !== (string) get_option( 'rsseo_pro_ai_perplexity_key', '' );
+        $configured = $has_key && ! empty( $queries );
+
+        if ( ! $configured ) {
+            // Don't auto-schedule until queries + an API key exist; clear any
+            // stale event left from a previous configuration.
+            if ( wp_next_scheduled( self::CRON_HOOK ) ) {
+                wp_unschedule_hook( self::CRON_HOOK );
+            }
+            return;
+        }
         if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
             wp_schedule_event( time() + 2 * DAY_IN_SECONDS, 'weekly', self::CRON_HOOK );
         }

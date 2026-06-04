@@ -763,7 +763,25 @@ class RSSEO_Admin {
             wp_send_json_error( __( 'Invalid report ID.', 'real-smart-seo' ) );
         }
 
-        $result = RSSEO_Fixer::apply_all( $report_id );
+        $result  = RSSEO_Fixer::apply_all( $report_id );
+        $applied = (int) ( $result['applied'] ?? 0 );
+        $errors  = (array) ( $result['errors'] ?? array() );
+
+        // Surface partial failure instead of always reporting success.
+        if ( ! empty( $errors ) ) {
+            $msg = sprintf(
+                /* translators: 1: applied count, 2: failed count */
+                _n( 'Applied %1$d fix; %2$d failed.', 'Applied %1$d fixes; %2$d failed.', $applied, 'real-smart-seo' ),
+                $applied,
+                count( $errors )
+            );
+            wp_send_json_error( array(
+                'message' => $msg,
+                'applied' => $applied,
+                'errors'  => $errors,
+            ) );
+        }
+
         wp_send_json_success( $result );
     }
 

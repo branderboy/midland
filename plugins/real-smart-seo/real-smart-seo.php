@@ -44,6 +44,7 @@ class RSSEO_Plugin {
 
     private function __construct() {
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
+        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
         add_action( 'plugins_loaded', array( $this, 'init' ) );
         add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
     }
@@ -71,8 +72,34 @@ class RSSEO_Plugin {
         flush_rewrite_rules();
     }
 
+    /**
+     * Clear every scheduled cron event this plugin registers, so nothing keeps
+     * firing after deactivation. wp_unschedule_hook() removes all instances of
+     * a hook regardless of the args they were scheduled with (covers the
+     * per-URL / per-scan single events too).
+     */
+    public function deactivate() {
+        $hooks = array(
+            'rsseo_geogrid_weekly_scan',   // RSSEO_Pro_Geogrid::CRON_HOOK
+            'rsseo_geogrid_process_cell',  // RSSEO_Pro_Geogrid::TICK_HOOK
+            'rsseo_ai_rank_weekly_scan',   // RSSEO_Pro_AI_Rank::CRON_HOOK
+            'rsseo_ai_rank_process_one',   // RSSEO_Pro_AI_Rank::TICK_HOOK
+            'rsseo_growth_digest_send',    // RSSEO_Pro_Growth_Digest::CRON_HOOK
+            'rsseo_analyze_scan',          // RSSEO_Jobs::HOOK (background analysis)
+            'rsseo_indexnow_ping',         // RSSEO_Pro_IndexNow single + batch
+            'rsseo_indexnow_batch_ping',
+        );
+        foreach ( $hooks as $hook ) {
+            wp_unschedule_hook( $hook );
+        }
+        flush_rewrite_rules();
+    }
+
     public function init() {
         load_plugin_textdomain( 'real-smart-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+        // Several bundled modules still use the 'real-smart-seo-pro' text domain;
+        // register it against the same languages folder so those strings load.
+        load_plugin_textdomain( 'real-smart-seo-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
         $this->includes();
         $this->init_classes();
         add_action( 'admin_init',        array( $this, 'maybe_upgrade_db' ) );
