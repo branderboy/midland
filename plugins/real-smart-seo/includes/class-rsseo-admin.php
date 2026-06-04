@@ -25,6 +25,7 @@ class RSSEO_Admin {
         add_action( 'wp_ajax_rsseo_save_settings', array( $this, 'ajax_save_settings' ) );
         add_action( 'wp_ajax_rsseo_rename_scan',   array( $this, 'ajax_rename_scan' ) );
         add_action( 'admin_post_rsseo_new_scan',    array( $this, 'handle_new_scan' ) );
+        add_action( 'wp_ajax_rsseo_analysis_status', array( $this, 'ajax_analysis_status' ) );
         add_action( 'wp_ajax_rsseo_run_audit',      array( $this, 'ajax_run_audit' ) );
         add_action( 'wp_ajax_rsseo_apply_audit_fix', array( $this, 'ajax_apply_audit_fix' ) );
     }
@@ -420,11 +421,27 @@ class RSSEO_Admin {
         }
         $has_key = RSSEO_Settings::has_api_key();
 
+        // Background analysis in flight? Show the progress panel — it polls and
+        // redirects to the report when the job finishes. (Set after a scan is
+        // submitted, before the report exists.)
+        $scan_id   = isset( $_GET['scan_id'] ) ? (int) $_GET['scan_id'] : 0;     // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $report_id = isset( $_GET['report_id'] ) ? (int) $_GET['report_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( $scan_id > 0 && $report_id <= 0 ) {
+            $job = RSSEO_Jobs::status( $scan_id );
+            if ( in_array( $job['status'], array( 'queued', 'running' ), true ) ) {
+                $this->render_analysis_progress( $scan_id, $job );
+                return;
+            }
+            if ( 'complete' === $job['status'] && ! empty( $job['report_id'] ) ) {
+                $report_id = (int) $job['report_id'];
+            } elseif ( 'error' === $job['status'] ) {
+                echo '<div class="rsseo-notice rsseo-notice--error" style="margin-bottom:18px;"><strong>' . esc_html__( 'Analysis failed:', 'real-smart-seo' ) . '</strong> ' . esc_html( $job['message'] ) . '</div>';
+            }
+        }
+
         // If we just finished analyzing, render the report findings inline ABOVE
         // the new-scan form so the user sees their fixes + Apply buttons without
-        // hunting through tabs. Each action ties forward to the next step
-        // (Analyze → Repair findings inline → Index ping → Insights).
-        $report_id = isset( $_GET['report_id'] ) ? (int) $_GET['report_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        // hunting through tabs.
         if ( $report_id > 0 ) {
             $report = RSSEO_Database::get_report( $report_id );
             if ( $report ) {
@@ -723,27 +740,18 @@ class RSSEO_Admin {
          */
         $scan_id = apply_filters( 'rsseo_after_scan_created', $scan_id, $_POST ); // phpcs:ignore WordPress.Security
 
-        // Run analysis immediately (synchronous for simplicity — fine for most sites).
-        // A Pro add-on may take over analysis entirely (its own AI pass + report
-        // row); when none is hooked the filter returns null and the base
-        // analyzer runs.
-        $report_id = apply_filters( 'rsseo_run_analyzer', null, $scan_id );
-        if ( null === $report_id ) {
-            $report_id = RSSEO_Analyzer::analyze( $scan_id );
-        }
-
-        if ( is_wp_error( $report_id ) ) {
-            wp_redirect( add_query_arg( array(
-                'page'  => 'rsseo-new-scan',
-                'error' => urlencode( $report_id->get_error_message() ),
-            ), admin_url( 'admin.php' ) ) );
-            exit;
-        }
+        // Queue the AI analysis as a background job instead of blocking this
+        // POST on a ~2-minute Perplexity call. The Opportunities tab polls for
+        // progress and swaps in the report when it's ready. A Pro add-on can
+        // still take over the analysis via the rsseo_run_analyzer filter inside
+        // the job runner.
+        RSSEO_Jobs::enqueue( $scan_id );
 
         wp_redirect( add_query_arg( array(
-            'page'      => 'real-smart-seo',
-            'tab'       => 'analyze',
-            'report_id' => $report_id,
+            'page'    => 'real-smart-seo',
+            'tab'     => 'opportunities',
+            'scan_id' => (int) $scan_id,
+            'queued'  => 1,
         ), admin_url( 'admin.php' ) ) );
         exit;
     }
@@ -814,6 +822,81 @@ class RSSEO_Admin {
             wp_send_json_error( __( 'Invalid report ID.', 'real-smart-seo' ) );
         }
         wp_send_json_success( RSSEO_Fixer::restore_all( $report_id ) );
+    }
+
+    // ── AJAX: Background analysis status ──────────────────────────────────────
+
+    /**
+     * Polled by the Opportunities progress panel. Returns the background job's
+     * state for a scan, plus the URL to send the browser to once it completes.
+     */
+    public function ajax_analysis_status() {
+        check_ajax_referer( 'rsseo_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        $scan_id = isset( $_POST['scan_id'] ) ? (int) $_POST['scan_id'] : 0;
+        if ( $scan_id <= 0 ) {
+            wp_send_json_error( __( 'Invalid scan.', 'real-smart-seo' ) );
+        }
+        $job      = RSSEO_Jobs::status( $scan_id );
+        $redirect = '';
+        if ( 'complete' === $job['status'] && ! empty( $job['report_id'] ) ) {
+            $redirect = admin_url( 'admin.php?page=real-smart-seo&tab=opportunities&report_id=' . (int) $job['report_id'] );
+        }
+        wp_send_json_success( array(
+            'status'   => $job['status'],
+            'message'  => $job['message'],
+            'redirect' => $redirect,
+        ) );
+    }
+
+    /**
+     * Progress panel shown while the background analysis runs. Polls
+     * ajax_analysis_status and redirects to the report when complete.
+     */
+    private function render_analysis_progress( $scan_id, $job ) {
+        $running = 'running' === $job['status'];
+        ?>
+        <div class="rsseo-tabview rsseo-analysis-progress">
+            <h2><?php esc_html_e( 'Analyzing your site…', 'real-smart-seo' ); ?></h2>
+            <div class="rsseo-progress-card" style="background:#fff;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.08);max-width:640px;">
+                <p style="display:flex;align-items:center;gap:12px;font-size:15px;margin-top:0;">
+                    <span class="spinner is-active" style="float:none;margin:0;"></span>
+                    <span id="rsseo-progress-text"><?php echo esc_html( $running ? __( 'Perplexity is reviewing your scan data and writing prioritized fixes…', 'real-smart-seo' ) : __( 'Queued — starting analysis…', 'real-smart-seo' ) ); ?></span>
+                </p>
+                <p class="description"><?php esc_html_e( 'This runs in the background — you can leave this page and come back. Findings will appear here automatically when ready (usually under a minute).', 'real-smart-seo' ); ?></p>
+                <p id="rsseo-progress-error" class="rsseo-notice rsseo-notice--error" style="display:none;"></p>
+            </div>
+        </div>
+        <script>
+        (function($){
+            var d = window.rsseoData || {};
+            var ajaxUrl = d.ajax_url || ajaxurl;
+            var nonce   = <?php echo wp_json_encode( wp_create_nonce( 'rsseo_nonce' ) ); ?>;
+            var scanId  = <?php echo (int) $scan_id; ?>;
+            var tries   = 0;
+            function poll(){
+                tries++;
+                $.post(ajaxUrl, { action:'rsseo_analysis_status', nonce:nonce, scan_id:scanId }, function(res){
+                    if(!res || !res.success){ return schedule(); }
+                    var s = res.data || {};
+                    if(s.status === 'complete' && s.redirect){ window.location = s.redirect; return; }
+                    if(s.status === 'error'){
+                        $('#rsseo-progress-text').text(<?php echo wp_json_encode( __( 'Analysis failed.', 'real-smart-seo' ) ); ?>);
+                        $('.rsseo-analysis-progress .spinner').removeClass('is-active');
+                        $('#rsseo-progress-error').text(s.message || 'Error').show();
+                        return;
+                    }
+                    if(s.status === 'running'){ $('#rsseo-progress-text').text(<?php echo wp_json_encode( __( 'Perplexity is reviewing your scan data and writing prioritized fixes…', 'real-smart-seo' ) ); ?>); }
+                    schedule();
+                }).fail(schedule);
+            }
+            function schedule(){ if(tries < 120){ setTimeout(poll, 3000); } }
+            poll();
+        })(jQuery);
+        </script>
+        <?php
     }
 
     // ── AJAX: Test API Key ─────────────────────────────────────────────────────

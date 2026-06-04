@@ -86,9 +86,10 @@ class RSSEO_Plugin {
         require_once RSSEO_PATH . 'includes/class-rsseo-profile.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-database.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-settings.php';
-        require_once RSSEO_PATH . 'includes/class-rsseo-claude-api.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-ai-client.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-importer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-analyzer.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-jobs.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-fixer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-crawler.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-admin.php';

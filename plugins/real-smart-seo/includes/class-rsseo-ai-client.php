@@ -1,19 +1,18 @@
 <?php
 /**
- * RSSEO_Claude_API
+ * RSSEO_AI_Client
  *
- * NOTE: The class name is preserved for backwards compatibility — its three
- * callers (RSSEO_Admin, RSSEO_Analyzer, RSSEO_Pro_Analyzer) keep working
- * without changes. Under the hood, this class now calls Perplexity's Sonar
- * API instead of Anthropic. Settings UI and error messages have been
- * updated to refer to Perplexity.
+ * Thin client for the AI provider behind the analyzer. It currently calls
+ * Perplexity's Sonar API (OpenAI-style chat completions). Formerly named
+ * RSSEO_Claude_API back when it called Anthropic — a class_alias at the bottom
+ * keeps that old name working for any caller not yet updated.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class RSSEO_Claude_API {
+class RSSEO_AI_Client {
 
     const API_URL     = 'https://api.perplexity.ai/chat/completions';
     const MAX_RETRIES = 3;
@@ -36,7 +35,7 @@ class RSSEO_Claude_API {
     public static function ask( $prompt, $scan_id = null ) {
         $api_key = RSSEO_Settings::get_api_key();
         if ( empty( $api_key ) ) {
-            return new WP_Error( 'no_api_key', __( 'Perplexity API key is not configured. Go to Real Smart SEO → Settings to add your key.', 'real-smart-seo' ) );
+            return new WP_Error( 'no_api_key', __( 'Perplexity API key is not configured. Go to Real Smart SEO → Setup to add your key.', 'real-smart-seo' ) );
         }
 
         $model      = RSSEO_Settings::get_model();
@@ -133,4 +132,10 @@ class RSSEO_Claude_API {
         }
         return true;
     }
+}
+
+// Back-compat: the class was RSSEO_Claude_API before it moved off Anthropic.
+// Existing callers (and any third-party code) keep working through the alias.
+if ( ! class_exists( 'RSSEO_Claude_API' ) ) {
+    class_alias( 'RSSEO_AI_Client', 'RSSEO_Claude_API' );
 }
