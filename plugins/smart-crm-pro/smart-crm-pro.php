@@ -11,7 +11,6 @@
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Requires Plugins: smart-forms-for-midland
  * Tested up to: 6.7
  * Update URI: false
  */
@@ -31,7 +30,12 @@ function smart_crm_pro_init() {
 
     if ( ! defined( 'SFCO_VERSION' ) ) {
         add_action( 'admin_notices', function() {
-            echo '<div class="notice notice-error"><p><strong>' . esc_html__( 'Smart CRM PRO requires Smart Forms for Contractors to be installed and active.', 'smart-crm-pro' ) . '</strong></p></div>';
+            $link = current_user_can( 'activate_plugins' )
+                ? ' <a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">' . esc_html__( 'Activate it on the Plugins page.', 'smart-crm-pro' ) . '</a>'
+                : '';
+            echo '<div class="notice notice-warning"><p><strong>'
+                . esc_html__( 'Midland Smart CRM is idle: it needs the "Midland Smart Forms" plugin active to pass leads through.', 'smart-crm-pro' )
+                . '</strong>' . $link . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         });
         return;
     }
