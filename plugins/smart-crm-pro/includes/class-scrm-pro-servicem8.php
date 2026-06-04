@@ -423,16 +423,19 @@ class SCRM_Pro_ServiceM8 {
 
     /**
      * Auth headers for the ServiceM8 REST API. ServiceM8 private-app API keys
-     * authenticate via the X-API-Key header (the documented method); we also
-     * send HTTP Basic for older accounts that accepted the key as the Basic
-     * username. Sending both is harmless and lets either scheme satisfy the
-     * request. A 401 means the key is missing/invalid or the account plan has
-     * no REST API access.
+     * authenticate via the X-API-Key header — that is the only scheme that
+     * works for an API key.
+     *
+     * We must NOT also send an "Authorization: Basic" header. ServiceM8's Basic
+     * scheme is email+password, so when that header is present ServiceM8 tries
+     * to validate "<api_key>:x" as a login, fails, and rejects the whole request
+     * with "HTTP 401: Invalid username or password" — shadowing the X-API-Key
+     * auth that would otherwise succeed. A 401 now means the key itself is
+     * missing/invalid or the account plan has no REST API access.
      */
     public static function auth_headers( $api_key ) {
         return array(
             'X-API-Key'     => $api_key,
-            'Authorization' => 'Basic ' . base64_encode( $api_key . ':x' ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
             'Content-Type'  => 'application/json',
             'Accept'        => 'application/json',
         );
