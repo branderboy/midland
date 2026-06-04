@@ -39,8 +39,11 @@ $selected     = GSB_Settings::indexed_post_types();
 			</tr>
 		</table>
 
-		<h2><?php esc_html_e( 'Neon (pgvector) vector store', 'geo-site-brain' ); ?></h2>
-		<p class="description"><?php esc_html_e( 'Embeddings are stored in Neon (serverless Postgres + pgvector). If Neon is off or unreachable, GEO Site Brain automatically falls back to a local store, so the plugin always works.', 'geo-site-brain' ); ?></p>
+		<h2><?php esc_html_e( 'Vector storage', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'Advanced — optional', 'geo-site-brain' ); ?></span></h2>
+		<p class="description">
+			<strong><?php esc_html_e( 'By default, embeddings are stored locally in your WordPress database — no external service, no server extensions, nothing to install.', 'geo-site-brain' ); ?></strong>
+			<?php esc_html_e( 'Neon (serverless Postgres + pgvector) is an optional upgrade for very large sites. If it is off or unreachable, GEO Site Brain uses the local store automatically, so the plugin always works.', 'geo-site-brain' ); ?>
+		</p>
 		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Use Neon', 'geo-site-brain' ); ?></th>
