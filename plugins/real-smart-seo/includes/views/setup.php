@@ -143,11 +143,18 @@ $overall_color = RSSEO_Profile::status_color( $overall );
 
     </form>
 
-    <?php if ( $has_pro && has_action( 'rsseo_render_pro_settings_panel' ) ) : ?>
+    <hr style="margin:28px 0;">
+    <div class="rsseo-settings-section">
+        <h2><?php esc_html_e( 'Business Identity & Schema', 'real-smart-seo' ); ?></h2>
+        <p class="description"><?php esc_html_e( 'Publish LocalBusiness / sameAs schema sitewide and confirm your name, address, and profile links to Google.', 'real-smart-seo' ); ?></p>
+        <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-sameas' ) ); ?>"><?php esc_html_e( 'Open Business Identity →', 'real-smart-seo' ); ?></a>
+    </div>
+
+    <?php if ( has_action( 'rsseo_render_pro_settings_panel' ) ) : ?>
         <hr style="margin:28px 0;">
         <div class="rsseo-settings-section">
-            <h2><?php esc_html_e( 'Connections (Pro)', 'real-smart-seo' ); ?></h2>
-            <p class="description"><?php esc_html_e( 'Optional — connect DataForSEO to power rank tracking, the geo-grid, and the backlinks dashboard.', 'real-smart-seo' ); ?></p>
+            <h2><?php esc_html_e( 'Connections', 'real-smart-seo' ); ?></h2>
+            <p class="description"><?php esc_html_e( 'Connect DataForSEO to power rank tracking, the geo-grid, and the backlinks dashboard.', 'real-smart-seo' ); ?></p>
             <?php do_action( 'rsseo_render_pro_settings_panel' ); ?>
         </div>
     <?php endif; ?>

@@ -35,8 +35,8 @@ class RSSEO_Admin {
         // appropriate page_* method based on the ?tab= query var, so the user
         // never has to click between 5 lookalike submenus.
         add_menu_page(
-            __( 'Real Smart SEO', 'real-smart-seo' ),
-            __( 'Real Smart SEO', 'real-smart-seo' ),
+            __( 'Midland Smart SEO', 'real-smart-seo' ),
+            __( 'Midland Smart SEO', 'real-smart-seo' ),
             'manage_options',
             'real-smart-seo',
             array( $this, 'render_tabbed_page' ),
@@ -47,7 +47,7 @@ class RSSEO_Admin {
         // Legacy slugs kept hidden (parent=null) so old bookmarks/links still
         // resolve. They forward to the tabbed page.
         $legacy = array(
-            'rsseo-new-scan'   => 'scan',
+            'rsseo-new-scan'   => 'analyze',
             'rsseo-reports'    => 'reports',
             'rsseo-site-audit' => 'audit',
             'rsseo-settings'   => 'settings',
@@ -61,20 +61,23 @@ class RSSEO_Admin {
     }
 
     private function get_active_tab() {
-        $allowed = array( 'dashboard', 'setup', 'scan', 'opportunities', 'fixqueue', 'pagebuilder', 'indexing', 'reports' );
+        $allowed = array( 'dashboard', 'settings', 'audit', 'analysis', 'fixqueue', 'content', 'internal-links', 'indexing', 'reports' );
         $tab     = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'dashboard'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-        // Map the old + legacy slugs onto the Command Center vocabulary so
-        // existing bookmarks, redirects, and in-page CTAs keep resolving.
+        // Map the old + legacy slugs onto the current Command Center vocabulary
+        // so bookmarks, redirects, and in-page CTAs keep resolving.
         $alias = array(
-            'workflow' => 'dashboard',
-            'audit'    => 'scan',
-            'analyze'  => 'opportunities',
-            'repair'   => 'fixqueue',
-            'report'   => 'reports',
-            'index'    => 'indexing',
-            'insights' => 'reports',
-            'settings' => 'setup',
+            'workflow'      => 'dashboard',
+            'setup'         => 'settings',
+            'scan'          => 'audit',
+            'site-audit'    => 'audit',
+            'opportunities' => 'analysis',
+            'analyze'       => 'analysis',
+            'repair'        => 'fixqueue',
+            'pagebuilder'   => 'content',
+            'report'        => 'reports',
+            'index'         => 'indexing',
+            'insights'      => 'reports',
         );
         if ( isset( $alias[ $tab ] ) ) {
             $tab = $alias[ $tab ];
@@ -88,23 +91,22 @@ class RSSEO_Admin {
         }
         $active = $this->get_active_tab();
 
-        // Tabs follow the Scan → Analyze → Repair → Insights pipeline.
-        // Repair = where the Apply Fixes table lives.
-        // Insights = rankings, AI Rank, Geo-Grid (Pro). Free users see a
-        //            "what is this" panel pointing at the Pro upgrade.
+        // Command Center flow: Settings → Audit → Analysis → Fix Queue →
+        // Content → Internal Links → Indexing → Reports, with Dashboard up top.
         $tabs = array(
-            'dashboard'     => __( 'Dashboard', 'real-smart-seo' ),
-            'setup'         => __( 'Setup', 'real-smart-seo' ),
-            'scan'          => __( 'Site Scan', 'real-smart-seo' ),
-            'opportunities' => __( 'Opportunities', 'real-smart-seo' ),
-            'fixqueue'      => __( 'Fix Queue', 'real-smart-seo' ),
-            'pagebuilder'   => __( 'Page Builder', 'real-smart-seo' ),
-            'indexing'      => __( 'Indexing', 'real-smart-seo' ),
-            'reports'       => __( 'Reports', 'real-smart-seo' ),
+            'dashboard'      => __( 'Dashboard', 'real-smart-seo' ),
+            'settings'       => __( 'Settings', 'real-smart-seo' ),
+            'audit'          => __( 'Audit', 'real-smart-seo' ),
+            'analysis'       => __( 'Analysis', 'real-smart-seo' ),
+            'fixqueue'       => __( 'Fix Queue', 'real-smart-seo' ),
+            'content'        => __( 'Content', 'real-smart-seo' ),
+            'internal-links' => __( 'Internal Links', 'real-smart-seo' ),
+            'indexing'       => __( 'Indexing', 'real-smart-seo' ),
+            'reports'        => __( 'Reports', 'real-smart-seo' ),
         );
 
         echo '<div class="wrap rsseo-wrap">';
-        echo '<h1>' . esc_html__( 'Real Smart SEO', 'real-smart-seo' ) . '</h1>';
+        echo '<h1>' . esc_html__( 'Midland Smart SEO', 'real-smart-seo' ) . '</h1>';
 
         echo '<h2 class="nav-tab-wrapper rsseo-tabs">';
         foreach ( $tabs as $slug => $label ) {
@@ -116,23 +118,23 @@ class RSSEO_Admin {
 
         echo '<div class="rsseo-tab-content rsseo-tab-content--' . esc_attr( $active ) . '">';
         switch ( $active ) {
-            case 'setup':         $this->page_setup();           break;
-            case 'scan':          $this->page_site_audit();      break;
-            case 'opportunities': $this->page_new_scan();        break;
-            case 'fixqueue':      $this->page_fix_queue();       break;
-            case 'pagebuilder':   $this->page_pagebuilder();     break;
-            case 'indexing':      $this->page_index();           break;
-            case 'reports':       $this->page_reports_archive(); break;
+            case 'settings':       $this->page_setup();           break;
+            case 'audit':          $this->page_site_audit();      break;
+            case 'analysis':       $this->page_new_scan();        break;
+            case 'fixqueue':       $this->page_fix_queue();       break;
+            case 'content':        $this->page_content();         break;
+            case 'internal-links': $this->page_internal_links();  break;
+            case 'indexing':       $this->page_index();           break;
+            case 'reports':        $this->page_reports_archive(); break;
             case 'dashboard':
             default:
                 $this->page_dashboard();
                 break;
         }
         // Pipeline CTA — every tab IN THE PIPELINE ends with a "Next: X →" so
-        // the user always knows the one button to click after finishing here.
-        // Settings + Workflow + Reports (archive) are excluded — they aren't
-        // pipeline steps. Reports is just history; its empty state stands alone.
-        if ( ! in_array( $active, array( 'dashboard', 'setup', 'reports' ), true ) ) {
+        // the user always knows the one button to click next. Dashboard,
+        // Settings, and Reports are excluded — they aren't pipeline steps.
+        if ( ! in_array( $active, array( 'dashboard', 'settings', 'reports' ), true ) ) {
             $this->render_pipeline_cta( $active );
         }
         echo '</div></div>';
@@ -154,31 +156,36 @@ class RSSEO_Admin {
         $report_qs     = $report_id ? '&report_id=' . $report_id : '';
 
         $url = array(
-            'scan'          => admin_url( 'admin.php?page=real-smart-seo&tab=scan' ),
-            'opportunities' => admin_url( 'admin.php?page=real-smart-seo&tab=opportunities' . $report_qs ),
-            'fixqueue'      => admin_url( 'admin.php?page=real-smart-seo&tab=fixqueue' . $report_qs ),
-            'indexing'      => admin_url( 'admin.php?page=real-smart-seo&tab=indexing' ),
-            'reports'       => admin_url( 'admin.php?page=real-smart-seo&tab=reports' ),
+            'audit'          => admin_url( 'admin.php?page=real-smart-seo&tab=audit' ),
+            'analysis'       => admin_url( 'admin.php?page=real-smart-seo&tab=analysis' . $report_qs ),
+            'fixqueue'       => admin_url( 'admin.php?page=real-smart-seo&tab=fixqueue' . $report_qs ),
+            'content'        => admin_url( 'admin.php?page=real-smart-seo&tab=content' ),
+            'internal-links' => admin_url( 'admin.php?page=real-smart-seo&tab=internal-links' ),
+            'indexing'       => admin_url( 'admin.php?page=real-smart-seo&tab=indexing' ),
+            'reports'        => admin_url( 'admin.php?page=real-smart-seo&tab=reports' ),
         );
 
         $cta = array( 'label' => '', 'href' => '', 'hint' => '' );
 
         switch ( $current ) {
-            case 'scan':
-                $cta = array( 'label' => __( 'Find Opportunities →', 'real-smart-seo' ), 'href' => $url['opportunities'], 'hint' => __( 'Turn the scan into a prioritized list of fixes and content opportunities.', 'real-smart-seo' ) );
+            case 'audit':
+                $cta = array( 'label' => __( 'Run Analysis →', 'real-smart-seo' ), 'href' => $url['analysis'], 'hint' => __( 'Turn the crawl + your data into a prioritized set of fixes and opportunities.', 'real-smart-seo' ) );
                 break;
-            case 'opportunities':
+            case 'analysis':
                 $cta = $has_report
                     ? array( 'label' => __( 'Go to Fix Queue →', 'real-smart-seo' ), 'href' => $url['fixqueue'], 'hint' => __( 'Review each recommended fix, preview the before/after, and apply.', 'real-smart-seo' ) )
-                    : array( 'label' => __( 'Run a scan first →', 'real-smart-seo' ), 'href' => $url['scan'], 'hint' => __( 'Opportunities need scan data. Start with Site Scan.', 'real-smart-seo' ) );
+                    : array( 'label' => __( 'Run an audit first →', 'real-smart-seo' ), 'href' => $url['audit'], 'hint' => __( 'Analysis needs site data. Start with an Audit.', 'real-smart-seo' ) );
                 break;
             case 'fixqueue':
                 $cta = $has_report
-                    ? array( 'label' => __( 'Continue to Indexing →', 'real-smart-seo' ), 'href' => $url['indexing'], 'hint' => __( 'Once fixes are applied, push the updated URLs to Google + Bing so they get recrawled fast.', 'real-smart-seo' ) )
-                    : array( 'label' => __( 'Find Opportunities first →', 'real-smart-seo' ), 'href' => $url['opportunities'], 'hint' => __( 'No fixes queued yet. Generate them on the Opportunities tab.', 'real-smart-seo' ) );
+                    ? array( 'label' => __( 'Build Content →', 'real-smart-seo' ), 'href' => $url['content'], 'hint' => __( 'With on-page fixes applied, build the local pages that fill your coverage gaps.', 'real-smart-seo' ) )
+                    : array( 'label' => __( 'Run Analysis first →', 'real-smart-seo' ), 'href' => $url['analysis'], 'hint' => __( 'No fixes queued yet. Generate them on the Analysis tab.', 'real-smart-seo' ) );
                 break;
-            case 'pagebuilder':
-                $cta = array( 'label' => __( 'Continue to Indexing →', 'real-smart-seo' ), 'href' => $url['indexing'], 'hint' => __( 'After building pages, submit them to search engines so they get indexed.', 'real-smart-seo' ) );
+            case 'content':
+                $cta = array( 'label' => __( 'Add Internal Links →', 'real-smart-seo' ), 'href' => $url['internal-links'], 'hint' => __( 'Connect new and existing pages with internal links before you index.', 'real-smart-seo' ) );
+                break;
+            case 'internal-links':
+                $cta = array( 'label' => __( 'Continue to Indexing →', 'real-smart-seo' ), 'href' => $url['indexing'], 'hint' => __( 'Push the updated URLs to Google + Bing so they get recrawled fast.', 'real-smart-seo' ) );
                 break;
             case 'indexing':
                 $cta = array( 'label' => __( 'View Reports →', 'real-smart-seo' ), 'href' => $url['reports'], 'hint' => __( 'Track what changed — issues fixed, pages built, URLs submitted — and the next recommended action.', 'real-smart-seo' ) );
@@ -193,16 +200,15 @@ class RSSEO_Admin {
     }
 
     /**
-     * Index tab — controls for getting (and keeping) pages indexed.
-     * Sitemap status, IndexNow ping (Bing + Yandex), and GSC Cleanup links.
+     * Indexing tab — get (and keep) pages indexed: sitemap, IndexNow ping,
+     * GSC coverage cleanup, Rapid URL Indexer, and site-speed controls.
      */
     public function page_index() {
-        $has_pro     = defined( 'RSSEO_PRO_VERSION' );
         $sitemap_url = home_url( '/sitemap_index.xml' );
         ?>
         <div class="rsseo-index">
-            <h2><?php esc_html_e( 'Index', 'real-smart-seo' ); ?></h2>
-            <p><?php esc_html_e( 'After Repair, push the updated content into Google, Bing, and Yandex so the fixes get crawled fast — not on whatever schedule the bots feel like.', 'real-smart-seo' ); ?></p>
+            <h2><?php esc_html_e( 'Indexing', 'real-smart-seo' ); ?></h2>
+            <p><?php esc_html_e( 'After fixes and new pages, push the updated content into Google, Bing, and Yandex so it gets crawled fast — not on whatever schedule the bots feel like.', 'real-smart-seo' ); ?></p>
 
             <div class="rsseo-insights-grid">
                 <div class="rsseo-insights-card">
@@ -215,61 +221,27 @@ class RSSEO_Admin {
                 <div class="rsseo-insights-card">
                     <h3><?php esc_html_e( 'IndexNow Ping', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Tell Bing, Yandex, Seznam, and Naver about new + updated URLs the moment they change. No waiting on a crawl schedule.', 'real-smart-seo' ); ?></p>
-                    <?php if ( $has_pro ) : ?>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow' ) ); ?>"><?php esc_html_e( 'Configure IndexNow →', 'real-smart-seo' ); ?></a>
-                    <?php else :
-                        $this->pro_upsell( __( 'IndexNow', 'real-smart-seo' ), __( 'Bing/Yandex/Seznam/Naver get a notification the moment any post is published, edited, or trashed. Critical for time-sensitive content like job postings.', 'real-smart-seo' ) );
-                    endif; ?>
+                    <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow' ) ); ?>"><?php esc_html_e( 'Configure IndexNow →', 'real-smart-seo' ); ?></a>
                 </div>
 
                 <div class="rsseo-insights-card">
                     <h3><?php esc_html_e( 'GSC Coverage Cleanup', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Auto-resolve Search Console errors — duplicate canonicals, soft 404s, "discovered but not indexed" pages.', 'real-smart-seo' ); ?></p>
-                    <?php if ( $has_pro ) : ?>
-                        <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-gsc-cleanup' ) ); ?>"><?php esc_html_e( 'GSC Cleanup →', 'real-smart-seo' ); ?></a>
-                    <?php else :
-                        $this->pro_upsell( __( 'GSC Cleanup', 'real-smart-seo' ), __( 'Bulk-fix duplicate canonicals, soft 404s, and "Discovered but not indexed" pages from your GSC Coverage report.', 'real-smart-seo' ) );
-                    endif; ?>
+                    <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-gsc-cleanup' ) ); ?>"><?php esc_html_e( 'GSC Cleanup →', 'real-smart-seo' ); ?></a>
                 </div>
 
                 <div class="rsseo-insights-card">
                     <h3><?php esc_html_e( 'Rapid URL Indexer', 'real-smart-seo' ); ?></h3>
                     <p><?php esc_html_e( 'Force-index stubborn URLs via third-party indexing services (paid). Optional — useful for fresh programmatic pages.', 'real-smart-seo' ); ?></p>
-                    <?php if ( $has_pro ) : ?>
-                        <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow#rapid' ) ); ?>"><?php esc_html_e( 'Setup →', 'real-smart-seo' ); ?></a>
-                    <?php else :
-                        $this->pro_upsell( __( 'Rapid URL Indexer', 'real-smart-seo' ), __( 'Optional paid integration with third-party indexers for stubborn URLs Google won\'t crawl on its own.', 'real-smart-seo' ) );
-                    endif; ?>
+                    <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-indexnow#rapid' ) ); ?>"><?php esc_html_e( 'Set up →', 'real-smart-seo' ); ?></a>
+                </div>
+
+                <div class="rsseo-insights-card">
+                    <h3><?php esc_html_e( 'Site Speed', 'real-smart-seo' ); ?></h3>
+                    <p><?php esc_html_e( 'Front-end performance toggles and a PageSpeed check — faster pages crawl and rank better.', 'real-smart-seo' ); ?></p>
+                    <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-speed' ) ); ?>"><?php esc_html_e( 'Open Site Speed →', 'real-smart-seo' ); ?></a>
                 </div>
             </div>
-        </div>
-        <?php
-    }
-
-    /**
-     * Render a Pro-upsell block on a card that's gated behind the paid plugin.
-     * Tells the user exactly what they get and where to find the upgrade —
-     * no more "Pro feature" pill with zero context.
-     */
-    private function pro_upsell( $feature_label, $value_line = '' ) {
-        $url = 'https://tagglefish.com/real-smart-seo-pro';
-        ?>
-        <div class="rsseo-upsell">
-            <p class="rsseo-upsell__tag"><?php esc_html_e( '🔒 Comes with Real Smart SEO Pro', 'real-smart-seo' ); ?></p>
-            <?php if ( $value_line ) : ?>
-                <p class="rsseo-upsell__value"><?php echo esc_html( $value_line ); ?></p>
-            <?php endif; ?>
-            <p>
-                <a class="button button-primary button-small" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener noreferrer">
-                    <?php
-                    /* translators: %s: name of the gated feature */
-                    printf( esc_html__( 'Unlock %s →', 'real-smart-seo' ), esc_html( $feature_label ) );
-                    ?>
-                </a>
-                <a class="button button-small" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener noreferrer">
-                    <?php esc_html_e( 'See all Pro features', 'real-smart-seo' ); ?>
-                </a>
-            </p>
         </div>
         <?php
     }
@@ -286,7 +258,83 @@ class RSSEO_Admin {
         $seo_plugin = RSSEO_Settings::detect_seo_plugin();
         $growth     = $this->growth_stats();
         $next       = $this->next_action();
+        $priorities = $this->dashboard_priorities();
         require RSSEO_PATH . 'includes/views/dashboard.php';
+    }
+
+    /**
+     * The real work items the operator should act on, each with a Ready /
+     * Needs-attention status: setup, open audit issues, pending fixes, local
+     * page gaps, and indexing. Drives the Dashboard priority list.
+     *
+     * @return array[]
+     */
+    private function dashboard_priorities() {
+        $items = array();
+        $att   = function ( $bad ) {
+            return $bad ? RSSEO_Profile::ATTENTION : RSSEO_Profile::READY;
+        };
+
+        if ( class_exists( 'RSSEO_Profile' ) ) {
+            $st = RSSEO_Profile::overall_status();
+            $items[] = array(
+                'label'  => __( 'Setup', 'real-smart-seo' ),
+                'detail' => RSSEO_Profile::MISSING === $st ? __( 'A required field or your API key is missing.', 'real-smart-seo' ) : __( 'Profile and API key are ready.', 'real-smart-seo' ),
+                'status' => $st,
+                'url'    => admin_url( 'admin.php?page=real-smart-seo&tab=settings' ),
+            );
+        }
+
+        if ( method_exists( 'RSSEO_Database', 'get_latest_audit' ) ) {
+            $audit = RSSEO_Database::get_latest_audit();
+            if ( $audit && ! empty( $audit->id ) ) {
+                $open = 0;
+                foreach ( (array) RSSEO_Database::get_audit_issues( $audit->id ) as $i ) {
+                    if ( empty( $i->fixed ) ) {
+                        $open++;
+                    }
+                }
+                $items[] = array(
+                    'label'  => __( 'Audit issues', 'real-smart-seo' ),
+                    'detail' => sprintf( _n( '%d open issue from the last audit.', '%d open issues from the last audit.', $open, 'real-smart-seo' ), $open ),
+                    'status' => $att( $open > 0 ),
+                    'url'    => admin_url( 'admin.php?page=real-smart-seo&tab=audit' ),
+                );
+            }
+        }
+
+        $scans  = RSSEO_Database::get_scans( 1 );
+        $latest = ! empty( $scans ) ? $scans[0] : null;
+        $rid    = (int) ( $latest->report_id ?? 0 );
+        $report = $rid ? RSSEO_Database::get_report( $rid ) : null;
+        if ( $report ) {
+            $pending = max( 0, (int) $report->fixes_available - (int) $report->fixes_applied );
+            $items[] = array(
+                'label'  => __( 'Fix Queue', 'real-smart-seo' ),
+                'detail' => sprintf( _n( '%d fix to apply.', '%d fixes to apply.', $pending, 'real-smart-seo' ), $pending ),
+                'status' => $att( $pending > 0 ),
+                'url'    => admin_url( 'admin.php?page=real-smart-seo&tab=fixqueue&report_id=' . $rid ),
+            );
+        }
+
+        if ( class_exists( 'RSSEO_Opportunities' ) ) {
+            $gaps = count( RSSEO_Opportunities::local_gaps() );
+            $items[] = array(
+                'label'  => __( 'Local pages', 'real-smart-seo' ),
+                'detail' => sprintf( _n( '%d service × city gap to build.', '%d service × city gaps to build.', $gaps, 'real-smart-seo' ), $gaps ),
+                'status' => $att( $gaps > 0 ),
+                'url'    => admin_url( 'admin.php?page=real-smart-seo&tab=content' ),
+            );
+        }
+
+        $items[] = array(
+            'label'  => __( 'Indexing', 'real-smart-seo' ),
+            'detail' => __( 'Submit updated URLs so changes get recrawled.', 'real-smart-seo' ),
+            'status' => RSSEO_Profile::READY,
+            'url'    => admin_url( 'admin.php?page=real-smart-seo&tab=indexing' ),
+        );
+
+        return $items;
     }
 
     /**
@@ -504,6 +552,45 @@ class RSSEO_Admin {
             }
         }
 
+        // Latest report summary — real numbers from the most recent analysis.
+        $scans       = RSSEO_Database::get_scans( 1 );
+        $latest_scan = ! empty( $scans ) ? $scans[0] : null;
+        $rid         = (int) ( $latest_scan->report_id ?? 0 );
+        $latest      = $rid ? RSSEO_Database::get_report( $rid ) : null;
+        if ( $latest ) {
+            $avail   = (int) $latest->fixes_available;
+            $applied = (int) $latest->fixes_applied;
+            $pending = max( 0, $avail - $applied );
+            $schema  = 0;
+            global $wpdb;
+            $t_schema = $wpdb->prefix . 'rsseo_pro_schema';
+            if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $t_schema ) ) === $t_schema ) { // phpcs:ignore WordPress.DB
+                $schema = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$t_schema} WHERE report_id = %d AND applied = 1", $rid ) ); // phpcs:ignore WordPress.DB
+            }
+            echo '<h2>' . esc_html__( 'Latest report', 'real-smart-seo' ) . '</h2>';
+            echo '<div class="rsseo-latest-report" style="background:#fff;border-radius:8px;padding:16px 18px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.06);">';
+            echo '<strong>' . esc_html( $latest_scan->label ?? __( 'Analysis', 'real-smart-seo' ) ) . '</strong> ';
+            echo '<span class="description">' . esc_html( date_i18n( get_option( 'date_format' ), strtotime( (string) $latest->created_at ) ) ) . '</span>';
+            echo '<p style="margin:8px 0 12px;">';
+            echo esc_html( sprintf(
+                /* translators: 1: applied, 2: available, 3: schema applied */
+                __( '%1$d of %2$d fixes applied · %3$d schema block(s) applied', 'real-smart-seo' ),
+                $applied,
+                $avail,
+                $schema
+            ) ) . '</p>';
+            if ( $pending > 0 ) {
+                echo '<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=fixqueue&report_id=' . $rid ) ) . '">' . esc_html( sprintf(
+                    /* translators: %d: pending fixes */
+                    _n( 'Apply %d pending fix →', 'Apply %d pending fixes →', $pending, 'real-smart-seo' ),
+                    $pending
+                ) ) . '</a>';
+            } else {
+                echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=reports&report_id=' . $rid ) ) . '">' . esc_html__( 'View full report →', 'real-smart-seo' ) . '</a>';
+            }
+            echo '</div><hr style="margin:20px 0;">';
+        }
+
         // Measurement tools — the rankings/backlinks that used to hide on the
         // old "Insights" tab now live here, where you measure what changed.
         $has_pro = defined( 'RSSEO_PRO_VERSION' );
@@ -535,14 +622,13 @@ class RSSEO_Admin {
         require RSSEO_PATH . 'includes/views/reports-list.php';
     }
 
-    // ── Page: Page Builder ────────────────────────────────────────────────────
+    // ── Page: Content ─────────────────────────────────────────────────────────
 
     /**
-     * Page Builder — surfaces the page-generation tools as a first-class step
-     * instead of burying them in hidden Pro submenus. Programmatic city×service
-     * pages are the primary builder; clusters + content briefs support it.
+     * Content — the page-generation tools as a first-class step: programmatic
+     * city × service pages (primary), topic clusters, and content briefs.
      */
-    public function page_pagebuilder() {
+    public function page_content() {
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
@@ -569,8 +655,8 @@ class RSSEO_Admin {
                 'primary' => false,
             ),
         );
-        echo '<div class="rsseo-pagebuilder">';
-        echo '<h2>' . esc_html__( 'Page Builder', 'real-smart-seo' ) . '</h2>';
+        echo '<div class="rsseo-content-tab">';
+        echo '<h2>' . esc_html__( 'Content', 'real-smart-seo' ) . '</h2>';
         echo '<p>' . esc_html__( 'Build the local pages that win the map pack: a dedicated page for each service in each city you serve. Plan the topics, brief the content, then generate the pages.', 'real-smart-seo' ) . '</p>';
 
         // Coverage summary driven by the Setup profile.
@@ -578,7 +664,7 @@ class RSSEO_Admin {
         $services = RSSEO_Profile::lines( $p['services'] );
         $cities   = RSSEO_Profile::lines( $p['cities'] );
         if ( empty( $services ) || empty( $cities ) ) {
-            echo '<div class="rsseo-notice rsseo-notice--warning" style="margin:0 0 16px;"><strong>' . esc_html__( 'Add your services and cities in Setup', 'real-smart-seo' ) . '</strong> — ' . esc_html__( 'the builder uses them to map out your local pages.', 'real-smart-seo' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=setup' ) ) . '">' . esc_html__( 'Go to Setup →', 'real-smart-seo' ) . '</a></div>';
+            echo '<div class="rsseo-notice rsseo-notice--warning" style="margin:0 0 16px;"><strong>' . esc_html__( 'Add your services and cities in Setup', 'real-smart-seo' ) . '</strong> — ' . esc_html__( 'the builder uses them to map out your local pages.', 'real-smart-seo' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=settings' ) ) . '">' . esc_html__( 'Go to Settings →', 'real-smart-seo' ) . '</a></div>';
         } else {
             $possible = count( $services ) * count( $cities );
             $gaps     = class_exists( 'RSSEO_Opportunities' ) ? count( RSSEO_Opportunities::local_gaps() ) : 0;
@@ -616,6 +702,24 @@ class RSSEO_Admin {
             echo '</div>';
         }
         echo '</div></div>';
+    }
+
+    // ── Page: Internal Links ──────────────────────────────────────────────────
+
+    /**
+     * Internal Links — its own workflow, embedded as a first-class tab. Renders
+     * the internal-link opportunity scanner inline (the module now registers no
+     * visible submenu of its own).
+     */
+    public function page_internal_links() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
+        }
+        if ( class_exists( 'RSSEO_Pro_Internal_Links' ) ) {
+            RSSEO_Pro_Internal_Links::get_instance()->render_page();
+        } else {
+            echo '<p>' . esc_html__( 'Internal Links module not available.', 'real-smart-seo' ) . '</p>';
+        }
     }
 
     // ── Page: Setup ──────────────────────────────────────────────────────────

@@ -29,7 +29,7 @@ class RSSEO_Pro_Content_Brief {
 
     public function add_menu() {
         add_submenu_page(
-            'real-smart-seo',
+            null, // hidden from menu — surfaced via the Content tab in the Command Center
             esc_html__( 'Content Brief', 'real-smart-seo-pro' ),
             esc_html__( 'Content Brief', 'real-smart-seo-pro' ),
             'manage_options',
