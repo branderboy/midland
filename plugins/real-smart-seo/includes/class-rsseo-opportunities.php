@@ -89,7 +89,7 @@ class RSSEO_Opportunities {
         if ( class_exists( 'RSSEO_Database' ) && method_exists( 'RSSEO_Database', 'get_latest_audit' ) ) {
             $audit = RSSEO_Database::get_latest_audit();
             if ( $audit && ! empty( $audit->id ) ) {
-                $audit_url = admin_url( 'admin.php?page=real-smart-seo&tab=scan' );
+                $audit_url = admin_url( 'admin.php?page=real-smart-seo&tab=audit' );
                 foreach ( (array) RSSEO_Database::get_audit_issues( $audit->id ) as $issue ) {
                     $bucket = self::classify_issue( (string) ( $issue->issue_type ?? '' ), (string) ( $issue->description ?? '' ) );
                     $out[ $bucket ][] = array(
@@ -196,7 +196,7 @@ class RSSEO_Opportunities {
             $titles[] = strtolower( (string) get_the_title( $id ) );
         }
 
-        $builder_url = admin_url( 'admin.php?page=real-smart-seo&tab=pagebuilder' );
+        $builder_url = admin_url( 'admin.php?page=real-smart-seo&tab=content' );
         $gaps        = array();
         foreach ( $services as $service ) {
             $svc_token = strtolower( self::primary_token( $service ) );

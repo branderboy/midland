@@ -37,7 +37,7 @@ class RSSEO_Pro_Internal_Links {
 
     public function add_menu() {
         add_submenu_page(
-            'real-smart-seo',
+            null,
             esc_html__( 'Internal Links', 'real-smart-seo-pro' ),
             esc_html__( 'Internal Links', 'real-smart-seo-pro' ),
             'manage_options',

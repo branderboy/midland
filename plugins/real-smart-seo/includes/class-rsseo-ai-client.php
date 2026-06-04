@@ -134,8 +134,8 @@ class RSSEO_AI_Client {
     }
 }
 
-// Back-compat: the class was RSSEO_Claude_API before it moved off Anthropic.
-// Existing callers (and any third-party code) keep working through the alias.
+// Back-compat alias kept for any third-party code that references the old class
+// name. All internal callers now use RSSEO_AI_Client directly.
 if ( ! class_exists( 'RSSEO_Claude_API' ) ) {
     class_alias( 'RSSEO_AI_Client', 'RSSEO_Claude_API' );
 }

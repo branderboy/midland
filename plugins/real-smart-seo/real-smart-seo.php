@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart SEO
  * Plugin URI: https://midlandfloors.com/smart-seo
- * Description: Midland's all-in-one local SEO suite — audit, reporting and one-click auto-fixes (with full diff review + rollback), programmatic city × service pages, internal-link suggestions, keyword clustering, content briefs, schema, GSC cleanup, IndexNow, geo-grid and rank tracking. One plugin, no add-ons.
+ * Description: Midland's all-in-one local SEO suite — audit, AI-powered analysis, one-click fixes with rollback, programmatic city × service pages, internal link suggestions, keyword clustering, content briefs, schema, GSC cleanup, IndexNow, geo-grid, and rank tracking. One plugin, all features included.
  * Version: 2.0.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
@@ -25,8 +25,7 @@ define( 'RSSEO_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_URL',      plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_FILE',     __FILE__ );
 
-// The former "Pro" add-on is now bundled into this single plugin. These aliases
-// keep the merged modules (which were written against RSSEO_PRO_*) working as-is.
+// Constants mirrored so bundled modules keep working unchanged.
 define( 'RSSEO_PRO_VERSION', RSSEO_VERSION );
 define( 'RSSEO_PRO_PATH',    RSSEO_PATH );
 define( 'RSSEO_PRO_URL',     RSSEO_URL );

@@ -40,7 +40,7 @@ class RSSEO_Pro_Clusters {
 
     public function add_menu() {
         add_submenu_page(
-            'real-smart-seo',
+            null,
             esc_html__( 'Keyword Clusters', 'real-smart-seo-pro' ),
             esc_html__( 'Keyword Clusters', 'real-smart-seo-pro' ),
             'manage_options',

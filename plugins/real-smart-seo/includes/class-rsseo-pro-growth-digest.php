@@ -242,7 +242,7 @@ class RSSEO_Pro_Growth_Digest {
 
     public function add_menu() {
         add_submenu_page(
-            'real-smart-seo',
+            null,
             __( 'Growth Digest', 'real-smart-seo-pro' ),
             __( 'Growth Digest', 'real-smart-seo-pro' ),
             'manage_options',

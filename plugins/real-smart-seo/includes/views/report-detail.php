@@ -113,7 +113,7 @@
 
     <?php
     /**
-     * Lets a Pro add-on render extra report sections (schema blocks, backlink
+     * Additional report sections (schema blocks, backlink
      * opportunities) below the base fixes table.
      */
     do_action( 'rsseo_after_report_fixes', $report );
