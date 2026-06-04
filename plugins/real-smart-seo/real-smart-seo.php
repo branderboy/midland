@@ -90,6 +90,7 @@ class RSSEO_Plugin {
         require_once RSSEO_PATH . 'includes/class-rsseo-importer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-analyzer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-jobs.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-opportunities.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-fixer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-crawler.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-admin.php';

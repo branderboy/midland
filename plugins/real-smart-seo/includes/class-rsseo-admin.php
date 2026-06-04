@@ -439,20 +439,16 @@ class RSSEO_Admin {
             }
         }
 
-        // If we just finished analyzing, render the report findings inline ABOVE
-        // the new-scan form so the user sees their fixes + Apply buttons without
-        // hunting through tabs.
+        // Analysis done → show the Opportunity Map (findings grouped by action),
+        // with a CTA into the Fix Queue where fixes are previewed + applied.
         if ( $report_id > 0 ) {
             $report = RSSEO_Database::get_report( $report_id );
             if ( $report ) {
-                $fixes      = RSSEO_Database::get_fixes( $report_id );
-                $url_index  = admin_url( 'admin.php?page=real-smart-seo&tab=index' );
-                $url_insights = admin_url( 'admin.php?page=real-smart-seo&tab=insights' );
-                echo '<div class="rsseo-notice rsseo-notice--success" style="margin-bottom:18px;"><strong>' . esc_html__( '✓ Analysis complete.', 'real-smart-seo' ) . '</strong> ' . esc_html__( 'Review the findings below and click Apply on each row — or "Apply All" to write every fix at once.', 'real-smart-seo' ) . '</div>';
+                $url_fixqueue = admin_url( 'admin.php?page=real-smart-seo&tab=fixqueue&report_id=' . (int) $report_id );
+                echo '<div class="rsseo-notice rsseo-notice--success" style="margin-bottom:18px;"><strong>' . esc_html__( '✓ Analysis complete.', 'real-smart-seo' ) . '</strong> ' . esc_html__( 'Findings are grouped into opportunities below. Open the Fix Queue to preview and apply the on-page fixes.', 'real-smart-seo' ) . '</div>';
 
-                // Inline rename so the user can name + save this analysis with
-                // a meaningful label (e.g. "Q2 Carpet Cleaning audit") and find
-                // it later in Repair history.
+                // Inline rename so the user can name + save this analysis and
+                // find it later in Reports.
                 $scan_label = isset( $report->label ) ? (string) $report->label : '';
                 ?>
                 <div class="rsseo-rename-bar">
@@ -462,15 +458,12 @@ class RSSEO_Admin {
                     <span class="rsseo-rename-status" aria-live="polite"></span>
                 </div>
                 <?php
-                require RSSEO_PATH . 'includes/views/report-detail.php';
+                $this->render_opportunity_map( (int) $report_id );
 
-                // Next-step CTA — tied to the pipeline so the user always knows
-                // the one button to click after the current action finishes.
-                echo '<div class="rsseo-next-step">';
-                echo '<h2 style="margin-top:0;">' . esc_html__( 'Next: push the fixes into Google', 'real-smart-seo' ) . '</h2>';
-                echo '<p>' . esc_html__( 'After applying fixes, ping Google + Bing + Yandex so the new content gets recrawled in minutes instead of days.', 'real-smart-seo' ) . '</p>';
-                echo '<p><a class="button button-primary button-large" href="' . esc_url( $url_index ) . '">' . esc_html__( 'Continue to Index →', 'real-smart-seo' ) . '</a> ';
-                echo '<a class="button" href="' . esc_url( $url_insights ) . '">' . esc_html__( 'Or view Insights', 'real-smart-seo' ) . '</a></p>';
+                echo '<div class="rsseo-next-step" style="margin-top:20px;">';
+                echo '<h2 style="margin-top:0;">' . esc_html__( 'Next: work the Fix Queue', 'real-smart-seo' ) . '</h2>';
+                echo '<p>' . esc_html__( 'Preview each recommended fix, then apply it. Every change is reversible from the post editor.', 'real-smart-seo' ) . '</p>';
+                echo '<p><a class="button button-primary button-large" href="' . esc_url( $url_fixqueue ) . '">' . esc_html__( 'Go to Fix Queue →', 'real-smart-seo' ) . '</a></p>';
                 echo '</div>';
 
                 echo '<hr style="margin:32px 0;"><h2 style="margin-top:0;">' . esc_html__( 'Run another analysis', 'real-smart-seo' ) . '</h2>';
@@ -897,6 +890,54 @@ class RSSEO_Admin {
         })(jQuery);
         </script>
         <?php
+    }
+
+    /**
+     * Opportunity Map — findings regrouped into Quick Wins / Local SEO Gaps /
+     * Content Opportunities / Technical Issues, each item badged with its
+     * lifecycle status and linked to where it gets acted on.
+     */
+    private function render_opportunity_map( $report_id ) {
+        $groups = RSSEO_Opportunities::groups( (int) $report_id );
+        $meta   = RSSEO_Opportunities::buckets();
+        $total  = RSSEO_Opportunities::total( $groups );
+
+        echo '<div class="rsseo-oppmap">';
+        if ( 0 === $total ) {
+            echo '<p class="description">' . esc_html__( 'No opportunities detected in this scan.', 'real-smart-seo' ) . '</p></div>';
+            return;
+        }
+        echo '<div class="rsseo-oppmap__grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">';
+        foreach ( $meta as $key => $m ) {
+            $items = isset( $groups[ $key ] ) ? $groups[ $key ] : array();
+            echo '<div class="rsseo-oppmap__bucket" style="background:#fff;border-top:4px solid ' . esc_attr( $m['color'] ) . ';border-radius:8px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.06);">';
+            echo '<h3 style="margin:0 0 2px;">' . esc_html( $m['title'] ) . ' <span style="color:' . esc_attr( $m['color'] ) . ';">(' . count( $items ) . ')</span></h3>';
+            echo '<p class="description" style="margin:0 0 12px;">' . esc_html( $m['desc'] ) . '</p>';
+            if ( empty( $items ) ) {
+                echo '<p class="description"><em>' . esc_html__( 'Nothing here — nice.', 'real-smart-seo' ) . '</em></p>';
+            } else {
+                echo '<ul style="margin:0;list-style:none;padding:0;">';
+                foreach ( array_slice( $items, 0, 8 ) as $it ) {
+                    echo '<li style="padding:7px 0;border-bottom:1px solid #f0f0f1;">';
+                    echo RSSEO_Status::badge( $it['status'] ) . ' '; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    echo '<a href="' . esc_url( $it['action_url'] ) . '" style="font-weight:600;text-decoration:none;">' . esc_html( $it['label'] ) . '</a>';
+                    if ( ! empty( $it['detail'] ) ) {
+                        echo '<div class="description" style="font-size:12px;margin-top:2px;">' . esc_html( $it['detail'] ) . '</div>';
+                    }
+                    echo '</li>';
+                }
+                echo '</ul>';
+                if ( count( $items ) > 8 ) {
+                    echo '<p style="margin:10px 0 0;"><a href="' . esc_url( $items[0]['action_url'] ) . '">' . esc_html( sprintf(
+                        /* translators: %d: number of additional items */
+                        __( '+ %d more →', 'real-smart-seo' ),
+                        count( $items ) - 8
+                    ) ) . '</a></p>';
+                }
+            }
+            echo '</div>';
+        }
+        echo '</div></div>';
     }
 
     // ── AJAX: Test API Key ─────────────────────────────────────────────────────
