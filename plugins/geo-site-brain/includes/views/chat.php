@@ -20,7 +20,7 @@ $samples = array(
 );
 ?>
 <div class="wrap gsb-wrap">
-	<h1><?php esc_html_e( 'Agent Chat', 'geo-site-brain' ); ?></h1>
+	<h1><?php esc_html_e( 'Ask the Site', 'geo-site-brain' ); ?></h1>
 	<p class="gsb-sub"><?php esc_html_e( 'Retrieval-first: the agent answers from your indexed content, and clearly separates what was Found on site, Inferred from site, and Recommended additions. It will not invent facts.', 'geo-site-brain' ); ?></p>
 
 	<?php if ( ! GSB_Settings::has_openai() ) : ?>

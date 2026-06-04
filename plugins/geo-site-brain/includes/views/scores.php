@@ -10,7 +10,7 @@ $rows    = GSB_Database::get_scores( 'score', 'ASC', 300 );
 $labels  = GSB_Scorer::labels();
 ?>
 <div class="wrap gsb-wrap">
-	<h1><?php esc_html_e( 'GEO Scores', 'geo-site-brain' ); ?></h1>
+	<h1><?php esc_html_e( 'GEO Scorecard', 'geo-site-brain' ); ?></h1>
 	<p class="gsb-sub"><?php esc_html_e( 'Each page is scored 1–100 from ten weighted dimensions. Click a row to see the breakdown.', 'geo-site-brain' ); ?></p>
 
 	<?php if ( empty( $rows ) ) : ?>
