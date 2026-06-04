@@ -406,11 +406,115 @@ class RSSEO_Admin {
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
-        $scans   = RSSEO_Database::get_scans( 5 );
-        $usage   = RSSEO_Database::get_monthly_usage();
-        $has_key = RSSEO_Settings::has_api_key();
+        $scans      = RSSEO_Database::get_scans( 5 );
+        $usage      = RSSEO_Database::get_monthly_usage();
+        $has_key    = RSSEO_Settings::has_api_key();
         $seo_plugin = RSSEO_Settings::detect_seo_plugin();
+        $growth     = $this->growth_stats();
+        $next       = $this->next_action();
         require RSSEO_PATH . 'includes/views/dashboard.php';
+    }
+
+    /**
+     * "What changed" tallies for the Growth Dashboard — the work the loop has
+     * actually done. Each metric is guarded so a missing table/post-type can't
+     * fatal.
+     *
+     * @return array{fixes_applied:int,pages_built:int,schema_applied:int,urls_submitted:int}
+     */
+    private function growth_stats() {
+        global $wpdb;
+        $stats = array( 'fixes_applied' => 0, 'pages_built' => 0, 'schema_applied' => 0, 'urls_submitted' => 0 );
+
+        $fixes = $wpdb->prefix . 'rsseo_fixes';
+        if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $fixes ) ) === $fixes ) { // phpcs:ignore WordPress.DB
+            $stats['fixes_applied'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$fixes} WHERE applied = 1" ); // phpcs:ignore WordPress.DB
+        }
+        $schema = $wpdb->prefix . 'rsseo_pro_schema';
+        if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $schema ) ) === $schema ) { // phpcs:ignore WordPress.DB
+            $stats['schema_applied'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$schema} WHERE applied = 1" ); // phpcs:ignore WordPress.DB
+        }
+        if ( post_type_exists( 'mfc_location' ) ) {
+            $counts = wp_count_posts( 'mfc_location' );
+            $stats['pages_built'] = (int) ( $counts->publish ?? 0 );
+        }
+        $logs = get_option( 'rsseo_indexnow_logs', array() );
+        $stats['urls_submitted'] = is_array( $logs ) ? count( $logs ) : 0;
+
+        return $stats;
+    }
+
+    /**
+     * The single next recommended action, chosen from setup readiness + scan
+     * state, so the Dashboard always points at the one button to click next.
+     *
+     * @return array{label:string,desc:string,url:string}
+     */
+    private function next_action() {
+        $url = function ( $tab ) {
+            return admin_url( 'admin.php?page=real-smart-seo&tab=' . $tab );
+        };
+
+        // 1) Setup incomplete?
+        if ( class_exists( 'RSSEO_Profile' ) && RSSEO_Profile::MISSING === RSSEO_Profile::overall_status() ) {
+            return array(
+                'label' => __( 'Finish Setup', 'real-smart-seo' ),
+                'desc'  => __( 'A required field or your API key is missing — finish Setup before scanning.', 'real-smart-seo' ),
+                'url'   => $url( 'setup' ),
+            );
+        }
+
+        // 2) No scans yet?
+        $scans  = RSSEO_Database::get_scans( 1 );
+        $latest = ! empty( $scans ) ? $scans[0] : null;
+        if ( ! $latest ) {
+            return array(
+                'label' => __( 'Run your first scan', 'real-smart-seo' ),
+                'desc'  => __( 'Crawl your site to surface issues and opportunities.', 'real-smart-seo' ),
+                'url'   => $url( 'scan' ),
+            );
+        }
+
+        // 3) Pending fixes in the latest report?
+        $report_id = (int) ( $latest->report_id ?? 0 );
+        $report    = $report_id ? RSSEO_Database::get_report( $report_id ) : null;
+        if ( $report ) {
+            $pending = max( 0, (int) $report->fixes_available - (int) $report->fixes_applied );
+            if ( $pending > 0 ) {
+                return array(
+                    'label' => sprintf(
+                        /* translators: %d: number of pending fixes */
+                        _n( 'Apply %d fix in the Fix Queue', 'Apply %d fixes in the Fix Queue', $pending, 'real-smart-seo' ),
+                        $pending
+                    ),
+                    'desc'  => __( 'Preview and apply the recommended fixes from your latest analysis.', 'real-smart-seo' ),
+                    'url'   => admin_url( 'admin.php?page=real-smart-seo&tab=fixqueue&report_id=' . $report_id ),
+                );
+            }
+        }
+
+        // 4) Local pages to build?
+        if ( class_exists( 'RSSEO_Opportunities' ) ) {
+            $gaps = RSSEO_Opportunities::local_gaps();
+            if ( ! empty( $gaps ) ) {
+                return array(
+                    'label' => sprintf(
+                        /* translators: %d: number of local page gaps */
+                        _n( 'Build %d local page', 'Build %d local pages', count( $gaps ), 'real-smart-seo' ),
+                        count( $gaps )
+                    ),
+                    'desc'  => __( 'You serve these service × city combinations but have no page for them yet.', 'real-smart-seo' ),
+                    'url'   => $url( 'pagebuilder' ),
+                );
+            }
+        }
+
+        // 5) Otherwise — keep things indexed.
+        return array(
+            'label' => __( 'Submit updated URLs', 'real-smart-seo' ),
+            'desc'  => __( 'Ping Google + Bing so recent changes get recrawled fast.', 'real-smart-seo' ),
+            'url'   => $url( 'indexing' ),
+        );
     }
 
     // ── Page: New Scan ─────────────────────────────────────────────────────────
@@ -618,6 +722,36 @@ class RSSEO_Admin {
         echo '<div class="rsseo-pagebuilder">';
         echo '<h2>' . esc_html__( 'Page Builder', 'real-smart-seo' ) . '</h2>';
         echo '<p>' . esc_html__( 'Build the local pages that win the map pack: a dedicated page for each service in each city you serve. Plan the topics, brief the content, then generate the pages.', 'real-smart-seo' ) . '</p>';
+
+        // Coverage summary driven by the Setup profile.
+        $p        = RSSEO_Profile::get();
+        $services = RSSEO_Profile::lines( $p['services'] );
+        $cities   = RSSEO_Profile::lines( $p['cities'] );
+        if ( empty( $services ) || empty( $cities ) ) {
+            echo '<div class="rsseo-notice rsseo-notice--warning" style="margin:0 0 16px;"><strong>' . esc_html__( 'Add your services and cities in Setup', 'real-smart-seo' ) . '</strong> — ' . esc_html__( 'the builder uses them to map out your local pages.', 'real-smart-seo' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=setup' ) ) . '">' . esc_html__( 'Go to Setup →', 'real-smart-seo' ) . '</a></div>';
+        } else {
+            $possible = count( $services ) * count( $cities );
+            $gaps     = class_exists( 'RSSEO_Opportunities' ) ? count( RSSEO_Opportunities::local_gaps() ) : 0;
+            echo '<div class="rsseo-coverage" style="background:#fff;border-radius:8px;padding:14px 16px;margin:0 0 18px;box-shadow:0 1px 2px rgba(0,0,0,.06);">';
+            echo '<strong>' . esc_html( sprintf(
+                /* translators: 1: services count, 2: cities count, 3: possible pages */
+                __( '%1$d services × %2$d cities = %3$d possible local pages.', 'real-smart-seo' ),
+                count( $services ),
+                count( $cities ),
+                $possible
+            ) ) . '</strong> ';
+            if ( $gaps > 0 ) {
+                echo '<span style="color:#b45309;font-weight:700;">' . esc_html( sprintf(
+                    /* translators: %d: number of gaps */
+                    _n( '%d gap not yet covered.', '%d gaps not yet covered.', $gaps, 'real-smart-seo' ),
+                    $gaps
+                ) ) . '</span>';
+            } else {
+                echo '<span style="color:#0a8754;font-weight:700;">' . esc_html__( 'Every combination has a page — nice coverage.', 'real-smart-seo' ) . '</span>';
+            }
+            echo '</div>';
+        }
+
         echo '<div class="rsseo-insights-grid">';
         foreach ( $cards as $c ) {
             echo '<div class="rsseo-insights-card">';
