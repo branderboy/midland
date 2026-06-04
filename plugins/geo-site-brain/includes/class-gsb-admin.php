@@ -436,7 +436,12 @@ class GSB_Admin {
 
 	public function ajax_test_openai() {
 		$this->guard();
-		$res = ( new GSB_OpenAI() )->test();
+		// Use the key typed into the field (so the user can test before saving);
+		// fall back to the stored key when the field was left blank.
+		$key    = isset( $_POST['key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['key'] ) ) ) : '';
+		$is_mask = '' !== $key && preg_match( '/^[•\*]+$/u', $key );
+		$client = ( '' !== $key && ! $is_mask ) ? new GSB_OpenAI( $key ) : new GSB_OpenAI();
+		$res    = $client->test();
 		if ( is_wp_error( $res ) ) {
 			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
 		}
@@ -445,7 +450,13 @@ class GSB_Admin {
 
 	public function ajax_test_neon() {
 		$this->guard();
-		$res = ( new GSB_Vector_Store() )->test();
+		$dsn     = isset( $_POST['key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['key'] ) ) ) : '';
+		$is_mask = '' !== $dsn && preg_match( '/^[•\*]+$/u', $dsn );
+		$store   = new GSB_Vector_Store();
+		if ( '' !== $dsn && ! $is_mask ) {
+			$store->set_dsn( $dsn );
+		}
+		$res = $store->test();
 		if ( is_wp_error( $res ) ) {
 			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
 		}
