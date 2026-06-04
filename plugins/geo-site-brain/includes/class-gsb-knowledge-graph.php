@@ -17,25 +17,73 @@ class GSB_Knowledge_Graph {
 	 * Full rebuild: analyse every page once, then refresh entities,
 	 * relationships, visibility scores and the fix queue from that single pass.
 	 */
+	/**
+	 * Rebuild the full knowledge graph: entities, relationships, visibility,
+	 * and the fix queue. Safe to call from cron or AJAX.
+	 *
+	 * Concurrency: a transient lock prevents concurrent rebuilds from racing
+	 * each other (duplicate recommendations, inconsistent entity counts). The
+	 * lock expires after 5 minutes so a crashed process never blocks forever.
+	 *
+	 * Partial-state on failure: MySQL does not support nested transactions via
+	 * wpdb, so we cannot atomically roll back all four sub-steps. Instead we
+	 * log exactly which step failed so the admin knows which data may be stale.
+	 * The lock is released immediately on any failure so a retry is possible.
+	 * Steps run in dependency order — entities before relationships, visibility
+	 * and fixes last — so partial output is always internally consistent up to
+	 * the failing step.
+	 */
 	public static function rebuild_all() {
-		$pages = array();
-		foreach ( GSB_Scanner::all_post_ids() as $id ) {
-			$a = GSB_Scanner::analyze( $id );
-			if ( $a ) {
-				$pages[ $id ] = $a;
+		$lock_key = 'gsb_rebuild_lock';
+
+		// Acquire lock. If another process holds it, bail immediately.
+		if ( get_transient( $lock_key ) ) {
+			throw new \RuntimeException( __( 'A rebuild is already in progress. Try again in a moment.', 'geo-site-brain' ) );
+		}
+		set_transient( $lock_key, 1, 5 * MINUTE_IN_SECONDS );
+
+		$step = '';
+		try {
+			$pages = array();
+			foreach ( GSB_Scanner::all_post_ids() as $id ) {
+				$a = GSB_Scanner::analyze( $id );
+				if ( $a ) {
+					$pages[ $id ] = $a;
+				}
 			}
+
+			$step = 'entities';
+			GSB_Entities::rebuild_from_site( $pages );
+
+			$step = 'relationships';
+			self::build_relationships( $pages );
+
+			$step = 'visibility';
+			GSB_Visibility::recompute( $pages );
+
+			$step = 'fixes';
+			GSB_Fixes::generate();
+
+			GSB_Database::set_state( 'last_understanding', current_time( 'mysql' ) );
+			// Notify external tools (visibility.updated, and visibility.drop when
+			// the score falls past the threshold).
+			if ( class_exists( 'GSB_Webhooks' ) ) {
+				GSB_Webhooks::fire_visibility();
+			}
+			GSB_Logger::info( 'graph', 'Knowledge graph rebuilt.' );
+		} catch ( \Throwable $e ) {
+			delete_transient( $lock_key );
+			// Log which step failed so the admin can tell which data is stale.
+			GSB_Logger::error( 'graph', sprintf(
+				/* translators: 1: step name, 2: error message */
+				__( 'Rebuild failed at step "%1$s": %2$s. Data up to that step may be partially updated.', 'geo-site-brain' ),
+				$step,
+				$e->getMessage()
+			) );
+			throw $e;
 		}
 
-		GSB_Entities::rebuild_from_site( $pages );
-		self::build_relationships( $pages );
-		GSB_Visibility::recompute( $pages );
-		GSB_Fixes::generate();
-
-		GSB_Database::set_state( 'last_understanding', current_time( 'mysql' ) );
-		// Notify external tools (fires visibility.updated, and visibility.drop
-		// when the score falls past the threshold).
-		GSB_Webhooks::fire_visibility();
-		GSB_Logger::info( 'graph', 'Knowledge graph rebuilt.' );
+		delete_transient( $lock_key );
 	}
 
 	/**

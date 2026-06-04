@@ -354,23 +354,30 @@ class GSB_Visibility {
 	 * or WP_Error.
 	 */
 	public static function narrative( $engine ) {
-		$openai = new GSB_OpenAI();
-		if ( ! $openai->has_key() ) {
-			return new WP_Error( 'gsb_no_key', __( 'Connect AI in Setup to generate the narrative.', 'geo-site-brain' ) );
+		if ( ! in_array( $engine, self::ENGINES, true ) ) {
+			return new WP_Error( 'gsb_engine', __( 'Unknown engine.', 'geo-site-brain' ) );
+		}
+		// Bug 3 fix: original code always used GSB_OpenAI regardless of which
+		// engine tab the user was on. Now we route through GSB_AI_Providers so
+		// any configured key (Claude, Gemini, Perplexity, ChatGPT) works.
+		if ( ! GSB_AI_Providers::has_key( $engine ) ) {
+			return new WP_Error( 'gsb_no_key', sprintf(
+				/* translators: %s: engine label */
+				__( 'Add a %s API key in Settings to generate the narrative.', 'geo-site-brain' ),
+				self::engine_label( $engine )
+			) );
 		}
 		$profile = self::business_profile_text();
 		$label   = self::engine_label( $engine );
 
-		$messages = array(
-			array(
-				'role'    => 'system',
-				'content' => "You are simulating how {$label}, an AI assistant, would describe a local business to a user — using ONLY the structured business knowledge provided. Do not invent facts. Reply in two short labelled parts:\n\"Description:\" a 2–3 sentence description as {$label} would give it.\n\"Can't determine:\" a short comma-separated list of things the knowledge does not make clear.",
-			),
-			array( 'role' => 'user', 'content' => $profile ),
-		);
-		$text = $openai->chat( $messages, 0.3, 400 );
+		$system = "You are simulating how {$label}, an AI assistant, would describe a local business to a user — using ONLY the structured business knowledge provided. Do not invent facts. Reply in two short labelled parts:\n\"Description:\" a 2–3 sentence description as {$label} would give it.\n\"Can't determine:\" a short comma-separated list of things the knowledge does not make clear.";
+
+		$text = GSB_AI_Providers::chat( $engine, $system, $profile, 400 );
 		if ( is_wp_error( $text ) ) {
 			return $text;
+		}
+		if ( null === $text ) {
+			return new WP_Error( 'gsb_no_key', __( 'No API key configured for this engine.', 'geo-site-brain' ) );
 		}
 
 		// Persist into the engine's summary.
@@ -507,25 +514,43 @@ class GSB_Visibility {
 	}
 
 	private static function differentiators_score( $pages ) {
-		if ( null === $pages ) {
-			$pages = array();
-			foreach ( GSB_Scanner::all_post_ids() as $id ) {
-				$a = GSB_Scanner::analyze( $id );
-				if ( $a ) { $pages[ $id ] = $a; }
-			}
-		}
-		$blob = '';
-		foreach ( $pages as $a ) {
-			$blob .= ' ' . $a['plain'];
-		}
-		$hits = 0;
+		// Bug 6 fix: original code called GSB_Scanner::analyze() on every post
+		// when $pages was null, triggering apply_filters('the_content') hundreds
+		// of times inside a cron tick that has a 20-second budget. On any real
+		// site this causes timeouts. We now pull the already-indexed chunk text
+		// directly from the DB — it was scanned and stored during the index run,
+		// so it contains the same plain text content at zero extra cost.
 		$signals = array( 'guarantee', 'certified', 'licensed', 'insured', 'award', 'years', 'family owned', 'eco', 'same day', 'emergency', 'satisfaction' );
-		foreach ( $signals as $s ) {
-			if ( stripos( $blob, $s ) !== false ) {
-				$hits++;
+		$found   = array_fill_keys( $signals, false );
+
+		if ( null === $pages ) {
+			// Pull stored chunk text from the DB (cheap — already scanned), but do
+			// NOT use GROUP_CONCAT: MySQL truncates it at group_concat_max_len
+			// (1024 bytes by default), which would only sample ~1KB of the whole
+			// site and miss most differentiators. Stream rows and scan each.
+			global $wpdb;
+			$table = GSB_Database::table( 'chunks' );
+			$rows  = $wpdb->get_col( "SELECT chunk_text FROM {$table} WHERE chunk_text IS NOT NULL" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			foreach ( $rows as $text ) {
+				self::flag_signals( (string) $text, $found );
+			}
+		} else {
+			foreach ( $pages as $a ) {
+				self::flag_signals( (string) $a['plain'], $found );
 			}
 		}
+
+		$hits = count( array_filter( $found ) );
 		return min( 100, $hits * 15 );
+	}
+
+	/** Mark which differentiator signals appear in a piece of text. */
+	private static function flag_signals( $text, array &$found ) {
+		foreach ( $found as $signal => $seen ) {
+			if ( ! $seen && stripos( $text, $signal ) !== false ) {
+				$found[ $signal ] = true;
+			}
+		}
 	}
 
 	private static function record_history() {

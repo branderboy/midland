@@ -1,13 +1,15 @@
 <?php
 /**
- * Reports — a client-facing, printable summary of AI visibility and the
- * business knowledge graph. No technical vocabulary.
+ * Reports — a scan summary + client-facing AI visibility summary.
+ * Shows: latest scan, indexed pages, embedded chunks, avg score,
+ * visibility score, open fixes, applied fixes, competitor gaps.
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 $d = GSB_Reports::data();
+$has_openai = GSB_Settings::has_openai();
 ?>
 <div class="wrap gsb-wrap">
 	<h1><?php esc_html_e( 'Reports', 'geo-site-brain' ); ?></h1>
@@ -16,8 +18,13 @@ $d = GSB_Reports::data();
 		<button class="button" onclick="window.print()"><?php esc_html_e( 'Print / Save PDF', 'geo-site-brain' ); ?></button>
 	</p>
 
-	<?php if ( null === $d['overall'] ) : ?>
-		<div class="notice notice-info inline"><p><?php printf( wp_kses_post( __( 'No data yet. <a href="%s">Scan your website</a> to generate a report.', 'geo-site-brain' ) ), esc_url( admin_url( 'admin.php?page=gsb-scan' ) ) ); ?></p></div>
+	<?php if ( null === $d['overall'] && 0 === $d['indexed_pages'] ) : ?>
+		<div class="notice notice-info inline"><p><?php
+			printf(
+				wp_kses_post( __( 'No data yet. <a href="%s">Scan your website</a> to generate a report.', 'geo-site-brain' ) ),
+				esc_url( admin_url( 'admin.php?page=gsb-scan' ) )
+			);
+		?></p></div>
 		<?php return; ?>
 	<?php endif; ?>
 
@@ -38,6 +45,74 @@ $d = GSB_Reports::data();
 			</div>
 		</div>
 
+		<!-- Scan summary -->
+		<h3><?php esc_html_e( 'Scan Summary', 'geo-site-brain' ); ?></h3>
+		<table class="widefat striped" style="max-width:520px;margin-bottom:20px;">
+			<tbody>
+				<tr>
+					<td><?php esc_html_e( 'Latest scan', 'geo-site-brain' ); ?></td>
+					<td><?php echo $d['last_scan'] ? esc_html( $d['last_scan'] ) : '<span class="gsb-muted">' . esc_html__( 'Never — scan now', 'geo-site-brain' ) . '</span>'; ?></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Indexed pages', 'geo-site-brain' ); ?></td>
+					<td><?php echo (int) $d['indexed_pages']; ?></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Embedded chunks', 'geo-site-brain' ); ?></td>
+					<td>
+						<?php echo (int) $d['embedded_chunks']; ?>
+						<?php if ( $d['unembedded_chunks'] > 0 ) : ?>
+							&nbsp;<span class="<?php echo $has_openai ? 'gsb-muted' : 'gsb-bad'; ?>">
+								(<?php printf(
+									esc_html( _n( '%d not embedded', '%d not embedded', $d['unembedded_chunks'], 'geo-site-brain' ) ),
+									$d['unembedded_chunks']
+								); ?>
+								<?php if ( ! $has_openai ) : ?>
+									— <a href="<?php echo esc_url( admin_url( 'admin.php?page=gsb-settings' ) ); ?>"><?php esc_html_e( 'add OpenAI key', 'geo-site-brain' ); ?></a>
+								<?php endif; ?>)
+							</span>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Average page score', 'geo-site-brain' ); ?></td>
+					<td><?php echo null !== $d['avg_page_score'] ? (int) $d['avg_page_score'] . ' / 100' : '—'; ?></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'AI visibility score', 'geo-site-brain' ); ?></td>
+					<td><?php echo null !== $d['avg_vis_score'] ? (int) $d['avg_vis_score'] . ' / 100' : '—'; ?></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Open fixes', 'geo-site-brain' ); ?></td>
+					<td>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=gsb-recommendations' ) ); ?>">
+							<?php echo (int) $d['open_fixes']; ?>
+						</a>
+					</td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Applied fixes', 'geo-site-brain' ); ?></td>
+					<td><?php echo (int) $d['applied_fixes']; ?></td>
+				</tr>
+				<?php if ( $d['has_competitors'] ) : ?>
+					<tr>
+						<td><?php esc_html_e( 'Competitor service gaps', 'geo-site-brain' ); ?></td>
+						<td>
+							<?php if ( $d['competitor_gaps'] > 0 ) : ?>
+								<span class="gsb-bad"><?php echo (int) $d['competitor_gaps']; ?></span>
+								&nbsp;<a href="<?php echo esc_url( admin_url( 'admin.php?page=gsb-competitors' ) ); ?>" class="gsb-muted"><?php esc_html_e( 'view gaps', 'geo-site-brain' ); ?></a>
+							<?php else : ?>
+								<span class="gsb-ok">✓ <?php esc_html_e( 'No gaps detected', 'geo-site-brain' ); ?></span>
+							<?php endif; ?>
+						</td>
+					</tr>
+				<?php endif; ?>
+			</tbody>
+		</table>
+
+		<?php if ( null !== $d['overall'] ) : ?>
+
+		<!-- AI visibility per engine -->
 		<div class="gsb-cards">
 			<div class="gsb-card gsb-score-card">
 				<div class="gsb-score-num"><?php echo (int) $d['overall']; ?></div>
@@ -82,6 +157,8 @@ $d = GSB_Reports::data();
 				<?php endforeach; ?>
 			</ol>
 		<?php endif; ?>
+
+		<?php endif; // overall ?>
 
 		<?php if ( $footer ) : ?>
 			<div class="gsb-report-footer gsb-muted"><?php echo nl2br( esc_html( $footer ) ); ?></div>

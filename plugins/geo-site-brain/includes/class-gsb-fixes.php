@@ -18,8 +18,16 @@ class GSB_Fixes {
 	/**
 	 * Rebuild the open fix queue from current entities, relationships and scores.
 	 */
+	/** Signatures of recommendations the user has already acted on. */
+	private static $known_sigs = null;
+
 	public static function generate() {
 		GSB_Database::clear_recommendations( 'heuristic' );
+
+		// clear_recommendations() only removes 'open' rows. Capture everything
+		// else (in_progress / applied / manual / failed / dismissed / done) so we
+		// don't recreate a duplicate of something the user has already touched.
+		self::$known_sigs = self::load_known_sigs();
 
 		self::fix_missing_services();
 		self::fix_missing_locations();
@@ -29,14 +37,43 @@ class GSB_Fixes {
 		self::fix_missing_meta();
 		self::fix_weak_pages();
 
+		self::$known_sigs = null;
 		GSB_Logger::info( 'fixes', 'Fix queue rebuilt.' );
+	}
+
+	/** Insert a recommendation unless one with the same signature already exists. */
+	private static function add_unique( array $data ) {
+		if ( null === self::$known_sigs ) {
+			self::$known_sigs = self::load_known_sigs();
+		}
+		$sig = self::sig( $data['rec_type'] ?? '', (int) ( $data['post_id'] ?? 0 ), $data['title'] ?? '' );
+		if ( isset( self::$known_sigs[ $sig ] ) ) {
+			return 0; // already open, in progress, applied, dismissed, etc.
+		}
+		self::$known_sigs[ $sig ] = true;
+		return GSB_Database::add_recommendation( $data );
+	}
+
+	private static function sig( $type, $post_id, $title ) {
+		return $type . '|' . (int) $post_id . '|' . md5( (string) $title );
+	}
+
+	private static function load_known_sigs() {
+		global $wpdb;
+		$table = GSB_Database::table( 'recommendations' );
+		$rows  = $wpdb->get_results( "SELECT rec_type, post_id, title FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$out   = array();
+		foreach ( (array) $rows as $r ) {
+			$out[ self::sig( $r->rec_type, (int) $r->post_id, $r->title ) ] = true;
+		}
+		return $out;
 	}
 
 	/* ---------------------------------------------------------- generators */
 
 	private static function fix_missing_services() {
 		foreach ( GSB_Database::get_entities( 'service', 'recommended' ) as $svc ) {
-			GSB_Database::add_recommendation( array(
+			self::add_unique( array(
 				'rec_type'   => 'missing_service_page',
 				'title'      => sprintf( __( 'Create a page for "%s"', 'geo-site-brain' ), $svc->name ),
 				'detail'     => sprintf( __( 'AI has no clear page describing "%s" as one of your services.', 'geo-site-brain' ), $svc->name ),
@@ -51,7 +88,7 @@ class GSB_Fixes {
 
 	private static function fix_missing_locations() {
 		foreach ( GSB_Database::get_entities( 'location', 'recommended' ) as $loc ) {
-			GSB_Database::add_recommendation( array(
+			self::add_unique( array(
 				'rec_type'   => 'missing_location_page',
 				'title'      => sprintf( __( 'Create a service-area page for "%s"', 'geo-site-brain' ), $loc->name ),
 				'detail'     => sprintf( __( 'AI cannot confirm that you serve "%s".', 'geo-site-brain' ), $loc->name ),
@@ -84,7 +121,7 @@ class GSB_Fixes {
 			if ( ! $s || ! $l ) {
 				continue;
 			}
-			GSB_Database::add_recommendation( array(
+			self::add_unique( array(
 				'rec_type'   => 'missing_coverage',
 				'title'      => sprintf( __( 'Show "%1$s" in "%2$s"', 'geo-site-brain' ), $s->name, $l->name ),
 				'detail'     => sprintf( __( 'No page connects "%1$s" with "%2$s".', 'geo-site-brain' ), $s->name, $l->name ),
@@ -111,7 +148,7 @@ class GSB_Fixes {
 				return;
 			}
 		}
-		GSB_Database::add_recommendation( array(
+		self::add_unique( array(
 			'rec_type'   => 'schema',
 			'title'      => __( 'Add business (LocalBusiness) structured data', 'geo-site-brain' ),
 			'detail'     => __( 'Your site has no LocalBusiness structured data describing the business, its contact details and service area.', 'geo-site-brain' ),
@@ -128,7 +165,7 @@ class GSB_Fixes {
 			$sub = json_decode( (string) $row->subscores, true ) ?: array();
 			if ( ( $sub['faq_coverage'] ?? 0 ) >= 55 && ( $sub['schema_coverage'] ?? 0 ) < 50 ) {
 				$title = get_the_title( $row->post_id ) ?: $row->url;
-				GSB_Database::add_recommendation( array(
+				self::add_unique( array(
 					'post_id'    => $row->post_id,
 					'rec_type'   => 'schema',
 					'title'      => sprintf( __( 'Add FAQ structured data to "%s"', 'geo-site-brain' ), $title ),
@@ -149,7 +186,7 @@ class GSB_Fixes {
 			$svc = isset( $det['service_clarity'] ) ? (array) $det['service_clarity'] : array();
 			if ( in_array( 'meta description missing', $svc, true ) ) {
 				$title = get_the_title( $row->post_id ) ?: $row->url;
-				GSB_Database::add_recommendation( array(
+				self::add_unique( array(
 					'post_id'    => $row->post_id,
 					'rec_type'   => 'meta_rewrite',
 					'title'      => sprintf( __( 'Write a search description for "%s"', 'geo-site-brain' ), $title ),
@@ -170,7 +207,7 @@ class GSB_Fixes {
 				continue;
 			}
 			$title = get_the_title( $row->post_id ) ?: $row->url;
-			GSB_Database::add_recommendation( array(
+			self::add_unique( array(
 				'post_id'    => $row->post_id,
 				'rec_type'   => 'weak_page',
 				'title'      => sprintf( __( 'Strengthen "%1$s" (understood %2$d%%)', 'geo-site-brain' ), $title, (int) $row->score ),
@@ -198,7 +235,9 @@ class GSB_Fixes {
 		$payload = json_decode( (string) $rec->fix_payload, true ) ?: array();
 
 		$result = self::dispatch( $rec, $payload );
-		if ( ! is_wp_error( $result ) && empty( $result['manual'] ) ) {
+
+		// Notify external tools when a fix was actually applied (not a manual one).
+		if ( ! is_wp_error( $result ) && empty( $result['manual'] ) && class_exists( 'GSB_Webhooks' ) ) {
 			GSB_Webhooks::fire( 'fix.applied', array(
 				'id'     => (int) $rec->id,
 				'title'  => $rec->title,
@@ -231,6 +270,12 @@ class GSB_Fixes {
 		}
 	}
 
+	/** True when the recommendation row is present and marked applied. */
+	private static function is_applied( $id ) {
+		$rec = GSB_Database::get_recommendation( $id );
+		return $rec && 'applied' === $rec->status;
+	}
+
 	private static function do_create_page( $id, $payload, $kind ) {
 		$brand = trim( (string) GSB_Settings::get( 'business_name' ) ) ?: get_bloginfo( 'name' );
 
@@ -258,7 +303,15 @@ class GSB_Fixes {
 		if ( is_wp_error( $post_id ) ) {
 			return $post_id;
 		}
+
+		// Mark applied. If that DB write fails, roll back by deleting the draft
+		// so the recommendation stays actionable and no orphan post is left.
 		GSB_Database::mark_recommendation_applied( $id );
+		if ( ! self::is_applied( $id ) ) {
+			wp_delete_post( $post_id, true );
+			return new WP_Error( 'gsb_apply_failed', __( 'Page created but the recommendation could not be marked applied. The draft was removed — retry the fix.', 'geo-site-brain' ) );
+		}
+
 		return array(
 			'message'  => sprintf( __( 'Draft page "%s" created. Review and publish when ready.', 'geo-site-brain' ), $title ),
 			'edit_url' => get_edit_post_link( $post_id, 'raw' ),
@@ -290,6 +343,12 @@ class GSB_Fixes {
 
 		self::save_meta_description( $post_id, $desc );
 		GSB_Database::mark_recommendation_applied( $id );
+		// Rollback: if marking applied fails, clear the meta we just wrote so
+		// the recommendation stays actionable with no partial state.
+		if ( ! self::is_applied( $id ) ) {
+			self::save_meta_description( $post_id, '' );
+			return new WP_Error( 'gsb_apply_failed', __( 'Description written but the recommendation could not be marked applied. The change was reverted — retry the fix.', 'geo-site-brain' ) );
+		}
 		return array(
 			'message'  => sprintf( __( 'Description added: "%s"', 'geo-site-brain' ), $desc ),
 			'edit_url' => get_edit_post_link( $post_id, 'raw' ),
@@ -340,6 +399,15 @@ class GSB_Fixes {
 		);
 		self::store_post_schema( $post_id, 'faq', $schema );
 		GSB_Database::mark_recommendation_applied( $id );
+		// Rollback: remove the schema we just stored if the status update fails.
+		if ( ! self::is_applied( $id ) ) {
+			$existing = get_post_meta( $post_id, self::POST_SCHEMA_META, true );
+			if ( is_array( $existing ) ) {
+				unset( $existing['faq'] );
+				update_post_meta( $post_id, self::POST_SCHEMA_META, $existing );
+			}
+			return new WP_Error( 'gsb_apply_failed', __( 'FAQ structured data added but the recommendation could not be marked applied. The schema was removed — retry the fix.', 'geo-site-brain' ) );
+		}
 		return array(
 			'message'  => sprintf( _n( 'FAQ structured data added (%d question).', 'FAQ structured data added (%d questions).', count( $entities ), 'geo-site-brain' ), count( $entities ) ),
 			'edit_url' => get_edit_post_link( $post_id, 'raw' ),
@@ -379,6 +447,11 @@ class GSB_Fixes {
 
 		update_option( self::SITE_SCHEMA_OPTION, wp_json_encode( $schema ) );
 		GSB_Database::mark_recommendation_applied( $id );
+		// Rollback: remove the schema option if the status update fails.
+		if ( ! self::is_applied( $id ) ) {
+			delete_option( self::SITE_SCHEMA_OPTION );
+			return new WP_Error( 'gsb_apply_failed', __( 'Business structured data added but the recommendation could not be marked applied. The schema was removed — retry the fix.', 'geo-site-brain' ) );
+		}
 		return array( 'message' => __( 'Business structured data added across the site. AI and search engines can now identify your business, contact details and service area.', 'geo-site-brain' ) );
 	}
 
@@ -399,17 +472,29 @@ class GSB_Fixes {
 		if ( is_admin() ) {
 			return;
 		}
+		// Bug 2 fix: wp_kses_post() strips valid JSON-LD (query strings, @context
+		// URLs, etc.). The JSON was already sanitized at write time via wp_json_encode;
+		// re-encode from the decoded array to guarantee clean output.
 		if ( is_front_page() || is_home() ) {
 			$site = get_option( self::SITE_SCHEMA_OPTION );
 			if ( $site ) {
-				echo "\n" . '<script type="application/ld+json">' . wp_kses_post( $site ) . '</script>' . "\n";
+				$decoded = json_decode( $site, true );
+				if ( is_array( $decoded ) ) {
+					echo "\n" . '<script type="application/ld+json">' . wp_json_encode( $decoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
 			}
 		}
+		// Bug 7 fix: use get_queried_object_id() instead of get_the_ID() so we
+		// always read the correct singular post even when the_post() hasn't been
+		// called yet (e.g. on template_redirect before the loop starts).
 		if ( is_singular() ) {
-			$post_schema = get_post_meta( get_the_ID(), self::POST_SCHEMA_META, true );
-			if ( is_array( $post_schema ) ) {
-				foreach ( $post_schema as $schema ) {
-					echo "\n" . '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
+			$singular_id = get_queried_object_id();
+			if ( $singular_id ) {
+				$post_schema = get_post_meta( $singular_id, self::POST_SCHEMA_META, true );
+				if ( is_array( $post_schema ) ) {
+					foreach ( $post_schema as $schema ) {
+						echo "\n" . '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
 				}
 			}
 		}

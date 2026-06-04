@@ -397,8 +397,10 @@ class GSB_Database {
 
 	public static function mark_recommendation_applied( $id ) {
 		global $wpdb;
+		// Uses 'applied' (not 'done') to distinguish auto-applied fixes from
+		// manually-completed ones. Old 'done' rows are preserved as-is.
 		$wpdb->update( self::table( 'recommendations' ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			array( 'status' => 'done', 'applied_at' => current_time( 'mysql' ) ),
+			array( 'status' => 'applied', 'applied_at' => current_time( 'mysql' ) ),
 			array( 'id' => (int) $id )
 		);
 	}
@@ -406,6 +408,22 @@ class GSB_Database {
 	public static function get_recommendations( $status = 'open' ) {
 		global $wpdb;
 		$table = self::table( 'recommendations' );
+		// 'open' returns active items including in_progress.
+		// 'applied' returns all completed items: applied, manual (marked done by hand),
+		//   and old 'done' rows for backward compat. Fix 4: 'manual' was previously
+		//   excluded, causing manually-completed fixes to vanish from history.
+		// Other statuses are queried literally.
+		if ( 'open' === $status ) {
+			return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT * FROM {$table} WHERE status IN ('open','in_progress') ORDER BY FIELD(impact,'critical','high','medium','low'), FIELD(priority,'high','medium','low'), id DESC"
+			);
+		}
+		if ( 'applied' === $status ) {
+			// 'manual' = manually marked done; 'done' = legacy status from older versions.
+			return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT * FROM {$table} WHERE status IN ('applied','manual','done') ORDER BY applied_at DESC, id DESC"
+			);
+		}
 		return $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			"SELECT * FROM {$table} WHERE status = %s ORDER BY FIELD(impact,'critical','high','medium','low'), FIELD(priority,'high','medium','low'), id DESC",
 			$status
@@ -414,8 +432,26 @@ class GSB_Database {
 
 	public static function update_recommendation_status( $id, $status ) {
 		global $wpdb;
-		$status = in_array( $status, array( 'open', 'done', 'dismissed' ), true ) ? $status : 'open';
-		$wpdb->update( self::table( 'recommendations' ), array( 'status' => $status ), array( 'id' => (int) $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		// Full valid set. 'done' kept for backward compat with old rows.
+		$valid = array( 'open', 'in_progress', 'applied', 'manual', 'dismissed', 'failed', 'done' );
+		if ( ! in_array( $status, $valid, true ) ) {
+			return false; // invalid input — caller sent a bad value
+		}
+		$row = array( 'status' => $status );
+		if ( 'manual' === $status ) {
+			// Set applied_at so manually-done fixes show a completion date.
+			$row['applied_at'] = current_time( 'mysql' );
+		}
+		$result = $wpdb->update( self::table( 'recommendations' ), $row, array( 'id' => (int) $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		// $wpdb->update returns:
+		//   int > 0  — rows changed (success)
+		//   int = 0  — query ran fine but the value was already the same (also success)
+		//   false    — query error
+		// Distinguishing 0-rows-affected from a real error requires checking $wpdb->last_error.
+		if ( false === $result ) {
+			return false; // real DB error
+		}
+		return true; // 0 or more rows affected — either way the desired state is set
 	}
 
 	/* ------------------------------------------------------------- settings KV */

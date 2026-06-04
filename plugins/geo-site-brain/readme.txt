@@ -4,7 +4,7 @@ Tags: geo, aeo, seo, embeddings, openai, neon, pgvector, ai, schema, recommendat
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.3.0
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,13 +58,18 @@ browser.
 
 == Changelog ==
 
-= 2.3.0 =
-* REST API (read-only) under gsb/v1: summary, visibility, scores, fixes,
-  entities, competitors. Authenticate as a logged-in admin or with the plugin
-  API key (Authorization: Bearer, or X-GSB-Key).
-* Outbound webhooks: signed (HMAC-SHA256) JSON POSTs on visibility.updated,
-  visibility.drop and fix.applied — so external tools are notified when your AI
-  visibility drops. API key + signing secret managed in Settings.
+= 2.4.0 =
+* Based on the maintainer's patched build (12 bug fixes) plus four hardening
+  fixes and the REST API + webhooks reinstated on top:
+  - Weekly cron now catches rebuild failures (lock/step) so it can't fatal or
+    get stuck mid-run.
+  - Differentiator scoring no longer uses GROUP_CONCAT (MySQL truncates it at
+    ~1KB); it streams chunk text so the whole site is sampled.
+  - Fix Queue rebuilds no longer duplicate items already in progress, applied,
+    failed or dismissed (signature-based dedupe).
+  - Hardened fix-apply rollbacks against a missing recommendation row.
+* REST API (gsb/v1) + signed webhooks (visibility.updated, visibility.drop,
+  fix.applied) restored.
 
 = 2.2.0 =
 * Competitive GEO: add competitor website URLs and analyse how AI-legible they

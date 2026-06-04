@@ -64,10 +64,14 @@ class GSB_Indexer {
 	}
 
 	public function on_delete_post( $post_id ) {
+		// Bug 1 fix: original code called both delete_post() (deletes by post_id
+		// from Neon) AND delete_ids() (deletes the same rows by chunk id). That's
+		// a double-delete — both queries target the same Neon rows. Use delete_ids
+		// with the chunk ids returned by delete_post_chunks(), which is exact and
+		// avoids the redundant post_id scan in Neon.
 		$ids = GSB_Database::delete_post_chunks( $post_id );
 		GSB_Database::delete_score( $post_id );
 		$store = new GSB_Vector_Store();
-		$store->delete_post( $post_id );
 		if ( ! empty( $ids ) ) {
 			$store->delete_ids( $ids );
 		}
@@ -156,8 +160,12 @@ class GSB_Indexer {
 		}
 		global $wpdb;
 		$table = GSB_Database::table( 'chunks' );
-		$in    = implode( ',', array_map( 'intval', $ids ) );
-		$rows  = $wpdb->get_results( "SELECT * FROM {$table} WHERE id IN ({$in})" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// Bug 5 fix: build a parameterized IN clause instead of interpolating
+		// the integer list directly into the query string.
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id IN ({$placeholders})", $ids ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
 		return $this->embed_rows( $rows );
 	}
 
@@ -343,7 +351,17 @@ class GSB_Indexer {
 				return;
 			}
 			// Rebuild the business understanding (entities, graph, visibility, fixes).
-			GSB_Knowledge_Graph::rebuild_all();
+			// rebuild_all() can throw (concurrency lock / per-step failure); the
+			// cron request has no UI to catch it, so guard here. On failure we
+			// still clear the phase so the run ends cleanly and the next weekly
+			// tick can retry, rather than getting stuck re-firing the continuation.
+			try {
+				GSB_Knowledge_Graph::rebuild_all();
+			} catch ( \Throwable $e ) {
+				GSB_Logger::error( 'cron', 'Weekly rebuild failed: ' . $e->getMessage() );
+				GSB_Database::set_state( self::STATE_CRON_PHASE, '' );
+				return;
+			}
 			GSB_Database::set_state( self::STATE_LAST, current_time( 'mysql' ) );
 			GSB_Database::set_state( self::STATE_CRON_PHASE, '' ); // done
 			// Email the scheduled AI Visibility digest / drop alert if enabled.
