@@ -185,8 +185,15 @@ class GSB_Competitors {
 			if ( 0 === strpos( $href, '#' ) || 0 === stripos( $href, 'mailto:' ) || 0 === stripos( $href, 'tel:' ) ) {
 				continue;
 			}
-			// Resolve relative URLs.
-			if ( 0 === strpos( $href, '/' ) ) {
+			// Bug 4 fix: handle protocol-relative URLs (//example.com/path).
+			// Original code only resolved /path-relative URLs, so //host/path
+			// was treated as a //-prefixed path and resolved to
+			// https://yourdomain.com//host/path — a cross-domain URL that slips
+			// past the host check and gets fetched from the wrong domain.
+			if ( 0 === strpos( $href, '//' ) ) {
+				$scheme = wp_parse_url( $base, PHP_URL_SCHEME ) ?: 'https';
+				$href   = $scheme . ':' . $href;
+			} elseif ( 0 === strpos( $href, '/' ) ) {
 				$href = self::origin( $base ) . $href;
 			}
 			$lhost = wp_parse_url( $href, PHP_URL_HOST );
@@ -196,7 +203,7 @@ class GSB_Competitors {
 			if ( ! $lhost ) {
 				continue;
 			}
-			$score = preg_match( '/(service|clean|repair|restoration|location|area|about|faq|commercial)/i', $href ) ? 0 : 1;
+			$score            = preg_match( '/(service|clean|repair|restoration|location|area|about|faq|commercial)/i', $href ) ? 0 : 1;
 			$priority[ $href ] = $score;
 		}
 		asort( $priority );

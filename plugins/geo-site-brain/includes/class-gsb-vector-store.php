@@ -118,7 +118,21 @@ class GSB_Vector_Store {
 			return true;
 		}
 		try {
-			$pdo->exec( 'CREATE EXTENSION IF NOT EXISTS vector' );
+			// Bug 8 fix: CREATE EXTENSION IF NOT EXISTS returns false (not an
+			// exception) when the extension is unavailable on the Neon plan,
+			// leaving the subsequent CREATE TABLE to fail with a cryptic
+			// "type vector does not exist" error. We check explicitly so we can
+			// surface a clear "pgvector not available" message instead.
+			$ext_ok = $pdo->exec( 'CREATE EXTENSION IF NOT EXISTS vector' );
+			// Verify the extension is actually present (exec returns false on error
+			// with PDO::ERRMODE_SILENT, the default).
+			$check = $pdo->query( "SELECT 1 FROM pg_extension WHERE extname = 'vector'" );
+			if ( ! $check || ! $check->fetch() ) {
+				return new WP_Error(
+					'gsb_no_pgvector',
+					__( 'pgvector is not available on this Neon plan. Enable it in the Neon console (Extensions tab) or use the local vector fallback.', 'geo-site-brain' )
+				);
+			}
 			$pdo->exec( 'CREATE TABLE IF NOT EXISTS ' . self::NEON_TABLE . ' (
 				id bigint PRIMARY KEY,
 				site text NOT NULL,

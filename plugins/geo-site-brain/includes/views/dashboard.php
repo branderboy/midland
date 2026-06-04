@@ -1,20 +1,35 @@
 <?php
 /**
- * Executive dashboard — answers "How understandable is my business to AI?"
+ * Dashboard — answers "What should I do next?" based on actual plugin state.
+ * Next-action priority:
+ *   1. Configure settings (no API key)
+ *   2. Scan site (never scanned)
+ *   3. Review Page Scorecard (scanned but no visibility data)
+ *   4. Review Knowledge Graph (entities found)
+ *   5. Fix open recommendations
+ *   6. Run competitor analysis (competitors configured, none analysed)
+ *   7. Open report
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$has_openai = GSB_Settings::has_openai();
-$progress   = GSB_Indexer::get_instance()->progress();
-$engines    = GSB_Database::get_visibility();
-$overall    = GSB_Visibility::overall_score();
-$counts     = GSB_Database::entity_counts();
-$open_recs  = GSB_Database::get_recommendations( 'open' );
-$history    = (array) GSB_Database::get_state( 'visibility_history', array() );
+$has_openai  = GSB_Settings::has_openai();
+$progress    = GSB_Indexer::get_instance()->progress();
+$engines     = GSB_Database::get_visibility();
+$overall     = GSB_Visibility::overall_score();
+$counts      = GSB_Database::entity_counts();
+$open_recs   = GSB_Database::get_recommendations( 'open' );
+$applied_recs = GSB_Database::get_recommendations( 'applied' );
+$history     = (array) GSB_Database::get_state( 'visibility_history', array() );
 
-// Knowledge completeness + entity coverage (averaged across engines).
+$never_scanned   = ( (int) $progress['posts'] === 0 );
+$has_score_data  = ( null !== GSB_Database::site_score() );
+$has_vis_data    = ! empty( $engines );
+$comp_urls       = GSB_Settings::competitor_urls();
+$comp_analysed   = count( GSB_Database::get_competitors() );
+
+// Knowledge completeness averaged across engines.
 $knowledge = null;
 if ( ! empty( $engines ) ) {
 	$k = 0;
@@ -22,16 +37,48 @@ if ( ! empty( $engines ) ) {
 	$knowledge = (int) round( $k / count( $engines ) );
 }
 
-$svc_found = isset( $counts['service'] ) ? (int) $counts['service'] : 0;
-$loc_found = isset( $counts['location'] ) ? (int) $counts['location'] : 0;
-$svc_exp   = max( count( GSB_Settings::services() ), $svc_found, 1 );
-$loc_exp   = max( count( GSB_Settings::locations() ), $loc_found, 1 );
+$svc_found  = isset( $counts['service'] )  ? (int) $counts['service']  : 0;
+$loc_found  = isset( $counts['location'] ) ? (int) $counts['location'] : 0;
+$svc_exp    = max( count( GSB_Settings::services() ), $svc_found, 1 );
+$loc_exp    = max( count( GSB_Settings::locations() ), $loc_found, 1 );
 $entity_cov = (int) round( 100 * (
 	min( 1, $svc_found / $svc_exp ) + min( 1, $loc_found / $loc_exp )
 	+ ( ( $counts['faq'] ?? 0 ) > 0 ? 1 : 0 ) + ( ( $counts['testimonial'] ?? 0 ) > 0 ? 1 : 0 )
 ) / 4 );
 
-$first_run = ( ! $has_openai || empty( $engines ) );
+// Determine the single next recommended action.
+if ( ! $has_openai ) {
+	$next_label = __( 'Configure Settings', 'geo-site-brain' );
+	$next_url   = admin_url( 'admin.php?page=gsb-settings' );
+	$next_desc  = __( 'Add your OpenAI key and business details so the plugin can index and understand your site.', 'geo-site-brain' );
+} elseif ( $never_scanned ) {
+	$next_label = __( 'Scan your site', 'geo-site-brain' );
+	$next_url   = admin_url( 'admin.php?page=gsb-scan' );
+	$next_desc  = __( 'Run the first scan to read your content, score every page, and build your knowledge graph.', 'geo-site-brain' );
+} elseif ( $has_score_data && ! $has_vis_data ) {
+	$next_label = __( 'Review Page Scorecard', 'geo-site-brain' );
+	$next_url   = admin_url( 'admin.php?page=gsb-scores' );
+	$next_desc  = __( 'Your pages have been scored. Check which pages are hardest for AI to understand.', 'geo-site-brain' );
+} elseif ( $has_score_data && $svc_found > 0 && ! $has_vis_data ) {
+	$next_label = __( 'Review Knowledge Graph', 'geo-site-brain' );
+	$next_url   = admin_url( 'admin.php?page=gsb-knowledge-graph' );
+	$next_desc  = __( 'See what services, locations, FAQs, and trust signals have been identified from your content.', 'geo-site-brain' );
+} elseif ( ! empty( $open_recs ) ) {
+	$next_label = sprintf(
+		_n( 'Fix %d open recommendation', 'Fix %d open recommendations', count( $open_recs ), 'geo-site-brain' ),
+		count( $open_recs )
+	);
+	$next_url   = admin_url( 'admin.php?page=gsb-recommendations' );
+	$next_desc  = __( 'Work through the Fix Queue — apply easy one-click fixes first, then tackle the manual ones.', 'geo-site-brain' );
+} elseif ( ! empty( $comp_urls ) && 0 === $comp_analysed ) {
+	$next_label = __( 'Run competitor analysis', 'geo-site-brain' );
+	$next_url   = admin_url( 'admin.php?page=gsb-competitors' );
+	$next_desc  = __( 'You have competitor URLs configured. Run the analysis to see how your AI visibility compares.', 'geo-site-brain' );
+} else {
+	$next_label = __( 'Open full report', 'geo-site-brain' );
+	$next_url   = admin_url( 'admin.php?page=gsb-reports' );
+	$next_desc  = __( 'Review your AI Visibility report and identify what to improve next.', 'geo-site-brain' );
+}
 
 $recent = array();
 foreach ( GSB_Logger::recent( 8 ) as $log ) {
@@ -44,27 +91,16 @@ foreach ( GSB_Logger::recent( 8 ) as $log ) {
 	<h1><span class="dashicons dashicons-superhero"></span> <?php esc_html_e( 'AI Visibility Command Center', 'geo-site-brain' ); ?></h1>
 	<p class="gsb-sub"><?php esc_html_e( 'How well ChatGPT, Claude, Gemini and Perplexity understand — and would recommend — your business.', 'geo-site-brain' ); ?></p>
 
-	<?php if ( $first_run ) : ?>
-		<div class="gsb-panel gsb-getstarted">
-			<h2><?php esc_html_e( 'Start here', 'geo-site-brain' ); ?></h2>
-			<ol class="gsb-steps">
-				<li class="<?php echo $has_openai ? 'done' : ''; ?>">
-					<strong><?php esc_html_e( '1. Connect AI', 'geo-site-brain' ); ?></strong>
-					<?php esc_html_e( 'Add your AI key so we can build an AI-readable version of your business.', 'geo-site-brain' ); ?>
-					<?php if ( ! $has_openai ) : ?>
-						<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=gsb-settings' ) ); ?>"><?php esc_html_e( 'Open Settings', 'geo-site-brain' ); ?></a>
-					<?php else : ?><span class="gsb-ok">✓ <?php esc_html_e( 'Connected', 'geo-site-brain' ); ?></span><?php endif; ?>
-				</li>
-				<li><strong><?php esc_html_e( '2. Scan your website', 'geo-site-brain' ); ?></strong>
-					<?php esc_html_e( 'We read every page and map your services, locations, FAQs and proof.', 'geo-site-brain' ); ?>
-					<a class="button <?php echo $has_openai ? 'button-primary' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=gsb-scan' ) ); ?>"><?php esc_html_e( 'Scan Website', 'geo-site-brain' ); ?></a>
-				</li>
-				<li><strong><?php esc_html_e( '3. See & fix the gaps', 'geo-site-brain' ); ?></strong>
-					<?php esc_html_e( 'Review AI Visibility, work the Fix Queue, and ask your website questions.', 'geo-site-brain' ); ?>
-				</li>
-			</ol>
+	<div class="gsb-next-action" style="background:#fff;border-left:4px solid #2271b1;border-radius:4px;padding:14px 16px;margin:0 0 20px;box-shadow:0 1px 2px rgba(0,0,0,.06);">
+		<div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#2271b1;font-weight:600;margin-bottom:4px;"><?php esc_html_e( 'Next recommended action', 'geo-site-brain' ); ?></div>
+		<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+			<div>
+				<strong style="font-size:15px;"><?php echo esc_html( $next_label ); ?></strong>
+				<div class="gsb-muted" style="font-size:13px;margin-top:2px;"><?php echo esc_html( $next_desc ); ?></div>
+			</div>
+			<a class="button button-primary" href="<?php echo esc_url( $next_url ); ?>"><?php echo esc_html( $next_label ); ?> →</a>
 		</div>
-	<?php endif; ?>
+	</div>
 
 	<div class="gsb-cards">
 		<div class="gsb-card gsb-score-card">
@@ -81,7 +117,11 @@ foreach ( GSB_Logger::recent( 8 ) as $log ) {
 		</div>
 		<div class="gsb-card">
 			<div class="gsb-card-num"><a href="<?php echo esc_url( admin_url( 'admin.php?page=gsb-recommendations' ) ); ?>"><?php echo (int) count( $open_recs ); ?></a></div>
-			<div class="gsb-card-label"><?php esc_html_e( 'Fixes in the queue', 'geo-site-brain' ); ?></div>
+			<div class="gsb-card-label"><?php esc_html_e( 'Open fixes', 'geo-site-brain' ); ?></div>
+		</div>
+		<div class="gsb-card">
+			<div class="gsb-card-num"><?php echo (int) count( $applied_recs ); ?></div>
+			<div class="gsb-card-label"><?php esc_html_e( 'Fixes applied', 'geo-site-brain' ); ?></div>
 		</div>
 	</div>
 

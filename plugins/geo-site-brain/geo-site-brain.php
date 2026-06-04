@@ -2,7 +2,7 @@
 /**
  * Plugin Name: GEO Site Brain
  * Description: Turns your WordPress content into an AI-readable knowledge base using OpenAI embeddings (stored in Neon pgvector, with a local fallback). Scores every page for GEO/AEO/SEO, generates recommendations, and answers questions in an admin chat using retrieval first.
- * Version: 2.3.0
+ * Version: 2.4.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GSB_VERSION', '2.3.0' );
+define( 'GSB_VERSION', '2.4.0' );
 define( 'GSB_PLUGIN_FILE', __FILE__ );
 define( 'GSB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GSB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -108,8 +108,9 @@ final class GSB_Plugin {
 		GSB_Database::install();
 		GSB_Settings::set_defaults();
 
-		// Weekly full reindex, opt-in by default.
-		if ( ! wp_next_scheduled( GSB_CRON_REINDEX ) ) {
+		// Only schedule the weekly reindex if the setting is on (default: 1).
+		// Checking after set_defaults() so the option always exists.
+		if ( (int) GSB_Settings::get( 'weekly_reindex', 1 ) && ! wp_next_scheduled( GSB_CRON_REINDEX ) ) {
 			wp_schedule_event( time() + DAY_IN_SECONDS, 'weekly', GSB_CRON_REINDEX );
 		}
 	}
@@ -117,6 +118,8 @@ final class GSB_Plugin {
 	public function deactivate() {
 		wp_clear_scheduled_hook( GSB_CRON_REINDEX );
 		wp_clear_scheduled_hook( GSB_CRON_CONTINUE );
+		// Clear any pending single-post index events queued by on_save_post.
+		wp_clear_scheduled_hook( GSB_CRON_POST );
 	}
 }
 

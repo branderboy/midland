@@ -31,27 +31,69 @@ class GSB_Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'assets' ) );
 		add_action( 'admin_notices', array( 'GSB_Logger', 'render_notice' ) );
 
+		// Fix 1: HTML checkboxes are not submitted when unchecked, so the
+		// sanitize_callback never fires and the stored value stays 1 forever.
+		// Hook pre_update_option so unchecking actually saves 0 by detecting
+		// whether the field is present in the form POST for our settings group.
+		foreach ( array( 'gsb_weekly_reindex', 'gsb_neon_enabled', 'gsb_enable_digest' ) as $opt ) {
+			add_filter(
+				'pre_update_option_' . $opt,
+				static function ( $new_value, $old_value ) use ( $opt ) {
+					// phpcs:ignore WordPress.Security.NonceVerification
+					if ( isset( $_POST['option_page'] ) && GSB_Admin::GROUP === sanitize_key( wp_unslash( $_POST['option_page'] ) ) ) {
+						// phpcs:ignore WordPress.Security.NonceVerification
+						return isset( $_POST[ $opt ] ) ? 1 : 0;
+					}
+					return $new_value;
+				},
+				10,
+				2
+			);
+		}
+
+		// Sync cron whenever options.php saves weekly_reindex (Fix 12).
+		add_action( 'update_option_gsb_weekly_reindex', array( $this, 'sync_reindex_cron' ), 10, 2 );
+
+		// Fix 3: gsb_save_settings removed — settings are saved via the standard
+		// options.php form which calls the register_setting sanitize callbacks.
+		// A parallel AJAX save path created dead/unsafe duplicate logic and its
+		// keep_secret() calls broke in AJAX context because current_filter()
+		// returns 'wp_ajax_gsb_save_settings', not 'sanitize_option_gsb_*'.
 		$ajax = array(
-			'gsb_start_scan'   => 'ajax_start_scan',
-			'gsb_scan_step'    => 'ajax_scan_step',
-			'gsb_embed_step'   => 'ajax_embed_step',
-			'gsb_finalize'     => 'ajax_finalize',
-			'gsb_progress'     => 'ajax_progress',
-			'gsb_reindex_post' => 'ajax_reindex_post',
-			'gsb_rebuild_recs' => 'ajax_rebuild_recs',
-			'gsb_rec_status'   => 'ajax_rec_status',
-			'gsb_apply_fix'    => 'ajax_apply_fix',
-			'gsb_narrative'    => 'ajax_narrative',
-			'gsb_probe'        => 'ajax_probe',
+			'gsb_start_scan'      => 'ajax_start_scan',
+			'gsb_scan_step'       => 'ajax_scan_step',
+			'gsb_embed_step'      => 'ajax_embed_step',
+			'gsb_finalize'        => 'ajax_finalize',
+			'gsb_progress'        => 'ajax_progress',
+			'gsb_reindex_post'    => 'ajax_reindex_post',
+			'gsb_rebuild_recs'    => 'ajax_rebuild_recs',
+			'gsb_rec_status'      => 'ajax_rec_status',
+			'gsb_apply_fix'       => 'ajax_apply_fix',
+			'gsb_narrative'       => 'ajax_narrative',
+			'gsb_probe'           => 'ajax_probe',
 			'gsb_run_competitors' => 'ajax_run_competitors',
-			'gsb_send_digest'  => 'ajax_send_digest',
-			'gsb_regen_key'    => 'ajax_regen_key',
-			'gsb_test_openai'  => 'ajax_test_openai',
-			'gsb_test_neon'    => 'ajax_test_neon',
-			'gsb_chat'         => 'ajax_chat',
+			'gsb_send_digest'     => 'ajax_send_digest',
+			'gsb_regen_key'       => 'ajax_regen_key',
+			'gsb_test_openai'     => 'ajax_test_openai',
+			'gsb_test_neon'       => 'ajax_test_neon',
+			'gsb_chat'            => 'ajax_chat',
 		);
 		foreach ( $ajax as $action => $method ) {
 			add_action( 'wp_ajax_' . $action, array( $this, $method ) );
+		}
+	}
+
+	/**
+	 * Called whenever gsb_weekly_reindex is saved via options.php.
+	 * $old_value is the previous value; $new_value is the just-saved value.
+	 */
+	public function sync_reindex_cron( $old_value, $new_value ) {
+		if ( (int) $new_value ) {
+			if ( ! wp_next_scheduled( GSB_CRON_REINDEX ) ) {
+				wp_schedule_event( time() + DAY_IN_SECONDS, 'weekly', GSB_CRON_REINDEX );
+			}
+		} else {
+			wp_clear_scheduled_hook( GSB_CRON_REINDEX );
 		}
 	}
 
@@ -67,20 +109,24 @@ class GSB_Admin {
 			'dashicons-superhero',
 			58
 		);
-		// Labelled as a product loop — Understand → Scan → Scorecard → Fix →
-		// Ask → Setup — instead of developer nouns. Slugs are unchanged so links,
-		// bookmarks and AJAX keep working.
+		// Order: Dashboard → Settings → Scan → Page Scorecard → Knowledge Graph
+		//        → AI Visibility Gaps → Fix Queue → Site Chat → Competitors
+		//        → Reports
+		// Settings moves to position 2 because every other screen depends on
+		// API keys, post types, services, locations, and competitors being set.
+		// Page Scorecard moves immediately after Scan because scoring is the
+		// direct output of a scan run. All slugs unchanged.
 		$pages = array(
 			'geo-site-brain'      => array( __( 'Dashboard', 'geo-site-brain' ), 'view_dashboard' ),
-			'gsb-knowledge-graph' => array( __( 'Knowledge Graph', 'geo-site-brain' ), 'view_knowledge_graph' ),
+			'gsb-settings'        => array( __( 'Settings', 'geo-site-brain' ), 'view_settings' ),
 			'gsb-scan'            => array( __( 'Scan Website', 'geo-site-brain' ), 'view_scan' ),
+			'gsb-scores'          => array( __( 'Page Scorecard', 'geo-site-brain' ), 'view_scores' ),
+			'gsb-knowledge-graph' => array( __( 'Knowledge Graph', 'geo-site-brain' ), 'view_knowledge_graph' ),
 			'gsb-visibility'      => array( __( 'AI Visibility Gaps', 'geo-site-brain' ), 'view_visibility' ),
 			'gsb-recommendations' => array( __( 'Fix Queue', 'geo-site-brain' ), 'view_recommendations' ),
-			'gsb-chat'            => array( __( 'Ask My Website', 'geo-site-brain' ), 'view_chat' ),
+			'gsb-chat'            => array( __( 'Site Chat', 'geo-site-brain' ), 'view_chat' ),
 			'gsb-competitors'     => array( __( 'Competitors', 'geo-site-brain' ), 'view_competitors' ),
 			'gsb-reports'         => array( __( 'Reports', 'geo-site-brain' ), 'view_reports' ),
-			'gsb-scores'          => array( __( 'Page Scorecard', 'geo-site-brain' ), 'view_scores' ),
-			'gsb-settings'        => array( __( 'Settings', 'geo-site-brain' ), 'view_settings' ),
 		);
 		foreach ( $pages as $slug => $cfg ) {
 			add_submenu_page( 'geo-site-brain', $cfg[0], $cfg[0], self::CAP, $slug, array( $this, $cfg[1] ) );
@@ -163,12 +209,25 @@ class GSB_Admin {
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( self::NONCE ),
 			'strings' => array(
-				'scanning'      => __( 'Reading your website…', 'geo-site-brain' ),
-				'embedding'     => __( 'Building knowledge…', 'geo-site-brain' ),
-				'understanding' => __( 'Mapping your business…', 'geo-site-brain' ),
-				'done'          => __( 'Done.', 'geo-site-brain' ),
-				'thinking'  => __( 'Thinking…', 'geo-site-brain' ),
-				'error'     => __( 'Something went wrong.', 'geo-site-brain' ),
+				// Scan phase labels shown in the progress bar.
+				'phase_scanning'    => __( 'Scanning content…', 'geo-site-brain' ),
+				'phase_chunks'      => __( 'Creating chunks…', 'geo-site-brain' ),
+				'phase_embedding'   => __( 'Generating embeddings…', 'geo-site-brain' ),
+				'phase_graph'       => __( 'Building knowledge graph…', 'geo-site-brain' ),
+				'phase_visibility'  => __( 'Generating visibility data…', 'geo-site-brain' ),
+				'phase_fixes'       => __( 'Generating fix queue…', 'geo-site-brain' ),
+				// Legacy keys kept so any cached JS still works.
+				'scanning'          => __( 'Scanning content…', 'geo-site-brain' ),
+				'embedding'         => __( 'Generating embeddings…', 'geo-site-brain' ),
+				'understanding'     => __( 'Building knowledge graph…', 'geo-site-brain' ),
+				'done'              => __( 'Done.', 'geo-site-brain' ),
+				'thinking'          => __( 'Thinking…', 'geo-site-brain' ),
+				'error'             => __( 'Something went wrong.', 'geo-site-brain' ),
+				'no_openai'         => __( 'Content scanned and scored. Add an OpenAI key in Settings to generate embeddings for semantic search and the chat agent.', 'geo-site-brain' ),
+				// Fix Queue UI (Fix 9 — failed section created dynamically).
+				'fixes_failed'      => __( 'Fix failed', 'geo-site-brain' ),
+				'retry'             => __( 'Retry Fix', 'geo-site-brain' ),
+				'dismiss'           => __( 'Dismiss', 'geo-site-brain' ),
 			),
 		) );
 	}
@@ -226,28 +285,53 @@ class GSB_Admin {
 
 	public function ajax_rebuild_recs() {
 		$this->guard();
-		GSB_Knowledge_Graph::rebuild_all();
+		try {
+			GSB_Knowledge_Graph::rebuild_all();
+		} catch ( \Throwable $e ) {
+			GSB_Logger::error( 'graph', 'Rebuild recommendations failed: ' . $e->getMessage() );
+			wp_send_json_error( array( 'message' => __( 'Rebuild failed. Check the activity log for details.', 'geo-site-brain' ) ) );
+		}
 		wp_send_json_success( array( 'count' => count( GSB_Database::get_recommendations( 'open' ) ) ) );
 	}
 
 	/**
 	 * Post-scan "understanding" pass: build entities, graph, visibility + fixes.
+	 * Fix 10: wraps rebuild_all() in a try/catch so internal failures are
+	 * surfaced to the UI instead of always returning success.
 	 */
 	public function ajax_finalize() {
 		$this->guard();
-		GSB_Knowledge_Graph::rebuild_all();
+		try {
+			GSB_Knowledge_Graph::rebuild_all();
+		} catch ( \Throwable $e ) {
+			GSB_Logger::error( 'graph', 'Knowledge graph rebuild failed: ' . $e->getMessage() );
+			wp_send_json_error( array( 'message' => __( 'Knowledge graph rebuild failed. Check the activity log for details.', 'geo-site-brain' ) ) );
+		}
 		wp_send_json_success( array(
 			'entities' => array_sum( GSB_Database::entity_counts() ),
 			'fixes'    => count( GSB_Database::get_recommendations( 'open' ) ),
 		) );
 	}
 
+	/**
+	 * Apply a fix. On success marks the recommendation as 'applied' and returns
+	 * result data. On failure logs the error and marks as 'failed' when the fix
+	 * was attempted (not when pre-conditions are missing).
+	 */
 	public function ajax_apply_fix() {
 		$this->guard();
 		$id  = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 		$res = GSB_Fixes::apply( $id );
 		if ( is_wp_error( $res ) ) {
-			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+			$msg = $res->get_error_message();
+			GSB_Logger::error( 'fixes', sprintf( 'Fix #%d failed: %s', $id, $msg ) );
+			// Mark as failed only when the fix was attempted but hit a runtime
+			// error (not missing pre-conditions like no OpenAI key or no post).
+			$runtime_codes = array( 'gsb_no_fix' );
+			if ( ! in_array( $res->get_error_code(), $runtime_codes, true ) ) {
+				GSB_Database::update_recommendation_status( $id, 'failed' );
+			}
+			wp_send_json_error( array( 'message' => $msg ) );
 		}
 		wp_send_json_success( $res );
 	}
@@ -312,12 +396,25 @@ class GSB_Admin {
 		wp_send_json_success( array( 'narrative' => $res ) );
 	}
 
+	/**
+	 * Update a recommendation status.
+	 * Fix 8: returns an error on invalid status instead of silently defaulting
+	 * to 'open', which previously turned stray POST values into unexpected resets.
+	 */
 	public function ajax_rec_status() {
 		$this->guard();
 		$id     = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 		$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : '';
 		if ( ! $id ) {
 			wp_send_json_error( array( 'message' => __( 'No id.', 'geo-site-brain' ) ) );
+		}
+		$valid = array( 'open', 'in_progress', 'applied', 'manual', 'dismissed', 'failed', 'done' );
+		if ( ! in_array( $status, $valid, true ) ) {
+			wp_send_json_error( array( 'message' => sprintf(
+				/* translators: %s: the invalid status string */
+				__( 'Invalid status "%s".', 'geo-site-brain' ),
+				$status
+			) ) );
 		}
 		GSB_Database::update_recommendation_status( $id, $status );
 		wp_send_json_success();
@@ -375,3 +472,4 @@ class GSB_Admin {
 		}
 	}
 }
+
