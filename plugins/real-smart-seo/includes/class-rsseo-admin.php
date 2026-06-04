@@ -518,7 +518,7 @@ class RSSEO_Admin {
         $report = $report_id ? RSSEO_Database::get_report( $report_id ) : null;
         if ( $report ) {
             $fixes = RSSEO_Database::get_fixes( $report_id );
-            require RSSEO_PATH . 'includes/views/report-detail.php';
+            require RSSEO_PATH . 'includes/views/fix-queue.php';
             return;
         }
         echo '<div class="rsseo-empty">';
