@@ -45,6 +45,7 @@ class GSB_Admin {
 			'gsb_probe'        => 'ajax_probe',
 			'gsb_run_competitors' => 'ajax_run_competitors',
 			'gsb_send_digest'  => 'ajax_send_digest',
+			'gsb_regen_key'    => 'ajax_regen_key',
 			'gsb_test_openai'  => 'ajax_test_openai',
 			'gsb_test_neon'    => 'ajax_test_neon',
 			'gsb_chat'         => 'ajax_chat',
@@ -120,6 +121,10 @@ class GSB_Admin {
 		register_setting( self::GROUP, $o . 'agency_name', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
 		register_setting( self::GROUP, $o . 'agency_logo', array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
 		register_setting( self::GROUP, $o . 'report_contact', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+
+		// REST API + webhooks (the key + secret are managed via buttons, not the form).
+		register_setting( self::GROUP, $o . 'webhooks_enabled', array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+		register_setting( self::GROUP, $o . 'webhook_urls', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
 	}
 
 	/**
@@ -283,6 +288,15 @@ class GSB_Admin {
 			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
 		}
 		wp_send_json_success( array( 'message' => __( 'Digest email sent.', 'geo-site-brain' ) ) );
+	}
+
+	public function ajax_regen_key() {
+		$this->guard();
+		$which = isset( $_POST['which'] ) ? sanitize_key( wp_unslash( $_POST['which'] ) ) : '';
+		if ( 'webhook' === $which ) {
+			wp_send_json_success( array( 'value' => GSB_Settings::regenerate_webhook_secret() ) );
+		}
+		wp_send_json_success( array( 'value' => GSB_Settings::regenerate_api_key() ) );
 	}
 
 	public function ajax_narrative() {
