@@ -22,8 +22,8 @@ $defaults   = $is_midland
     );
 $profile = wp_parse_args( $profile, $defaults );
 ?>
-<div class="wrap rsseo-wrap">
-    <h1><?php esc_html_e( 'Real Smart SEO Settings', 'real-smart-seo' ); ?></h1>
+<div class="rsseo-tabview">
+    <h2><?php esc_html_e( 'Settings', 'real-smart-seo' ); ?></h2>
 
     <div id="rsseo-settings-msg" class="rsseo-notice" style="display:none;"></div>
 

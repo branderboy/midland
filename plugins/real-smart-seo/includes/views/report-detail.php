@@ -1,9 +1,9 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
-<div class="wrap rsseo-wrap">
-    <h1>
+<div class="rsseo-tabview">
+    <h2>
         <?php esc_html_e( 'SEO Report', 'real-smart-seo' ); ?>
         <span class="rsseo-report-label">— <?php echo esc_html( $report->label ); ?></span>
-    </h1>
+    </h2>
 
     <div class="rsseo-report-meta">
         <span><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $report->scan_date ) ) ); ?></span>
