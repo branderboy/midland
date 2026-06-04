@@ -87,6 +87,34 @@ class WGB_GitHub_API {
 	}
 
 	/**
+	 * Whether a URL points at a trusted GitHub host.
+	 *
+	 * Used to decide if the access token may be attached to a request. Only
+	 * github.com / githubusercontent.com (and their subdomains, e.g.
+	 * api.github.com, raw.githubusercontent.com) are trusted.
+	 *
+	 * @param string $url URL to check.
+	 * @return bool True if the host is a trusted GitHub host.
+	 */
+	private function is_trusted_github_host( $url ) {
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+
+		if ( empty( $host ) ) {
+			return false;
+		}
+
+		$host = strtolower( $host );
+
+		foreach ( array( 'github.com', 'githubusercontent.com' ) as $trusted ) {
+			if ( $host === $trusted || substr( $host, -strlen( '.' . $trusted ) ) === '.' . $trusted ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Make an API request with rate limiting retry logic.
 	 *
 	 * @param string $url     Full API URL.
@@ -112,7 +140,7 @@ class WGB_GitHub_API {
 			$rate_remaining = wp_remote_retrieve_header( $response, 'x-ratelimit-remaining' );
 			if ( $retry_after || '0' === $rate_remaining ) {
 				$wait = $retry_after ? (int) $retry_after : ( $attempt * 5 );
-				sleep( $wait );
+				sleep( min( $wait, 15 ) );
 				return $this->request( $url, $args, $attempt + 1 );
 			}
 		}
@@ -507,13 +535,22 @@ class WGB_GitHub_API {
 
 			// For large files, use the download_url.
 			if ( isset( $data['download_url'] ) ) {
-				$auth_prefix = ( 0 === strpos( $this->token, 'ghp_' ) ) ? 'token' : 'Bearer';
+				$headers = array(
+					'User-Agent' => 'WP-GitHub-Backup/' . WGB_VERSION,
+				);
+
+				// Only forward the access token when the download host is a
+				// trusted GitHub host. download_url can point at arbitrary
+				// hosts (CDNs, redirects); leaking the PAT to those would be
+				// a credential disclosure.
+				if ( $this->is_trusted_github_host( $data['download_url'] ) ) {
+					$auth_prefix              = ( 0 === strpos( $this->token, 'ghp_' ) ) ? 'token' : 'Bearer';
+					$headers['Authorization'] = $auth_prefix . ' ' . $this->token;
+				}
+
 				$download = wp_remote_get( $data['download_url'], array(
 					'timeout' => 120,
-					'headers' => array(
-						'Authorization' => $auth_prefix . ' ' . $this->token,
-						'User-Agent'    => 'WP-GitHub-Backup/' . WGB_VERSION,
-					),
+					'headers' => $headers,
 				) );
 
 				if ( is_wp_error( $download ) ) {

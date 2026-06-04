@@ -38,3 +38,4 @@ foreach ( $options as $opt ) {
 wp_clear_scheduled_hook( 'gsb_weekly_reindex' );
 wp_clear_scheduled_hook( 'gsb_reindex_continue' );
 wp_clear_scheduled_hook( 'gsb_index_post' );
+wp_clear_scheduled_hook( 'gsb_weekly_digest' );

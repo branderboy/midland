@@ -241,9 +241,16 @@ class GSB_Visibility {
 		$id_services  = self::clean_list( $parsed['services'] ?? array() );
 		$id_locations = self::clean_list( $parsed['locations'] ?? array() );
 
-		$recall_s = self::recall( $graph_services, $id_services );
-		$recall_l = self::recall( $graph_locations, $id_locations );
-		$coverage = (int) round( 100 * ( ( $recall_s + $recall_l ) / 2 ) );
+		// recall() returns null when there's no ground truth for that dimension
+		// (no services/locations configured) — average only the dimensions we can
+		// actually measure so an empty graph doesn't score a perfect coverage.
+		$recalls  = array_filter(
+			array( self::recall( $graph_services, $id_services ), self::recall( $graph_locations, $id_locations ) ),
+			static function ( $r ) {
+				return null !== $r;
+			}
+		);
+		$coverage = empty( $recalls ) ? 0 : (int) round( 100 * ( array_sum( $recalls ) / count( $recalls ) ) );
 
 		$desc   = trim( (string) ( $parsed['description'] ?? '' ) );
 		$cannot = self::clean_list( $parsed['cannot_determine'] ?? array() );
@@ -326,10 +333,15 @@ class GSB_Visibility {
 		return array_values( array_unique( $out ) );
 	}
 
-	/** Fraction of ground-truth items the model reproduced (substring match). */
+	/**
+	 * Fraction of ground-truth items the model reproduced (substring match).
+	 * Returns null when there's no ground truth to recall — an empty graph is
+	 * "nothing to measure", not perfect coverage, so callers can skip the signal
+	 * instead of treating it as 1.0 and inflating the score.
+	 */
 	private static function recall( $truth, $found ) {
 		if ( empty( $truth ) ) {
-			return empty( $found ) ? 1.0 : 1.0;
+			return null;
 		}
 		$found_l = array_map( 'strtolower', $found );
 		$hit = 0;

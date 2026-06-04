@@ -54,6 +54,10 @@ class GSB_Admin {
 		// Sync cron whenever options.php saves weekly_reindex (Fix 12).
 		add_action( 'update_option_gsb_weekly_reindex', array( $this, 'sync_reindex_cron' ), 10, 2 );
 
+		// Sync the independent weekly digest cron when enable_digest is saved, so
+		// the digest schedule follows the setting even with reindex turned off.
+		add_action( 'update_option_gsb_enable_digest', array( $this, 'sync_digest_cron' ), 10, 2 );
+
 		// Fix 3: gsb_save_settings removed — settings are saved via the standard
 		// options.php form which calls the register_setting sanitize callbacks.
 		// A parallel AJAX save path created dead/unsafe duplicate logic and its
@@ -95,6 +99,14 @@ class GSB_Admin {
 		} else {
 			wp_clear_scheduled_hook( GSB_CRON_REINDEX );
 		}
+	}
+
+	/**
+	 * Called whenever gsb_enable_digest is saved via options.php. Schedules or
+	 * clears the standalone weekly digest cron to match the new value.
+	 */
+	public function sync_digest_cron( $old_value, $new_value ) {
+		GSB_Monitor::sync_digest_cron( (int) $new_value );
 	}
 
 	/* ----------------------------------------------------------------- menu */

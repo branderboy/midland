@@ -33,6 +33,9 @@ define( 'GSB_EMBED_DIM', 1536 );
 define( 'GSB_CRON_REINDEX', 'gsb_weekly_reindex' );
 define( 'GSB_CRON_CONTINUE', 'gsb_reindex_continue' );
 define( 'GSB_CRON_POST', 'gsb_index_post' );
+// The email digest has its own weekly cron so it fires independently of the
+// weekly reindex (a user can enable the digest while leaving reindex off).
+define( 'GSB_CRON_DIGEST', 'gsb_weekly_digest' );
 
 /**
  * Main plugin bootstrap. Singleton, mirrors the other Midland plugins.
@@ -93,6 +96,9 @@ final class GSB_Plugin {
 		// Content lifecycle + cron indexing hooks.
 		GSB_Indexer::get_instance()->register_hooks();
 
+		// Weekly email digest cron (independent of the reindex schedule).
+		GSB_Monitor::register_hooks();
+
 		// Front-end: output any structured data created from the Fix Queue.
 		add_action( 'wp_head', array( 'GSB_Fixes', 'render_head' ), 20 );
 
@@ -113,6 +119,9 @@ final class GSB_Plugin {
 		if ( (int) GSB_Settings::get( 'weekly_reindex', 1 ) && ! wp_next_scheduled( GSB_CRON_REINDEX ) ) {
 			wp_schedule_event( time() + DAY_IN_SECONDS, 'weekly', GSB_CRON_REINDEX );
 		}
+
+		// Schedule the email digest on its own weekly cron when enabled.
+		GSB_Monitor::sync_digest_cron( (int) GSB_Settings::get( 'enable_digest', 0 ) );
 	}
 
 	public function deactivate() {
@@ -120,6 +129,7 @@ final class GSB_Plugin {
 		wp_clear_scheduled_hook( GSB_CRON_CONTINUE );
 		// Clear any pending single-post index events queued by on_save_post.
 		wp_clear_scheduled_hook( GSB_CRON_POST );
+		wp_clear_scheduled_hook( GSB_CRON_DIGEST );
 	}
 }
 

@@ -103,7 +103,7 @@ class WGB_Claude_API {
 		$text = '';
 		if ( isset( $data['content'] ) && is_array( $data['content'] ) ) {
 			foreach ( $data['content'] as $block ) {
-				if ( 'text' === $block['type'] ) {
+				if ( is_array( $block ) && isset( $block['type'] ) && 'text' === $block['type'] && isset( $block['text'] ) ) {
 					$text .= $block['text'];
 				}
 			}

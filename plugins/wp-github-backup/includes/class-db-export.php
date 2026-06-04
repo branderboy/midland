@@ -22,6 +22,27 @@ class WGB_DB_Export {
 		'token',
 		'password',
 		'api_key',
+		'_token',
+		'_secret',
+		'_json',
+		'service_account',
+		'private_key',
+		'access_token',
+		'client_secret',
+	);
+
+	/**
+	 * Exact option names that must always be redacted, regardless of pattern.
+	 *
+	 * Some sensitive options (e.g. a service-account JSON blob containing an
+	 * RSA private key) do not contain an obvious keyword in their name.
+	 *
+	 * @var array
+	 */
+	private static $sensitive_option_names = array(
+		'dpjp_indexing_api_json',
+		'dpjp_fb_page_token',
+		'dpjp_indeed_client_secret',
 	);
 
 	/**
@@ -161,6 +182,12 @@ class WGB_DB_Export {
 		}
 
 		$option_name = strtolower( $row['option_name'] );
+
+		// Always redact known sensitive option names.
+		if ( in_array( $option_name, array_map( 'strtolower', self::$sensitive_option_names ), true ) ) {
+			$row['option_value'] = '***REDACTED***';
+			return $row;
+		}
 
 		foreach ( self::$sensitive_patterns as $pattern ) {
 			if ( false !== strpos( $option_name, $pattern ) ) {

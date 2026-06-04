@@ -48,7 +48,15 @@ class SCRM_Pro_Tags {
 
     /* ---- lifecycle listeners ---- */
 
-    public function on_submitted( $lead, $a = null, $b = null ) {
+    public function on_submitted( $lead_id, $payload = null, $form = null ) {
+        // sfco_lead_submitted fires with ( int $lead_id, array $payload, $form ) —
+        // unlike booked/completed/canceled, which hand us the lead row directly.
+        // Resolve the real lead row so record()/store()/compute() get the same
+        // object shape (and a non-zero id) as every other lifecycle path.
+        $lead = $this->resolve_lead( $lead_id, $payload );
+        if ( ! $lead ) {
+            return;
+        }
         $this->record( $lead, 'new_lead' );
     }
     public function on_booked( $lead, $is_rebook = false ) {
@@ -115,6 +123,34 @@ class SCRM_Pro_Tags {
             'time'      => time(),
         ) );
         update_option( self::OPT_LOG, array_slice( $log, 0, self::LOG_CAP ), false );
+    }
+
+    /**
+     * Turn the sfco_lead_submitted (int $lead_id, array $payload) args into a
+     * real lead row object. Prefers the canonical wp_sfco_leads row so segment
+     * / emergency detection sees every column; falls back to the submission
+     * payload (which carries customer_name / customer_email and the journey
+     * fields) stamped with the real id when the loader isn't available.
+     */
+    private function resolve_lead( $lead_id, $payload ) {
+        $lead_id = (int) $lead_id;
+        if ( $lead_id <= 0 ) {
+            return null;
+        }
+
+        if ( class_exists( 'SFCO_Database' ) ) {
+            $lead = SFCO_Database::get_lead( $lead_id );
+            if ( $lead ) {
+                return $lead;
+            }
+        }
+
+        if ( is_array( $payload ) ) {
+            $payload['id'] = $lead_id;
+            return (object) $payload;
+        }
+
+        return null;
     }
 
     private function lead_id( $lead ) {

@@ -104,7 +104,7 @@ class SRP_Admin {
                 $stats = array(
                     array( 'Surveys Sent', $total, '#3b82f6' ),
                     array( 'Response Rate', $response_rate . '%', '#8b5cf6' ),
-                    array( 'Avg Score', $avg_score . ' / 10', '#f59e0b' ),
+                    array( 'Avg Score', $avg_score . ' / ' . SRP_Survey::MAX_SCORE, '#f59e0b' ),
                     array( 'GMB Review Requests', $routed_gmb, '#22c55e' ),
                 );
                 foreach ( $stats as $s ) :

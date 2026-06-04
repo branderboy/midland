@@ -157,6 +157,13 @@ class GSB_Competitors {
 	/* ----------------------------------------------------------- helpers */
 
 	private static function fetch( $url ) {
+		// SSRF guard: reject loopback / link-local / private-range hosts before
+		// any outbound request. Covers both the homepage fetch and the internal
+		// link crawl, which both route through here.
+		$url = GSB_Settings::safe_remote_url( $url );
+		if ( false === $url ) {
+			return new WP_Error( 'gsb_unsafe_url', __( 'Refused to fetch a non-public or invalid URL.', 'geo-site-brain' ) );
+		}
 		$res = wp_remote_get( $url, array(
 			'timeout'     => 20,
 			'redirection' => 3,

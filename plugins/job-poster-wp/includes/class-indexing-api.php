@@ -195,7 +195,7 @@ class DPJP_Indexing_API {
     // ── Admin UI ──────────────────────────────────────────────────────────────
 
     public static function render_section(): void {
-        $json     = self::get_service_account();
+        $has_json = self::is_configured();
         $enabled  = (bool) get_option( self::OPT_ENABLED, 0 );
         $log      = (array) get_option( self::OPT_LOG, [] );
         $action   = admin_url( 'admin-post.php' );
@@ -233,8 +233,9 @@ class DPJP_Indexing_API {
                 <tr>
                     <th><label for="dpjp_indexing_api_json">Service Account JSON</label></th>
                     <td>
-                        <textarea id="dpjp_indexing_api_json" name="dpjp_indexing_api_json" rows="10" cols="80" class="large-text code" placeholder='{"type":"service_account","project_id":"...","private_key":"...","client_email":"...",...}'><?php echo esc_textarea( $json ); ?></textarea>
+                        <textarea id="dpjp_indexing_api_json" name="dpjp_indexing_api_json" rows="10" cols="80" class="large-text code" placeholder='<?php echo $has_json ? esc_attr__( '••• saved — leave blank to keep the stored key', 'job-manager-pro' ) : '{"type":"service_account","project_id":"...","private_key":"...","client_email":"...",...}'; ?>'></textarea>
                         <p class="description">
+                            <?php if ( $has_json ) : ?>A service account key is already saved. Leave this blank to keep it, or paste a new JSON key to replace it.<br><?php endif; ?>
                             Paste the full JSON key file you downloaded from <code>console.cloud.google.com → IAM → Service Accounts → Keys</code>.
                             The service account must have the <strong>Owner</strong> role on a Google Search Console property covering this site, and the <strong>Indexing API</strong> must be enabled in your Cloud project.
                         </p>
@@ -286,13 +287,15 @@ class DPJP_Indexing_API {
 
         $json = trim( (string) wp_unslash( $_POST['dpjp_indexing_api_json'] ?? '' ) );
         if ( '' !== $json ) {
+            // A new key was pasted: validate then store it.
             $parsed = json_decode( $json, true );
             if ( ! is_array( $parsed ) || empty( $parsed['client_email'] ) || empty( $parsed['private_key'] ) ) {
                 self::redirect( 'fail', 'Pasted JSON is not a valid service account key.' );
                 return;
             }
+            update_option( self::OPT_JSON, $json );
         }
-        update_option( self::OPT_JSON, $json );
+        // Blank submission keeps the previously stored key (never echoed back to the browser).
         update_option( self::OPT_ENABLED, isset( $_POST['dpjp_indexing_api_enabled'] ) ? 1 : 0 );
         delete_transient( self::TRANSIENT );
         self::redirect( '', '', true );

@@ -364,8 +364,9 @@ class GSB_Indexer {
 			}
 			GSB_Database::set_state( self::STATE_LAST, current_time( 'mysql' ) );
 			GSB_Database::set_state( self::STATE_CRON_PHASE, '' ); // done
-			// Email the scheduled AI Visibility digest / drop alert if enabled.
-			GSB_Monitor::after_reindex();
+			// The AI Visibility digest / drop alert is delivered by its own
+			// weekly cron (GSB_CRON_DIGEST) so it fires independently of this
+			// reindex — see GSB_Monitor. Nothing to send here.
 			GSB_Logger::info( 'cron', 'Weekly reindex complete.' );
 		}
 	}
