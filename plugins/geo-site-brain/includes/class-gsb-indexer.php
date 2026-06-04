@@ -342,7 +342,8 @@ class GSB_Indexer {
 				$this->reschedule_continue(); // more embeddings to do
 				return;
 			}
-			GSB_Recommendations::rebuild();
+			// Rebuild the business understanding (entities, graph, visibility, fixes).
+			GSB_Knowledge_Graph::rebuild_all();
 			GSB_Database::set_state( self::STATE_LAST, current_time( 'mysql' ) );
 			GSB_Database::set_state( self::STATE_CRON_PHASE, '' ); // done
 			GSB_Logger::info( 'cron', 'Weekly reindex complete.' );

@@ -83,3 +83,75 @@
 .gsb-status-row { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #f0f0f1; }
 .gsb-status-row:first-of-type { border-top: 0; }
 .gsb-setup-status { max-width: 640px; }
+
+/* ---- v2: command center ---- */
+.gsb-prio-critical { background: #8c1d1e; }
+
+.gsb-engine-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 16px; }
+.gsb-engine-chip { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdcde; border-radius: 999px; padding: 6px 14px; text-decoration: none; color: #1d2327; font-weight: 600; }
+.gsb-engine-name { font-size: 13px; }
+
+.gsb-entity-strip { display: flex; flex-wrap: wrap; gap: 26px; background: #fff; border: 1px solid #dcdcde; border-radius: 8px; padding: 14px 22px; margin-bottom: 18px; }
+.gsb-entity-stat { text-align: center; }
+.gsb-entity-num { display: block; font-size: 24px; font-weight: 800; color: #1d2327; }
+.gsb-entity-label { font-size: 12px; color: #50575e; }
+
+.gsb-activity { margin: 0; }
+.gsb-activity li { padding: 4px 0; border-top: 1px solid #f0f0f1; font-size: 13px; }
+.gsb-spark { display: flex; align-items: flex-end; gap: 3px; height: 60px; margin-top: 6px; }
+.gsb-spark-bar { flex: 1; background: #2271b1; border-radius: 2px 2px 0 0; min-height: 3px; }
+
+/* Visibility cards */
+.gsb-vis-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+@media (max-width: 1100px) { .gsb-vis-grid { grid-template-columns: 1fr; } }
+.gsb-vis-head { display: flex; justify-content: space-between; align-items: center; }
+.gsb-vis-head h2 { margin: 0; }
+.gsb-vis-scores { display: flex; gap: 18px; margin: 12px 0; }
+.gsb-vis-score { text-align: center; }
+.gsb-vis-score-num { font-size: 22px; font-weight: 800; }
+.gsb-vis-score-lbl { font-size: 11px; color: #50575e; }
+.gsb-band-good { color: #00794b; } .gsb-band-ok { color: #2271b1; } .gsb-band-warn { color: #b26200; } .gsb-band-bad { color: #b32d2e; }
+.gsb-vis-summary { background: #f6f7f7; border-radius: 6px; padding: 10px 12px; }
+.gsb-checklist { margin: 8px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
+.gsb-checklist li.yes { color: #00794b; }
+.gsb-checklist li.no { color: #b32d2e; }
+.gsb-narrative-out { white-space: pre-wrap; margin-top: 8px; color: #1d2327; }
+
+/* Knowledge graph matrix */
+.gsb-matrix-scroll { overflow-x: auto; }
+.gsb-matrix { border-collapse: collapse; }
+.gsb-matrix th, .gsb-matrix td { border: 1px solid #e0e0e0; padding: 6px 10px; text-align: center; font-size: 12px; }
+.gsb-matrix thead th { background: #f6f7f7; }
+.gsb-matrix tbody th { text-align: left; background: #fbfbfc; white-space: nowrap; }
+.gsb-cell { display: inline-block; width: 22px; height: 22px; line-height: 22px; border-radius: 4px; font-weight: 700; color: #fff; }
+.gsb-cell-found { background: #00794b; } .gsb-cell-weak { background: #b26200; } .gsb-cell-missing { background: #e9e9ed; color: #8a8a8a; }
+.gsb-legend { margin-left: 14px; font-size: 12px; }
+.gsb-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; }
+.gsb-dot.found { background: #00794b; } .gsb-dot.weak { background: #b26200; } .gsb-dot.missing { background: #c9c9cf; }
+
+.gsb-entity-list { margin: 0; }
+.gsb-entity-list li { padding: 5px 0; border-top: 1px solid #f0f0f1; }
+.gsb-status { display: inline-block; font-size: 10px; text-transform: uppercase; font-weight: 700; padding: 1px 7px; border-radius: 4px; margin-right: 6px; }
+.gsb-status-found { background: #e3f5ec; color: #00794b; }
+.gsb-status-inferred { background: #e7f0fa; color: #2271b1; }
+.gsb-status-recommended { background: #fdeede; color: #b26200; }
+
+/* Fix queue */
+.gsb-fixqueue .gsb-rec { align-items: flex-start; }
+.gsb-rec-badges { display: flex; flex-direction: column; gap: 4px; min-width: 76px; }
+.gsb-diff { font-size: 10px; text-transform: uppercase; color: #50575e; background: #f0f0f1; border-radius: 4px; padding: 2px 7px; text-align: center; }
+.gsb-fix-result { margin-top: 6px; font-size: 13px; }
+.gsb-rec.gsb-applied { opacity: .6; }
+
+/* Advanced disclosure */
+.gsb-advanced { margin: 18px 0; border: 1px solid #e0e0e0; border-radius: 6px; padding: 6px 14px; background: #fbfbfc; }
+.gsb-advanced > summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+
+/* Reports (print-friendly) */
+.gsb-report { background: #fff; border: 1px solid #dcdcde; border-radius: 8px; padding: 24px; }
+.gsb-report-head { border-bottom: 2px solid #2271b1; padding-bottom: 10px; margin-bottom: 16px; }
+.gsb-report-head h2 { margin: 0; }
+@media print {
+	#adminmenumain, #wpadminbar, #wpfooter, .gsb-sub .button { display: none !important; }
+	.gsb-report { border: 0; }
+}

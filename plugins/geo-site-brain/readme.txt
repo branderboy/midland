@@ -4,14 +4,14 @@ Tags: geo, aeo, seo, embeddings, openai, neon, pgvector, ai, schema, recommendat
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Turn your WordPress content into an AI-readable knowledge base using OpenAI
-embeddings (stored in Neon pgvector, with a local fallback), then score every
-page for GEO/AEO/SEO, get prioritised recommendations, and ask an admin chat
-agent that answers from your real content.
+An AI Visibility Command Center for WordPress: build an AI-readable version of
+your business (a knowledge graph), see how ChatGPT, Claude, Gemini and
+Perplexity understand and would recommend you, and work a one-click Fix Queue to
+close the gaps.
 
 == Description ==
 
@@ -57,6 +57,22 @@ key, Neon connection string) are stored privately and never returned to the
 browser.
 
 == Changelog ==
+
+= 2.0.0 =
+* Product refactor into an AI Visibility Command Center. New navigation:
+  Dashboard, Knowledge Graph, Scan Website, AI Visibility Gaps, Fix Queue,
+  Ask My Website, Reports, Settings.
+* Business knowledge graph: extracts Business, Services, Locations, FAQs,
+  Testimonials, Reviews, Authors and Case Studies as entities (found / inferred
+  / recommended) with a Service × Location coverage matrix and orphan detection.
+* AI Visibility engine: per-engine (ChatGPT/Claude/Gemini/Perplexity) scores —
+  visibility, confidence, knowledge completeness, recommendation likelihood —
+  plus a "can AI identify…?" checklist and an on-demand narrative.
+* Fix Queue: every gap is an action with impact, reason and difficulty, plus
+  one-click apply (create service/location draft pages, write meta descriptions,
+  generate FAQ + LocalBusiness structured data).
+* Client-facing Reports (printable). Agent now answers from the knowledge graph.
+* Infrastructure vocabulary (embeddings, vectors, Neon) moved out of the way.
 
 = 1.0.0 =
 * Initial release: scanner + chunker, OpenAI embeddings, Neon pgvector store

@@ -40,7 +40,10 @@ $selected     = GSB_Settings::indexed_post_types();
 			</tr>
 		</table>
 
-		<h2><?php esc_html_e( 'Vector storage', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'Advanced — optional', 'geo-site-brain' ); ?></span></h2>
+		<details class="gsb-advanced">
+		<summary><?php esc_html_e( 'Advanced — storage & indexing (optional)', 'geo-site-brain' ); ?></summary>
+
+		<h2><?php esc_html_e( 'Vector storage', 'geo-site-brain' ); ?> <span class="gsb-count"><?php esc_html_e( 'optional', 'geo-site-brain' ); ?></span></h2>
 		<p class="description">
 			<strong><?php esc_html_e( 'By default, embeddings are stored locally in your WordPress database — no external service, no server extensions, nothing to install.', 'geo-site-brain' ); ?></strong>
 			<?php esc_html_e( 'Neon (serverless Postgres + pgvector) is an optional upgrade for very large sites. If it is off or unreachable, GEO Site Brain uses the local store automatically, so the plugin always works.', 'geo-site-brain' ); ?>
@@ -100,8 +103,10 @@ $selected     = GSB_Settings::indexed_post_types();
 			</tr>
 		</table>
 
+		</details>
+
 		<h2><?php esc_html_e( 'Business context', 'geo-site-brain' ); ?></h2>
-		<p class="description"><?php esc_html_e( 'Used by the scoring and recommendations engines to judge entity, service and location coverage.', 'geo-site-brain' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Tells the engine who you are. Used to map your services, service areas and AI visibility.', 'geo-site-brain' ); ?></p>
 		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row"><label for="gsb_biz"><?php esc_html_e( 'Business name', 'geo-site-brain' ); ?></label></th>

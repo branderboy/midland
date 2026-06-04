@@ -8,20 +8,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $brand = trim( (string) GSB_Settings::get( 'business_name' ) );
 $samples = array(
-	__( 'What services does this website clearly offer?', 'geo-site-brain' ),
-	__( 'What pages are weak for GEO?', 'geo-site-brain' ),
-	__( 'What schema is missing?', 'geo-site-brain' ),
-	__( 'What internal links should we add?', 'geo-site-brain' ),
-	$brand
-		? sprintf( __( 'What FAQs should %s add?', 'geo-site-brain' ), $brand )
-		: __( 'What FAQs should we add?', 'geo-site-brain' ),
-	__( 'What pages should be expanded?', 'geo-site-brain' ),
-	__( 'What pages could rank for commercial floor care in Washington DC?', 'geo-site-brain' ),
+	__( 'What services do we offer?', 'geo-site-brain' ),
+	__( 'What cities are we targeting?', 'geo-site-brain' ),
+	__( 'What FAQs are missing?', 'geo-site-brain' ),
+	__( 'What topics should we add?', 'geo-site-brain' ),
+	__( 'What entities are weak?', 'geo-site-brain' ),
+	__( 'How would ChatGPT describe this business?', 'geo-site-brain' ),
+	__( 'What would improve our AI visibility?', 'geo-site-brain' ),
 );
 ?>
 <div class="wrap gsb-wrap">
-	<h1><?php esc_html_e( 'Ask the Site', 'geo-site-brain' ); ?></h1>
-	<p class="gsb-sub"><?php esc_html_e( 'Retrieval-first: the agent answers from your indexed content, and clearly separates what was Found on site, Inferred from site, and Recommended additions. It will not invent facts.', 'geo-site-brain' ); ?></p>
+	<h1><?php esc_html_e( 'Ask My Website', 'geo-site-brain' ); ?></h1>
+	<p class="gsb-sub"><?php esc_html_e( 'Answers come from your business knowledge graph, clearly separating what was Found on site, Inferred, and Recommended to add. It will not invent facts.', 'geo-site-brain' ); ?></p>
 
 	<?php if ( ! GSB_Settings::has_openai() ) : ?>
 		<div class="notice notice-warning inline"><p><?php printf( wp_kses_post( __( 'Without an OpenAI key the agent returns the most relevant passages it finds (still grounded, no AI synthesis). Add a key on <a href="%s">Settings</a> for full answers.', 'geo-site-brain' ) ), esc_url( admin_url( 'admin.php?page=gsb-settings' ) ) ); ?></p></div>

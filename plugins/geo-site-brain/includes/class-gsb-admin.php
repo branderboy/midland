@@ -35,10 +35,13 @@ class GSB_Admin {
 			'gsb_start_scan'   => 'ajax_start_scan',
 			'gsb_scan_step'    => 'ajax_scan_step',
 			'gsb_embed_step'   => 'ajax_embed_step',
+			'gsb_finalize'     => 'ajax_finalize',
 			'gsb_progress'     => 'ajax_progress',
 			'gsb_reindex_post' => 'ajax_reindex_post',
 			'gsb_rebuild_recs' => 'ajax_rebuild_recs',
 			'gsb_rec_status'   => 'ajax_rec_status',
+			'gsb_apply_fix'    => 'ajax_apply_fix',
+			'gsb_narrative'    => 'ajax_narrative',
 			'gsb_test_openai'  => 'ajax_test_openai',
 			'gsb_test_neon'    => 'ajax_test_neon',
 			'gsb_chat'         => 'ajax_chat',
@@ -64,12 +67,15 @@ class GSB_Admin {
 		// Ask → Setup — instead of developer nouns. Slugs are unchanged so links,
 		// bookmarks and AJAX keep working.
 		$pages = array(
-			'geo-site-brain'      => array( __( 'Site Brain', 'geo-site-brain' ), 'view_dashboard' ),
-			'gsb-scan'            => array( __( 'Scan Site', 'geo-site-brain' ), 'view_scan' ),
-			'gsb-scores'          => array( __( 'GEO Scorecard', 'geo-site-brain' ), 'view_scores' ),
+			'geo-site-brain'      => array( __( 'Dashboard', 'geo-site-brain' ), 'view_dashboard' ),
+			'gsb-knowledge-graph' => array( __( 'Knowledge Graph', 'geo-site-brain' ), 'view_knowledge_graph' ),
+			'gsb-scan'            => array( __( 'Scan Website', 'geo-site-brain' ), 'view_scan' ),
+			'gsb-visibility'      => array( __( 'AI Visibility Gaps', 'geo-site-brain' ), 'view_visibility' ),
 			'gsb-recommendations' => array( __( 'Fix Queue', 'geo-site-brain' ), 'view_recommendations' ),
-			'gsb-chat'            => array( __( 'Ask the Site', 'geo-site-brain' ), 'view_chat' ),
-			'gsb-settings'        => array( __( 'Setup', 'geo-site-brain' ), 'view_settings' ),
+			'gsb-chat'            => array( __( 'Ask My Website', 'geo-site-brain' ), 'view_chat' ),
+			'gsb-reports'         => array( __( 'Reports', 'geo-site-brain' ), 'view_reports' ),
+			'gsb-scores'          => array( __( 'Page Scorecard', 'geo-site-brain' ), 'view_scores' ),
+			'gsb-settings'        => array( __( 'Settings', 'geo-site-brain' ), 'view_settings' ),
 		);
 		foreach ( $pages as $slug => $cfg ) {
 			add_submenu_page( 'geo-site-brain', $cfg[0], $cfg[0], self::CAP, $slug, array( $this, $cfg[1] ) );
@@ -132,9 +138,10 @@ class GSB_Admin {
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( self::NONCE ),
 			'strings' => array(
-				'scanning'  => __( 'Scanning…', 'geo-site-brain' ),
-				'embedding' => __( 'Generating embeddings…', 'geo-site-brain' ),
-				'done'      => __( 'Done.', 'geo-site-brain' ),
+				'scanning'      => __( 'Reading your website…', 'geo-site-brain' ),
+				'embedding'     => __( 'Building knowledge…', 'geo-site-brain' ),
+				'understanding' => __( 'Mapping your business…', 'geo-site-brain' ),
+				'done'          => __( 'Done.', 'geo-site-brain' ),
 				'thinking'  => __( 'Thinking…', 'geo-site-brain' ),
 				'error'     => __( 'Something went wrong.', 'geo-site-brain' ),
 			),
@@ -194,8 +201,43 @@ class GSB_Admin {
 
 	public function ajax_rebuild_recs() {
 		$this->guard();
-		GSB_Recommendations::rebuild();
+		GSB_Knowledge_Graph::rebuild_all();
 		wp_send_json_success( array( 'count' => count( GSB_Database::get_recommendations( 'open' ) ) ) );
+	}
+
+	/**
+	 * Post-scan "understanding" pass: build entities, graph, visibility + fixes.
+	 */
+	public function ajax_finalize() {
+		$this->guard();
+		GSB_Knowledge_Graph::rebuild_all();
+		wp_send_json_success( array(
+			'entities' => array_sum( GSB_Database::entity_counts() ),
+			'fixes'    => count( GSB_Database::get_recommendations( 'open' ) ),
+		) );
+	}
+
+	public function ajax_apply_fix() {
+		$this->guard();
+		$id  = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+		$res = GSB_Fixes::apply( $id );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( $res );
+	}
+
+	public function ajax_narrative() {
+		$this->guard();
+		$engine = isset( $_POST['engine'] ) ? sanitize_key( wp_unslash( $_POST['engine'] ) ) : '';
+		if ( ! in_array( $engine, GSB_Visibility::ENGINES, true ) ) {
+			wp_send_json_error( array( 'message' => __( 'Unknown engine.', 'geo-site-brain' ) ) );
+		}
+		$res = GSB_Visibility::narrative( $engine );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( array( 'narrative' => $res ) );
 	}
 
 	public function ajax_rec_status() {
@@ -241,10 +283,13 @@ class GSB_Admin {
 	/* --------------------------------------------------------------- views */
 
 	public function view_dashboard() { $this->render( 'dashboard' ); }
+	public function view_knowledge_graph() { $this->render( 'knowledge-graph' ); }
 	public function view_scan() { $this->render( 'scan' ); }
+	public function view_visibility() { $this->render( 'visibility' ); }
 	public function view_scores() { $this->render( 'scores' ); }
 	public function view_recommendations() { $this->render( 'recommendations' ); }
 	public function view_chat() { $this->render( 'chat' ); }
+	public function view_reports() { $this->render( 'reports' ); }
 	public function view_settings() { $this->render( 'settings' ); }
 
 	private function render( $view ) {
