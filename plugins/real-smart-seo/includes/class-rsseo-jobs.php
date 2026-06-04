@@ -83,10 +83,22 @@ class RSSEO_Jobs {
         }
 
         $current = self::status( $scan_id );
+
+        // Bug 6 fix: a job that has been 'running' for more than 10 minutes is
+        // almost certainly stale — the cron process was killed (timeout, OOM,
+        // fatal) before it could mark itself complete or error. Without this
+        // check the 'running' guard below prevents all future retry attempts,
+        // leaving the admin stuck on a spinner with no way to recover.
         if ( 'running' === $current['status'] ) {
-            return; // already in flight — don't double-run
+            $started_at = isset( $current['at'] ) ? (int) $current['at'] : 0;
+            if ( $started_at > 0 && ( time() - $started_at ) < 10 * MINUTE_IN_SECONDS ) {
+                return; // genuinely in flight — respect the lock
+            }
+            // Stale — fall through and re-run.
+            self::set( $scan_id, 'running' ); // refresh timestamp
+        } else {
+            self::set( $scan_id, 'running' );
         }
-        self::set( $scan_id, 'running' );
 
         $report_id = apply_filters( 'rsseo_run_analyzer', null, $scan_id );
         if ( null === $report_id ) {

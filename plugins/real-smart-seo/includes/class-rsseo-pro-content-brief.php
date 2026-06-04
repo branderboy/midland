@@ -44,7 +44,7 @@ class RSSEO_Pro_Content_Brief {
             wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
         }
         if ( ! class_exists( 'RSSEO_Claude_API' ) ) {
-            wp_send_json_error( __( 'The Real Smart SEO base plugin (AI client) is not active.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'The Midland Smart SEO base plugin (AI client) is not active.', 'real-smart-seo-pro' ) );
         }
 
         $keyword = isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '';

@@ -4,7 +4,12 @@
 
     <?php if ( isset( $_GET['error'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
         <div class="rsseo-notice rsseo-notice--error">
-            <?php echo esc_html( sanitize_text_field( wp_unslash( $_GET['error'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+            <?php
+            // Bug 1 fix: handle_new_scan() encodes the error with rawurlencode() so
+            // special characters survive the redirect. Decode before displaying so
+            // the message reads as plain text instead of showing %20, %27, etc.
+            echo esc_html( sanitize_text_field( rawurldecode( wp_unslash( $_GET['error'] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            ?>
         </div>
     <?php endif; ?>
 

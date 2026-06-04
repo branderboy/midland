@@ -49,7 +49,7 @@ class RSSEO_Pro_Database {
             link_type varchar(20) NOT NULL DEFAULT '',
             target_name varchar(200) NOT NULL DEFAULT '',
             target_url varchar(500) NOT NULL DEFAULT '',
-            rationale text NOT NULL DEFAULT '',
+            rationale text NOT NULL,
             status varchar(20) NOT NULL DEFAULT 'pending',
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),

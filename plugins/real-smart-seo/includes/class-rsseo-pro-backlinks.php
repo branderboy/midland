@@ -30,7 +30,7 @@ class RSSEO_Pro_Backlinks {
         if ( ! RSSEO_Pro_DataForSEO::is_configured() ) {
             ?>
             <div class="rsseo-empty-state">
-                <p><strong>DataForSEO credentials required.</strong> Backlinks data comes from DataForSEO (pay-as-you-go, ~$0.02 per refresh). Add your login + password under Real Smart SEO → Settings → Pro.</p>
+                <p><strong>DataForSEO credentials required.</strong> Backlinks data comes from DataForSEO (pay-as-you-go, ~$0.02 per refresh). Add your login + password under Midland Smart SEO → Settings → Pro.</p>
                 <p><a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=settings&sub=pro' ) ); ?>">Configure DataForSEO →</a></p>
             </div>
             <?php

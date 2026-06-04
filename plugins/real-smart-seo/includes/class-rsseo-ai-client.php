@@ -35,7 +35,7 @@ class RSSEO_AI_Client {
     public static function ask( $prompt, $scan_id = null ) {
         $api_key = RSSEO_Settings::get_api_key();
         if ( empty( $api_key ) ) {
-            return new WP_Error( 'no_api_key', __( 'Perplexity API key is not configured. Go to Real Smart SEO → Setup to add your key.', 'real-smart-seo' ) );
+            return new WP_Error( 'no_api_key', __( 'Perplexity API key is not configured. Go to Midland Smart SEO → Setup to add your key.', 'real-smart-seo' ) );
         }
 
         $model      = RSSEO_Settings::get_model();
@@ -54,7 +54,12 @@ class RSSEO_AI_Client {
 
         while ( $retry <= self::MAX_RETRIES ) {
             $response = wp_remote_post( self::API_URL, array(
-                'timeout' => 120,
+                // Bug 5 fix: 120s per attempt × 4 tries could block cron for ~8 min,
+                // exceeding the typical 300s process limit on shared hosting and leaving
+                // the job stuck in 'running'. 60s is still generous for Perplexity Sonar
+                // (p99 latency is well under 30s) while keeping the worst-case total
+                // (60s × 4 + 6s sleep) well inside a 5-minute process budget.
+                'timeout' => 60,
                 'headers' => array(
                     'Authorization' => 'Bearer ' . $api_key,
                     'Content-Type'  => 'application/json',

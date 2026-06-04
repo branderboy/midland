@@ -111,6 +111,12 @@ class RSSEO_Importer {
             'created_at'      => current_time( 'mysql' ),
         ) );
 
+        // Bug 1 fix: RSSEO_Pro_Admin hooks this filter (add_filter on line 22) to
+        // save DataForSEO and other Pro scan data alongside the core scan row.
+        // Without firing it the Pro scan record is never created, so the Pro
+        // analyzer fails with "Scan data not found." when the job runs.
+        $scan_id = apply_filters( 'rsseo_after_scan_created', $scan_id, $post );
+
         // Rolling 10-scan window — older runs (and their reports + fixes) are
         // pruned so the archive doesn't grow forever.
         RSSEO_Database::prune_old_scans( 10 );

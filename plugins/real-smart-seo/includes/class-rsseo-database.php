@@ -29,10 +29,10 @@ class RSSEO_Database {
             issue_type varchar(50) NOT NULL,
             severity varchar(10) NOT NULL DEFAULT 'medium',
             description text NOT NULL,
-            suggestion text NOT NULL DEFAULT '',
+            suggestion text NOT NULL,
             auto_fixable tinyint(1) NOT NULL DEFAULT 0,
             fix_field varchar(100) NOT NULL DEFAULT '',
-            fix_value longtext NOT NULL DEFAULT '',
+            fix_value longtext NOT NULL,
             fixed tinyint(1) NOT NULL DEFAULT 0,
             fixed_at datetime DEFAULT NULL,
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -81,8 +81,8 @@ class RSSEO_Database {
             post_id bigint(20) NOT NULL,
             fix_type varchar(50) NOT NULL,
             field_key varchar(100) NOT NULL,
-            old_value longtext NOT NULL DEFAULT '',
-            new_value longtext NOT NULL DEFAULT '',
+            old_value longtext NOT NULL,
+            new_value longtext NOT NULL,
             applied tinyint(1) NOT NULL DEFAULT 0,
             applied_at datetime DEFAULT NULL,
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -177,10 +177,39 @@ class RSSEO_Database {
         ) );
         if ( ! empty( $report_ids ) ) {
             $rp_placeholders = implode( ',', array_fill( 0, count( $report_ids ), '%d' ) );
+
+            // Collect fix IDs before deleting them so we can wipe backup options.
+            $fix_ids = $wpdb->get_col( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                "SELECT id FROM {$wpdb->prefix}rsseo_fixes WHERE report_id IN ($rp_placeholders)",
+                $report_ids
+            ) );
+            // Bug 2 fix: delete the per-fix backup options (rsseo_fix_backup_{id})
+            // stored by RSSEO_Fixer::capture_backup(). Without this they silently
+            // accumulate in wp_options and never get cleared.
+            foreach ( $fix_ids as $fid ) {
+                delete_option( 'rsseo_fix_backup_' . (int) $fid );
+            }
+
             $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
                 "DELETE FROM {$wpdb->prefix}rsseo_fixes WHERE report_id IN ($rp_placeholders)",
                 $report_ids
             ) );
+
+            // Bug 7 fix: cascade to Pro tables (rsseo_pro_schema, rsseo_pro_backlinks)
+            // which store rows keyed by report_id but are not cleaned up by the
+            // standard prune. They become orphaned permanently if left here.
+            if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}rsseo_pro_schema'" ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                    "DELETE FROM {$wpdb->prefix}rsseo_pro_schema WHERE report_id IN ($rp_placeholders)",
+                    $report_ids
+                ) );
+            }
+            if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}rsseo_pro_backlinks'" ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                    "DELETE FROM {$wpdb->prefix}rsseo_pro_backlinks WHERE report_id IN ($rp_placeholders)",
+                    $report_ids
+                ) );
+            }
         }
         $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             "DELETE FROM {$wpdb->prefix}rsseo_reports WHERE scan_id IN ($placeholders)",
@@ -190,6 +219,12 @@ class RSSEO_Database {
             "DELETE FROM {$wpdb->prefix}rsseo_scans WHERE id IN ($placeholders)",
             $stale_ids
         ) );
+        // Bug 2 fix: delete the per-scan job progress options (rsseo_job_{scan_id})
+        // stored by RSSEO_Jobs::enqueue(). Without this they silently accumulate
+        // in wp_options on autoload forever.
+        foreach ( $stale_ids as $sid ) {
+            delete_option( 'rsseo_job_' . (int) $sid );
+        }
         return count( $stale_ids );
     }
 

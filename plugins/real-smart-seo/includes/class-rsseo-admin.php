@@ -35,8 +35,8 @@ class RSSEO_Admin {
         // appropriate page_* method based on the ?tab= query var, so the user
         // never has to click between 5 lookalike submenus.
         add_menu_page(
-            __( 'Real Smart SEO', 'real-smart-seo' ),
-            __( 'Real Smart SEO', 'real-smart-seo' ),
+            __( 'Midland Smart SEO', 'real-smart-seo' ),
+            __( 'Midland Smart SEO', 'real-smart-seo' ),
             'manage_options',
             'real-smart-seo',
             array( $this, 'render_tabbed_page' ),
@@ -135,7 +135,7 @@ class RSSEO_Admin {
         );
 
         echo '<div class="wrap rsseo-wrap">';
-        echo '<h1>' . esc_html__( 'Real Smart SEO', 'real-smart-seo' ) . '</h1>';
+        echo '<h1>' . esc_html__( 'Midland Smart SEO', 'real-smart-seo' ) . '</h1>';
 
         echo '<h2 class="nav-tab-wrapper rsseo-tabs">';
         foreach ( $tabs as $slug => $label ) {
@@ -1110,7 +1110,7 @@ class RSSEO_Admin {
             wp_safe_redirect( add_query_arg(
                 array(
                     'page'  => 'real-smart-seo',
-                    'tab'   => 'opportunities',
+                    'tab'   => 'analysis',
                     'error' => rawurlencode( $scan_id->get_error_message() ),
                 ),
                 admin_url( 'admin.php' )
@@ -1124,7 +1124,7 @@ class RSSEO_Admin {
         wp_safe_redirect( add_query_arg(
             array(
                 'page'    => 'real-smart-seo',
-                'tab'     => 'opportunities',
+                'tab'     => 'analysis',
                 'scan_id' => (int) $scan_id,
             ),
             admin_url( 'admin.php' )

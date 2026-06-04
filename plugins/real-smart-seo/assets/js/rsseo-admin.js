@@ -144,9 +144,18 @@
         });
     });
 
-    // $.fn.serializeObject helper
+    // $.fn.serializeObject helper — includes unchecked checkboxes as 0 so
+    // boolean settings always send a value instead of being silently omitted
+    // (the default serializeArray() behavior skips unchecked boxes entirely,
+    // which means the server-side handler can't tell the difference between
+    // "field not in this form" and "user unchecked this option").
     $.fn.serializeObject = function() {
         var obj = {};
+        // Seed all checkboxes in the form as 0 first.
+        $(this).find('input[type="checkbox"]').each(function() {
+            obj[this.name] = '0';
+        });
+        // Let serializeArray() overwrite with '1' (or any other value) when checked.
         $.each(this.serializeArray(), function(_, item) {
             obj[item.name] = item.value;
         });

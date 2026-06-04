@@ -17,7 +17,7 @@ class RSSEO_Pro_Analyzer {
         // classes/methods we call. Guard the hard dependencies so a base
         // mismatch surfaces a clean error instead of a fatal.
         if ( ! class_exists( 'RSSEO_Database' ) || ! class_exists( 'RSSEO_Claude_API' ) || ! method_exists( 'RSSEO_Claude_API', 'ask' ) ) {
-            return new WP_Error( 'base_incompatible', __( 'The installed Real Smart SEO base plugin is missing required components — update it to a compatible version.', 'real-smart-seo-pro' ) );
+            return new WP_Error( 'base_incompatible', __( 'The installed Midland Smart SEO base plugin is missing required components — update it to a compatible version.', 'real-smart-seo-pro' ) );
         }
 
         $base_scan = RSSEO_Database::get_scan( $scan_id );
