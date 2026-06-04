@@ -136,6 +136,18 @@ class GSB_Database {
 			UNIQUE KEY engine (engine)
 		) {$charset};" );
 
+		$comp = self::table( 'competitors' );
+		dbDelta( "CREATE TABLE {$comp} (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			url varchar(191) DEFAULT NULL,
+			name varchar(255) DEFAULT NULL,
+			snapshot longtext DEFAULT NULL,
+			ai_score int DEFAULT 0,
+			scored_at datetime DEFAULT NULL,
+			PRIMARY KEY (id),
+			UNIQUE KEY url (url)
+		) {$charset};" );
+
 		$logs = self::table( 'logs' );
 		dbDelta( "CREATE TABLE {$logs} (
 			id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -553,5 +565,38 @@ class GSB_Database {
 		global $wpdb;
 		$table = self::table( 'visibility' );
 		return $wpdb->get_results( "SELECT * FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/* --------------------------------------------------------- competitors */
+
+	public static function save_competitor( $url, $name, array $snapshot, $ai_score ) {
+		global $wpdb;
+		$table = self::table( 'competitors' );
+		$now   = current_time( 'mysql' );
+		$existing = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE url = %s", $url ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row = array(
+			'url'       => $url,
+			'name'      => $name,
+			'snapshot'  => wp_json_encode( $snapshot ),
+			'ai_score'  => (int) $ai_score,
+			'scored_at' => $now,
+		);
+		if ( $existing ) {
+			$wpdb->update( $table, $row, array( 'id' => $existing ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return (int) $existing;
+		}
+		$wpdb->insert( $table, $row ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (int) $wpdb->insert_id;
+	}
+
+	public static function get_competitors() {
+		global $wpdb;
+		$table = self::table( 'competitors' );
+		return $wpdb->get_results( "SELECT * FROM {$table} ORDER BY ai_score DESC" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	public static function delete_competitor( $id ) {
+		global $wpdb;
+		$wpdb->delete( self::table( 'competitors' ), array( 'id' => (int) $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 }

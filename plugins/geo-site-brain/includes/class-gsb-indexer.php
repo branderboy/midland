@@ -346,6 +346,8 @@ class GSB_Indexer {
 			GSB_Knowledge_Graph::rebuild_all();
 			GSB_Database::set_state( self::STATE_LAST, current_time( 'mysql' ) );
 			GSB_Database::set_state( self::STATE_CRON_PHASE, '' ); // done
+			// Email the scheduled AI Visibility digest / drop alert if enabled.
+			GSB_Monitor::after_reindex();
 			GSB_Logger::info( 'cron', 'Weekly reindex complete.' );
 		}
 	}

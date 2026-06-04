@@ -133,6 +133,18 @@
 .gsb-edge-weak { stroke: #b26200; stroke-dasharray: 4 3; stroke-opacity: .7; }
 .gsb-edge-recommended { stroke: #c9c9cf; stroke-dasharray: 2 3; }
 
+/* Competitors */
+.gsb-you-row { background: #f0f6fc !important; }
+.gsb-verdict { font-size: 10px; text-transform: uppercase; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.gsb-verdict-advantage { background: #e3f5ec; color: #00794b; }
+.gsb-verdict-parity { background: #eef1f4; color: #50575e; }
+.gsb-verdict-gap { background: #fcf0f1; color: #b32d2e; }
+.gsb-verdict-neither { background: #fdf6e7; color: #b26200; }
+
+/* White-label report */
+.gsb-report-logo { max-height: 56px; margin-bottom: 8px; display: block; }
+.gsb-report-footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid #e0e0e0; }
+
 /* Knowledge graph matrix */
 .gsb-matrix-scroll { overflow-x: auto; }
 .gsb-matrix { border-collapse: collapse; }

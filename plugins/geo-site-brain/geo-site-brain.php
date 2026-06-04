@@ -2,7 +2,7 @@
 /**
  * Plugin Name: GEO Site Brain
  * Description: Turns your WordPress content into an AI-readable knowledge base using OpenAI embeddings (stored in Neon pgvector, with a local fallback). Scores every page for GEO/AEO/SEO, generates recommendations, and answers questions in an admin chat using retrieval first.
- * Version: 2.1.0
+ * Version: 2.2.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GSB_VERSION', '2.1.0' );
+define( 'GSB_VERSION', '2.2.0' );
 define( 'GSB_PLUGIN_FILE', __FILE__ );
 define( 'GSB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GSB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -68,6 +68,8 @@ final class GSB_Plugin {
 		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-knowledge-graph.php';
 		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-visibility.php';
 		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-fixes.php';
+		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-competitors.php';
+		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-monitor.php';
 		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-reports.php';
 		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-agent.php';
 		require_once GSB_PLUGIN_DIR . 'includes/class-gsb-view-helpers.php';

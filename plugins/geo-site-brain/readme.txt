@@ -4,7 +4,7 @@ Tags: geo, aeo, seo, embeddings, openai, neon, pgvector, ai, schema, recommendat
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,15 @@ key, Neon connection string) are stored privately and never returned to the
 browser.
 
 == Changelog ==
+
+= 2.2.0 =
+* Competitive GEO: add competitor website URLs and analyse how AI-legible they
+  are versus you — side-by-side AI score, services, locations, FAQs and schema,
+  plus a per-service "who targets what" breakdown (advantage / parity / gap).
+* Scheduled monitoring + email alerts: optional weekly AI Visibility digest with
+  a drop alert, plus a "send test now" button.
+* White-label reports: add your agency name, logo and footer to client-facing
+  reports.
 
 = 2.1.0 =
 * Live per-engine probing: add a Claude, Gemini or Perplexity key (ChatGPT uses

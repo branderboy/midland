@@ -204,6 +204,45 @@
 		} );
 	} );
 
+	/* ------------------------------------------------------- competitors */
+
+	$( '#gsb-run-competitors' ).on( 'click', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this ).prop( 'disabled', true );
+		var $st = $( '#gsb-comp-status' ).text( GSB.strings.thinking ).removeClass( 'gsb-bad' );
+		post( 'gsb_run_competitors' ).done( function ( res ) {
+			if ( res && res.success ) {
+				$st.text( GSB.strings.done );
+				location.reload();
+			} else {
+				$st.addClass( 'gsb-bad' ).text( ( res && res.data && res.data.message ) || GSB.strings.error );
+				$btn.prop( 'disabled', false );
+			}
+		} ).fail( function () {
+			$st.addClass( 'gsb-bad' ).text( GSB.strings.error );
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
+	/* ----------------------------------------------------- send test digest */
+
+	$( '#gsb-send-digest' ).on( 'click', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this ).prop( 'disabled', true );
+		var $out = $( '.gsb-test-result[data-for="digest"]' ).text( '…' ).removeClass( 'gsb-ok gsb-bad' );
+		post( 'gsb_send_digest' ).done( function ( res ) {
+			if ( res && res.success ) {
+				$out.addClass( 'gsb-ok' ).text( res.data.message );
+			} else {
+				$out.addClass( 'gsb-bad' ).text( ( res && res.data && res.data.message ) || GSB.strings.error );
+			}
+		} ).fail( function () {
+			$out.addClass( 'gsb-bad' ).text( GSB.strings.error );
+		} ).always( function () {
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
 	/* ----------------------------------------------- AI visibility narrative */
 
 	$( document ).on( 'click', '.gsb-narrative', function ( e ) {

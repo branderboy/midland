@@ -21,10 +21,21 @@ $d = GSB_Reports::data();
 		<?php return; ?>
 	<?php endif; ?>
 
+	<?php
+	$agency = trim( (string) GSB_Settings::get( 'agency_name' ) );
+	$logo   = trim( (string) GSB_Settings::get( 'agency_logo' ) );
+	$footer = trim( (string) GSB_Settings::get( 'report_contact' ) );
+	?>
 	<div class="gsb-report">
 		<div class="gsb-report-head">
+			<?php if ( $logo ) : ?>
+				<img src="<?php echo esc_url( $logo ); ?>" alt="<?php echo esc_attr( $agency ?: $d['business'] ); ?>" class="gsb-report-logo" />
+			<?php endif; ?>
 			<h2><?php echo esc_html( $d['business'] ); ?></h2>
-			<div class="gsb-muted"><?php printf( esc_html__( 'AI Visibility Report · %s', 'geo-site-brain' ), esc_html( $d['generated'] ) ); ?></div>
+			<div class="gsb-muted">
+				<?php printf( esc_html__( 'AI Visibility Report · %s', 'geo-site-brain' ), esc_html( $d['generated'] ) ); ?>
+				<?php if ( $agency ) : ?> · <?php printf( esc_html__( 'Prepared by %s', 'geo-site-brain' ), esc_html( $agency ) ); ?><?php endif; ?>
+			</div>
 		</div>
 
 		<div class="gsb-cards">
@@ -70,6 +81,10 @@ $d = GSB_Reports::data();
 					<li><strong><?php echo esc_html( ucfirst( $rec->impact ) ); ?>:</strong> <?php echo esc_html( $rec->title ); ?></li>
 				<?php endforeach; ?>
 			</ol>
+		<?php endif; ?>
+
+		<?php if ( $footer ) : ?>
+			<div class="gsb-report-footer gsb-muted"><?php echo nl2br( esc_html( $footer ) ); ?></div>
 		<?php endif; ?>
 	</div>
 </div>

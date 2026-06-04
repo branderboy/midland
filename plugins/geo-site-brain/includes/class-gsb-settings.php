@@ -39,6 +39,13 @@ class GSB_Settings {
 			'business_name'     => '',
 			'business_locations'=> '',          // newline-separated cities/regions
 			'core_services'     => '',          // newline-separated services
+			// Phase 3 — competitors, monitoring, white-label.
+			'competitor_urls'   => '',          // newline-separated competitor homepages
+			'enable_digest'     => 0,
+			'digest_email'      => '',
+			'agency_name'       => '',
+			'agency_logo'       => '',
+			'report_contact'    => '',
 		);
 	}
 
@@ -90,6 +97,18 @@ class GSB_Settings {
 	/** Core services as an array of trimmed strings. */
 	public static function services() {
 		return self::lines( (string) self::get( 'core_services' ) );
+	}
+
+	/** Competitor homepage URLs as an array. */
+	public static function competitor_urls() {
+		$out = array();
+		foreach ( self::lines( (string) self::get( 'competitor_urls' ) ) as $u ) {
+			$u = esc_url_raw( $u );
+			if ( $u ) {
+				$out[] = $u;
+			}
+		}
+		return array_slice( array_unique( $out ), 0, 5 );
 	}
 
 	private static function lines( $text ) {

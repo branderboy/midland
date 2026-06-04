@@ -10,7 +10,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 global $wpdb;
 
-$tables = array( 'chunks', 'scores', 'recommendations', 'logs', 'settings', 'entities', 'relationships', 'visibility' );
+$tables = array( 'chunks', 'scores', 'recommendations', 'logs', 'settings', 'entities', 'relationships', 'visibility', 'competitors' );
 foreach ( $tables as $t ) {
 	$table = $wpdb->prefix . 'gsb_' . $t;
 	$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -25,6 +25,10 @@ $options = array(
 	'gsb_openai_api_key', 'gsb_chat_model', 'gsb_neon_enabled', 'gsb_neon_dsn',
 	'gsb_post_types', 'gsb_chunk_max_chars', 'gsb_embed_batch', 'gsb_retrieval_k',
 	'gsb_weekly_reindex', 'gsb_business_name', 'gsb_business_locations', 'gsb_core_services',
+	'gsb_anthropic_api_key', 'gsb_gemini_api_key', 'gsb_perplexity_api_key',
+	'gsb_anthropic_model', 'gsb_gemini_model', 'gsb_perplexity_model',
+	'gsb_competitor_urls', 'gsb_enable_digest', 'gsb_digest_email',
+	'gsb_agency_name', 'gsb_agency_logo', 'gsb_report_contact',
 );
 foreach ( $options as $opt ) {
 	delete_option( $opt );

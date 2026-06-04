@@ -43,6 +43,8 @@ class GSB_Admin {
 			'gsb_apply_fix'    => 'ajax_apply_fix',
 			'gsb_narrative'    => 'ajax_narrative',
 			'gsb_probe'        => 'ajax_probe',
+			'gsb_run_competitors' => 'ajax_run_competitors',
+			'gsb_send_digest'  => 'ajax_send_digest',
 			'gsb_test_openai'  => 'ajax_test_openai',
 			'gsb_test_neon'    => 'ajax_test_neon',
 			'gsb_chat'         => 'ajax_chat',
@@ -74,6 +76,7 @@ class GSB_Admin {
 			'gsb-visibility'      => array( __( 'AI Visibility Gaps', 'geo-site-brain' ), 'view_visibility' ),
 			'gsb-recommendations' => array( __( 'Fix Queue', 'geo-site-brain' ), 'view_recommendations' ),
 			'gsb-chat'            => array( __( 'Ask My Website', 'geo-site-brain' ), 'view_chat' ),
+			'gsb-competitors'     => array( __( 'Competitors', 'geo-site-brain' ), 'view_competitors' ),
 			'gsb-reports'         => array( __( 'Reports', 'geo-site-brain' ), 'view_reports' ),
 			'gsb-scores'          => array( __( 'Page Scorecard', 'geo-site-brain' ), 'view_scores' ),
 			'gsb-settings'        => array( __( 'Settings', 'geo-site-brain' ), 'view_settings' ),
@@ -109,6 +112,14 @@ class GSB_Admin {
 		register_setting( self::GROUP, $o . 'business_name', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
 		register_setting( self::GROUP, $o . 'business_locations', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
 		register_setting( self::GROUP, $o . 'core_services', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+
+		// Phase 3 — competitors, monitoring, white-label.
+		register_setting( self::GROUP, $o . 'competitor_urls', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+		register_setting( self::GROUP, $o . 'enable_digest', array( 'type' => 'integer', 'sanitize_callback' => 'absint' ) );
+		register_setting( self::GROUP, $o . 'digest_email', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_email' ) );
+		register_setting( self::GROUP, $o . 'agency_name', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+		register_setting( self::GROUP, $o . 'agency_logo', array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
+		register_setting( self::GROUP, $o . 'report_contact', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field' ) );
 	}
 
 	/**
@@ -256,6 +267,24 @@ class GSB_Admin {
 		wp_send_json_success( $res );
 	}
 
+	public function ajax_run_competitors() {
+		$this->guard();
+		if ( empty( GSB_Settings::competitor_urls() ) ) {
+			wp_send_json_error( array( 'message' => __( 'Add competitor URLs in Settings first.', 'geo-site-brain' ) ) );
+		}
+		$n = GSB_Competitors::run();
+		wp_send_json_success( array( 'analysed' => $n ) );
+	}
+
+	public function ajax_send_digest() {
+		$this->guard();
+		$res = GSB_Monitor::send_digest( true );
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error( array( 'message' => $res->get_error_message() ) );
+		}
+		wp_send_json_success( array( 'message' => __( 'Digest email sent.', 'geo-site-brain' ) ) );
+	}
+
 	public function ajax_narrative() {
 		$this->guard();
 		$engine = isset( $_POST['engine'] ) ? sanitize_key( wp_unslash( $_POST['engine'] ) ) : '';
@@ -318,6 +347,7 @@ class GSB_Admin {
 	public function view_scores() { $this->render( 'scores' ); }
 	public function view_recommendations() { $this->render( 'recommendations' ); }
 	public function view_chat() { $this->render( 'chat' ); }
+	public function view_competitors() { $this->render( 'competitors' ); }
 	public function view_reports() { $this->render( 'reports' ); }
 	public function view_settings() { $this->render( 'settings' ); }
 
