@@ -76,6 +76,20 @@ class RSSEO_Pro_Geogrid {
     }
 
     public function maybe_schedule_cron() {
+        $settings   = get_option( 'rsseo_pro_geogrid_settings', array() );
+        $configured = class_exists( 'RSSEO_Pro_DataForSEO' )
+            && RSSEO_Pro_DataForSEO::is_configured()
+            && ! empty( $settings['keyword'] )
+            && ! empty( $settings['target_domain'] );
+
+        if ( ! $configured ) {
+            // Don't auto-schedule until the module is set up; clear any stale
+            // event left from a previous configuration.
+            if ( wp_next_scheduled( self::CRON_HOOK ) ) {
+                wp_unschedule_hook( self::CRON_HOOK );
+            }
+            return;
+        }
         if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
             wp_schedule_event( time() + DAY_IN_SECONDS, 'weekly', self::CRON_HOOK );
         }

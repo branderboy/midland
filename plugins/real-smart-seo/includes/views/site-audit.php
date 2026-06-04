@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
-<div class="wrap rsseo-wrap">
-    <h1><?php esc_html_e( 'Site Audit', 'real-smart-seo' ); ?></h1>
+<div class="rsseo-tabview">
+    <h2><?php esc_html_e( 'Site Audit', 'real-smart-seo' ); ?></h2>
 
     <p><?php esc_html_e( 'Scans every published post and page directly inside WordPress — no uploads needed. Finds missing titles, thin content, broken alt text, duplicate meta, orphaned pages, and more.', 'real-smart-seo' ); ?></p>
 

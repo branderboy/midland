@@ -205,7 +205,23 @@ class RSSEO_Pro_Admin {
             wp_send_json_error( __( 'Invalid report ID.', 'real-smart-seo-pro' ) );
         }
 
-        $result = RSSEO_Pro_Fixer::apply_all_schemas( $report_id );
+        $result  = RSSEO_Pro_Fixer::apply_all_schemas( $report_id );
+        $applied = (int) ( $result['applied'] ?? 0 );
+        $errors  = (array) ( $result['errors'] ?? array() );
+
+        if ( ! empty( $errors ) ) {
+            wp_send_json_error( array(
+                'message' => sprintf(
+                    /* translators: 1: applied count, 2: failed count */
+                    _n( 'Applied %1$d schema block; %2$d failed.', 'Applied %1$d schema blocks; %2$d failed.', $applied, 'real-smart-seo-pro' ),
+                    $applied,
+                    count( $errors )
+                ),
+                'applied' => $applied,
+                'errors'  => $errors,
+            ) );
+        }
+
         wp_send_json_success( $result );
     }
 

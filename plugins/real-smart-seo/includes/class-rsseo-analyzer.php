@@ -20,7 +20,7 @@ class RSSEO_Analyzer {
         RSSEO_Database::update_scan( $scan_id, array( 'status' => 'analyzing' ) );
 
         $prompt = self::build_prompt( $scan );
-        $result = RSSEO_Claude_API::ask( $prompt, $scan_id );
+        $result = RSSEO_AI_Client::ask( $prompt, $scan_id );
 
         if ( is_wp_error( $result ) ) {
             RSSEO_Database::update_scan( $scan_id, array( 'status' => 'error' ) );

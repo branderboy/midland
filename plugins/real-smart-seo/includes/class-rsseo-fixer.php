@@ -32,14 +32,37 @@ class RSSEO_Fixer {
         }
 
         RSSEO_Database::apply_fix( $fix_id );
-
-        // Update report fix count. ($wpdb already declared global above.)
-        $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            "UPDATE {$wpdb->prefix}rsseo_reports SET fixes_applied = fixes_applied + 1 WHERE id = %d",
-            $fix->report_id
-        ) );
+        self::sync_count( (int) $fix->report_id );
 
         return true;
+    }
+
+    /**
+     * Recompute fixes_applied from the actual applied rows, so the counter can
+     * never drift from reality even if an apply/restore step partially fails.
+     */
+    private static function sync_count( $report_id ) {
+        global $wpdb;
+        $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "UPDATE {$wpdb->prefix}rsseo_reports
+             SET fixes_applied = ( SELECT COUNT(*) FROM {$wpdb->prefix}rsseo_fixes WHERE report_id = %d AND applied = 1 )
+             WHERE id = %d",
+            (int) $report_id,
+            (int) $report_id
+        ) );
+    }
+
+    /** Is this fix one we can safely apply? Mirrors apply_fix()'s allow-list. */
+    private static function is_supported( $fix ) {
+        $type = (string) $fix->fix_type;
+        if ( in_array( $type, array( 'title', 'meta_description', 'content', 'alt_text' ), true ) ) {
+            return true;
+        }
+        $allow = array(
+            '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc',
+            '_yoast_wpseo_title', 'rank_math_title', '_aioseo_title', '_seopress_titles_title',
+        );
+        return ! empty( $fix->field_key ) && in_array( $fix->field_key, $allow, true );
     }
 
     /**
@@ -67,12 +90,7 @@ class RSSEO_Fixer {
         }
 
         if ( $applied > 0 ) {
-            global $wpdb;
-            $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-                "UPDATE {$wpdb->prefix}rsseo_reports SET fixes_applied = fixes_applied + %d WHERE id = %d",
-                $applied,
-                $report_id
-            ) );
+            self::sync_count( (int) $report_id );
         }
 
         return array( 'applied' => $applied, 'errors' => $errors );
@@ -153,7 +171,7 @@ class RSSEO_Fixer {
         $wpdb->update( $wpdb->prefix . 'rsseo_fixes', array( 'applied' => 0 ), array( 'id' => (int) $fix_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
         $fix = $wpdb->get_row( $wpdb->prepare( "SELECT report_id FROM {$wpdb->prefix}rsseo_fixes WHERE id = %d", (int) $fix_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         if ( $fix ) {
-            $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}rsseo_reports SET fixes_applied = GREATEST(0, fixes_applied - 1) WHERE id = %d", (int) $fix->report_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            self::sync_count( (int) $fix->report_id );
         }
         delete_option( 'rsseo_fix_backup_' . (int) $fix_id );
         return true;
@@ -186,6 +204,12 @@ class RSSEO_Fixer {
      * Execute the actual WordPress update for a fix row.
      */
     private static function apply_fix( $fix ) {
+        // Refuse unsupported fixes BEFORE creating a backup, so a malformed
+        // suggestion can't litter wp_options with orphan backup entries.
+        if ( ! self::is_supported( $fix ) ) {
+            return new WP_Error( 'unknown_fix_type', __( 'Unsupported fix — skipped for safety.', 'real-smart-seo' ) );
+        }
+
         // Snapshot the live value first so every applied fix is reversible.
         self::capture_backup( $fix );
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart SEO
  * Plugin URI: https://midlandfloors.com/smart-seo
- * Description: Midland's all-in-one local SEO suite — audit, reporting and one-click auto-fixes (with full diff review + rollback), programmatic city × service pages, internal-link suggestions, keyword clustering, content briefs, schema, GSC cleanup, IndexNow, geo-grid and rank tracking. One plugin, no add-ons.
+ * Description: Midland's all-in-one local SEO suite — audit, AI-powered analysis, one-click fixes with rollback, programmatic city × service pages, internal link suggestions, keyword clustering, content briefs, schema, GSC cleanup, IndexNow, geo-grid, and rank tracking. One plugin, all features included.
  * Version: 2.0.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
@@ -25,8 +25,7 @@ define( 'RSSEO_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_URL',      plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_FILE',     __FILE__ );
 
-// The former "Pro" add-on is now bundled into this single plugin. These aliases
-// keep the merged modules (which were written against RSSEO_PRO_*) working as-is.
+// Constants mirrored so bundled modules keep working unchanged.
 define( 'RSSEO_PRO_VERSION', RSSEO_VERSION );
 define( 'RSSEO_PRO_PATH',    RSSEO_PATH );
 define( 'RSSEO_PRO_URL',     RSSEO_URL );
@@ -45,6 +44,7 @@ class RSSEO_Plugin {
 
     private function __construct() {
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
+        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
         add_action( 'plugins_loaded', array( $this, 'init' ) );
         add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
     }
@@ -72,8 +72,34 @@ class RSSEO_Plugin {
         flush_rewrite_rules();
     }
 
+    /**
+     * Clear every scheduled cron event this plugin registers, so nothing keeps
+     * firing after deactivation. wp_unschedule_hook() removes all instances of
+     * a hook regardless of the args they were scheduled with (covers the
+     * per-URL / per-scan single events too).
+     */
+    public function deactivate() {
+        $hooks = array(
+            'rsseo_geogrid_weekly_scan',   // RSSEO_Pro_Geogrid::CRON_HOOK
+            'rsseo_geogrid_process_cell',  // RSSEO_Pro_Geogrid::TICK_HOOK
+            'rsseo_ai_rank_weekly_scan',   // RSSEO_Pro_AI_Rank::CRON_HOOK
+            'rsseo_ai_rank_process_one',   // RSSEO_Pro_AI_Rank::TICK_HOOK
+            'rsseo_growth_digest_send',    // RSSEO_Pro_Growth_Digest::CRON_HOOK
+            'rsseo_analyze_scan',          // RSSEO_Jobs::HOOK (background analysis)
+            'rsseo_indexnow_ping',         // RSSEO_Pro_IndexNow single + batch
+            'rsseo_indexnow_batch_ping',
+        );
+        foreach ( $hooks as $hook ) {
+            wp_unschedule_hook( $hook );
+        }
+        flush_rewrite_rules();
+    }
+
     public function init() {
         load_plugin_textdomain( 'real-smart-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+        // Several bundled modules still use the 'real-smart-seo-pro' text domain;
+        // register it against the same languages folder so those strings load.
+        load_plugin_textdomain( 'real-smart-seo-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
         $this->includes();
         $this->init_classes();
         add_action( 'admin_init',        array( $this, 'maybe_upgrade_db' ) );
@@ -82,11 +108,15 @@ class RSSEO_Plugin {
 
     private function includes() {
         // Core engine.
+        require_once RSSEO_PATH . 'includes/class-rsseo-status.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-profile.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-database.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-settings.php';
-        require_once RSSEO_PATH . 'includes/class-rsseo-claude-api.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-ai-client.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-importer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-analyzer.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-jobs.php';
+        require_once RSSEO_PATH . 'includes/class-rsseo-opportunities.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-fixer.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-crawler.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-admin.php';

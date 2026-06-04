@@ -5,6 +5,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class RSSEO_Importer {
 
+    /** Hard cap on an uploaded data file (2 MB). */
+    const MAX_UPLOAD_BYTES = 2097152;
+    /** Cap on the characters from any one source that feed the prompt (~200 KB). */
+    const MAX_SOURCE_CHARS = 200000;
+
     /**
      * Process a scan form submission.
      * Accepts file uploads and/or pasted text for each data source.
@@ -120,24 +125,54 @@ class RSSEO_Importer {
         $text_key = 'rsseo_text_' . $source;
 
         // Try file upload first.
-        if ( isset( $files[ $file_key ] ) && ! empty( $files[ $file_key ]['tmp_name'] ) && UPLOAD_ERR_OK === $files[ $file_key ]['error'] ) {
+        if ( isset( $files[ $file_key ] ) && ! empty( $files[ $file_key ]['tmp_name'] ) && UPLOAD_ERR_OK === (int) $files[ $file_key ]['error'] ) {
             $tmp  = $files[ $file_key ]['tmp_name'];
+
+            // Must be a genuine PHP upload, not an arbitrary server path.
+            if ( ! is_uploaded_file( $tmp ) ) {
+                return '';
+            }
+
+            // Enforce a hard size cap before reading anything into memory.
+            $size = isset( $files[ $file_key ]['size'] ) ? (int) $files[ $file_key ]['size'] : (int) @filesize( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+            if ( $size <= 0 || $size > self::MAX_UPLOAD_BYTES ) {
+                return '';
+            }
+
             $name = sanitize_file_name( $files[ $file_key ]['name'] );
             $ext  = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
-
             if ( ! in_array( $ext, array( 'csv', 'txt', 'tsv' ), true ) ) {
                 return '';
             }
+
+            // Validate the real content is text (not a binary masquerading as .csv).
+            $type = function_exists( 'mime_content_type' ) ? @mime_content_type( $tmp ) : ''; // phpcs:ignore WordPress.PHP.NoSilencedErrors
+            if ( $type && 0 !== strpos( $type, 'text/' ) && ! in_array( $type, array( 'application/csv', 'application/vnd.ms-excel', 'inode/x-empty' ), true ) ) {
+                return '';
+            }
+
+            // Read at most MAX_UPLOAD_BYTES so a spoofed size can't exhaust memory.
             // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-            $content = file_get_contents( $tmp );
-            return $content ? wp_strip_all_tags( $content ) : '';
+            $content = file_get_contents( $tmp, false, null, 0, self::MAX_UPLOAD_BYTES );
+            if ( false === $content || '' === $content ) {
+                return '';
+            }
+            return self::cap( wp_strip_all_tags( $content ) );
         }
 
         // Fall back to pasted text.
         if ( ! empty( $post[ $text_key ] ) ) {
-            return sanitize_textarea_field( wp_unslash( $post[ $text_key ] ) );
+            return self::cap( sanitize_textarea_field( wp_unslash( $post[ $text_key ] ) ) );
         }
 
         return '';
+    }
+
+    /** Truncate any single source to MAX_SOURCE_CHARS so prompts stay bounded. */
+    private static function cap( $text ) {
+        $text = (string) $text;
+        return ( strlen( $text ) > self::MAX_SOURCE_CHARS )
+            ? substr( $text, 0, self::MAX_SOURCE_CHARS )
+            : $text;
     }
 }
