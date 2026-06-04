@@ -37,7 +37,7 @@ class RSSEO_Pro_Internal_Links {
 
     public function add_menu() {
         add_submenu_page(
-            null, // hidden from menu — surfaced via the Internal Links tab in the Command Center
+            null,
             esc_html__( 'Internal Links', 'real-smart-seo-pro' ),
             esc_html__( 'Internal Links', 'real-smart-seo-pro' ),
             'manage_options',
@@ -58,7 +58,7 @@ class RSSEO_Pro_Internal_Links {
         $types = array_map( 'sanitize_key', (array) ( $_POST['rsseo_il_types'] ?? array( 'post', 'page' ) ) );
         $results = $this->scan( $types );
         update_option( self::OPT_RESULTS, $results, false );
-        wp_safe_redirect( admin_url( 'admin.php?page=real-smart-seo&tab=internal-links&scanned=' . count( $results ) ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=rsseo-internal-links&scanned=' . count( $results ) ) );
         exit;
     }
 
@@ -244,7 +244,7 @@ class RSSEO_Pro_Internal_Links {
         $results = (array) get_option( self::OPT_RESULTS, array() );
         $count   = count( $results );
         ?>
-        <div class="rsseo-il">
+        <div class="wrap rsseo-il">
             <h1 class="wp-heading-inline"><?php esc_html_e( 'Internal Link Opportunities', 'real-smart-seo-pro' ); ?></h1>
             <hr class="wp-header-end">
 

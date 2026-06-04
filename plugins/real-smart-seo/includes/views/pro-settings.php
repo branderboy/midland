@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="rsseo-tabview">
-    <h2><?php esc_html_e( 'DataForSEO Connection', 'real-smart-seo-pro' ); ?></h2>
+    <h2><?php esc_html_e( 'Midland Smart SEO Pro — Settings', 'real-smart-seo-pro' ); ?></h2>
 
     <div id="rsseo-pro-settings-msg" class="rsseo-notice" style="display:none;"></div>
 

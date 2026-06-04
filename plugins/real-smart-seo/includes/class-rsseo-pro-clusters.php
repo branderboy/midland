@@ -40,7 +40,7 @@ class RSSEO_Pro_Clusters {
 
     public function add_menu() {
         add_submenu_page(
-            null, // hidden from menu — surfaced via the Content tab in the Command Center
+            null,
             esc_html__( 'Keyword Clusters', 'real-smart-seo-pro' ),
             esc_html__( 'Keyword Clusters', 'real-smart-seo-pro' ),
             'manage_options',

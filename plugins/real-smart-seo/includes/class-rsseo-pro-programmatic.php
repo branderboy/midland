@@ -71,7 +71,7 @@ class RSSEO_Pro_Programmatic {
 
     public function add_menu() {
         add_submenu_page(
-            null, // hidden from menu — surfaced via the Content tab in the Command Center
+            null,
             esc_html__( 'Programmatic Pages', 'real-smart-seo-pro' ),
             esc_html__( 'Programmatic Pages', 'real-smart-seo-pro' ),
             'manage_options',
@@ -283,6 +283,7 @@ class RSSEO_Pro_Programmatic {
         $lines       = array_slice( $lines, 0, $batch_limit );
 
         $created = 0;
+        $updated = 0;
         $urls    = array();
 
         foreach ( $lines as $line ) {
@@ -311,6 +312,14 @@ class RSSEO_Pro_Programmatic {
 
             if ( $existing ) {
                 $post_id = $existing[0];
+                // Refresh content and status so re-running with an updated template
+                // or a new status (draft → publish) takes effect on existing pages.
+                wp_update_post( array(
+                    'ID'           => $post_id,
+                    'post_status'  => $status,
+                    'post_content' => $this->generate_location_content( $city, $state, $bulk_services ),
+                ) );
+                $updated++;
             } else {
                 $post_id = wp_insert_post( array(
                     'post_type'    => self::CPT,
@@ -363,7 +372,7 @@ class RSSEO_Pro_Programmatic {
             do_action( 'rsseo_indexnow_batch_ping', $urls );
         }
 
-        $redirect = admin_url( 'admin.php?page=rsseo-programmatic&generated=' . $created );
+        $redirect = admin_url( 'admin.php?page=rsseo-programmatic&generated=' . $created . '&updated=' . $updated );
         if ( $skipped > 0 ) {
             $redirect = add_query_arg( 'skipped', $skipped, $redirect );
         }
@@ -521,8 +530,11 @@ class RSSEO_Pro_Programmatic {
      * mirrors templates/commercial-carpet-cleaning-services.json from the kit.
      */
     private function generate_elementor_data( $city, $state, $services ) {
-        $business = get_bloginfo( 'name' );
         $identity = get_option( 'rsseo_sameas_identity', array() );
+        $profile  = class_exists( 'RSSEO_Profile' ) ? RSSEO_Profile::get() : array();
+        $business = ! empty( $profile['business_name'] )
+            ? $profile['business_name']
+            : ( ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' ) );
         $phone    = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '(240) 532-9097';
         $tel_href = 'tel:' . preg_replace( '/[^0-9+]/', '', $phone );
 
@@ -537,7 +549,7 @@ class RSSEO_Pro_Programmatic {
         if ( ! empty( $services ) ) {
             $body_html .= '<p><strong>Services available in ' . esc_html( $city ) . ', ' . esc_html( $state ) . '</strong></p><ul>';
             foreach ( $services as $svc ) {
-                $body_html .= '<li><p>' . esc_html( $svc ) . ' for tailored to ' . esc_html( $city ) . ' facilities</p></li>';
+                $body_html .= '<li><p>' . esc_html( $svc ) . ' tailored to ' . esc_html( $city ) . ' facilities</p></li>';
             }
             $body_html .= '</ul>';
         }
@@ -921,6 +933,7 @@ class RSSEO_Pro_Programmatic {
     public function render_page() {
         // phpcs:disable WordPress.Security.NonceVerification.Recommended
         $generated      = isset( $_GET['generated'] ) ? absint( $_GET['generated'] ) : -1;
+        $updated_count  = isset( $_GET['updated'] ) ? absint( $_GET['updated'] ) : 0;
         $skipped        = isset( $_GET['skipped'] ) ? absint( $_GET['skipped'] ) : 0;
         $location_saved = isset( $_GET['location_saved'] );
         $tpl_saved      = isset( $_GET['tpl_saved'] );
@@ -957,7 +970,21 @@ class RSSEO_Pro_Programmatic {
             <p class="description"><?php esc_html_e( 'Generate location × service pages at scale. Each page gets optimized title, meta description, and LocalBusiness+Service schema automatically.', 'real-smart-seo-pro' ); ?></p>
 
             <?php if ( $generated >= 0 ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php printf( esc_html__( '%d new location pages generated and submitted to IndexNow.', 'real-smart-seo-pro' ), $generated ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php
+                    if ( $generated > 0 && $updated_count > 0 ) {
+                        printf(
+                            esc_html__( '%1$d new location pages created, %2$d existing pages refreshed.', 'real-smart-seo-pro' ),
+                            $generated,
+                            $updated_count
+                        );
+                    } elseif ( $generated > 0 ) {
+                        printf( esc_html__( '%d new location pages created.', 'real-smart-seo-pro' ), $generated );
+                    } elseif ( $updated_count > 0 ) {
+                        printf( esc_html__( '%d existing location pages refreshed.', 'real-smart-seo-pro' ), $updated_count );
+                    } else {
+                        esc_html_e( 'No changes — all submitted locations already exist and were up to date.', 'real-smart-seo-pro' );
+                    }
+                ?></p></div>
             <?php endif; ?>
             <?php if ( $skipped > 0 ) : ?>
                 <div class="notice notice-warning is-dismissible"><p><?php printf( esc_html__( '%d locations skipped because the batch limit was exceeded. Submit them in another run.', 'real-smart-seo-pro' ), $skipped ); ?></p></div>
@@ -1040,7 +1067,14 @@ class RSSEO_Pro_Programmatic {
                     '{city}':'Bethesda', '{state}':'MD', '{service}':'Carpet Cleaning',
                     '{services}':'Carpet Cleaning, Tile & Grout Cleaning, Hardwood Refinishing',
                     '{services_list}':'<ul><li>Carpet Cleaning in Bethesda, MD</li><li>Tile &amp; Grout Cleaning in Bethesda, MD</li></ul>',
-                    '{business}':<?php echo wp_json_encode( get_bloginfo( 'name' ) ); ?>,
+                    '{business}':<?php
+                        $preview_profile  = class_exists( 'RSSEO_Profile' ) ? RSSEO_Profile::get() : array();
+                        $preview_identity = get_option( 'rsseo_sameas_identity', array() );
+                        $preview_business = ! empty( $preview_profile['business_name'] )
+                            ? $preview_profile['business_name']
+                            : ( ! empty( $preview_identity['business_name'] ) ? $preview_identity['business_name'] : get_bloginfo( 'name' ) );
+                        echo wp_json_encode( $preview_business );
+                    ?>,
                     '{phone}':'(240) 532-9097', '{year}':String(new Date().getFullYear())
                 };
                 function sub(str){ return String(str||'').replace(/\{[a-z_]+\}/g, function(m){ return (m in sample)?sample[m]:m; }); }

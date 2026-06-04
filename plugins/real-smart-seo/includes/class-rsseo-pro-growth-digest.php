@@ -242,7 +242,7 @@ class RSSEO_Pro_Growth_Digest {
 
     public function add_menu() {
         add_submenu_page(
-            null, // hidden from menu — surfaced via the Reports tab in the Command Center
+            null,
             __( 'Growth Digest', 'real-smart-seo-pro' ),
             __( 'Growth Digest', 'real-smart-seo-pro' ),
             'manage_options',

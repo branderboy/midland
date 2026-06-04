@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="rsseo-tabview">
-    <h2><?php esc_html_e( 'New SEO Scan', 'real-smart-seo' ); ?></h2>
+    <h2><?php esc_html_e( 'SEO Analysis', 'real-smart-seo' ); ?></h2>
 
     <?php if ( isset( $_GET['error'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
         <div class="rsseo-notice rsseo-notice--error">
@@ -11,7 +11,7 @@
     <?php if ( ! $has_key ) : ?>
         <div class="rsseo-notice rsseo-notice--warning">
             <?php esc_html_e( 'You need to add your Perplexity API key in Settings before running a scan.', 'real-smart-seo' ); ?>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-settings' ) ); ?>"><?php esc_html_e( 'Go to Settings →', 'real-smart-seo' ); ?></a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=settings' ) ); ?>"><?php esc_html_e( 'Go to Settings →', 'real-smart-seo' ); ?></a>
         </div>
     <?php endif; ?>
 
@@ -124,8 +124,8 @@
 
         <?php
         /**
-         * Lets a Pro add-on inject extra scan inputs (keywords, location,
-         * DataForSEO, GMB, reviews, competitor data) into the new-scan form.
+         * Additional scan inputs (keywords, location, DataForSEO, GMB,
+         * reviews, competitor data) injected here by bundled modules.
          */
         do_action( 'rsseo_scan_form_fields' );
         ?>

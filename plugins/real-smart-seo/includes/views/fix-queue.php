@@ -119,7 +119,7 @@ $pending = max( 0, (int) $report->fixes_available - (int) $report->fixes_applied
     <?php endif; ?>
 
     <?php
-    /** Pro add-ons (schema, backlink opportunities) render below the cards. */
+    /** Additional sections (schema, backlink opportunities) render below the cards. */
     do_action( 'rsseo_after_report_fixes', $report );
     ?>
 </div>

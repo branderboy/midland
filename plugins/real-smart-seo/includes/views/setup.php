@@ -13,8 +13,8 @@ $overall_label = RSSEO_Profile::status_label( $overall );
 $overall_color = RSSEO_Profile::status_color( $overall );
 ?>
 <div class="rsseo-tabview rsseo-setup">
-    <h2><?php esc_html_e( 'Setup', 'real-smart-seo' ); ?></h2>
-    <p><?php esc_html_e( 'Get everything ready before you scan. Fill these in once — Site Scan, Opportunities, and Page Builder all read from here.', 'real-smart-seo' ); ?></p>
+    <h2><?php esc_html_e( 'Settings', 'real-smart-seo' ); ?></h2>
+    <p><?php esc_html_e( 'Configure everything once here — Audit, SEO Analysis, and Content all read from these settings.', 'real-smart-seo' ); ?></p>
 
     <!-- Readiness panel -->
     <div class="rsseo-setup__status" style="border-left:5px solid <?php echo esc_attr( $overall_color ); ?>;background:#fff;padding:14px 16px;border-radius:6px;margin:14px 0 20px;box-shadow:0 1px 2px rgba(0,0,0,.06);">
@@ -138,23 +138,16 @@ $overall_color = RSSEO_Profile::status_color( $overall );
         </div>
 
         <p class="submit">
-            <button type="submit" class="button button-primary button-large"><?php esc_html_e( 'Save Setup', 'real-smart-seo' ); ?></button>
+            <button type="submit" class="button button-primary button-large"><?php esc_html_e( 'Save Settings', 'real-smart-seo' ); ?></button>
         </p>
 
     </form>
 
-    <hr style="margin:28px 0;">
-    <div class="rsseo-settings-section">
-        <h2><?php esc_html_e( 'Business Identity & Schema', 'real-smart-seo' ); ?></h2>
-        <p class="description"><?php esc_html_e( 'Publish LocalBusiness / sameAs schema sitewide and confirm your name, address, and profile links to Google.', 'real-smart-seo' ); ?></p>
-        <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=rsseo-sameas' ) ); ?>"><?php esc_html_e( 'Open Business Identity →', 'real-smart-seo' ); ?></a>
-    </div>
-
-    <?php if ( has_action( 'rsseo_render_pro_settings_panel' ) ) : ?>
+    <?php if ( $has_pro && has_action( 'rsseo_render_pro_settings_panel' ) ) : ?>
         <hr style="margin:28px 0;">
         <div class="rsseo-settings-section">
-            <h2><?php esc_html_e( 'Connections', 'real-smart-seo' ); ?></h2>
-            <p class="description"><?php esc_html_e( 'Connect DataForSEO to power rank tracking, the geo-grid, and the backlinks dashboard.', 'real-smart-seo' ); ?></p>
+            <h2><?php esc_html_e( 'Connections (Pro)', 'real-smart-seo' ); ?></h2>
+            <p class="description"><?php esc_html_e( 'Optional — connect DataForSEO to power rank tracking, the geo-grid, and the backlinks dashboard.', 'real-smart-seo' ); ?></p>
             <?php do_action( 'rsseo_render_pro_settings_panel' ); ?>
         </div>
     <?php endif; ?>

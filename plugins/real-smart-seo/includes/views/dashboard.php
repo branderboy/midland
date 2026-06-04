@@ -3,17 +3,17 @@
 // Rendered inside the Command Center shell (RSSEO_Admin::render_tabbed_page),
 // which already provides the .wrap, the page <h1>, and the tab nav — so this
 // view emits inner content only (no second .wrap / duplicate heading).
-$url_setup   = admin_url( 'admin.php?page=real-smart-seo&tab=setup' );
-$url_scan    = admin_url( 'admin.php?page=real-smart-seo&tab=scan' );
+$url_setup   = admin_url( 'admin.php?page=real-smart-seo&tab=settings' );
+$url_scan    = admin_url( 'admin.php?page=real-smart-seo&tab=audit' );
 $url_reports = admin_url( 'admin.php?page=real-smart-seo&tab=reports' );
 ?>
 <div class="rsseo-dashboard">
 
     <?php if ( ! $has_key ) : ?>
     <div class="rsseo-notice rsseo-notice--warning">
-        <strong><?php esc_html_e( 'Setup required:', 'real-smart-seo' ); ?></strong>
+        <strong><?php esc_html_e( 'Settings required:', 'real-smart-seo' ); ?></strong>
         <?php esc_html_e( 'Add your Perplexity API key in', 'real-smart-seo' ); ?>
-        <a href="<?php echo esc_url( $url_setup ); ?>"><?php esc_html_e( 'Setup', 'real-smart-seo' ); ?></a>
+        <a href="<?php echo esc_url( $url_setup ); ?>"><?php esc_html_e( 'Settings', 'real-smart-seo' ); ?></a>
         <?php esc_html_e( 'before you run a scan.', 'real-smart-seo' ); ?>
     </div>
     <?php endif; ?>
@@ -30,21 +30,6 @@ $url_reports = admin_url( 'admin.php?page=real-smart-seo&tab=reports' );
             <div class="description" style="margin-top:2px;"><?php echo esc_html( $next['desc'] ); ?></div>
         </div>
         <a class="button button-primary button-large" href="<?php echo esc_url( $next['url'] ); ?>"><?php echo esc_html( $next['label'] ); ?> →</a>
-    </div>
-    <?php endif; ?>
-
-    <?php if ( ! empty( $priorities ) ) : ?>
-    <h2><?php esc_html_e( 'Priorities', 'real-smart-seo' ); ?></h2>
-    <div class="rsseo-priorities" style="background:#fff;border-radius:8px;padding:6px 4px;margin-bottom:24px;box-shadow:0 1px 2px rgba(0,0,0,.06);">
-        <?php foreach ( $priorities as $pr ) :
-            $c = RSSEO_Profile::status_color( $pr['status'] );
-            ?>
-            <a href="<?php echo esc_url( $pr['url'] ); ?>" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid #f0f0f1;text-decoration:none;color:inherit;">
-                <span style="flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:<?php echo esc_attr( $c ); ?>;"></span>
-                <span style="flex:1 1 auto;"><strong style="color:#1d2327;"><?php echo esc_html( $pr['label'] ); ?></strong> — <span class="description"><?php echo esc_html( $pr['detail'] ); ?></span></span>
-                <span style="flex:0 0 auto;color:#2271b1;font-weight:600;">→</span>
-            </a>
-        <?php endforeach; ?>
     </div>
     <?php endif; ?>
 
@@ -72,9 +57,9 @@ $url_reports = admin_url( 'admin.php?page=real-smart-seo&tab=reports' );
 
         <div class="rsseo-card rsseo-card--action">
             <h2><?php esc_html_e( 'Scan your site', 'real-smart-seo' ); ?></h2>
-            <p><?php esc_html_e( 'Crawl your pages (or upload Screaming Frog / GSC / GA / PageSpeed data) to surface issues and opportunities with one-click fixes.', 'real-smart-seo' ); ?></p>
+            <p><?php esc_html_e( 'Crawl your pages or upload Screaming Frog, GSC, GA, and PageSpeed data to surface issues and generate one-click fixes.', 'real-smart-seo' ); ?></p>
             <a href="<?php echo esc_url( $url_scan ); ?>" class="button button-primary button-large">
-                <?php esc_html_e( 'Scan My Site →', 'real-smart-seo' ); ?>
+                <?php esc_html_e( 'Run Audit →', 'real-smart-seo' ); ?>
             </a>
         </div>
 
