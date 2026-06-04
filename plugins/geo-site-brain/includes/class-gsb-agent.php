@@ -51,9 +51,13 @@ class GSB_Agent {
 		$sources = $this->sources_from_matches( $matches );
 		$graph   = $this->graph_context();
 
-		if ( empty( $matches ) && '' === $graph ) {
+		// The graph string is never truly empty (it always carries a "0 FAQs…"
+		// counts line), so test for REAL indexed knowledge: any retrieved chunk
+		// or any actual entity on file. Otherwise the model is handed an empty
+		// context and confidently "recommends" content as if the site lacked it.
+		if ( empty( $matches ) && ! $this->has_indexed_knowledge() ) {
 			return array(
-				'answer'  => __( "There's no business knowledge yet. Scan your website first, then ask again.", 'geo-site-brain' ),
+				'answer'  => __( "Nothing has been indexed yet, so I can't see your pages. Run a full Scan on the GEO Site Brain dashboard (OpenAI is connected now), then ask again. These answers come from the scan index — not your live pages in real time.", 'geo-site-brain' ),
 				'sources' => array(),
 				'backend' => $backend,
 				'used_ai' => false,
@@ -163,6 +167,32 @@ STRICT RULES — follow exactly:
 			}
 		}
 		return array_slice( $out, 0, 40 );
+	}
+
+	/**
+	 * True only when a scan has actually ingested real site content — a business
+	 * entity, a found/inferred service or location, or any FAQ/testimonial/
+	 * author/case study on file. The zero-counts line in graph_context() does
+	 * NOT count as knowledge.
+	 */
+	private function has_indexed_knowledge() {
+		if ( ! class_exists( 'GSB_Database' ) ) {
+			return false;
+		}
+		if ( GSB_Database::get_entities( 'business' ) ) {
+			return true;
+		}
+		if ( $this->entity_names( 'service', array( 'found', 'inferred' ) )
+			|| $this->entity_names( 'location', array( 'found', 'inferred' ) ) ) {
+			return true;
+		}
+		$counts = GSB_Database::entity_counts();
+		foreach ( array( 'faq', 'testimonial', 'author', 'case_study' ) as $t ) {
+			if ( (int) ( $counts[ $t ] ?? 0 ) > 0 ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private function build_context( $matches ) {

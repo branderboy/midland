@@ -21,10 +21,15 @@ class RSSEO_Pro_Analyzer {
         }
 
         $base_scan = RSSEO_Database::get_scan( $scan_id );
-        $pro_scan  = RSSEO_Pro_Database::get_pro_scan( $scan_id );
-
-        if ( ! $base_scan || ! $pro_scan ) {
+        if ( ! $base_scan ) {
             return new WP_Error( 'not_found', __( 'Scan data not found.', 'real-smart-seo-pro' ) );
+        }
+
+        $pro_scan = RSSEO_Pro_Database::get_pro_scan( $scan_id );
+        if ( ! $pro_scan ) {
+            // No Pro data was collected for this scan — return null so RSSEO_Jobs
+            // falls back to the base analyzer instead of erroring out.
+            return null;
         }
 
         RSSEO_Database::update_scan( $scan_id, array( 'status' => 'analyzing' ) );
@@ -254,14 +259,9 @@ INSTRUCTIONS;
             foreach ( $kv as $m ) {
                 $parts[ $m[1] ] = $m[2];
             }
-            if ( ! empty( $parts['fix_type'] ) && ! empty( $parts['new_value'] ) ) {
-                $fixes[] = array(
-                    'post_id'   => ! empty( $parts['post_id'] ) ? (int) $parts['post_id'] : 0,
-                    'fix_type'  => sanitize_text_field( $parts['fix_type'] ),
-                    'field_key' => sanitize_text_field( $parts['field_key'] ?? $parts['fix_type'] ),
-                    'old_value' => $parts['old_value'] ?? '',
-                    'new_value' => $parts['new_value'],
-                );
+            $fix = self::validate_fix( $parts );
+            if ( $fix ) {
+                $fixes[] = $fix;
             }
         }
 
@@ -270,5 +270,81 @@ INSTRUCTIONS;
             'fixes'           => $fixes,
             'fixes_available' => count( $fixes ),
         );
+    }
+
+    /**
+     * Validate + normalize one parsed WP_FIX line before it becomes a writable
+     * fix — mirrors RSSEO_Analyzer::validate_fix(), which is private to the base
+     * plugin and therefore can't be reused. Returns a safe fix array, or null to
+     * drop a malformed/unsafe suggestion. Guarantees fix_type is one of the four
+     * known types, the target post exists, field_key is allow-listed per type
+     * (never an arbitrary meta key), and the new value is sanitized + length-capped.
+     */
+    private static function validate_fix( $parts ) {
+        $type = strtolower( sanitize_key( $parts['fix_type'] ?? '' ) );
+        if ( ! in_array( $type, array( 'title', 'meta_description', 'content', 'alt_text' ), true ) ) {
+            return null;
+        }
+
+        $post_id = isset( $parts['post_id'] ) ? (int) $parts['post_id'] : 0;
+        if ( $post_id <= 0 || ! get_post( $post_id ) ) {
+            return null; // must target a real post
+        }
+
+        $new = (string) ( $parts['new_value'] ?? '' );
+        if ( '' === trim( $new ) ) {
+            return null;
+        }
+
+        $key_in = sanitize_text_field( $parts['field_key'] ?? '' );
+
+        switch ( $type ) {
+            case 'title':
+                $allow = array( 'post_title', '_yoast_wpseo_title', 'rank_math_title', '_aioseo_title', '_seopress_titles_title' );
+                $field = in_array( $key_in, $allow, true ) ? $key_in : 'post_title';
+                $new   = self::trim_len( wp_strip_all_tags( $new ), 200 );
+                break;
+
+            case 'meta_description':
+                // No safe default — we can't guess which SEO plugin owns the field.
+                $allow = array( '_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_seopress_titles_desc' );
+                if ( ! in_array( $key_in, $allow, true ) ) {
+                    return null;
+                }
+                $field = $key_in;
+                $new   = self::trim_len( wp_strip_all_tags( $new ), 320 );
+                break;
+
+            case 'content':
+                $field = 'post_content';
+                $new   = wp_kses_post( $new );
+                break;
+
+            case 'alt_text':
+                $field = '_wp_attachment_image_alt';
+                $new   = self::trim_len( wp_strip_all_tags( $new ), 300 );
+                break;
+
+            default:
+                return null;
+        }
+
+        if ( '' === trim( (string) $new ) ) {
+            return null;
+        }
+
+        return array(
+            'post_id'   => $post_id,
+            'fix_type'  => $type,
+            'field_key' => $field,
+            'old_value' => (string) ( $parts['old_value'] ?? '' ),
+            'new_value' => $new,
+        );
+    }
+
+    /** Multibyte-safe length cap. */
+    private static function trim_len( $str, $max ) {
+        $str = (string) $str;
+        return function_exists( 'mb_substr' ) ? mb_substr( $str, 0, $max ) : substr( $str, 0, $max );
     }
 }

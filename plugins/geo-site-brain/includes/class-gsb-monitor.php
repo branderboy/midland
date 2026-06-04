@@ -15,9 +15,33 @@ class GSB_Monitor {
 	const DROP_ALERT = 5; // points
 
 	/**
-	 * Called at the end of the weekly reindex. Sends the digest if enabled.
+	 * Wire the weekly digest cron. The digest runs on its own schedule so it
+	 * fires every week whether or not the weekly reindex is enabled.
 	 */
-	public static function after_reindex() {
+	public static function register_hooks() {
+		add_action( GSB_CRON_DIGEST, array( __CLASS__, 'run_digest' ) );
+	}
+
+	/**
+	 * Schedule or clear the weekly digest cron to match the enable_digest
+	 * setting. Called on activation and whenever the option is saved.
+	 *
+	 * @param int|bool $enabled Whether the digest is on.
+	 */
+	public static function sync_digest_cron( $enabled ) {
+		if ( (int) $enabled ) {
+			if ( ! wp_next_scheduled( GSB_CRON_DIGEST ) ) {
+				wp_schedule_event( time() + DAY_IN_SECONDS, 'weekly', GSB_CRON_DIGEST );
+			}
+		} else {
+			wp_clear_scheduled_hook( GSB_CRON_DIGEST );
+		}
+	}
+
+	/**
+	 * Weekly digest cron callback. Sends the digest if it's still enabled.
+	 */
+	public static function run_digest() {
 		if ( ! (int) GSB_Settings::get( 'enable_digest', 0 ) ) {
 			return;
 		}

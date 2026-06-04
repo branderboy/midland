@@ -28,6 +28,13 @@ class GSB_Vector_Store {
 	private $pdo = null;
 	private $schema_ready = false;
 	private $last_backend = 'local';
+	/** Optional DSN override used by the "Test connection" button (test before save). */
+	private $dsn_override = null;
+
+	public function set_dsn( $dsn ) {
+		$this->dsn_override = (string) $dsn;
+		return $this;
+	}
 
 	/* -------------------------------------------------------- capability check */
 
@@ -91,7 +98,7 @@ class GSB_Vector_Store {
 		if ( ! self::pgsql_available() ) {
 			return new WP_Error( 'gsb_no_pgsql', __( 'The PDO pgsql driver is not installed on this server.', 'geo-site-brain' ) );
 		}
-		$parsed = $this->parse_dsn( GSB_Settings::get( 'neon_dsn' ) );
+		$parsed = $this->parse_dsn( null !== $this->dsn_override ? $this->dsn_override : GSB_Settings::get( 'neon_dsn' ) );
 		if ( is_wp_error( $parsed ) ) {
 			return $parsed;
 		}

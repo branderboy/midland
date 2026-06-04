@@ -111,7 +111,7 @@ $source_meta = array(
                     <td><span class="rsseo-status rsseo-status--<?php echo esc_attr( $scan->status ); ?>"><?php echo esc_html( $scan->status ); ?></span></td>
                     <td>
                         <?php if ( $scan->report_id ) : ?>
-                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=repair&report_id=' . $scan->report_id ) ); ?>" class="button button-small">
+                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=real-smart-seo&tab=reports&report_id=' . $scan->report_id ) ); ?>" class="button button-small">
                                 <?php esc_html_e( 'View', 'real-smart-seo' ); ?>
                             </a>
                         <?php endif; ?>

@@ -65,6 +65,7 @@ add_action( 'init', function() {
 
 register_activation_hook( __FILE__, function() {
     DPJP_Post_Type::register();
+    DPJP_Application::harden_upload_dir();
     flush_rewrite_rules();
 } );
 

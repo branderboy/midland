@@ -3,7 +3,7 @@
  * Ops notifications — actionable emails to the Midland team on each
  * journey event so they can act without logging into WP.
  *
- * Recipients default to juston@midlandfloors.com and
+ * Recipients default to justin@midlandfloors.com and
  * support@midlandfloors.com. Override via the
  * scrm_pro_ops_notification_recipients filter if needed.
  *

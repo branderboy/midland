@@ -263,9 +263,11 @@ class WGB_Backup_Runner {
 				}
 
 				$result = $github->commit_batch( $batch, $commit_message, $branch );
-				if ( ! is_wp_error( $result ) ) {
-					$count = isset( $result['pushed_count'] ) ? (int) $result['pushed_count'] : 0;
+				if ( is_wp_error( $result ) ) {
+					WGB_File_Collector::cleanup( $zip_results );
+					return $result;
 				}
+				$count = isset( $result['pushed_count'] ) ? (int) $result['pushed_count'] : 0;
 			}
 
 			// Cleanup temp files.
@@ -314,9 +316,10 @@ class WGB_Backup_Runner {
 				}
 
 				$result = $github->commit_batch( $batch, $commit_message, $branch );
-				if ( ! is_wp_error( $result ) ) {
-					$count = isset( $result['pushed_count'] ) ? (int) $result['pushed_count'] : 0;
+				if ( is_wp_error( $result ) ) {
+					return $result;
 				}
+				$count = isset( $result['pushed_count'] ) ? (int) $result['pushed_count'] : 0;
 			}
 
 			return array(

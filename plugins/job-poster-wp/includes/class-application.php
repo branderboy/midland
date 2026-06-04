@@ -13,11 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class DPJP_Application {
 
+    /** Subdirectory (under wp-content/uploads) where applicant files are stored, away from the public web root. */
+    const UPLOAD_SUBDIR = 'dpjp-applications';
+
     public static function register(): void {
         add_action( 'init',        [ __CLASS__, 'register_post_type' ] );
         add_shortcode( 'dpjp_apply_form', [ __CLASS__, 'render_form' ] );
         add_action( 'admin_post_dpjp_submit_application', [ __CLASS__, 'handle_submission' ] );
         add_action( 'admin_post_nopriv_dpjp_submit_application', [ __CLASS__, 'handle_submission' ] );
+        add_action( 'admin_post_dpjp_download_application_file', [ __CLASS__, 'handle_download' ] );
         add_action( 'admin_menu',  [ __CLASS__, 'menu' ] );
         add_action( 'admin_post_dpjp_save_form_settings', [ __CLASS__, 'save_settings' ] );
         add_action( 'wp_head',     [ __CLASS__, 'inject_css_vars' ] );
@@ -196,6 +200,134 @@ class DPJP_Application {
         return $job_id ? add_query_arg( 'job', $job_id, $base ) : $base;
     }
 
+    // ── Protected applicant uploads ───────────────────────────────────────────
+
+    /**
+     * Absolute path to the protected applicant-upload directory.
+     */
+    public static function upload_basedir(): string {
+        $uploads = wp_upload_dir();
+        return trailingslashit( $uploads['basedir'] ) . self::UPLOAD_SUBDIR;
+    }
+
+    /**
+     * Create the protected upload directory and drop hardening files so Apache
+     * blocks direct web access to applicant resumes/cover letters.
+     *
+     * Safe to call repeatedly (on activation and before every upload).
+     */
+    public static function harden_upload_dir(): void {
+        $dir = self::upload_basedir();
+        if ( ! wp_mkdir_p( $dir ) ) {
+            return;
+        }
+
+        $htaccess = trailingslashit( $dir ) . '.htaccess';
+        if ( ! file_exists( $htaccess ) ) {
+            $rules  = "# Applicant uploads — block all direct web access.\n";
+            $rules .= "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n";
+            $rules .= "<IfModule !mod_authz_core.c>\n\tOrder allow,deny\n\tDeny from all\n</IfModule>\n";
+            file_put_contents( $htaccess, $rules );
+        }
+
+        $index = trailingslashit( $dir ) . 'index.php';
+        if ( ! file_exists( $index ) ) {
+            file_put_contents( $index, "<?php\n// Silence is golden.\n" );
+        }
+    }
+
+    /**
+     * upload_dir filter that redirects applicant uploads into the protected
+     * subdir (flat, no YYYY/MM) so they never land in the guessable public tree.
+     */
+    public static function filter_upload_dir( array $dirs ): array {
+        $uploads = wp_upload_dir();
+        $dirs['subdir'] = '/' . self::UPLOAD_SUBDIR;
+        $dirs['path']   = $dirs['basedir'] . $dirs['subdir'];
+        $dirs['url']    = $dirs['baseurl'] . $dirs['subdir'];
+        return $dirs;
+    }
+
+    /**
+     * Handle one applicant file upload into the protected dir with a randomized
+     * filename. Returns the stored path relative to the uploads basedir, or ''.
+     */
+    private static function store_applicant_file( array $file, array $allowed ): string {
+        self::harden_upload_dir();
+
+        // Randomize the stored filename so the path isn't guessable, preserving extension.
+        $orig = sanitize_file_name( $file['name'] );
+        $ext  = strtolower( pathinfo( $orig, PATHINFO_EXTENSION ) );
+        if ( $ext ) {
+            $file['name'] = wp_generate_password( 24, false, false ) . '.' . $ext;
+        }
+
+        add_filter( 'upload_dir', [ __CLASS__, 'filter_upload_dir' ] );
+        $uploaded = wp_handle_upload( $file, [ 'test_form' => false, 'mimes' => $allowed ] );
+        remove_filter( 'upload_dir', [ __CLASS__, 'filter_upload_dir' ] );
+
+        if ( empty( $uploaded['file'] ) || ! empty( $uploaded['error'] ) ) {
+            return '';
+        }
+
+        $uploads  = wp_upload_dir();
+        $relative = ltrim( str_replace( trailingslashit( $uploads['basedir'] ), '', $uploaded['file'] ), '/' );
+        return $relative;
+    }
+
+    /**
+     * Gated download handler: serves an applicant file to authorized admins only.
+     */
+    public static function handle_download(): void {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_die( 'You are not allowed to access this file.', 403 );
+        }
+        $app_id = isset( $_GET['app'] ) ? (int) $_GET['app'] : 0;
+        $which  = isset( $_GET['file'] ) && 'cover' === $_GET['file'] ? 'cover' : 'resume';
+        check_admin_referer( 'dpjp_download_application_' . $app_id . '_' . $which );
+
+        $meta_key = 'resume' === $which ? 'dpjp_app_resume' : 'dpjp_app_cover';
+        $relative = (string) get_post_meta( $app_id, $meta_key, true );
+        if ( '' === $relative ) {
+            wp_die( 'File not found.', 404 );
+        }
+
+        $uploads = wp_upload_dir();
+        $basedir = trailingslashit( wp_normalize_path( $uploads['basedir'] ) );
+        $path    = wp_normalize_path( $basedir . ltrim( $relative, '/' ) );
+
+        // Confine the resolved path to the uploads basedir (no traversal).
+        if ( 0 !== strpos( $path, $basedir ) || ! is_file( $path ) ) {
+            wp_die( 'File not found.', 404 );
+        }
+
+        $filetype = wp_check_filetype( $path );
+        $mime     = $filetype['type'] ?: 'application/octet-stream';
+
+        nocache_headers();
+        header( 'Content-Type: ' . $mime );
+        header( 'Content-Disposition: attachment; filename="' . basename( $path ) . '"' );
+        header( 'Content-Length: ' . filesize( $path ) );
+        header( 'X-Content-Type-Options: nosniff' );
+        readfile( $path );
+        exit;
+    }
+
+    /**
+     * Build a gated admin download URL for an applicant file.
+     */
+    private static function download_url( int $app_id, string $which ): string {
+        $url = add_query_arg(
+            [
+                'action' => 'dpjp_download_application_file',
+                'app'    => $app_id,
+                'file'   => $which,
+            ],
+            admin_url( 'admin-post.php' )
+        );
+        return wp_nonce_url( $url, 'dpjp_download_application_' . $app_id . '_' . $which );
+    }
+
     public static function render_form( $atts ): string {
         $submitted = isset( $_GET['applied'] ) && $_GET['applied'] === 'success';
         $preselect = isset( $_GET['job'] ) ? (int) $_GET['job'] : 0;
@@ -321,7 +453,7 @@ class DPJP_Application {
             wp_die( 'Invalid submission.' );
         }
         if ( ! empty( $_POST['website'] ) ) {  // honeypot
-            wp_safe_redirect( self::apply_url() . '?applied=success' );
+            wp_safe_redirect( add_query_arg( 'applied', 'success', self::apply_url() ) );
             exit;
         }
 
@@ -349,16 +481,17 @@ class DPJP_Application {
             'txt'  => 'text/plain',
         ];
 
-        $resume_url = '';
+        // Store applicant files in the PROTECTED dir (not the public web root),
+        // with randomized filenames. We persist the path relative to the uploads
+        // basedir; the raw file is only ever served via the gated download handler.
+        $resume_path = '';
         if ( ! empty( $_FILES['applicant_resume']['name'] ) ) {
-            $uploaded = wp_handle_upload( $_FILES['applicant_resume'], [ 'test_form' => false, 'mimes' => $allowed ] );
-            if ( ! empty( $uploaded['url'] ) ) $resume_url = $uploaded['url'];
+            $resume_path = self::store_applicant_file( $_FILES['applicant_resume'], $allowed );
         }
 
-        $cover_url = '';
+        $cover_path = '';
         if ( ! empty( $_FILES['applicant_cover']['name'] ) ) {
-            $uploaded = wp_handle_upload( $_FILES['applicant_cover'], [ 'test_form' => false, 'mimes' => $allowed ] );
-            if ( ! empty( $uploaded['url'] ) ) $cover_url = $uploaded['url'];
+            $cover_path = self::store_applicant_file( $_FILES['applicant_cover'], $allowed );
         }
 
         $app_id = wp_insert_post( [
@@ -375,8 +508,8 @@ class DPJP_Application {
             update_post_meta( $app_id, 'dpjp_app_email',  $email );
             update_post_meta( $app_id, 'dpjp_app_exp',    $exp );
             update_post_meta( $app_id, 'dpjp_app_certs',  $certs );
-            update_post_meta( $app_id, 'dpjp_app_resume', $resume_url );
-            update_post_meta( $app_id, 'dpjp_app_cover',  $cover_url );
+            update_post_meta( $app_id, 'dpjp_app_resume', $resume_path );
+            update_post_meta( $app_id, 'dpjp_app_cover',  $cover_path );
         }
 
         $s    = wp_parse_args( get_option( 'dpjp_form_settings', [] ), self::defaults() );
@@ -390,14 +523,16 @@ class DPJP_Application {
         $body .= "Email:      {$email}\n";
         $body .= "Experience: {$exp}\n";
         $body .= "Certs:      {$certs}\n";
-        if ( $resume_url ) $body .= "Resume:     {$resume_url}\n";
-        if ( $cover_url )  $body .= "Cover:      {$cover_url}\n";
+        if ( $app_id && ! is_wp_error( $app_id ) ) {
+            if ( $resume_path ) $body .= "Resume:     " . self::download_url( $app_id, 'resume' ) . "\n";
+            if ( $cover_path )  $body .= "Cover:      " . self::download_url( $app_id, 'cover' )  . "\n";
+        }
         $body .= "\nMessage:\n{$msg}\n\n";
         $body .= "---\nView in WP admin: " . admin_url( 'edit.php?post_type=dpjp_application' );
 
         wp_mail( $to, $subject, $body, [ 'Reply-To: ' . $name . ' <' . $email . '>' ] );
 
-        wp_safe_redirect( self::apply_url() . '?applied=success' );
+        wp_safe_redirect( add_query_arg( 'applied', 'success', self::apply_url() ) );
         exit;
     }
 
@@ -433,8 +568,8 @@ class DPJP_Application {
             case 'dpjp_app_files':
                 $resume = get_post_meta( $id, 'dpjp_app_resume', true );
                 $cover  = get_post_meta( $id, 'dpjp_app_cover',  true );
-                if ( $resume ) echo '<a href="' . esc_url( $resume ) . '" target="_blank">📄 Resume</a><br>';
-                if ( $cover )  echo '<a href="' . esc_url( $cover )  . '" target="_blank">📝 Cover Letter</a>';
+                if ( $resume ) echo '<a href="' . esc_url( self::download_url( $id, 'resume' ) ) . '">📄 Resume</a><br>';
+                if ( $cover )  echo '<a href="' . esc_url( self::download_url( $id, 'cover' ) )  . '">📝 Cover Letter</a>';
                 if ( ! $resume && ! $cover ) echo '—';
                 break;
         }

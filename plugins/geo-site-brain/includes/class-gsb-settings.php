@@ -151,4 +151,31 @@ class GSB_Settings {
 		self::set( 'webhook_secret', $s );
 		return $s;
 	}
+
+	/* ------------------------------------------------------------ SSRF guard */
+
+	/**
+	 * Defense-in-depth guard for admin-supplied outbound URLs (competitor pages,
+	 * webhook endpoints). Requires an http/https URL whose resolved host is not
+	 * loopback, link-local, or RFC1918-private — blocking SSRF probes against
+	 * 127.0.0.1, ::1, localhost, 169.254.169.254 (cloud metadata), etc.
+	 *
+	 * Built on wp_http_validate_url(), which already rejects those ranges (unless
+	 * a site explicitly opts out via http_request_host_is_external); we add a
+	 * strict scheme check on top of it.
+	 *
+	 * @param string $url
+	 * @return string|false The validated URL, or false if unsafe/invalid.
+	 */
+	public static function safe_remote_url( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return false;
+		}
+		$scheme = strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
+		if ( 'http' !== $scheme && 'https' !== $scheme ) {
+			return false;
+		}
+		return wp_http_validate_url( $url ) ? $url : false;
+	}
 }

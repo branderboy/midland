@@ -392,8 +392,11 @@
 	$( document ).on( 'click', '.gsb-test', function ( e ) {
 		e.preventDefault();
 		var which = $( this ).data( 'test' );
+		// Send the value typed into the field so the user can test BEFORE saving.
+		// Blank falls back to the saved key/DSN on the server.
+		var typed = $( this ).closest( 'td' ).find( 'input' ).first().val() || '';
 		var $out = $( '.gsb-test-result[data-for="' + which + '"]' ).text( '…' ).removeClass( 'gsb-ok gsb-bad' );
-		post( 'gsb_test_' + which ).done( function ( res ) {
+		post( 'gsb_test_' + which, { key: typed } ).done( function ( res ) {
 			if ( res && res.success ) {
 				$out.addClass( 'gsb-ok' ).text( res.data.message );
 			} else {

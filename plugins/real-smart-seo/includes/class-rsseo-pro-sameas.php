@@ -183,7 +183,9 @@ class RSSEO_Pro_SameAs {
         if ( empty( $schema['name'] ) ) {
             return;
         }
-        echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // Hex-escape <, >, &, ', " so a stray </script> can't break out of the
+        // <script> block — schema values are partly model/user-generated.
+        echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     public function render_page() {

@@ -49,7 +49,13 @@ class GSB_Webhooks {
 		$secret = GSB_Settings::webhook_secret();
 		$sig    = 'sha256=' . hash_hmac( 'sha256', $body, $secret );
 
+		$sent = 0;
 		foreach ( self::urls() as $url ) {
+			// SSRF guard: never POST to loopback / link-local / private hosts.
+			if ( false === GSB_Settings::safe_remote_url( $url ) ) {
+				GSB_Logger::warning( 'webhooks', 'Skipped non-public webhook URL: ' . $url );
+				continue;
+			}
 			wp_remote_post( $url, array(
 				'timeout'  => 8,
 				'blocking' => false, // don't slow the page; fire-and-forget

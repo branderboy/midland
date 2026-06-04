@@ -111,6 +111,13 @@ class RSSEO_Importer {
             'created_at'      => current_time( 'mysql' ),
         ) );
 
+        // Let extensions (e.g. the Pro add-on) persist their own per-scan data
+        // now that the base scan row exists. Pro listens on this to write its
+        // rsseo_pro_scans row so the Pro analyzer can read it at run time.
+        if ( ! is_wp_error( $scan_id ) && $scan_id ) {
+            do_action( 'rsseo_after_scan_created', $scan_id, $post );
+        }
+
         // Rolling 10-scan window — older runs (and their reports + fixes) are
         // pruned so the archive doesn't grow forever.
         RSSEO_Database::prune_old_scans( 10 );

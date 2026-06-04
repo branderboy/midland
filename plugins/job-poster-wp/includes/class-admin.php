@@ -181,11 +181,26 @@ class DPJP_Admin {
         <?php
     }
 
+    /**
+     * Setting keys whose values are secrets — never echoed back to the browser
+     * and only overwritten when a non-empty new value is submitted.
+     */
+    private static function secret_keys(): array {
+        return apply_filters( 'dpjp_settings_secret_keys', [ 'dpjp_fb_page_token', 'dpjp_indeed_client_secret' ] );
+    }
+
     private static function settings_row( string $key, array $f ): void {
-        $val = get_option( $key, '' );
-        $type = esc_attr( $f['type'] );
-        echo "<tr><th><label for='{$key}'>{$f['label']}</label></th><td>";
-        echo "<input type='{$type}' id='{$key}' name='{$key}' value='" . esc_attr( $val ) . "' class='regular-text'>";
+        $is_secret = in_array( $key, self::secret_keys(), true );
+        $val       = get_option( $key, '' );
+        $type      = esc_attr( $f['type'] );
+        echo "<tr><th><label for='{$key}'>" . esc_html( $f['label'] ) . "</label></th><td>";
+        if ( $is_secret ) {
+            // Render blank with a placeholder; the saved secret is never sent to the browser.
+            $placeholder = '' !== $val ? esc_attr__( '••• saved — leave blank to keep', 'job-manager-pro' ) : '';
+            echo "<input type='{$type}' id='{$key}' name='{$key}' value='' placeholder='{$placeholder}' autocomplete='new-password' class='regular-text'>";
+        } else {
+            echo "<input type='{$type}' id='{$key}' name='{$key}' value='" . esc_attr( $val ) . "' class='regular-text'>";
+        }
         echo "<p class='description'>{$f['desc']}</p></td></tr>";
     }
 
@@ -193,9 +208,16 @@ class DPJP_Admin {
         if ( ! current_user_can( 'manage_options' ) ) wp_die( 'No.' );
         check_admin_referer( 'dpjp_save_settings', 'dpjp_nonce' );
         $keys = [ 'dpjp_fb_page_id', 'dpjp_fb_page_token', 'dpjp_indeed_client_id', 'dpjp_indeed_client_secret', 'dpjp_indeed_employer_id', 'dpjp_indeed_company_name', 'dpjp_nextdoor_page_url', 'dpjp_craigslist_post_url' ];
-        $keys = apply_filters( 'dpjp_settings_keys', $keys );
+        $keys    = apply_filters( 'dpjp_settings_keys', $keys );
+        $secrets = self::secret_keys();
         foreach ( $keys as $key ) {
-            update_option( $key, sanitize_text_field( wp_unslash( $_POST[ $key ] ?? '' ) ) );
+            $value = sanitize_text_field( wp_unslash( $_POST[ $key ] ?? '' ) );
+            // Blank-to-keep for secret fields: only overwrite the stored secret
+            // when a non-empty new value is submitted.
+            if ( in_array( $key, $secrets, true ) && '' === $value ) {
+                continue;
+            }
+            update_option( $key, $value );
         }
         wp_safe_redirect( add_query_arg( [ 'post_type' => 'dpjp_job', 'page' => 'dpjp-settings', 'saved' => '1' ], admin_url( 'edit.php' ) ) );
         exit;
