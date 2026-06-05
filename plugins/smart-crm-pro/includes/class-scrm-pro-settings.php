@@ -273,7 +273,7 @@ class SCRM_Pro_Settings {
                     <p style="margin:0 0 8px;"><strong><?php esc_html_e( 'Configured in Smart Forms:', 'smart-crm-pro' ); ?></strong> <?php esc_html_e( 'Web forms, Calendly, Resend (form emails).', 'smart-crm-pro' ); ?>
                         <a href="<?php echo esc_url( admin_url( 'admin.php?page=smart-forms-settings&tab=calendly' ) ); ?>"><?php esc_html_e( 'Open the Calendly tab →', 'smart-crm-pro' ); ?></a>
                     </p>
-                    <p style="margin:0;color:#64748b;"><?php esc_html_e( 'Flow: a web form or Calendly booking → Smart Forms saves the lead → Smart CRM pushes it to ActiveCampaign, ServiceM8, Vapi, and Google Calendar. When ServiceM8 marks the job complete it calls back here and fires the Smart Reviews survey.', 'smart-crm-pro' ); ?></p>
+                    <p style="margin:0;color:#64748b;"><?php esc_html_e( 'Flow: a web form, a Midland Chat conversation, or a Calendly booking → Smart Forms saves the lead → Smart CRM pushes it to ActiveCampaign, ServiceM8, Vapi, and Google Calendar. The chat captures a name + email then sends the visitor to Calendly; that booking is tagged in the CRM just like a form booking. When ServiceM8 marks the job complete it calls back here and fires the Smart Reviews survey.', 'smart-crm-pro' ); ?></p>
                 </div>
             </details>
 
@@ -311,6 +311,50 @@ class SCRM_Pro_Settings {
                 </div>
                 <?php if ( '' !== $cal_url ) : ?>
                     <p style="margin:8px 0 0;font-size:12px;color:#64748b;"><?php esc_html_e( 'Booking URL:', 'smart-crm-pro' ); ?> <code><?php echo esc_html( $cal_url ); ?></code><?php if ( $cal_live ) : ?> &nbsp;&middot;&nbsp; <?php esc_html_e( 'webhook active', 'smart-crm-pro' ); ?><?php endif; ?></p>
+                <?php endif; ?>
+            </div>
+
+            <?php
+            // Chat → Calendly → CRM status. The chat sends visitors to the
+            // booking link after capturing their name + email; that booking
+            // reaches the CRM through the same Calendly webhook. Read live from
+            // the chat's options, reusing the Calendly state computed above.
+            $chat_active   = defined( 'SCAI_VERSION' );
+            $chat_book_url = (string) get_option( 'smart_chat_booking_url', '' );
+            if ( '' === $chat_book_url ) {
+                // The chat falls back to the Smart Forms Calendly URL when its
+                // own booking field is blank (see Midland Chat's enqueue).
+                $chat_book_url = $cal_url;
+            }
+            $chat_host   = '' !== $chat_book_url ? (string) wp_parse_url( $chat_book_url, PHP_URL_HOST ) : '';
+            $chat_is_cal = '' !== $chat_host && false !== stripos( $chat_host, 'calendly.com' );
+
+            if ( ! $chat_active ) {
+                $chat_color = '#b26200';
+                $chat_icon  = '&#9888;';
+                $chat_msg   = __( 'Midland Chat is not active — activate it so chat visitors can book a visit.', 'smart-crm-pro' );
+            } elseif ( $chat_is_cal && $cal_live ) {
+                $chat_color = '#15803d';
+                $chat_icon  = '&#10003;';
+                $chat_msg   = __( 'Connected. The chat captures a name + email, then sends the visitor to Calendly, and the booking is tagged in the CRM.', 'smart-crm-pro' );
+            } elseif ( $chat_is_cal ) {
+                $chat_color = '#b26200';
+                $chat_icon  = '&#9888;';
+                $chat_msg   = __( 'The chat points to Calendly, but the webhook is not connected yet — open Smart Forms and click "Connect Calendly" so chat bookings reach the CRM.', 'smart-crm-pro' );
+            } else {
+                $chat_color = '#b32d2e';
+                $chat_icon  = '&#10007;';
+                $chat_msg   = __( 'No Calendly booking link for the chat — set one in Midland Chat settings, or connect Calendly in Smart Forms.', 'smart-crm-pro' );
+            }
+            ?>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-left:4px solid <?php echo esc_attr( $chat_color ); ?>;border-radius:6px;padding:12px 18px;margin:16px 0;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <strong style="color:<?php echo esc_attr( $chat_color ); ?>;font-size:14px;"><?php echo wp_kses_post( $chat_icon ); ?> <?php esc_html_e( 'Chat &rarr; Calendly', 'smart-crm-pro' ); ?></strong>
+                    <span style="color:#334155;font-size:13px;"><?php echo esc_html( $chat_msg ); ?></span>
+                    <a class="button button-small" style="margin-left:auto;" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-chat-settings' ) ); ?>"><?php esc_html_e( 'Manage in Midland Chat', 'smart-crm-pro' ); ?></a>
+                </div>
+                <?php if ( '' !== $chat_book_url ) : ?>
+                    <p style="margin:8px 0 0;font-size:12px;color:#64748b;"><?php esc_html_e( 'Booking link:', 'smart-crm-pro' ); ?> <code><?php echo esc_html( $chat_book_url ); ?></code></p>
                 <?php endif; ?>
             </div>
 

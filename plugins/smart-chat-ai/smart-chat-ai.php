@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.31
+ * Version: 1.9.32
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.31');
+define('SCAI_VERSION', '1.9.32');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -398,22 +398,12 @@ class SCAI_Plugin {
         
         $wa_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'smart_chat_whatsapp_number', '' ) );
 
-        // Booking link comes from the Booking / Calendly field in Settings.
-        // If that's empty, fall back to the Smart Forms Calendly URL (the
-        // Calendar settings page), so the link works wherever it's configured.
-        // This reads an option only — no form is embedded.
-        $booking_url = (string) get_option( 'smart_chat_booking_url', '' );
-        if ( '' === $booking_url ) {
-            if ( class_exists( 'SFCO_Pro_Calendly' ) && method_exists( 'SFCO_Pro_Calendly', 'get_booking_url' ) ) {
-                $booking_url = (string) SFCO_Pro_Calendly::get_booking_url();
-            }
-            if ( '' === $booking_url ) {
-                // Direct option read in case the class isn't loaded on the front end.
-                if ( get_option( 'sfco_pro_calendly_enabled', 0 ) ) {
-                    $booking_url = (string) get_option( 'sfco_pro_calendly_url', '' );
-                }
-            }
-        }
+        // Booking link comes from the Booking / Calendly field in Settings,
+        // falling back to the Smart Forms Calendly URL. This is the bare link;
+        // once a lead is captured mid-conversation the AJAX response upgrades
+        // it to a per-lead decorated link (see session_booking_url()) so the
+        // Calendly webhook can attribute the booking to the CRM lead.
+        $booking_url = $this->resolve_booking_url();
 
         // Suggested starter questions, one per line in Settings. Defaults give
         // useful shortcuts out of the box.
@@ -580,6 +570,19 @@ class SCAI_Plugin {
             error_log( 'Smart Chat lead capture failed: ' . $e->getMessage() );
         }
 
+        // Once this session has a lead, hand the widget a Calendly link stamped
+        // with the CRM lead id so a booking made from chat is attributed back to
+        // the lead and tagged by the Calendly webhook. Runs every turn so the
+        // link is decorated whether the lead was captured this turn or earlier.
+        try {
+            $booking_url = $this->session_booking_url( $session_id );
+            if ( '' !== $booking_url ) {
+                $response['booking_url'] = esc_url_raw( $booking_url );
+            }
+        } catch ( \Throwable $e ) {
+            error_log( 'Smart Chat booking URL build failed: ' . $e->getMessage() );
+        }
+
         wp_send_json_success($response);
     }
 
@@ -711,6 +714,70 @@ class SCAI_Plugin {
         if ( $lead_id && get_option( 'smart_chat_enable_email_notifications', true ) ) {
             $this->send_lead_notification( $lead_id );
         }
+    }
+
+    /**
+     * Resolve the bare Calendly booking URL from settings, falling back to the
+     * Smart Forms Calendly integration. Returns '' when none is configured.
+     */
+    private function resolve_booking_url() {
+        $booking_url = (string) get_option( 'smart_chat_booking_url', '' );
+        if ( '' !== $booking_url ) {
+            return $booking_url;
+        }
+        if ( class_exists( 'SFCO_Pro_Calendly' ) && method_exists( 'SFCO_Pro_Calendly', 'get_booking_url' ) ) {
+            $booking_url = (string) SFCO_Pro_Calendly::get_booking_url();
+        }
+        if ( '' === $booking_url && get_option( 'sfco_pro_calendly_enabled', 0 ) ) {
+            // Direct option read in case the class isn't loaded on the front end.
+            $booking_url = (string) get_option( 'sfco_pro_calendly_url', '' );
+        }
+        return $booking_url;
+    }
+
+    /**
+     * Per-session Calendly link decorated with the CRM lead id, or '' when the
+     * session has no lead we can attribute a booking to.
+     *
+     * The chat → CRM bridge mirrors each captured chat lead into wp_sfco_leads
+     * and stamps that id back onto the chat lead row (smart_chat_leads.sfco_lead_id).
+     * Stamping it onto the booking link as utm_content=LEAD_<id> is what lets
+     * Calendly's invitee.created webhook (SFCO_Pro_Calendly::match_lead) match
+     * the booking 1:1 and run the booked → ServiceM8 → ActiveCampaign tagging.
+     * Without it a chat booking only matches by email (fragile) or not at all,
+     * so it was never tagged in the CRM.
+     */
+    private function session_booking_url( $session_id ) {
+        $base = $this->resolve_booking_url();
+        if ( '' === $base ) {
+            return '';
+        }
+        if ( ! class_exists( 'SFCO_Pro_Calendly' ) || ! method_exists( 'SFCO_Pro_Calendly', 'decorate_booking_url' ) ) {
+            return '';
+        }
+
+        global $wpdb;
+        // SELECT * so a missing sfco_lead_id column (CRM bridge inactive) just
+        // yields no property rather than a DB error.
+        $lead = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT * FROM {$wpdb->prefix}smart_chat_leads WHERE message LIKE %s ORDER BY id DESC LIMIT 1",
+            '%' . $wpdb->esc_like( '[sid:' . $session_id . ']' ) . '%'
+        ) );
+        if ( ! $lead ) {
+            return '';
+        }
+
+        $sfco_lead_id = isset( $lead->sfco_lead_id ) ? (int) $lead->sfco_lead_id : 0;
+        if ( $sfco_lead_id <= 0 ) {
+            return '';
+        }
+
+        return (string) SFCO_Pro_Calendly::decorate_booking_url(
+            $base,
+            $sfco_lead_id,
+            (string) ( $lead->name ?? '' ),
+            (string) ( $lead->email ?? '' )
+        );
     }
 
     /**
