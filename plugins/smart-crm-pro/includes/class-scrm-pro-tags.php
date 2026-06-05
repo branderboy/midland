@@ -138,11 +138,33 @@ class SCRM_Pro_Tags {
             return null;
         }
 
-        if ( class_exists( 'SFCO_Database' ) ) {
-            $lead = SFCO_Database::get_lead( $lead_id );
-            if ( $lead ) {
-                return $lead;
+        $row = class_exists( 'SFCO_Database' ) ? SFCO_Database::get_lead( $lead_id ) : null;
+
+        if ( $row ) {
+            // The canonical DB row has id/name/email/project_type/timeline, but the
+            // journey fields that drive segment + emergency tagging (segment,
+            // urgency, lead_intent, property_type, emergency_service) live only
+            // inside extra_fields_json and are never decoded onto the row. Decode
+            // them, and overlay the submission $payload, so lead_segment() and
+            // is_emergency() can actually see those signals. Only fill missing or
+            // empty properties — never clobber a real column.
+            $overlay = array();
+            if ( ! empty( $row->extra_fields_json ) ) {
+                $extra = json_decode( (string) $row->extra_fields_json, true );
+                if ( is_array( $extra ) ) {
+                    $overlay = $extra;
+                }
             }
+            if ( is_array( $payload ) ) {
+                $overlay = array_merge( $overlay, $payload );
+            }
+            foreach ( $overlay as $k => $v ) {
+                if ( ! isset( $row->$k ) || '' === $row->$k || null === $row->$k ) {
+                    $row->$k = $v;
+                }
+            }
+            $row->id = $lead_id;
+            return $row;
         }
 
         if ( is_array( $payload ) ) {

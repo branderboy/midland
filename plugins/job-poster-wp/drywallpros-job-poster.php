@@ -3,7 +3,7 @@
  * Plugin Name: Midland Job Manager
  * Plugin URI:  https://github.com/branderboy/midland
  * Description: Midland-branded job manager. Creates job listings with Google for Jobs schema, distributes to Facebook, Indeed, Nextdoor, and Craigslist, and runs an application form with resume + cover-letter uploads.
- * Version:     1.7.1
+ * Version:     1.7.3
  * Author:      Job Manager Pro
  * License:     GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -15,7 +15,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'JMP_VERSION', '1.7.1' );
+define( 'JMP_VERSION', '1.7.3' );
 define( 'JMP_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'JMP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'JMP_FILE',    __FILE__ );

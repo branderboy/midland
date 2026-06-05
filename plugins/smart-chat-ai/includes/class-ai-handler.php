@@ -314,6 +314,13 @@ PROMPT;
         $content = (string) ( $body['choices'][0]['message']['content'] ?? '' );
         $content = $this->clean_response( $content );
 
+        // Guard against a well-formed API response that contains no actual text.
+        // This can happen with certain model configurations or provider quirks.
+        // Return a safe fallback rather than an empty assistant bubble.
+        if ( '' === $content ) {
+            return $this->error_response( 'Sorry, I did not get a response. Please try again or contact us directly.' );
+        }
+
         return array(
             'message' => $content,
             'model'   => $this->model,
