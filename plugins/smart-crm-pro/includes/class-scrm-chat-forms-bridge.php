@@ -40,6 +40,72 @@ class SCRM_Chat_Forms_Bridge {
         // there, including the midland-source-chat source tag.
         add_action( 'scai_lead_captured', array( $this, 'mirror_to_smart_forms' ), 5, 2 );
         add_action( 'init',               array( $this, 'maybe_add_link_column' ), 20 );
+
+        // Chat-owned Calendly (SCAI_Calendly) fires these when a visitor books or
+        // cancels from the chat. We advance the SAME CRM lead the capture created
+        // so the existing deal moves to Booked/Canceled and ServiceM8 +
+        // ActiveCampaign run their booked/canceled flows — the chat's booking is
+        // tagged in the CRM with no Smart Forms plugin in the loop.
+        add_action( 'scai_lead_booked',   array( $this, 'on_chat_booked' ), 10, 2 );
+        add_action( 'scai_lead_canceled', array( $this, 'on_chat_canceled' ), 10, 3 );
+    }
+
+    /**
+     * Relay a chat booking to the CRM booked conversion on the mirrored lead.
+     */
+    public function on_chat_booked( $chat_lead_id, $data = array() ) {
+        $sfco = $this->sfco_lead_row( $chat_lead_id );
+        if ( ! $sfco ) {
+            return; // capture was never mirrored (e.g. no email) — nothing to advance
+        }
+        global $wpdb;
+        $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $wpdb->prefix . 'sfco_leads',
+            array( 'status' => 'booked' ),
+            array( 'id' => (int) $sfco->id ),
+            array( '%s' ),
+            array( '%d' )
+        );
+        $sfco->status = 'booked';
+        do_action( 'sfco_lead_booked', $sfco, false );
+    }
+
+    /**
+     * Relay a chat cancellation to the CRM canceled conversion.
+     */
+    public function on_chat_canceled( $chat_lead_id, $data = array(), $reason = '' ) {
+        $sfco = $this->sfco_lead_row( $chat_lead_id );
+        if ( ! $sfco ) {
+            return;
+        }
+        global $wpdb;
+        $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $wpdb->prefix . 'sfco_leads',
+            array( 'status' => 'canceled' ),
+            array( 'id' => (int) $sfco->id ),
+            array( '%s' ),
+            array( '%d' )
+        );
+        $sfco->status = 'canceled';
+        do_action( 'sfco_lead_canceled', $sfco, sanitize_text_field( (string) $reason ) );
+    }
+
+    /**
+     * Load the mirrored wp_sfco_leads row for a chat lead, or null.
+     */
+    private function sfco_lead_row( $chat_lead_id ) {
+        global $wpdb;
+        $sfco_id = (int) $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT sfco_lead_id FROM {$wpdb->prefix}smart_chat_leads WHERE id = %d",
+            (int) $chat_lead_id
+        ) );
+        if ( $sfco_id <= 0 ) {
+            return null;
+        }
+        return $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT * FROM {$wpdb->prefix}sfco_leads WHERE id = %d",
+            $sfco_id
+        ) );
     }
 
     /**

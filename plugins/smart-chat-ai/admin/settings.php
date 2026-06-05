@@ -233,56 +233,64 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
         </table>
 
         <h2><?php esc_html_e( 'Booking / Calendly', 'smart-chat-ai' ); ?></h2>
+        <?php
+        // Connect result banner (set by SCAI_Calendly::connect_redirect()).
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+        $scai_conn     = isset( $_GET['scai_connect'] ) ? sanitize_key( $_GET['scai_connect'] ) : '';
+        $scai_conn_msg = isset( $_GET['scai_connect_msg'] ) ? sanitize_text_field( wp_unslash( $_GET['scai_connect_msg'] ) ) : '';
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
+        if ( 'ok' === $scai_conn ) : ?>
+            <div class="notice notice-success is-dismissible"><p><strong><?php esc_html_e( 'Connected to Calendly.', 'smart-chat-ai' ); ?></strong> <?php esc_html_e( 'Bookings made from the chat will now mark the lead Booked and tag it in your CRM.', 'smart-chat-ai' ); ?></p></div>
+        <?php elseif ( 'exists' === $scai_conn ) : ?>
+            <div class="notice notice-warning is-dismissible"><p><?php echo esc_html( $scai_conn_msg ); ?></p></div>
+        <?php elseif ( 'fail' === $scai_conn ) : ?>
+            <div class="notice notice-error is-dismissible"><p><strong><?php esc_html_e( 'Calendly connection failed.', 'smart-chat-ai' ); ?></strong> <?php echo esc_html( $scai_conn_msg ); ?></p></div>
+        <?php endif; ?>
         <table class="form-table">
             <tr>
                 <th><label for="smart_chat_booking_url"><?php esc_html_e( 'Booking Link', 'smart-chat-ai' ); ?></label></th>
                 <td>
                     <input type="url" id="smart_chat_booking_url" name="smart_chat_booking_url" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_booking_url', '' ) ); ?>" placeholder="https://calendly.com/your-handle/30min">
-                    <p class="description"><?php esc_html_e( 'Paste your Calendly (or any scheduling) link. When set, the chat shows a "Pick a time" button when someone wants to schedule.', 'smart-chat-ai' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Your Calendly scheduling URL. After the chat collects a name + email, it shows a "Pick a time" button pointing here.', 'smart-chat-ai' ); ?></p>
                 </td>
             </tr>
             <tr>
-                <th><?php esc_html_e( 'Calendly → CRM', 'smart-chat-ai' ); ?></th>
+                <th><label for="smart_chat_calendly_api_key"><?php esc_html_e( 'Calendly API Key', 'smart-chat-ai' ); ?></label></th>
+                <td>
+                    <input type="password" id="smart_chat_calendly_api_key" name="smart_chat_calendly_api_key" class="regular-text" value="<?php echo esc_attr( get_option( 'smart_chat_calendly_api_key', '' ) ); ?>" autocomplete="off">
+                    <p class="description"><?php esc_html_e( 'Your Calendly Personal Access Token (Calendly → Integrations → API & Webhooks). Save Settings, then click Connect Calendly below to create the webhook automatically.', 'smart-chat-ai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><?php esc_html_e( 'Connection', 'smart-chat-ai' ); ?></th>
                 <td>
                     <?php
-                    // Live connection status: is the chat's booking link a Calendly
-                    // link, and is the Calendly webhook actually connected so a
-                    // booking gets tagged in the CRM? The webhook + API key live in
-                    // Smart Forms (SFCO_Pro_Calendly); read its options here so the
-                    // chat app shows the real end-to-end state instead of a bare URL.
-                    $chat_url = (string) get_option( 'smart_chat_booking_url', '' );
-                    if ( '' === $chat_url ) {
-                        // Falls back to the Smart Forms Calendly URL when blank.
-                        $chat_url = (string) get_option( 'sfco_pro_calendly_url', '' );
-                    }
+                    // Live status, read from the chat's OWN Calendly options — no
+                    // Smart Forms involved. Bookings flow chat → Calendly → CRM.
+                    $chat_url   = (string) get_option( 'smart_chat_booking_url', '' );
                     $host       = '' !== $chat_url ? (string) wp_parse_url( $chat_url, PHP_URL_HOST ) : '';
                     $is_cal     = '' !== $host && false !== stripos( $host, 'calendly.com' );
-                    $forms_on   = defined( 'SFCO_VERSION' );
-                    $hook_ready = $forms_on
-                        && '' !== (string) get_option( 'sfco_pro_calendly_signing_key', '' )
-                        && '' !== (string) get_option( 'sfco_pro_calendly_webhook_uri', '' );
-                    $cal_admin  = admin_url( 'admin.php?page=sfco-calendar' );
+                    $connected  = SCAI_Calendly::is_connected();
+                    $webhook_in = rest_url( SCAI_Calendly::REST_NS . SCAI_Calendly::REST_ROUTE );
 
-                    if ( $is_cal && $hook_ready ) {
+                    if ( $connected && $is_cal ) {
                         $color = '#15803d'; $icon = '&#10003;';
-                        $msg   = __( 'Connected. Bookings made from the chat are recorded in Calendly and tagged in your CRM.', 'smart-chat-ai' );
-                    } elseif ( $is_cal ) {
+                        $msg   = __( 'Connected. A chat booking marks the lead Booked and tags the contact in your CRM.', 'smart-chat-ai' );
+                    } elseif ( ! $is_cal && '' !== $chat_url ) {
                         $color = '#b26200'; $icon = '&#9888;';
-                        $msg   = __( 'Your link points to Calendly, but the Calendly webhook is not connected, so bookings will NOT be tagged in the CRM yet. Connect it below.', 'smart-chat-ai' );
-                    } elseif ( '' !== $chat_url ) {
-                        $color = '#b26200'; $icon = '&#9888;';
-                        $msg   = __( 'This is a custom scheduling link, not Calendly. CRM tagging of bookings only works with a Calendly link.', 'smart-chat-ai' );
-                    } else {
+                        $msg   = __( 'Your booking link is not a Calendly URL. CRM tagging of bookings only works with Calendly.', 'smart-chat-ai' );
+                    } elseif ( '' === $chat_url ) {
                         $color = '#b32d2e'; $icon = '&#10007;';
-                        $msg   = __( 'No booking link set. Paste your Calendly link above so the chat can offer a time and tag the booking in your CRM.', 'smart-chat-ai' );
+                        $msg   = __( 'Add your Calendly booking link above.', 'smart-chat-ai' );
+                    } else {
+                        $color = '#b26200'; $icon = '&#9888;';
+                        $msg   = __( 'Booking link set, but the webhook is not connected yet — click Connect Calendly so bookings reach the CRM.', 'smart-chat-ai' );
                     }
                     ?>
-                    <p style="margin:0 0 8px;"><strong style="color:<?php echo esc_attr( $color ); ?>;"><?php echo wp_kses_post( $icon ); ?> <?php echo esc_html( $msg ); ?></strong></p>
-                    <?php if ( $forms_on ) : ?>
-                        <a class="button" href="<?php echo esc_url( $cal_admin ); ?>"><?php echo $hook_ready ? esc_html__( 'Manage Calendly connection', 'smart-chat-ai' ) : esc_html__( 'Connect Calendly', 'smart-chat-ai' ); ?></a>
-                    <?php else : ?>
-                        <span class="description"><?php esc_html_e( 'Activate Smart Forms to connect Calendly to your CRM (it holds the Calendly API key + webhook).', 'smart-chat-ai' ); ?></span>
-                    <?php endif; ?>
+                    <p style="margin:0 0 10px;"><strong style="color:<?php echo esc_attr( $color ); ?>;"><?php echo wp_kses_post( $icon ); ?> <?php echo esc_html( $msg ); ?></strong></p>
+                    <button type="submit" name="scai_connect_calendly" value="1" class="button button-primary" formaction="<?php echo esc_url( admin_url( 'admin.php?page=smart-chat-settings' ) ); ?>"><?php echo $connected ? esc_html__( 'Reconnect Calendly', 'smart-chat-ai' ) : esc_html__( 'Connect Calendly', 'smart-chat-ai' ); ?></button>
+                    <?php wp_nonce_field( 'scai_connect_calendly', '_scai_cal_nonce' ); ?>
+                    <p class="description" style="margin-top:10px;"><?php esc_html_e( 'Webhook endpoint (created automatically):', 'smart-chat-ai' ); ?> <code><?php echo esc_html( $webhook_in ); ?></code></p>
                 </td>
             </tr>
         </table>

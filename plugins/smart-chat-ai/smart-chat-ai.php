@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.33
+ * Version: 1.9.34
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.33');
+define('SCAI_VERSION', '1.9.34');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -94,7 +94,12 @@ class SCAI_Plugin {
         require_once SCAI_PLUGIN_DIR . 'includes/class-lead-manager.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-analytics.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-content-context.php';
+        require_once SCAI_PLUGIN_DIR . 'includes/class-calendly.php';
         SCAI_Content_Context::get_instance();
+
+        // The chat owns its Calendly connection (API key, webhook, signing key)
+        // so a booking flows chat → Calendly → CRM with no Smart Forms in the loop.
+        new SCAI_Calendly();
 
         // WhatsApp is now click-to-chat only (wa.me link inside the widget). The
         // old Cloud API + Smart Messages admin layer was removed in 1.9.0 — clients
@@ -331,6 +336,12 @@ class SCAI_Plugin {
 
         // Calendly / booking link, pasted directly in Settings.
         register_setting( 'scai_settings', 'smart_chat_booking_url', array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
+
+        // Chat-owned Calendly connection. The API key is entered here; the
+        // signing key + webhook URI are written by the one-click Connect.
+        register_setting( 'scai_settings', 'smart_chat_calendly_api_key', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+        register_setting( 'scai_settings', 'smart_chat_calendly_signing_key', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+        register_setting( 'scai_settings', 'smart_chat_calendly_webhook_uri', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
 
         // Resend email delivery for lead notifications.
         register_setting( 'scai_settings', 'smart_chat_resend_api_key', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
@@ -717,48 +728,29 @@ class SCAI_Plugin {
     }
 
     /**
-     * Resolve the bare Calendly booking URL from settings, falling back to the
-     * Smart Forms Calendly integration. Returns '' when none is configured.
+     * Resolve the bare Calendly booking URL from the chat's own settings.
+     * Returns '' when none is configured. No Smart Forms dependency.
      */
     private function resolve_booking_url() {
-        $booking_url = (string) get_option( 'smart_chat_booking_url', '' );
-        if ( '' !== $booking_url ) {
-            return $booking_url;
-        }
-        if ( class_exists( 'SFCO_Pro_Calendly' ) && method_exists( 'SFCO_Pro_Calendly', 'get_booking_url' ) ) {
-            $booking_url = (string) SFCO_Pro_Calendly::get_booking_url();
-        }
-        if ( '' === $booking_url && get_option( 'sfco_pro_calendly_enabled', 0 ) ) {
-            // Direct option read in case the class isn't loaded on the front end.
-            $booking_url = (string) get_option( 'sfco_pro_calendly_url', '' );
-        }
-        return $booking_url;
+        return SCAI_Calendly::get_booking_url();
     }
 
     /**
-     * Per-session Calendly link decorated with the CRM lead id, or '' when the
-     * session has no lead we can attribute a booking to.
+     * Per-session Calendly link decorated with the CHAT lead id, or '' when the
+     * session has no captured lead to attribute a booking to.
      *
-     * The chat → CRM bridge mirrors each captured chat lead into wp_sfco_leads
-     * and stamps that id back onto the chat lead row (smart_chat_leads.sfco_lead_id).
-     * Stamping it onto the booking link as utm_content=LEAD_<id> is what lets
-     * Calendly's invitee.created webhook (SFCO_Pro_Calendly::match_lead) match
-     * the booking 1:1 and run the booked → ServiceM8 → ActiveCampaign tagging.
-     * Without it a chat booking only matches by email (fragile) or not at all,
-     * so it was never tagged in the CRM.
+     * Stamping utm_content=LEAD_<chat_lead_id> on the link is what lets the
+     * chat's OWN Calendly webhook (SCAI_Calendly::match_lead) match the booking
+     * 1:1 and fire scai_lead_booked, which Smart CRM tags in ActiveCampaign.
+     * This keeps the whole chat → Calendly → CRM path inside the chat plugin.
      */
     private function session_booking_url( $session_id ) {
         $base = $this->resolve_booking_url();
         if ( '' === $base ) {
             return '';
         }
-        if ( ! class_exists( 'SFCO_Pro_Calendly' ) || ! method_exists( 'SFCO_Pro_Calendly', 'decorate_booking_url' ) ) {
-            return '';
-        }
 
         global $wpdb;
-        // SELECT * so a missing sfco_lead_id column (CRM bridge inactive) just
-        // yields no property rather than a DB error.
         $lead = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             "SELECT * FROM {$wpdb->prefix}smart_chat_leads WHERE message LIKE %s ORDER BY id DESC LIMIT 1",
             '%' . $wpdb->esc_like( '[sid:' . $session_id . ']' ) . '%'
@@ -767,14 +759,9 @@ class SCAI_Plugin {
             return '';
         }
 
-        $sfco_lead_id = isset( $lead->sfco_lead_id ) ? (int) $lead->sfco_lead_id : 0;
-        if ( $sfco_lead_id <= 0 ) {
-            return '';
-        }
-
-        return (string) SFCO_Pro_Calendly::decorate_booking_url(
+        return (string) SCAI_Calendly::decorate_booking_url(
             $base,
-            $sfco_lead_id,
+            (int) $lead->id,
             (string) ( $lead->name ?? '' ),
             (string) ( $lead->email ?? '' )
         );
