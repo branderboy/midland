@@ -241,6 +241,50 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
                     <p class="description"><?php esc_html_e( 'Paste your Calendly (or any scheduling) link. When set, the chat shows a "Pick a time" button when someone wants to schedule.', 'smart-chat-ai' ); ?></p>
                 </td>
             </tr>
+            <tr>
+                <th><?php esc_html_e( 'Calendly → CRM', 'smart-chat-ai' ); ?></th>
+                <td>
+                    <?php
+                    // Live connection status: is the chat's booking link a Calendly
+                    // link, and is the Calendly webhook actually connected so a
+                    // booking gets tagged in the CRM? The webhook + API key live in
+                    // Smart Forms (SFCO_Pro_Calendly); read its options here so the
+                    // chat app shows the real end-to-end state instead of a bare URL.
+                    $chat_url = (string) get_option( 'smart_chat_booking_url', '' );
+                    if ( '' === $chat_url ) {
+                        // Falls back to the Smart Forms Calendly URL when blank.
+                        $chat_url = (string) get_option( 'sfco_pro_calendly_url', '' );
+                    }
+                    $host       = '' !== $chat_url ? (string) wp_parse_url( $chat_url, PHP_URL_HOST ) : '';
+                    $is_cal     = '' !== $host && false !== stripos( $host, 'calendly.com' );
+                    $forms_on   = defined( 'SFCO_VERSION' );
+                    $hook_ready = $forms_on
+                        && '' !== (string) get_option( 'sfco_pro_calendly_signing_key', '' )
+                        && '' !== (string) get_option( 'sfco_pro_calendly_webhook_uri', '' );
+                    $cal_admin  = admin_url( 'admin.php?page=sfco-calendar' );
+
+                    if ( $is_cal && $hook_ready ) {
+                        $color = '#15803d'; $icon = '&#10003;';
+                        $msg   = __( 'Connected. Bookings made from the chat are recorded in Calendly and tagged in your CRM.', 'smart-chat-ai' );
+                    } elseif ( $is_cal ) {
+                        $color = '#b26200'; $icon = '&#9888;';
+                        $msg   = __( 'Your link points to Calendly, but the Calendly webhook is not connected, so bookings will NOT be tagged in the CRM yet. Connect it below.', 'smart-chat-ai' );
+                    } elseif ( '' !== $chat_url ) {
+                        $color = '#b26200'; $icon = '&#9888;';
+                        $msg   = __( 'This is a custom scheduling link, not Calendly. CRM tagging of bookings only works with a Calendly link.', 'smart-chat-ai' );
+                    } else {
+                        $color = '#b32d2e'; $icon = '&#10007;';
+                        $msg   = __( 'No booking link set. Paste your Calendly link above so the chat can offer a time and tag the booking in your CRM.', 'smart-chat-ai' );
+                    }
+                    ?>
+                    <p style="margin:0 0 8px;"><strong style="color:<?php echo esc_attr( $color ); ?>;"><?php echo wp_kses_post( $icon ); ?> <?php echo esc_html( $msg ); ?></strong></p>
+                    <?php if ( $forms_on ) : ?>
+                        <a class="button" href="<?php echo esc_url( $cal_admin ); ?>"><?php echo $hook_ready ? esc_html__( 'Manage Calendly connection', 'smart-chat-ai' ) : esc_html__( 'Connect Calendly', 'smart-chat-ai' ); ?></a>
+                    <?php else : ?>
+                        <span class="description"><?php esc_html_e( 'Activate Smart Forms to connect Calendly to your CRM (it holds the Calendly API key + webhook).', 'smart-chat-ai' ); ?></span>
+                    <?php endif; ?>
+                </td>
+            </tr>
         </table>
 
         <h2><?php esc_html_e( 'Business Info', 'smart-chat-ai' ); ?></h2>
