@@ -39,6 +39,7 @@ class SCRM_Chat_Forms_Bridge {
         // mirrored lead through sfco_lead_submitted and tags it from
         // there, including the midland-source-chat source tag.
         add_action( 'scai_lead_captured', array( $this, 'mirror_to_smart_forms' ), 5, 2 );
+        add_action( 'init',               array( $this, 'maybe_create_leads_table' ), 1 );
         add_action( 'init',               array( $this, 'maybe_add_link_column' ), 20 );
 
         // Chat-owned Calendly (SCAI_Calendly) fires these when a visitor books or
@@ -106,6 +107,46 @@ class SCRM_Chat_Forms_Bridge {
             "SELECT * FROM {$wpdb->prefix}sfco_leads WHERE id = %d",
             $sfco_id
         ) );
+    }
+
+    /**
+     * Own the leads table so the chat → CRM connection never depends on the
+     * Smart Forms plugin being active. wp_sfco_leads is normally created by
+     * Smart Forms, but the chat now drives the CRM directly — so if that table
+     * is missing (Smart Forms deactivated / removed), create a CRM-owned copy
+     * with the columns the chat bridge writes and the journey reads. Idempotent:
+     * a SHOW TABLES guard means it's a no-op when the table already exists.
+     */
+    public function maybe_create_leads_table() {
+        global $wpdb;
+        $table = $wpdb->prefix . 'sfco_leads';
+        if ( $table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            return;
+        }
+        $charset = $wpdb->get_charset_collate();
+        // Direct CREATE TABLE IF NOT EXISTS (not dbDelta) so a Smart-Forms-owned
+        // table with extra columns is left untouched and we never fight over schema.
+        $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "CREATE TABLE IF NOT EXISTS {$table} (
+                id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                form_id bigint(20) unsigned NOT NULL DEFAULT 1,
+                customer_name varchar(255) NOT NULL DEFAULT '',
+                customer_email varchar(255) NOT NULL DEFAULT '',
+                customer_phone varchar(50) NOT NULL DEFAULT '',
+                project_type varchar(100) NOT NULL DEFAULT '',
+                timeline varchar(50) DEFAULT NULL,
+                zip_code varchar(20) DEFAULT NULL,
+                additional_notes text DEFAULT NULL,
+                extra_fields_json longtext DEFAULT NULL,
+                job_id varchar(100) DEFAULT NULL,
+                deal_id varchar(100) DEFAULT NULL,
+                status varchar(50) DEFAULT 'new',
+                created_at datetime DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                KEY status (status),
+                KEY created_at (created_at)
+            ) {$charset}"
+        );
     }
 
     /**
