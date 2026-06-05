@@ -80,7 +80,7 @@ class SCRM_Pro_Settings {
         $ac_on      = '' !== (string) get_option( 'scrm_pro_ac_api_url', '' ) && '' !== (string) get_option( 'scrm_pro_ac_api_key', '' );
         $sm8_on     = '' !== (string) get_option( 'scrm_pro_sm8_api_key', '' );
         $reviews_on = defined( 'SRP_VERSION' );
-        $forms_on   = defined( 'SFCO_VERSION' );
+        $chat_on    = defined( 'SCAI_VERSION' );
         $plan_on    = class_exists( 'SCRM_Pro_Floor_Care_Plan' );
 
         $badge = function ( $on, $label, $note ) {
@@ -93,7 +93,12 @@ class SCRM_Pro_Settings {
         echo '<p class="description">' . esc_html__( 'Smart CRM applies lifecycle tags to each lead and fans the event out to the connected systems. Tags are applied to the contact in ActiveCampaign; "completed" also triggers the Smart Reviews survey and the floor-care plan.', 'smart-crm-pro' ) . '</p>';
 
         echo '<h3 style="margin-top:18px;">' . esc_html__( 'Connections', 'smart-crm-pro' ) . '</h3><ul style="margin:0 0 8px;">';
-        echo $badge( $forms_on,   'Smart Forms for Midland', $forms_on   ? 'lead source connected' : 'not active' );                       // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // Midland Chat is the lead source: it captures the lead free-hand and
+        // sends the visitor to its own Calendly. Linked so you can jump straight in.
+        $chat_color = $chat_on ? '#2F8137' : '#b32d2e';
+        $chat_mark  = $chat_on ? '&#10003;' : '&#10005;';
+        $chat_link  = admin_url( 'admin.php?page=smart-chat-settings' );
+        echo '<li style="margin:0 0 6px;"><span style="color:' . esc_attr( $chat_color ) . ';font-weight:700;">' . wp_kses_post( $chat_mark ) . '</span> <strong>' . esc_html__( 'Midland Chat', 'smart-crm-pro' ) . '</strong> — ' . esc_html( $chat_on ? __( 'lead source: captures the lead and books via Calendly', 'smart-crm-pro' ) : __( 'not active', 'smart-crm-pro' ) ) . ' &nbsp;<a href="' . esc_url( $chat_link ) . '">' . esc_html__( 'Open Midland Chat →', 'smart-crm-pro' ) . '</a></li>';
         echo $badge( $ac_on,      'ActiveCampaign',          $ac_on      ? 'tags are applied to contacts' : 'API URL/key not set — tags will not sync' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo $badge( $sm8_on,     'ServiceM8',               $sm8_on     ? 'job create + completion polling' : 'API key not set' );        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo $badge( $reviews_on, 'Smart Reviews',           $reviews_on ? 'emails the survey on completion' : 'not active' );             // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -117,13 +122,13 @@ class SCRM_Pro_Settings {
         echo '<h3 style="margin-top:18px;">' . esc_html__( 'Lifecycle', 'smart-crm-pro' ) . '</h3>';
         $stage(
             __( 'New lead', 'smart-crm-pro' ),
-            __( 'form / chat submission', 'smart-crm-pro' ),
-            array( 'midland-segment-new-lead', 'midland-segment-new-lead-{segment}', 'midland-source-{form|chat|calendly}' ),
-            __( 'Lead enters ActiveCampaign tagged with its segment and source.', 'smart-crm-pro' )
+            __( 'Midland Chat captures a name + email in conversation', 'smart-crm-pro' ),
+            array( 'midland-segment-new-lead', 'midland-segment-new-lead-{segment}', 'midland-source-chat' ),
+            __( 'Lead enters ActiveCampaign tagged with its segment and source (chat).', 'smart-crm-pro' )
         );
         $stage(
             __( 'Booked (visit scheduled)', 'smart-crm-pro' ),
-            __( 'Calendly booking', 'smart-crm-pro' ),
+            __( 'Calendly booking from the chat', 'smart-crm-pro' ),
             array( 'midland-job-booked', 'midland-job-booked-{segment}', 'midland-onsite-booked-commercial' ),
             __( 'Advances the ActiveCampaign deal to Booked.', 'smart-crm-pro' )
         );
