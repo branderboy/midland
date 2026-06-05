@@ -295,6 +295,53 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
             </tr>
         </table>
 
+        <h2><?php esc_html_e( 'Smart CRM', 'smart-chat-ai' ); ?></h2>
+        <table class="form-table">
+            <tr>
+                <th><?php esc_html_e( 'Connection', 'smart-chat-ai' ); ?></th>
+                <td>
+                    <?php
+                    // The chat → CRM link is automatic (event-driven): every captured
+                    // lead and every booking is pushed to Smart CRM, which tags the
+                    // contact in ActiveCampaign. Show the live state + the exact tags.
+                    $crm_active = defined( 'SCRM_PRO_VERSION' );
+                    $crm_ac_on  = '' !== (string) get_option( 'scrm_pro_ac_api_url', '' ) && '' !== (string) get_option( 'scrm_pro_ac_api_key', '' );
+
+                    if ( ! $crm_active ) {
+                        $cc = '#b32d2e'; $ci = '&#10007;';
+                        $cm = __( 'Smart CRM for Midland is not active. Activate it to tag chat leads and bookings.', 'smart-chat-ai' );
+                    } elseif ( ! $crm_ac_on ) {
+                        $cc = '#b26200'; $ci = '&#9888;';
+                        $cm = __( 'Connected to Smart CRM, but ActiveCampaign is not configured yet, so tags will not sync. Set the AC API key in the CRM.', 'smart-chat-ai' );
+                    } else {
+                        $cc = '#15803d'; $ci = '&#10003;';
+                        $cm = __( 'Connected. Every chat lead and booking is sent to Smart CRM and tagged in ActiveCampaign automatically.', 'smart-chat-ai' );
+                    }
+                    ?>
+                    <p style="margin:0 0 10px;"><strong style="color:<?php echo esc_attr( $cc ); ?>;"><?php echo wp_kses_post( $ci ); ?> <?php echo esc_html( $cm ); ?></strong></p>
+                    <p class="description" style="margin:0 0 6px;"><?php esc_html_e( 'Tags Smart CRM distributes for chat leads:', 'smart-chat-ai' ); ?></p>
+                    <?php
+                    $tag_groups = array(
+                        __( 'New lead', 'smart-chat-ai' )  => array( 'midland-segment-new-lead', 'midland-segment-new-lead-{segment}', 'midland-source-chat' ),
+                        __( 'Booked', 'smart-chat-ai' )    => array( 'midland-job-booked', 'midland-job-booked-{segment}', 'midland-onsite-booked-commercial' ),
+                        __( 'Completed', 'smart-chat-ai' ) => array( 'midland-job-completed', 'midland-job-completed-{segment}', 'midland-floor-care-plan-offer' ),
+                        __( 'Canceled', 'smart-chat-ai' )  => array( 'midland-job-canceled', 'midland-job-canceled-{segment}' ),
+                    );
+                    foreach ( $tag_groups as $label => $tags ) {
+                        echo '<div style="margin:0 0 6px;"><span style="display:inline-block;min-width:80px;font-weight:600;font-size:12px;color:#5b6b60;">' . esc_html( $label ) . '</span>';
+                        foreach ( $tags as $t ) {
+                            echo '<code style="display:inline-block;background:#F3FCF4;border:1px solid #cdeccf;border-radius:3px;padding:2px 7px;margin:2px 4px 2px 0;font-size:12px;">' . esc_html( $t ) . '</code>';
+                        }
+                        echo '</div>';
+                    }
+                    ?>
+                    <?php if ( $crm_active ) : ?>
+                        <p style="margin-top:10px;"><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-crm' ) ); ?>"><?php esc_html_e( 'Open Smart CRM', 'smart-chat-ai' ); ?></a></p>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        </table>
+
         <h2><?php esc_html_e( 'Business Info', 'smart-chat-ai' ); ?></h2>
         <table class="form-table">
             <tr>
