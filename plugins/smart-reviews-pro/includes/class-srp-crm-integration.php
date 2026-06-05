@@ -83,22 +83,34 @@ class SRP_CRM_Integration {
         if ( empty( $data['email'] ) ) {
             return;
         }
-
-        // Prevent double-fire if both an action AND the cron poll catch the same lead.
+        $email   = $data['email'];
         $lead_id = (int) ( $data['lead_id'] ?? 0 );
+
+        // Dedupe. The lead_id guard alone misses completion events that carry no
+        // lead id (ServiceM8 job completions, chat leads), so the same survey
+        // re-fired on every event/poll — the "survey goes out too many times"
+        // bug. An email-keyed marker (independent of lead_id) stops that: one
+        // survey sequence per customer per cooldown window, however many times
+        // completion fires.
         if ( $lead_id > 0 && $this->already_fired( $lead_id ) ) {
+            return;
+        }
+        if ( $this->already_fired_email( $email ) ) {
             return;
         }
 
         do_action( 'srp_job_completed', $data );
 
-        // Only mark the lead surveyed when the email actually went out. If the
-        // send failed, leave it unmarked so the hourly poll retries it instead
-        // of silently dropping the customer's survey. (Defaults to "sent" when
-        // the survey module isn't available, to avoid an endless retry loop.)
-        $sent = ! class_exists( 'SRP_Survey' ) || SRP_Survey::was_sent( $data['email'] );
-        if ( $lead_id > 0 && $sent ) {
-            $this->mark_fired( $lead_id );
+        // Only mark surveyed when the email actually went out. If the send
+        // failed, leave it unmarked so the hourly poll retries it instead of
+        // silently dropping the customer's survey. (Defaults to "sent" when the
+        // survey module isn't available, to avoid an endless retry loop.)
+        $sent = ! class_exists( 'SRP_Survey' ) || SRP_Survey::was_sent( $email );
+        if ( $sent ) {
+            $this->mark_fired_email( $email );
+            if ( $lead_id > 0 ) {
+                $this->mark_fired( $lead_id );
+            }
         }
     }
 
@@ -417,6 +429,25 @@ do_action( 'srp_job_completed', array(
             $lead_id
         ) );
         return ! empty( $found );
+    }
+
+    /** Per-email dedupe key (prune-proof, non-autoloaded option). */
+    private function email_marker_key( $email ) {
+        return self::META_SURVEY_FIRED . '_email_' . md5( strtolower( sanitize_email( (string) $email ) ) );
+    }
+
+    /**
+     * True if this email was surveyed within the cooldown. The window lets a
+     * genuinely new job months later still get a survey, while suppressing the
+     * rapid duplicate completion events (incl. re-testing the same lead).
+     */
+    private function already_fired_email( $email ) {
+        $ts = (int) get_option( $this->email_marker_key( $email ), 0 );
+        return $ts > 0 && ( time() - $ts ) < ( 30 * DAY_IN_SECONDS );
+    }
+
+    private function mark_fired_email( $email ) {
+        update_option( $this->email_marker_key( $email ), time(), false );
     }
 
     private function mark_fired( $lead_id ) {

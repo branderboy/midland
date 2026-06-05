@@ -8,9 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Hooks:
  *   srp_job_completed( $data ) — fire this from any plugin/theme to trigger the survey.
  *   srp_survey_response        — public AJAX handler for the survey form.
- * Cron sends at most three spaced reminders if there's no response: the first
- * ~24h after the survey, the second ~48h after that, and a final one a few days
- * (~5) later. Reminders stop the moment the customer submits a score.
+ * Cron sends at most two spaced reminders if there's no response: the first
+ * ~24h after the survey and the second ~48h after that — three emails total
+ * per customer (initial + 2 reminders). Reminders stop the moment the customer
+ * submits a score.
  */
 class SRP_Survey {
 
@@ -459,10 +460,9 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
             SRP_DB::update_survey( $survey->id, array( 'reminder2_at' => current_time( 'mysql' ) ) );
         }
 
-        foreach ( (array) SRP_DB::get_pending_reminders_third() as $survey ) {
-            $this->send_reminder( $survey, $business, 3 );
-            SRP_DB::update_survey( $survey->id, array( 'reminder3_at' => current_time( 'mysql' ) ) );
-        }
+        // Capped at 3 emails total per customer: the initial survey + two
+        // reminders. The third reminder was removed so a customer is never
+        // contacted more than three times.
     }
 
     private function send_reminder( $survey, $business, $which ) {
