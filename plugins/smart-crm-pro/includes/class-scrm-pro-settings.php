@@ -277,6 +277,43 @@ class SCRM_Pro_Settings {
                 </div>
             </details>
 
+            <?php
+            // Calendly → CRM connection status, read live from the Smart Forms options.
+            $forms_active = defined( 'SFCO_VERSION' );
+            $cal_url      = (string) get_option( 'sfco_pro_calendly_url', '' );
+            $cal_signing  = (string) get_option( 'sfco_pro_calendly_signing_key', '' );
+            $cal_hook     = (string) get_option( 'sfco_pro_calendly_webhook_uri', '' );
+            $cal_live     = $forms_active && '' !== $cal_signing && '' !== $cal_hook;
+
+            if ( ! $forms_active ) {
+                $cal_color = '#b26200';
+                $cal_icon  = '&#9888;';
+                $cal_msg   = __( 'Smart Forms is inactive — activate it so Calendly bookings can reach the CRM.', 'smart-crm-pro' );
+            } elseif ( $cal_live ) {
+                $cal_color = '#15803d';
+                $cal_icon  = '&#10003;';
+                $cal_msg   = __( 'Connected. A Calendly booking fires the booked event, which creates the ServiceM8 job and advances the ActiveCampaign deal.', 'smart-crm-pro' );
+            } elseif ( '' !== $cal_url ) {
+                $cal_color = '#b26200';
+                $cal_icon  = '&#9888;';
+                $cal_msg   = __( 'Booking URL is set, but the webhook was never created — open Smart Forms and click "Connect Calendly" so bookings reach the CRM.', 'smart-crm-pro' );
+            } else {
+                $cal_color = '#b32d2e';
+                $cal_icon  = '&#10007;';
+                $cal_msg   = __( 'Not set up — add your booking URL + API key in Smart Forms, then click "Connect Calendly".', 'smart-crm-pro' );
+            }
+            ?>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-left:4px solid <?php echo esc_attr( $cal_color ); ?>;border-radius:6px;padding:12px 18px;margin:16px 0;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <strong style="color:<?php echo esc_attr( $cal_color ); ?>;font-size:14px;"><?php echo wp_kses_post( $cal_icon ); ?> <?php esc_html_e( 'Calendly &rarr; CRM', 'smart-crm-pro' ); ?></strong>
+                    <span style="color:#334155;font-size:13px;"><?php echo esc_html( $cal_msg ); ?></span>
+                    <a class="button button-small" style="margin-left:auto;" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-forms-settings&tab=calendly' ) ); ?>"><?php esc_html_e( 'Manage in Smart Forms', 'smart-crm-pro' ); ?></a>
+                </div>
+                <?php if ( '' !== $cal_url ) : ?>
+                    <p style="margin:8px 0 0;font-size:12px;color:#64748b;"><?php esc_html_e( 'Booking URL:', 'smart-crm-pro' ); ?> <code><?php echo esc_html( $cal_url ); ?></code><?php if ( $cal_live ) : ?> &nbsp;&middot;&nbsp; <?php esc_html_e( 'webhook active', 'smart-crm-pro' ); ?><?php endif; ?></p>
+                <?php endif; ?>
+            </div>
+
             <?php if ( ! empty( $tabs[ $current ]['test'] ) ) : ?>
                 <div style="background:#fff;border:1px solid #d6e6dc;border-radius:6px;padding:14px 18px;margin:16px 0;display:flex;align-items:center;gap:12px;">
                     <strong style="color:#0F1411;"><?php esc_html_e( 'Test connection', 'smart-crm-pro' ); ?></strong>
