@@ -247,13 +247,33 @@ class SFCO_Pro_Calendly {
         $name    = sanitize_text_field( (string) ( $payload['name'] ?? '' ) );
         $time    = (string) ( $payload['scheduled_event']['start_time'] ?? '' );
 
-        $lead = $this->match_lead( $payload, $email );
+        $lead    = $this->match_lead( $payload, $email );
+        $created = false;
         if ( ! $lead ) {
-            return new WP_REST_Response( array(
-                'received' => true,
-                'action'   => 'no_match',
-                'note'     => 'No wp_sfco_leads row matched the booking (utm_content / email).',
-            ), 200 );
+            // A cancellation for a booking we never recorded is a no-op.
+            if ( 'invitee.canceled' === $event ) {
+                return new WP_REST_Response( array(
+                    'received' => true,
+                    'action'   => 'no_match',
+                    'note'     => 'No matching lead to cancel.',
+                ), 200 );
+            }
+
+            // invitee.created with no prior lead: the booking IS the lead.
+            // Direct Calendly bookings — e.g. the chat hands visitors the
+            // booking link without capturing a lead first — would otherwise be
+            // dropped here and never tagged in the CRM. Create the lead from the
+            // booking so it flows through the same booked → ServiceM8 →
+            // ActiveCampaign pipeline as a matched lead.
+            $lead = $this->create_lead_from_booking( $payload, $name, $email, $time );
+            if ( ! $lead ) {
+                return new WP_REST_Response( array(
+                    'received' => true,
+                    'action'   => 'no_match',
+                    'note'     => 'Booking had no usable email; could not create a lead.',
+                ), 200 );
+            }
+            $created = true;
         }
 
         if ( 'invitee.canceled' === $event ) {
@@ -264,10 +284,74 @@ class SFCO_Pro_Calendly {
         }
 
         return new WP_REST_Response( array(
-            'received' => true,
-            'action'   => $result,
-            'lead_id'  => (int) $lead->id,
+            'received'      => true,
+            'action'        => $result,
+            'lead_id'       => (int) $lead->id,
+            'created_lead'  => $created,
         ), 200 );
+    }
+
+    /**
+     * Create a wp_sfco_leads row from a Calendly invitee.created booking when
+     * no existing lead matched. This is what lets a booking made without a
+     * prior lead (a direct Calendly link, e.g. from the chat) still be captured
+     * and tagged: the returned row is handed to mark_lead_booked(), which fires
+     * sfco_lead_booked so Smart CRM pushes it to ServiceM8 and ActiveCampaign
+     * (booked tag + midland-source-calendly).
+     *
+     * Requires a valid email (sfco_leads.customer_email is NOT NULL and the CRM
+     * keys the AC contact on it); returns null otherwise so the caller can
+     * report no_match rather than insert a junk row.
+     *
+     * @param array  $payload Calendly invitee.created payload.
+     * @param string $name    Sanitized invitee name.
+     * @param string $email   Sanitized invitee email.
+     * @param string $time    Scheduled start_time (RFC3339), stored for context.
+     * @return object|null Inserted wp_sfco_leads row, or null.
+     */
+    private function create_lead_from_booking( $payload, $name, $email, $time ) {
+        if ( ! is_email( $email ) ) {
+            return null;
+        }
+
+        // Calendly only carries a phone when the event type collects one; it
+        // surfaces on the SMS-reminder field. Absent is fine — phone is optional.
+        $phone = sanitize_text_field( (string) ( $payload['text_reminder_number'] ?? '' ) );
+
+        // Tagging this lead_source=calendly makes Smart CRM apply the
+        // midland-source-calendly tag in ActiveCampaign (see lead_source()).
+        $extra = array(
+            'lead_source'        => 'calendly',
+            'calendly_booked_at' => $time,
+        );
+
+        $row = array(
+            'form_id'           => (int) apply_filters( 'sfco_calendly_lead_form_id', 1 ),
+            'customer_name'     => '' !== $name ? $name : __( 'Calendly booking', 'smart-forms-pro' ),
+            'customer_email'    => $email,
+            'customer_phone'    => $phone,
+            'project_type'      => __( 'Calendly booking', 'smart-forms-pro' ),
+            'additional_notes'  => __( 'Created from a Calendly booking (no prior lead).', 'smart-forms-pro' ),
+            'extra_fields_json' => wp_json_encode( $extra ),
+            'status'            => 'new',
+            'created_at'        => current_time( 'mysql' ),
+        );
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'sfco_leads';
+        $ok = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+            $table,
+            $row,
+            array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+        );
+        if ( false === $ok ) {
+            return null;
+        }
+
+        return $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT * FROM {$table} WHERE id = %d",
+            (int) $wpdb->insert_id
+        ) );
     }
 
     /**
