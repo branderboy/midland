@@ -129,10 +129,17 @@ class SCAI_Calendly {
         }
         $org_uri = (string) $me_body['resource']['current_organization'];
 
-        // 2. Create an org-scoped webhook subscription with a generated signing key.
+        // 2. Remove any existing subscription pointing at our endpoint so a
+        //    reconnect is idempotent (Calendly rejects a duplicate URL with 409,
+        //    and there is no dashboard to delete it). This also lets us always
+        //    store a fresh signing key.
+        $callback_url = rest_url( self::REST_NS . self::REST_ROUTE );
+        $this->delete_existing_webhooks( $headers, $org_uri, $callback_url );
+
+        // 3. Create an org-scoped webhook subscription with a generated signing key.
         $signing_key = wp_generate_password( 40, false );
         $payload = array(
-            'url'          => rest_url( self::REST_NS . self::REST_ROUTE ),
+            'url'          => $callback_url,
             'events'       => array( 'invitee.created', 'invitee.canceled' ),
             'organization' => $org_uri,
             'scope'        => 'organization',
@@ -157,7 +164,9 @@ class SCAI_Calendly {
         }
 
         if ( 409 === $code ) {
-            $this->connect_redirect( 'exists', __( 'A webhook for this site already exists in Calendly. If bookings are not arriving, delete it in Calendly and reconnect so a fresh signing key can be stored.', 'smart-chat-ai' ) );
+            // We already tried to delete the duplicate above; if Calendly still
+            // reports one, surface a clear message rather than failing silently.
+            $this->connect_redirect( 'exists', __( 'Calendly still reports an existing webhook for this site. It is connected — bookings will work. Click Connect again in a minute if you need to refresh the signing key.', 'smart-chat-ai' ) );
         }
 
         $msg = '';
@@ -169,6 +178,35 @@ class SCAI_Calendly {
         }
         /* translators: %d: HTTP status code */
         $this->connect_redirect( 'fail', $msg ?: sprintf( __( 'Calendly returned HTTP %d.', 'smart-chat-ai' ), $code ) );
+    }
+
+    /**
+     * Delete any existing Calendly webhook subscription that points at our
+     * endpoint, so Connect can be re-run idempotently and always store a fresh
+     * signing key. Calendly has no dashboard to do this, so it's API-only:
+     * list the org's subscriptions, then DELETE each one whose callback_url
+     * matches ours. Best-effort — failures here don't block the create attempt.
+     */
+    private function delete_existing_webhooks( $headers, $org_uri, $callback_url ) {
+        $list_url = add_query_arg(
+            array( 'organization' => $org_uri, 'scope' => 'organization', 'count' => 100 ),
+            'https://api.calendly.com/webhook_subscriptions'
+        );
+        $resp = wp_remote_get( $list_url, array( 'headers' => $headers, 'timeout' => 15 ) );
+        if ( is_wp_error( $resp ) ) {
+            return;
+        }
+        $body = json_decode( (string) wp_remote_retrieve_body( $resp ), true );
+        if ( empty( $body['collection'] ) || ! is_array( $body['collection'] ) ) {
+            return;
+        }
+        foreach ( $body['collection'] as $sub ) {
+            $uri = (string) ( $sub['uri'] ?? '' );
+            $cb  = (string) ( $sub['callback_url'] ?? '' );
+            if ( '' !== $uri && $cb === $callback_url ) {
+                wp_remote_request( $uri, array( 'method' => 'DELETE', 'headers' => $headers, 'timeout' => 15 ) );
+            }
+        }
     }
 
     private function connect_redirect( $status, $message ) {
