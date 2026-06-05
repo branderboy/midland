@@ -20,8 +20,13 @@ jQuery(document).ready(function($) {
     var $input = $('#smart-chat-input');
     var $actions = $('#smart-chat-actions');
 
-    // Visitor-intent phrases that auto-open the embedded Smart Form.
-    var intentRegex = /\b(schedul|book|visit|walk[- ]?through|quote|estimate|appointment|on[- ]?site|come (out|by)|get someone (to|out)|set up|set it up)\b/i;
+    // Booking is gated on the backend capturing a lead first. bookingReady
+    // flips true only when the server returns a decorated booking_url (i.e. a
+    // name + email have been captured for this session); bookingShown keeps the
+    // "Pick a time" card from repeating once it's been offered. This is what
+    // enforces capture-first: no booking card can appear before the lead exists.
+    var bookingReady = false;
+    var bookingShown = false;
 
     $widget.show();
 
@@ -62,19 +67,14 @@ jQuery(document).ready(function($) {
         $bubble.show();
     });
 
-    $('#smart-chat-cta-visit').on('click', startBooking);
-
-    // Scheduling entry point. Opens the Calendly booking link in a new tab and
-    // also drops a "Pick a time" card in the chat as a fallback (in case a
-    // popup blocker stops the auto-open). The embedded form was removed.
-    function startBooking() {
-        if (scaiConfig.bookingUrl) {
-            showBooking();
-            window.open(scaiConfig.bookingUrl, '_blank', 'noopener,noreferrer');
-        } else {
-            appendMsg('ai', "Give us a call and we'll get you on the schedule.");
-        }
-    }
+    // "Schedule a Visit" no longer jumps straight to an undecorated Calendly
+    // link (that bypassed lead capture and the booking never tied back to the
+    // CRM). Instead it kicks off the capture conversation: the AI asks for a
+    // name + email, and only then does the "Pick a time" card appear.
+    $('#smart-chat-cta-visit').on('click', function() {
+        $input.val('I want to schedule a visit');
+        sendMessage();
+    });
 
     function showBooking() {
         var $card = $('<div class="smart-chat-msg smart-chat-msg-ai smart-chat-booking"></div>');
@@ -125,23 +125,23 @@ jQuery(document).ready(function($) {
             if (res.success) {
                 appendMsg('ai', res.data.message);
 
-                // Upgrade the booking link to the per-lead decorated one the
-                // server returns once this session has a CRM lead. This is the
-                // link carrying utm_content=LEAD_<id>, so a booking made from
-                // chat gets attributed to the lead and tagged by the Calendly
-                // webhook (plain link = booking never tied back to the CRM).
+                // The server returns a decorated booking_url ONLY once it has
+                // captured a lead for this session (name + email). That is our
+                // capture-first gate: until it arrives, no booking card shows.
+                // The link carries utm_content=LEAD_<id> so the booking is
+                // attributed to the lead and tagged by the Calendly webhook.
                 if (res.data.booking_url) {
                     scaiConfig.bookingUrl = res.data.booking_url;
+                    bookingReady = true;
                 }
 
-                // Show the booking link only when the AI's own reply points the
-                // visitor to it (the prompt does this AFTER collecting name and
-                // email). Detecting it from the AI reply, not the visitor's
-                // words, prevents the link firing before contact info is captured.
+                // Offer the "Pick a time" card when the lead is captured AND the
+                // AI's own reply points the visitor to booking, and only once.
                 var aiSaid = (res.data.message || '').toLowerCase();
                 var bookingCue = /(grab (a |any )?time|pick a time|book a time|right here|grab a slot|schedule (it|that|your)|booking link|link (right )?here)/i;
-                if (scaiConfig.bookingUrl && bookingCue.test(aiSaid)) {
+                if (bookingReady && !bookingShown && bookingCue.test(aiSaid)) {
                     showBooking();
+                    bookingShown = true;
                 }
             } else {
                 appendMsg('ai', 'Sorry, something went wrong. Please try again.');
