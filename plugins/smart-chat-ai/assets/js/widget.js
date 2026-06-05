@@ -125,6 +125,15 @@ jQuery(document).ready(function($) {
             if (res.success) {
                 appendMsg('ai', res.data.message);
 
+                // Upgrade the booking link to the per-lead decorated one the
+                // server returns once this session has a CRM lead. This is the
+                // link carrying utm_content=LEAD_<id>, so a booking made from
+                // chat gets attributed to the lead and tagged by the Calendly
+                // webhook (plain link = booking never tied back to the CRM).
+                if (res.data.booking_url) {
+                    scaiConfig.bookingUrl = res.data.booking_url;
+                }
+
                 // Show the booking link only when the AI's own reply points the
                 // visitor to it (the prompt does this AFTER collecting name and
                 // email). Detecting it from the AI reply, not the visitor's
