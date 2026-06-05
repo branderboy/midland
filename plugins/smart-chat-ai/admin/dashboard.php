@@ -143,7 +143,7 @@ $warn_badge = '<span style="color:#e53e3e;font-weight:600;">&#x2717; ' . esc_htm
                             } ?>
                         </small>
                     </td>
-                    <td><a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=scrm-pro-settings' ) ); ?>"><?php esc_html_e( 'Open CRM', 'smart-chat-ai' ); ?></a></td>
+                    <td><?php if ( $crm_active ) : ?><a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=smart-crm' ) ); ?>"><?php esc_html_e( 'Open CRM', 'smart-chat-ai' ); ?></a><?php else : ?>&mdash;<?php endif; ?></td>
                 </tr>
                 <tr>
                     <td><strong><?php esc_html_e( 'WhatsApp', 'smart-chat-ai' ); ?></strong><br><small><?php esc_html_e( 'Click-to-chat handoff', 'smart-chat-ai' ); ?></small></td>
