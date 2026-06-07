@@ -136,6 +136,10 @@ class SRP_Review_Router {
      * Notify owner when a low score comes in.
      */
     private function notify_owner_low_score( $survey ) {
+        // Capped: after SRP_Survey::EMAIL_CAP owner alerts have gone out, stop.
+        if ( ! SRP_Survey::consume_email_cap( 'srp_owner_alert_count' ) ) {
+            return;
+        }
         $owner_email = get_option( 'srp_owner_email', get_option( 'admin_email' ) );
         $business    = SRP_Survey::business_name();
         $score       = (int) $survey->score;
