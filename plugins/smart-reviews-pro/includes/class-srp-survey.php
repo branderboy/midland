@@ -17,6 +17,11 @@ class SRP_Survey {
     const THRESHOLD = 4; // 1–5 star scale: score >= THRESHOLD (4★) → route to Google review.
     const MAX_SCORE = 5; // Top of the rating scale.
 
+    // Automated email cap: each capped email category (owner alerts, survey
+    // reminders) sends at most this many messages, then stops. Set at the
+    // owner's request to stop the inbox flood.
+    const EMAIL_CAP = 3;
+
     /**
      * Midland brand defaults — all overridable in Settings, mirroring the
      * pattern used by Midland Chat (business_name / chat_color / logo). These
@@ -111,6 +116,25 @@ class SRP_Survey {
     /** Whether the last survey email to $email was sent successfully. */
     public static function was_sent( $email ) {
         return ! empty( self::$last_send_ok[ sanitize_email( (string) $email ) ] );
+    }
+
+    /**
+     * Gate for capped automated emails. Consumes one slot from the persistent
+     * counter stored in $option_key and returns true only while fewer than
+     * EMAIL_CAP messages have been sent for that key. Once the cap is reached it
+     * returns false (until the counter is reset), so each category sends at most
+     * EMAIL_CAP emails total.
+     *
+     * @param string $option_key Counter option, e.g. 'srp_owner_alert_count'.
+     * @return bool True if another email in this category is still allowed.
+     */
+    public static function consume_email_cap( $option_key ) {
+        $sent = (int) get_option( $option_key, 0 );
+        if ( $sent >= self::EMAIL_CAP ) {
+            return false;
+        }
+        update_option( $option_key, $sent + 1, false );
+        return true;
     }
 
     public static function get_instance() {
@@ -421,20 +445,23 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         $feedback = sanitize_textarea_field( wp_unslash( $_POST['feedback'] ?? '' ) );
         SRP_DB::update_survey( $survey->id, array( 'feedback' => $feedback ) );
 
-        // Notify owner.
-        // Re-sanitize DB values for the email context: strip tags/control chars so
-        // a stored name or email can't inject headers or unexpected content.
-        $owner_email       = get_option( 'admin_email' );
-        $business          = wp_strip_all_tags( self::business_name() );
-        $safe_name         = sanitize_text_field( $survey->customer_name );
-        $safe_email        = sanitize_email( $survey->customer_email );
-        $safe_score        = absint( $survey->score );
-        wp_mail(
-            $owner_email,
-            "[{$business}] Private feedback received — score {$safe_score}/5",
-            "Customer: {$safe_name} ({$safe_email})\nScore: {$safe_score}/5\n\nFeedback:\n{$feedback}",
-            array( 'Content-Type: text/plain; charset=UTF-8' )
-        );
+        // Notify owner — shares the owner-alert cap with low-score alerts, so the
+        // owner gets at most EMAIL_CAP alert emails total before they stop.
+        if ( self::consume_email_cap( 'srp_owner_alert_count' ) ) {
+            // Re-sanitize DB values for the email context: strip tags/control chars
+            // so a stored name or email can't inject headers or unexpected content.
+            $owner_email       = get_option( 'admin_email' );
+            $business          = wp_strip_all_tags( self::business_name() );
+            $safe_name         = sanitize_text_field( $survey->customer_name );
+            $safe_email        = sanitize_email( $survey->customer_email );
+            $safe_score        = absint( $survey->score );
+            wp_mail(
+                $owner_email,
+                "[{$business}] Private feedback received — score {$safe_score}/5",
+                "Customer: {$safe_name} ({$safe_email})\nScore: {$safe_score}/5\n\nFeedback:\n{$feedback}",
+                array( 'Content-Type: text/plain; charset=UTF-8' )
+            );
+        }
 
         wp_send_json_success();
     }
@@ -468,6 +495,10 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
     private function send_reminder( $survey, $business, $which ) {
         $email = sanitize_email( $survey->customer_email );
         if ( ! is_email( $email ) ) {
+            return;
+        }
+        // Capped: after SRP_Survey::EMAIL_CAP reminder emails have gone out, stop.
+        if ( ! self::consume_email_cap( 'srp_reminder_count' ) ) {
             return;
         }
         $token = SRP_DB::build_token( $survey->id );
