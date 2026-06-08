@@ -97,9 +97,6 @@ class RSSEO_Plugin {
 
     public function init() {
         load_plugin_textdomain( 'real-smart-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-        // Several bundled modules still use the 'real-smart-seo-pro' text domain;
-        // register it against the same languages folder so those strings load.
-        load_plugin_textdomain( 'real-smart-seo-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
         $this->includes();
         $this->init_classes();
         add_action( 'admin_init',        array( $this, 'maybe_upgrade_db' ) );

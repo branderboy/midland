@@ -31,7 +31,18 @@ class Smart_Forms_Handler {
         if ( ! empty( $_POST['sfco_hp_token'] ) ) {
             wp_send_json_success( array( 'message' => 'OK' ) );
         }
-        
+
+        // IP-based rate limiting. reCAPTCHA is opt-in and the honeypot only
+        // stops the dumbest bots, so an always-on per-IP transient cap is the
+        // floor of bot protection that survives even when no keys are set. The
+        // limit mirrors Smart Chat's transient approach and is filterable for
+        // legitimately high-traffic forms.
+        if ( ! $this->check_rate_limit() ) {
+            wp_send_json_error( array(
+                'message' => esc_html__( 'Too many submissions. Please wait a little while and try again.', 'smart-forms-for-midland' ),
+            ) );
+        }
+
         // Identify the form so we validate against ITS fields and connect the
         // lead to the right form. The chat embeds a DB-built form (its own
         // fields), so the old hardcoded customer_name/project_type required list
@@ -212,6 +223,42 @@ class Smart_Forms_Handler {
                 'message' => esc_html__( 'Something went wrong submitting the form. Please try again.', 'smart-forms-for-midland' ),
             ) );
         }
+    }
+
+    /**
+     * Per-IP submission rate limiter backed by a transient.
+     *
+     * Keys on a salted hash of REMOTE_ADDR (never the raw IP, so nothing
+     * personally identifying lands in the options table) and counts
+     * submissions in a rolling window. Returns false once the cap is reached.
+     * Both the cap and the window are filterable; a proxy-rotating bot can step
+     * around it, but it raises the floor for the common case where neither
+     * reCAPTCHA nor anything beyond the honeypot is configured.
+     *
+     * @return bool True if the submission is allowed, false if rate-limited.
+     */
+    private function check_rate_limit() {
+        $limit  = (int) apply_filters( 'sfco_submission_rate_limit', 10 );
+        $window = (int) apply_filters( 'sfco_submission_rate_window', HOUR_IN_SECONDS );
+
+        // A non-positive limit disables the cap entirely (escape hatch).
+        if ( $limit <= 0 ) {
+            return true;
+        }
+
+        $ip   = ! empty( $_SERVER['REMOTE_ADDR'] )
+            ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
+            : 'unknown';
+        $salt = function_exists( 'wp_salt' ) ? wp_salt( 'auth' ) : 'sfco';
+        $key  = 'sfco_rate_' . substr( hash( 'sha256', $ip . '|' . $salt ), 0, 32 );
+
+        $count = (int) get_transient( $key );
+        if ( $count >= $limit ) {
+            return false;
+        }
+
+        set_transient( $key, $count + 1, $window );
+        return true;
     }
 
     /**

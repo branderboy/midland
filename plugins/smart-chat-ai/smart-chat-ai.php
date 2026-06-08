@@ -49,8 +49,13 @@ class SCAI_Plugin {
      * Constructor
      */
     private function __construct() {
-        $this->init_hooks();
+        // Dependencies first: load_dependencies() pulls in SCAI_Content_Context
+        // (and the other module classes) and instantiates the singletons that the
+        // hook callbacks reference. Registering hooks before the classes exist is
+        // the inverted pattern from the rest of the suite and a latent landmine if
+        // any callback ever touches a class constant at registration time.
         $this->load_dependencies();
+        $this->init_hooks();
     }
     
     /**

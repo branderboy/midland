@@ -14,8 +14,8 @@ class SFCO_Pro_Team {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Team', 'smart-forms-pro' ),
-            esc_html__( 'Team', 'smart-forms-pro' ),
+            esc_html__( 'Team', 'smart-forms-for-midland' ),
+            esc_html__( 'Team', 'smart-forms-for-midland' ),
             'manage_options',
             'sfco-team',
             array( $this, 'render_page' )
@@ -29,7 +29,7 @@ class SFCO_Pro_Team {
 
         $nonce = isset( $_POST['_sfco_team_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_team_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_invite_member' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         $email = isset( $_POST['member_email'] ) ? sanitize_email( wp_unslash( $_POST['member_email'] ) ) : '';
@@ -72,9 +72,9 @@ class SFCO_Pro_Team {
 
         // Send invite email.
         $site_name = get_bloginfo( 'name' );
-        $subject   = sprintf( __( "You've been invited to %s - Smart Forms", 'smart-forms-pro' ), $site_name );
+        $subject   = sprintf( __( "You've been invited to %s - Smart Forms", 'smart-forms-for-midland' ), $site_name );
         $message   = sprintf(
-            __( "Hi %s,\n\nYou've been invited to join the Smart Forms team on %s as a %s.\n\nLog in to WordPress to access the leads dashboard.\n\nSite: %s", 'smart-forms-pro' ),
+            __( "Hi %s,\n\nYou've been invited to join the Smart Forms team on %s as a %s.\n\nLog in to WordPress to access the leads dashboard.\n\nSite: %s", 'smart-forms-for-midland' ),
             $name,
             $site_name,
             ucfirst( $role ),
@@ -108,37 +108,37 @@ class SFCO_Pro_Team {
         $members = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}sfco_team_members ORDER BY created_at DESC" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
         $roles = array(
-            'admin'   => __( 'Admin', 'smart-forms-pro' ),
-            'manager' => __( 'Manager', 'smart-forms-pro' ),
-            'sales'   => __( 'Sales', 'smart-forms-pro' ),
+            'admin'   => __( 'Admin', 'smart-forms-for-midland' ),
+            'manager' => __( 'Manager', 'smart-forms-for-midland' ),
+            'sales'   => __( 'Sales', 'smart-forms-for-midland' ),
         );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Team Members', 'smart-forms-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'Team Members', 'smart-forms-for-midland' ); ?></h1>
 
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['invited'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Invitation sent!', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Invitation sent!', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['error'] ) && 'duplicate' === $_GET['error'] ) : ?>
-                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'This email is already on the team.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'This email is already on the team.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
 
             <!-- Invite Form -->
             <div class="sfco-card">
-                <h2><?php esc_html_e( 'Invite Team Member', 'smart-forms-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Invite Team Member', 'smart-forms-for-midland' ); ?></h2>
                 <form method="post" class="sfco-invite-form">
                     <?php wp_nonce_field( 'sfco_invite_member', '_sfco_team_nonce' ); ?>
                     <div class="sfco-invite-fields">
-                        <input type="text" name="member_name" placeholder="<?php esc_attr_e( 'Name', 'smart-forms-pro' ); ?>" required>
-                        <input type="email" name="member_email" placeholder="<?php esc_attr_e( 'Email', 'smart-forms-pro' ); ?>" required>
+                        <input type="text" name="member_name" placeholder="<?php esc_attr_e( 'Name', 'smart-forms-for-midland' ); ?>" required>
+                        <input type="email" name="member_email" placeholder="<?php esc_attr_e( 'Email', 'smart-forms-for-midland' ); ?>" required>
                         <select name="member_role">
                             <?php foreach ( $roles as $val => $label ) : ?>
                                 <option value="<?php echo esc_attr( $val ); ?>"><?php echo esc_html( $label ); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button type="submit" name="sfco_invite_member" value="1" class="button button-primary"><?php esc_html_e( 'Send Invite', 'smart-forms-pro' ); ?></button>
+                        <button type="submit" name="sfco_invite_member" value="1" class="button button-primary"><?php esc_html_e( 'Send Invite', 'smart-forms-for-midland' ); ?></button>
                     </div>
                 </form>
             </div>
@@ -147,16 +147,16 @@ class SFCO_Pro_Team {
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                     <tr>
-                        <th><?php esc_html_e( 'Name', 'smart-forms-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Email', 'smart-forms-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Role', 'smart-forms-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Status', 'smart-forms-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Actions', 'smart-forms-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Name', 'smart-forms-for-midland' ); ?></th>
+                        <th><?php esc_html_e( 'Email', 'smart-forms-for-midland' ); ?></th>
+                        <th><?php esc_html_e( 'Role', 'smart-forms-for-midland' ); ?></th>
+                        <th><?php esc_html_e( 'Status', 'smart-forms-for-midland' ); ?></th>
+                        <th><?php esc_html_e( 'Actions', 'smart-forms-for-midland' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ( empty( $members ) ) : ?>
-                        <tr><td colspan="5"><?php esc_html_e( 'No team members yet.', 'smart-forms-pro' ); ?></td></tr>
+                        <tr><td colspan="5"><?php esc_html_e( 'No team members yet.', 'smart-forms-for-midland' ); ?></td></tr>
                     <?php else : ?>
                         <?php foreach ( $members as $member ) : ?>
                             <tr>
@@ -165,13 +165,13 @@ class SFCO_Pro_Team {
                                 <td><?php echo esc_html( ucfirst( $member->role ) ); ?></td>
                                 <td>
                                     <?php if ( $member->accepted_at ) : ?>
-                                        <span class="sfco-status-badge sfco-status-active"><?php esc_html_e( 'Active', 'smart-forms-pro' ); ?></span>
+                                        <span class="sfco-status-badge sfco-status-active"><?php esc_html_e( 'Active', 'smart-forms-for-midland' ); ?></span>
                                     <?php else : ?>
-                                        <span class="sfco-status-badge sfco-status-contacted"><?php esc_html_e( 'Pending', 'smart-forms-pro' ); ?></span>
+                                        <span class="sfco-status-badge sfco-status-contacted"><?php esc_html_e( 'Pending', 'smart-forms-for-midland' ); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <button type="button" class="button sfco-remove-member" data-id="<?php echo esc_attr( $member->id ); ?>"><?php esc_html_e( 'Remove', 'smart-forms-pro' ); ?></button>
+                                    <button type="button" class="button sfco-remove-member" data-id="<?php echo esc_attr( $member->id ); ?>"><?php esc_html_e( 'Remove', 'smart-forms-for-midland' ); ?></button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

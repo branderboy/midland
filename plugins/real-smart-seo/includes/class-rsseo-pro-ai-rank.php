@@ -78,8 +78,8 @@ class RSSEO_Pro_AI_Rank {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'AI Rank + GEO', 'real-smart-seo-pro' ),
-            esc_html__( 'AI Rank + GEO', 'real-smart-seo-pro' ),
+            esc_html__( 'AI Rank + GEO', 'real-smart-seo' ),
+            esc_html__( 'AI Rank + GEO', 'real-smart-seo' ),
             'manage_options',
             'rsseo-ai-rank',
             array( $this, 'render_page' )
@@ -92,7 +92,7 @@ class RSSEO_Pro_AI_Rank {
         }
         $nonce = isset( $_POST['_rsseo_ai_rank_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_ai_rank_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_save_ai_rank' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $queries_raw = isset( $_POST['ai_queries'] ) ? wp_unslash( $_POST['ai_queries'] ) : '';
@@ -331,38 +331,38 @@ class RSSEO_Pro_AI_Rank {
         $run_url = wp_nonce_url( admin_url( 'admin.php?page=rsseo-ai-rank&rsseo_ai_rank_run=1' ), 'rsseo_ai_rank_run' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'AI Rank + GEO', 'real-smart-seo-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Track whether your domain is cited in AI answers (Perplexity today; ChatGPT/Google AI Overviews via filter when their APIs allow it).', 'real-smart-seo-pro' ); ?></p>
+            <h1><?php esc_html_e( 'AI Rank + GEO', 'real-smart-seo' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Track whether your domain is cited in AI answers (Perplexity today; ChatGPT/Google AI Overviews via filter when their APIs allow it).', 'real-smart-seo' ); ?></p>
 
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['ran'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Scan complete.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Scan complete.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
                 <?php wp_nonce_field( 'rsseo_save_ai_rank', '_rsseo_ai_rank_nonce' ); ?>
                 <table class="form-table">
                     <tr>
-                        <th><label for="ai_target_domain"><?php esc_html_e( 'Target Domain', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="ai_target_domain"><?php esc_html_e( 'Target Domain', 'real-smart-seo' ); ?></label></th>
                         <td><input type="text" id="ai_target_domain" name="ai_target_domain" class="regular-text" value="<?php echo esc_attr( $target ); ?>" placeholder="example.com"></td>
                     </tr>
                     <tr>
-                        <th><label for="ai_queries"><?php esc_html_e( 'Tracked Queries', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="ai_queries"><?php esc_html_e( 'Tracked Queries', 'real-smart-seo' ); ?></label></th>
                         <td>
-                            <textarea id="ai_queries" name="ai_queries" rows="6" class="large-text" placeholder="<?php esc_attr_e( "best commercial floor cleaning DC\nemergency carpet cleaning Maryland\n...", 'real-smart-seo-pro' ); ?>"><?php echo esc_textarea( implode( "\n", $queries ) ); ?></textarea>
-                            <p class="description"><?php esc_html_e( 'One query per line. Up to 25.', 'real-smart-seo-pro' ); ?></p>
+                            <textarea id="ai_queries" name="ai_queries" rows="6" class="large-text" placeholder="<?php esc_attr_e( "best commercial floor cleaning DC\nemergency carpet cleaning Maryland\n...", 'real-smart-seo' ); ?>"><?php echo esc_textarea( implode( "\n", $queries ) ); ?></textarea>
+                            <p class="description"><?php esc_html_e( 'One query per line. Up to 25.', 'real-smart-seo' ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="ai_perplexity_key"><?php esc_html_e( 'Perplexity API Key', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="ai_perplexity_key"><?php esc_html_e( 'Perplexity API Key', 'real-smart-seo' ); ?></label></th>
                         <td><input type="password" id="ai_perplexity_key" name="ai_perplexity_key" class="regular-text" value="<?php echo esc_attr( $key ); ?>" placeholder="pplx-..."></td>
                     </tr>
                     <tr>
-                        <th><label for="ai_perplexity_model"><?php esc_html_e( 'Perplexity Model', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="ai_perplexity_model"><?php esc_html_e( 'Perplexity Model', 'real-smart-seo' ); ?></label></th>
                         <td>
                             <select id="ai_perplexity_model" name="ai_perplexity_model">
                                 <?php foreach ( array( 'sonar', 'sonar-pro', 'sonar-reasoning' ) as $m ) : ?>
@@ -373,20 +373,20 @@ class RSSEO_Pro_AI_Rank {
                     </tr>
                 </table>
                 <p class="submit">
-                    <button type="submit" name="rsseo_save_ai_rank" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo-pro' ); ?></button>
-                    <a href="<?php echo esc_url( $run_url ); ?>" class="button button-secondary" style="margin-left:8px;"><?php esc_html_e( 'Run Scan Now', 'real-smart-seo-pro' ); ?></a>
+                    <button type="submit" name="rsseo_save_ai_rank" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo' ); ?></button>
+                    <a href="<?php echo esc_url( $run_url ); ?>" class="button button-secondary" style="margin-left:8px;"><?php esc_html_e( 'Run Scan Now', 'real-smart-seo' ); ?></a>
                 </p>
             </form>
 
             <?php if ( ! empty( $summary ) ) : ?>
                 <hr>
-                <h2><?php esc_html_e( 'Citation Rate', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Citation Rate', 'real-smart-seo' ); ?></h2>
                 <table class="widefat striped" style="max-width:780px;">
                     <thead><tr>
-                        <th><?php esc_html_e( 'Query', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Source', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Cited / Runs', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Rate', 'real-smart-seo-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Query', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Source', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Cited / Runs', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Rate', 'real-smart-seo' ); ?></th>
                     </tr></thead>
                     <tbody>
                         <?php foreach ( $summary as $row ) :
@@ -405,15 +405,15 @@ class RSSEO_Pro_AI_Rank {
             <?php endif; ?>
 
             <?php if ( ! empty( $recent ) ) : ?>
-                <h2><?php esc_html_e( 'Recent Runs', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Recent Runs', 'real-smart-seo' ); ?></h2>
                 <table class="widefat striped">
                     <thead><tr>
-                        <th><?php esc_html_e( 'When', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Source', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Query', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Cited?', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Citation', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Note', 'real-smart-seo-pro' ); ?></th>
+                        <th><?php esc_html_e( 'When', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Source', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Query', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Cited?', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Citation', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Note', 'real-smart-seo' ); ?></th>
                     </tr></thead>
                     <tbody>
                         <?php foreach ( $recent as $r ) : ?>
@@ -437,15 +437,15 @@ class RSSEO_Pro_AI_Rank {
             <?php endif; ?>
 
             <hr>
-            <h2><?php esc_html_e( 'GEO Optimization Checklist', 'real-smart-seo-pro' ); ?></h2>
-            <p class="description"><?php esc_html_e( 'Practices that increase the odds of being cited by LLM answers.', 'real-smart-seo-pro' ); ?></p>
+            <h2><?php esc_html_e( 'GEO Optimization Checklist', 'real-smart-seo' ); ?></h2>
+            <p class="description"><?php esc_html_e( 'Practices that increase the odds of being cited by LLM answers.', 'real-smart-seo' ); ?></p>
             <ol>
-                <li><?php esc_html_e( 'Publish FAQ blocks with schema.org/FAQPage markup on every key page.', 'real-smart-seo-pro' ); ?></li>
-                <li><?php esc_html_e( 'Lead each section with a one-sentence factual answer, then expand. LLMs prefer extractable claims.', 'real-smart-seo-pro' ); ?></li>
-                <li><?php esc_html_e( 'Use numbered lists for "best", "top", "how to" content — directly extractable.', 'real-smart-seo-pro' ); ?></li>
-                <li><?php esc_html_e( 'Cite primary sources and include the year. Recency boosts trust.', 'real-smart-seo-pro' ); ?></li>
-                <li><?php esc_html_e( 'Add Organization, LocalBusiness, and Service schema (handled by sameAs + schema modules).', 'real-smart-seo-pro' ); ?></li>
-                <li><?php esc_html_e( 'Keep paragraphs short. Token-bounded models prefer dense, scoped chunks.', 'real-smart-seo-pro' ); ?></li>
+                <li><?php esc_html_e( 'Publish FAQ blocks with schema.org/FAQPage markup on every key page.', 'real-smart-seo' ); ?></li>
+                <li><?php esc_html_e( 'Lead each section with a one-sentence factual answer, then expand. LLMs prefer extractable claims.', 'real-smart-seo' ); ?></li>
+                <li><?php esc_html_e( 'Use numbered lists for "best", "top", "how to" content — directly extractable.', 'real-smart-seo' ); ?></li>
+                <li><?php esc_html_e( 'Cite primary sources and include the year. Recency boosts trust.', 'real-smart-seo' ); ?></li>
+                <li><?php esc_html_e( 'Add Organization, LocalBusiness, and Service schema (handled by sameAs + schema modules).', 'real-smart-seo' ); ?></li>
+                <li><?php esc_html_e( 'Keep paragraphs short. Token-bounded models prefer dense, scoped chunks.', 'real-smart-seo' ); ?></li>
             </ol>
         </div>
         <?php

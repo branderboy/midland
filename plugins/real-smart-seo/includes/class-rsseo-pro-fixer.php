@@ -19,10 +19,10 @@ class RSSEO_Pro_Fixer {
         ) );
 
         if ( ! $schema ) {
-            return new WP_Error( 'not_found', __( 'Schema block not found.', 'real-smart-seo-pro' ) );
+            return new WP_Error( 'not_found', __( 'Schema block not found.', 'real-smart-seo' ) );
         }
         if ( $schema->applied ) {
-            return new WP_Error( 'already_applied', __( 'Schema already applied.', 'real-smart-seo-pro' ) );
+            return new WP_Error( 'already_applied', __( 'Schema already applied.', 'real-smart-seo' ) );
         }
 
         return RSSEO_Pro_Schema::apply( $schema_id, (int) $schema->post_id, $schema->schema_json );

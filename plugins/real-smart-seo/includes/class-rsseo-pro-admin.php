@@ -49,8 +49,8 @@ class RSSEO_Pro_Admin {
         // "where does this Pro feature live in the menu".
         add_submenu_page(
             null,
-            __( 'Pro Settings', 'real-smart-seo-pro' ),
-            __( 'Pro Settings', 'real-smart-seo-pro' ),
+            __( 'Pro Settings', 'real-smart-seo' ),
+            __( 'Pro Settings', 'real-smart-seo' ),
             'manage_options',
             'rsseo-pro-settings',
             array( $this, 'page_pro_settings' )
@@ -63,7 +63,7 @@ class RSSEO_Pro_Admin {
 
     public function page_pro_settings() {
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
         $dfs_login      = RSSEO_Pro_DataForSEO::get_login();
         $dfs_configured = RSSEO_Pro_DataForSEO::is_configured();
@@ -80,11 +80,11 @@ class RSSEO_Pro_Admin {
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'rsseo_pro_nonce' ),
             'strings'  => array(
-                'applying'   => __( 'Applying...', 'real-smart-seo-pro' ),
-                'applied'    => __( 'Applied!', 'real-smart-seo-pro' ),
-                'error'      => __( 'Error. Try again.', 'real-smart-seo-pro' ),
-                'confirm'    => __( 'Apply this schema to your site?', 'real-smart-seo-pro' ),
-                'confirm_all'=> __( 'Apply all schema blocks to your site?', 'real-smart-seo-pro' ),
+                'applying'   => __( 'Applying...', 'real-smart-seo' ),
+                'applied'    => __( 'Applied!', 'real-smart-seo' ),
+                'error'      => __( 'Error. Try again.', 'real-smart-seo' ),
+                'confirm'    => __( 'Apply this schema to your site?', 'real-smart-seo' ),
+                'confirm_all'=> __( 'Apply all schema blocks to your site?', 'real-smart-seo' ),
             ),
         ) );
     }
@@ -176,12 +176,12 @@ class RSSEO_Pro_Admin {
     public function ajax_apply_schema() {
         check_ajax_referer( 'rsseo_pro_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
 
         $schema_id = isset( $_POST['schema_id'] ) ? (int) $_POST['schema_id'] : 0;
         if ( ! $schema_id ) {
-            wp_send_json_error( __( 'Invalid schema ID.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Invalid schema ID.', 'real-smart-seo' ) );
         }
 
         $result = RSSEO_Pro_Fixer::apply_schema( $schema_id );
@@ -189,7 +189,7 @@ class RSSEO_Pro_Admin {
             wp_send_json_error( $result->get_error_message() );
         }
 
-        wp_send_json_success( array( 'message' => __( 'Schema applied.', 'real-smart-seo-pro' ) ) );
+        wp_send_json_success( array( 'message' => __( 'Schema applied.', 'real-smart-seo' ) ) );
     }
 
     // ── AJAX: Apply all schemas ───────────────────────────────────────────────
@@ -197,12 +197,12 @@ class RSSEO_Pro_Admin {
     public function ajax_apply_all_schemas() {
         check_ajax_referer( 'rsseo_pro_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
 
         $report_id = isset( $_POST['report_id'] ) ? (int) $_POST['report_id'] : 0;
         if ( ! $report_id ) {
-            wp_send_json_error( __( 'Invalid report ID.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Invalid report ID.', 'real-smart-seo' ) );
         }
 
         $result  = RSSEO_Pro_Fixer::apply_all_schemas( $report_id );
@@ -213,7 +213,7 @@ class RSSEO_Pro_Admin {
             wp_send_json_error( array(
                 'message' => sprintf(
                     /* translators: 1: applied count, 2: failed count */
-                    _n( 'Applied %1$d schema block; %2$d failed.', 'Applied %1$d schema blocks; %2$d failed.', $applied, 'real-smart-seo-pro' ),
+                    _n( 'Applied %1$d schema block; %2$d failed.', 'Applied %1$d schema blocks; %2$d failed.', $applied, 'real-smart-seo' ),
                     $applied,
                     count( $errors )
                 ),
@@ -230,14 +230,14 @@ class RSSEO_Pro_Admin {
     public function ajax_update_backlink() {
         check_ajax_referer( 'rsseo_pro_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
 
         $backlink_id = isset( $_POST['backlink_id'] ) ? (int) $_POST['backlink_id'] : 0;
         $status      = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
 
         if ( ! $backlink_id || ! in_array( $status, array( 'pursuing', 'completed', 'skipped', 'pending' ), true ) ) {
-            wp_send_json_error( __( 'Invalid data.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Invalid data.', 'real-smart-seo' ) );
         }
 
         RSSEO_Pro_Fixer::update_backlink( $backlink_id, $status );
@@ -249,7 +249,7 @@ class RSSEO_Pro_Admin {
     public function ajax_save_pro_settings() {
         check_ajax_referer( 'rsseo_pro_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
 
         $login    = isset( $_POST['dfs_login'] )    ? sanitize_text_field( wp_unslash( $_POST['dfs_login'] ) )    : '';
@@ -259,7 +259,7 @@ class RSSEO_Pro_Admin {
             RSSEO_Pro_DataForSEO::save_credentials( $login, $password );
         }
 
-        wp_send_json_success( array( 'message' => __( 'Settings saved.', 'real-smart-seo-pro' ) ) );
+        wp_send_json_success( array( 'message' => __( 'Settings saved.', 'real-smart-seo' ) ) );
     }
 
     // ── AJAX: Test DataForSEO ─────────────────────────────────────────────────
@@ -267,13 +267,13 @@ class RSSEO_Pro_Admin {
     public function ajax_test_dfs() {
         check_ajax_referer( 'rsseo_pro_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
 
         $result = RSSEO_Pro_DataForSEO::test_connection();
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( $result->get_error_message() );
         }
-        wp_send_json_success( array( 'message' => __( 'DataForSEO connected!', 'real-smart-seo-pro' ) ) );
+        wp_send_json_success( array( 'message' => __( 'DataForSEO connected!', 'real-smart-seo' ) ) );
     }
 }

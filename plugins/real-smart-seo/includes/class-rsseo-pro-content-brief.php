@@ -30,8 +30,8 @@ class RSSEO_Pro_Content_Brief {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Content Brief', 'real-smart-seo-pro' ),
-            esc_html__( 'Content Brief', 'real-smart-seo-pro' ),
+            esc_html__( 'Content Brief', 'real-smart-seo' ),
+            esc_html__( 'Content Brief', 'real-smart-seo' ),
             'manage_options',
             'rsseo-content-brief',
             array( $this, 'render_page' )
@@ -41,16 +41,16 @@ class RSSEO_Pro_Content_Brief {
     public function ajax_generate() {
         check_ajax_referer( 'rsseo_brief', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
         if ( ! class_exists( 'RSSEO_Claude_API' ) ) {
-            wp_send_json_error( __( 'The Real Smart SEO base plugin (AI client) is not active.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'The Real Smart SEO base plugin (AI client) is not active.', 'real-smart-seo' ) );
         }
 
         $keyword = isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '';
         $notes   = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
         if ( '' === $keyword ) {
-            wp_send_json_error( __( 'Enter a target keyword.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Enter a target keyword.', 'real-smart-seo' ) );
         }
 
         $result = RSSEO_Claude_API::ask( $this->build_prompt( $keyword, $notes ) );
@@ -60,7 +60,7 @@ class RSSEO_Pro_Content_Brief {
 
         $text = is_array( $result ) ? ( $result['text'] ?? '' ) : (string) $result;
         if ( '' === trim( $text ) ) {
-            wp_send_json_error( __( 'The model returned an empty brief. Try again.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'The model returned an empty brief. Try again.', 'real-smart-seo' ) );
         }
 
         wp_send_json_success( array(
@@ -141,21 +141,21 @@ class RSSEO_Pro_Content_Brief {
         $nonce = wp_create_nonce( 'rsseo_brief' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Content Brief Builder', 'real-smart-seo-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Generate a writer-ready SEO brief for any target keyword — intent, title/meta options, outline, entities, PAA questions, internal links, and a CTA.', 'real-smart-seo-pro' ); ?></p>
+            <h1><?php esc_html_e( 'Content Brief Builder', 'real-smart-seo' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Generate a writer-ready SEO brief for any target keyword — intent, title/meta options, outline, entities, PAA questions, internal links, and a CTA.', 'real-smart-seo' ); ?></p>
 
             <table class="form-table">
                 <tr>
-                    <th><label for="rsseo-brief-keyword"><?php esc_html_e( 'Target keyword', 'real-smart-seo-pro' ); ?></label></th>
+                    <th><label for="rsseo-brief-keyword"><?php esc_html_e( 'Target keyword', 'real-smart-seo' ); ?></label></th>
                     <td><input type="text" id="rsseo-brief-keyword" class="regular-text" placeholder="commercial carpet cleaning bethesda"></td>
                 </tr>
                 <tr>
-                    <th><label for="rsseo-brief-notes"><?php esc_html_e( 'Context (optional)', 'real-smart-seo-pro' ); ?></label></th>
+                    <th><label for="rsseo-brief-notes"><?php esc_html_e( 'Context (optional)', 'real-smart-seo' ); ?></label></th>
                     <td><textarea id="rsseo-brief-notes" rows="3" class="large-text" placeholder="Audience, location, angle, anything the writer should know."></textarea></td>
                 </tr>
             </table>
             <p>
-                <button id="rsseo-brief-go" class="button button-primary" data-nonce="<?php echo esc_attr( $nonce ); ?>"><?php esc_html_e( 'Generate Brief', 'real-smart-seo-pro' ); ?></button>
+                <button id="rsseo-brief-go" class="button button-primary" data-nonce="<?php echo esc_attr( $nonce ); ?>"><?php esc_html_e( 'Generate Brief', 'real-smart-seo' ); ?></button>
                 <span id="rsseo-brief-status" style="margin-left:10px;color:#666;"></span>
             </p>
 
@@ -163,7 +163,7 @@ class RSSEO_Pro_Content_Brief {
                 <div style="display:flex;gap:16px;align-items:flex-start;">
                     <div style="flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:18px 22px;" id="rsseo-brief-rendered"></div>
                     <div style="flex:1;">
-                        <p style="margin:0 0 6px;color:#666;font-size:12px;"><?php esc_html_e( 'Markdown (copy/paste)', 'real-smart-seo-pro' ); ?></p>
+                        <p style="margin:0 0 6px;color:#666;font-size:12px;"><?php esc_html_e( 'Markdown (copy/paste)', 'real-smart-seo' ); ?></p>
                         <textarea id="rsseo-brief-md" rows="22" class="large-text code" readonly></textarea>
                     </div>
                 </div>
@@ -173,9 +173,9 @@ class RSSEO_Pro_Content_Brief {
             (function($){
                 $('#rsseo-brief-go').on('click', function(){
                     var b = $(this), kw = $('#rsseo-brief-keyword').val();
-                    if (!kw) { alert('<?php echo esc_js( __( 'Enter a target keyword.', 'real-smart-seo-pro' ) ); ?>'); return; }
+                    if (!kw) { alert('<?php echo esc_js( __( 'Enter a target keyword.', 'real-smart-seo' ) ); ?>'); return; }
                     b.prop('disabled', true);
-                    $('#rsseo-brief-status').text('<?php echo esc_js( __( 'Generating… this can take 20–40 seconds.', 'real-smart-seo-pro' ) ); ?>');
+                    $('#rsseo-brief-status').text('<?php echo esc_js( __( 'Generating… this can take 20–40 seconds.', 'real-smart-seo' ) ); ?>');
                     $.post(ajaxurl, {
                         action: 'rsseo_brief_generate',
                         nonce:  b.data('nonce'),
@@ -188,7 +188,7 @@ class RSSEO_Pro_Content_Brief {
                             $('#rsseo-brief-md').val(res.data.markdown);
                             $('#rsseo-brief-out').show();
                             var c = res.data.cost ? (' · $' + Number(res.data.cost).toFixed(4)) : '';
-                            $('#rsseo-brief-status').text('<?php echo esc_js( __( 'Done.', 'real-smart-seo-pro' ) ); ?>' + c);
+                            $('#rsseo-brief-status').text('<?php echo esc_js( __( 'Done.', 'real-smart-seo' ) ); ?>' + c);
                         } else {
                             $('#rsseo-brief-status').text('');
                             alert(res.data || 'Error');
@@ -196,7 +196,7 @@ class RSSEO_Pro_Content_Brief {
                     }).fail(function(){
                         b.prop('disabled', false);
                         $('#rsseo-brief-status').text('');
-                        alert('<?php echo esc_js( __( 'Request failed. Try again.', 'real-smart-seo-pro' ) ); ?>');
+                        alert('<?php echo esc_js( __( 'Request failed. Try again.', 'real-smart-seo' ) ); ?>');
                     });
                 });
             })(jQuery);

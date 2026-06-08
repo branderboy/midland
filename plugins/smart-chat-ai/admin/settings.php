@@ -246,6 +246,19 @@ if ( ! current_user_can( 'manage_options' ) ) { return; }
         <?php elseif ( 'fail' === $scai_conn ) : ?>
             <div class="notice notice-error is-dismissible"><p><strong><?php esc_html_e( 'Calendly connection failed.', 'smart-chat-ai' ); ?></strong> <?php echo esc_html( $scai_conn_msg ); ?></p></div>
         <?php endif; ?>
+        <?php
+        // Cross-plugin heads-up: Smart Chat and Smart Forms each own a SEPARATE
+        // Calendly connection (different API key, signing key, and webhook). If
+        // this chat is connected but Smart Forms is active and still
+        // unconnected, the operator likely assumes one connection covers both —
+        // surface it so the form-side booking flow doesn't silently fail.
+        if (
+            SCAI_Calendly::is_connected()
+            && class_exists( 'SFCO_Pro_Calendly' )
+            && '' === (string) get_option( 'sfco_pro_calendly_signing_key', '' )
+        ) : ?>
+            <div class="notice notice-warning"><p><?php esc_html_e( 'Heads up: Smart Forms is active but its Calendly connection is separate from this one and is not connected yet. Connect Calendly under Smart Forms → Calendly so form bookings also reach the CRM.', 'smart-chat-ai' ); ?></p></div>
+        <?php endif; ?>
         <table class="form-table">
             <tr>
                 <th><label for="smart_chat_booking_url"><?php esc_html_e( 'Booking Link', 'smart-chat-ai' ); ?></label></th>

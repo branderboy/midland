@@ -18,7 +18,7 @@ class RSSEO_Pro_Schema {
         // Validate JSON.
         $decoded = json_decode( $schema_json, true );
         if ( json_last_error() !== JSON_ERROR_NONE ) {
-            return new WP_Error( 'invalid_json', __( 'Schema JSON is not valid.', 'real-smart-seo-pro' ) );
+            return new WP_Error( 'invalid_json', __( 'Schema JSON is not valid.', 'real-smart-seo' ) );
         }
 
         if ( $post_id > 0 ) {

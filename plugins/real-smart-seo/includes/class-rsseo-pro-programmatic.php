@@ -41,10 +41,10 @@ class RSSEO_Pro_Programmatic {
     public function register_cpt() {
         register_post_type( self::CPT, array(
             'labels' => array(
-                'name'          => __( 'Locations', 'real-smart-seo-pro' ),
-                'singular_name' => __( 'Location', 'real-smart-seo-pro' ),
-                'add_new_item'  => __( 'Add New Location', 'real-smart-seo-pro' ),
-                'edit_item'     => __( 'Edit Location', 'real-smart-seo-pro' ),
+                'name'          => __( 'Locations', 'real-smart-seo' ),
+                'singular_name' => __( 'Location', 'real-smart-seo' ),
+                'add_new_item'  => __( 'Add New Location', 'real-smart-seo' ),
+                'edit_item'     => __( 'Edit Location', 'real-smart-seo' ),
             ),
             'public'       => true,
             'has_archive'  => false,
@@ -58,8 +58,8 @@ class RSSEO_Pro_Programmatic {
     public function register_taxonomy() {
         register_taxonomy( self::TAXONOMY, self::CPT, array(
             'labels' => array(
-                'name'          => __( 'Services', 'real-smart-seo-pro' ),
-                'singular_name' => __( 'Service', 'real-smart-seo-pro' ),
+                'name'          => __( 'Services', 'real-smart-seo' ),
+                'singular_name' => __( 'Service', 'real-smart-seo' ),
             ),
             'public'            => true,
             'hierarchical'      => false,
@@ -72,8 +72,8 @@ class RSSEO_Pro_Programmatic {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Programmatic Pages', 'real-smart-seo-pro' ),
-            esc_html__( 'Programmatic Pages', 'real-smart-seo-pro' ),
+            esc_html__( 'Programmatic Pages', 'real-smart-seo' ),
+            esc_html__( 'Programmatic Pages', 'real-smart-seo' ),
             'manage_options',
             'rsseo-programmatic',
             array( $this, 'render_page' )
@@ -145,7 +145,7 @@ class RSSEO_Pro_Programmatic {
             return;
         }
         if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_rsseo_tpl_nonce'] ?? '' ) ), 'rsseo_prog_templates' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
         update_option( self::OPT_TEMPLATES, array(
             'title'         => sanitize_text_field( wp_unslash( $_POST['tpl_title'] ?? '' ) ),
@@ -170,7 +170,7 @@ class RSSEO_Pro_Programmatic {
 
         $nonce = isset( $_POST['_rsseo_prog_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_prog_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_programmatic' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $city      = sanitize_text_field( wp_unslash( $_POST['location_city'] ?? '' ) );
@@ -257,7 +257,7 @@ class RSSEO_Pro_Programmatic {
 
         $nonce = isset( $_POST['_rsseo_prog_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_prog_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_programmatic' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $raw_locations = sanitize_textarea_field( wp_unslash( $_POST['bulk_locations'] ?? '' ) );
@@ -491,7 +491,7 @@ class RSSEO_Pro_Programmatic {
         }
         return $content
             . '<section class="rsseo-service-areas" style="margin-top:2.5rem;">'
-            . '<h2>' . esc_html__( 'Service Areas We Also Cover', 'real-smart-seo-pro' ) . '</h2>'
+            . '<h2>' . esc_html__( 'Service Areas We Also Cover', 'real-smart-seo' ) . '</h2>'
             . '<ul class="rsseo-service-areas__list">' . $items . '</ul>'
             . '</section>';
     }
@@ -968,38 +968,38 @@ class RSSEO_Pro_Programmatic {
         ) );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Programmatic City × Service Pages', 'real-smart-seo-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Generate location × service pages at scale. Each page gets optimized title, meta description, and LocalBusiness+Service schema automatically.', 'real-smart-seo-pro' ); ?></p>
+            <h1><?php esc_html_e( 'Programmatic City × Service Pages', 'real-smart-seo' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Generate location × service pages at scale. Each page gets optimized title, meta description, and LocalBusiness+Service schema automatically.', 'real-smart-seo' ); ?></p>
 
             <?php if ( $generated >= 0 ) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php
                     if ( $generated > 0 && $updated_count > 0 ) {
                         printf(
-                            esc_html__( '%1$d new location pages created, %2$d existing pages refreshed.', 'real-smart-seo-pro' ),
+                            esc_html__( '%1$d new location pages created, %2$d existing pages refreshed.', 'real-smart-seo' ),
                             $generated,
                             $updated_count
                         );
                     } elseif ( $generated > 0 ) {
-                        printf( esc_html__( '%d new location pages created.', 'real-smart-seo-pro' ), $generated );
+                        printf( esc_html__( '%d new location pages created.', 'real-smart-seo' ), $generated );
                     } elseif ( $updated_count > 0 ) {
-                        printf( esc_html__( '%d existing location pages refreshed.', 'real-smart-seo-pro' ), $updated_count );
+                        printf( esc_html__( '%d existing location pages refreshed.', 'real-smart-seo' ), $updated_count );
                     } else {
-                        esc_html_e( 'No changes — all submitted locations already exist and were up to date.', 'real-smart-seo-pro' );
+                        esc_html_e( 'No changes — all submitted locations already exist and were up to date.', 'real-smart-seo' );
                     }
                 ?></p></div>
             <?php endif; ?>
             <?php if ( $skipped > 0 ) : ?>
-                <div class="notice notice-warning is-dismissible"><p><?php printf( esc_html__( '%d locations skipped because the batch limit was exceeded. Submit them in another run.', 'real-smart-seo-pro' ), $skipped ); ?></p></div>
+                <div class="notice notice-warning is-dismissible"><p><?php printf( esc_html__( '%d locations skipped because the batch limit was exceeded. Submit them in another run.', 'real-smart-seo' ), $skipped ); ?></p></div>
             <?php endif; ?>
             <?php if ( $location_saved ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Location saved and submitted to IndexNow.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Location saved and submitted to IndexNow.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
             <?php
             if ( $error ) :
                 $messages = array(
-                    'no_city'     => __( 'Add a city before creating a location page.', 'real-smart-seo-pro' ),
-                    'no_services' => __( 'Select at least one service — a location page with no services is a thin doorway page and was not created.', 'real-smart-seo-pro' ),
-                    'insert_fail' => __( 'WordPress could not create the page. Please try again.', 'real-smart-seo-pro' ),
+                    'no_city'     => __( 'Add a city before creating a location page.', 'real-smart-seo' ),
+                    'no_services' => __( 'Select at least one service — a location page with no services is a thin doorway page and was not created.', 'real-smart-seo' ),
+                    'insert_fail' => __( 'WordPress could not create the page. Please try again.', 'real-smart-seo' ),
                 );
                 $msg = $messages[ $error ] ?? $error;
                 ?>
@@ -1007,12 +1007,12 @@ class RSSEO_Pro_Programmatic {
             <?php endif; ?>
 
             <?php if ( $tpl_saved ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Page template saved. New pages use it; existing pages keep their content but pick up the title/meta template on the front end.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Page template saved. New pages use it; existing pages keep their content but pick up the title/meta template on the front end.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
 
-            <h2><?php esc_html_e( 'Page Template', 'real-smart-seo-pro' ); ?></h2>
+            <h2><?php esc_html_e( 'Page Template', 'real-smart-seo' ); ?></h2>
             <p class="description">
-                <?php esc_html_e( 'Define how every generated page is built. Click a variable to insert it; the preview updates live.', 'real-smart-seo-pro' ); ?>
+                <?php esc_html_e( 'Define how every generated page is built. Click a variable to insert it; the preview updates live.', 'real-smart-seo' ); ?>
                 <br>
                 <?php
                 $vars = array( '{city}', '{state}', '{service}', '{services}', '{services_list}', '{business}', '{phone}', '{year}' );
@@ -1025,42 +1025,42 @@ class RSSEO_Pro_Programmatic {
                 <?php wp_nonce_field( 'rsseo_prog_templates', '_rsseo_tpl_nonce' ); ?>
                 <table class="form-table">
                     <tr>
-                        <th><label for="tpl_title"><?php esc_html_e( 'Title template', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="tpl_title"><?php esc_html_e( 'Title template', 'real-smart-seo' ); ?></label></th>
                         <td><input type="text" id="tpl_title" name="tpl_title" class="large-text rsseo-tpl" value="<?php echo esc_attr( $tpl['title'] ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="tpl_meta"><?php esc_html_e( 'Meta description template', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="tpl_meta"><?php esc_html_e( 'Meta description template', 'real-smart-seo' ); ?></label></th>
                         <td><textarea id="tpl_meta" name="tpl_meta" rows="2" class="large-text rsseo-tpl"><?php echo esc_textarea( $tpl['meta'] ); ?></textarea>
-                            <p class="description"><?php esc_html_e( 'Trimmed to 160 characters on output.', 'real-smart-seo-pro' ); ?></p></td>
+                            <p class="description"><?php esc_html_e( 'Trimmed to 160 characters on output.', 'real-smart-seo' ); ?></p></td>
                     </tr>
                     <tr>
-                        <th><label for="tpl_slug"><?php esc_html_e( 'URL slug template', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="tpl_slug"><?php esc_html_e( 'URL slug template', 'real-smart-seo' ); ?></label></th>
                         <td><input type="text" id="tpl_slug" name="tpl_slug" class="regular-text rsseo-tpl" value="<?php echo esc_attr( $tpl['slug'] ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="tpl_body"><?php esc_html_e( 'Body template (HTML)', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="tpl_body"><?php esc_html_e( 'Body template (HTML)', 'real-smart-seo' ); ?></label></th>
                         <td><textarea id="tpl_body" name="tpl_body" rows="10" class="large-text code rsseo-tpl"><?php echo esc_textarea( $tpl['body'] ); ?></textarea></td>
                     </tr>
                     <tr>
-                        <th><?php esc_html_e( 'Layout', 'real-smart-seo-pro' ); ?></th>
-                        <td><label><input type="checkbox" name="tpl_use_elementor" value="1" <?php checked( ! empty( $tpl['use_elementor'] ) ); ?>> <?php esc_html_e( 'Build pages with the Elementor Hero/Content/CTA layout (uncheck to use the HTML body template as the page content).', 'real-smart-seo-pro' ); ?></label></td>
+                        <th><?php esc_html_e( 'Layout', 'real-smart-seo' ); ?></th>
+                        <td><label><input type="checkbox" name="tpl_use_elementor" value="1" <?php checked( ! empty( $tpl['use_elementor'] ) ); ?>> <?php esc_html_e( 'Build pages with the Elementor Hero/Content/CTA layout (uncheck to use the HTML body template as the page content).', 'real-smart-seo' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th><?php esc_html_e( 'Live preview', 'real-smart-seo-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Live preview', 'real-smart-seo' ); ?></th>
                         <td>
                             <div style="border:1px solid #ddd;border-radius:6px;padding:12px;background:#fafafa;">
-                                <div style="font-size:12px;color:#666;"><?php esc_html_e( 'Title', 'real-smart-seo-pro' ); ?></div>
+                                <div style="font-size:12px;color:#666;"><?php esc_html_e( 'Title', 'real-smart-seo' ); ?></div>
                                 <div id="prev_title" style="color:#1a0dab;font-size:18px;margin-bottom:6px;"></div>
                                 <div id="prev_slug" style="color:#0a7d00;font-size:13px;margin-bottom:6px;"></div>
                                 <div id="prev_meta" style="color:#444;font-size:13px;margin-bottom:12px;"></div>
-                                <div style="font-size:12px;color:#666;border-top:1px solid #eee;padding-top:8px;"><?php esc_html_e( 'Body', 'real-smart-seo-pro' ); ?></div>
+                                <div style="font-size:12px;color:#666;border-top:1px solid #eee;padding-top:8px;"><?php esc_html_e( 'Body', 'real-smart-seo' ); ?></div>
                                 <div id="prev_body" style="font-size:14px;"></div>
                             </div>
-                            <p class="description"><?php esc_html_e( 'Sample data: Carpet Cleaning · Bethesda, MD.', 'real-smart-seo-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Sample data: Carpet Cleaning · Bethesda, MD.', 'real-smart-seo' ); ?></p>
                         </td>
                     </tr>
                 </table>
-                <p><button type="submit" name="rsseo_save_templates" value="1" class="button button-primary"><?php esc_html_e( 'Save Template', 'real-smart-seo-pro' ); ?></button></p>
+                <p><button type="submit" name="rsseo_save_templates" value="1" class="button button-primary"><?php esc_html_e( 'Save Template', 'real-smart-seo' ); ?></button></p>
             </form>
 
             <script>
@@ -1107,27 +1107,27 @@ class RSSEO_Pro_Programmatic {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
 
                 <div>
-                    <h2><?php esc_html_e( 'Add Single Location', 'real-smart-seo-pro' ); ?></h2>
+                    <h2><?php esc_html_e( 'Add Single Location', 'real-smart-seo' ); ?></h2>
                     <form method="post">
                         <?php wp_nonce_field( 'rsseo_programmatic', '_rsseo_prog_nonce' ); ?>
                         <table class="form-table">
                             <tr>
-                                <th><label for="location_city"><?php esc_html_e( 'City', 'real-smart-seo-pro' ); ?></label></th>
+                                <th><label for="location_city"><?php esc_html_e( 'City', 'real-smart-seo' ); ?></label></th>
                                 <td><input type="text" id="location_city" name="location_city" class="regular-text" placeholder="Bethesda"></td>
                             </tr>
                             <tr>
-                                <th><label for="location_state"><?php esc_html_e( 'State', 'real-smart-seo-pro' ); ?></label></th>
+                                <th><label for="location_state"><?php esc_html_e( 'State', 'real-smart-seo' ); ?></label></th>
                                 <td><input type="text" id="location_state" name="location_state" style="width:80px;" placeholder="MD" value="MD"></td>
                             </tr>
                             <tr>
-                                <th><label for="location_wiki_url"><?php esc_html_e( 'Wikipedia URL (sameAs)', 'real-smart-seo-pro' ); ?></label></th>
+                                <th><label for="location_wiki_url"><?php esc_html_e( 'Wikipedia URL (sameAs)', 'real-smart-seo' ); ?></label></th>
                                 <td>
                                     <input type="url" id="location_wiki_url" name="location_wiki_url" class="large-text" placeholder="https://en.wikipedia.org/wiki/Bethesda,_Maryland">
-                                    <p class="description"><?php esc_html_e( 'Grounds this city in the Knowledge Graph. Highest-trust entity reference.', 'real-smart-seo-pro' ); ?></p>
+                                    <p class="description"><?php esc_html_e( 'Grounds this city in the Knowledge Graph. Highest-trust entity reference.', 'real-smart-seo' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><?php esc_html_e( 'Services', 'real-smart-seo-pro' ); ?></th>
+                                <th><?php esc_html_e( 'Services', 'real-smart-seo' ); ?></th>
                                 <td>
                                     <?php foreach ( $all_services as $svc ) : ?>
                                         <label style="display:block;margin-bottom:4px;">
@@ -1135,36 +1135,36 @@ class RSSEO_Pro_Programmatic {
                                             <?php echo esc_html( $svc ); ?>
                                         </label>
                                     <?php endforeach; ?>
-                                    <p class="description"><?php esc_html_e( 'Pick at least one — pages with no services are blocked as thin content.', 'real-smart-seo-pro' ); ?></p>
+                                    <p class="description"><?php esc_html_e( 'Pick at least one — pages with no services are blocked as thin content.', 'real-smart-seo' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><?php esc_html_e( 'Publish status', 'real-smart-seo-pro' ); ?></th>
+                                <th><?php esc_html_e( 'Publish status', 'real-smart-seo' ); ?></th>
                                 <td>
-                                    <label style="margin-right:14px;"><input type="radio" name="location_status" value="draft" checked> <?php esc_html_e( 'Draft (review first)', 'real-smart-seo-pro' ); ?></label>
-                                    <label><input type="radio" name="location_status" value="publish"> <?php esc_html_e( 'Publish immediately', 'real-smart-seo-pro' ); ?></label>
-                                    <p class="description"><?php esc_html_e( 'Draft is recommended — review the page before it goes live.', 'real-smart-seo-pro' ); ?></p>
+                                    <label style="margin-right:14px;"><input type="radio" name="location_status" value="draft" checked> <?php esc_html_e( 'Draft (review first)', 'real-smart-seo' ); ?></label>
+                                    <label><input type="radio" name="location_status" value="publish"> <?php esc_html_e( 'Publish immediately', 'real-smart-seo' ); ?></label>
+                                    <p class="description"><?php esc_html_e( 'Draft is recommended — review the page before it goes live.', 'real-smart-seo' ); ?></p>
                                 </td>
                             </tr>
                         </table>
-                        <p><button type="submit" name="rsseo_save_location" value="1" class="button button-primary"><?php esc_html_e( 'Create Location Page', 'real-smart-seo-pro' ); ?></button></p>
+                        <p><button type="submit" name="rsseo_save_location" value="1" class="button button-primary"><?php esc_html_e( 'Create Location Page', 'real-smart-seo' ); ?></button></p>
                     </form>
                 </div>
 
                 <div>
-                    <h2><?php esc_html_e( 'Bulk Generate Locations', 'real-smart-seo-pro' ); ?></h2>
+                    <h2><?php esc_html_e( 'Bulk Generate Locations', 'real-smart-seo' ); ?></h2>
                     <form method="post" enctype="multipart/form-data">
                         <?php wp_nonce_field( 'rsseo_programmatic', '_rsseo_prog_nonce' ); ?>
                         <table class="form-table">
                             <tr>
-                                <th><label for="bulk_locations"><?php esc_html_e( 'Locations (one per line)', 'real-smart-seo-pro' ); ?></label></th>
+                                <th><label for="bulk_locations"><?php esc_html_e( 'Locations (one per line)', 'real-smart-seo' ); ?></label></th>
                                 <td>
                                     <textarea id="bulk_locations" name="bulk_locations" rows="12" class="large-text" placeholder="Bethesda, MD, https://en.wikipedia.org/wiki/Bethesda,_Maryland&#10;Rockville, MD&#10;Silver Spring, MD&#10;Chevy Chase, MD&#10;Potomac, MD&#10;Gaithersburg, MD&#10;Germantown, MD&#10;Bowie, MD&#10;Columbia, MD&#10;Annapolis, MD&#10;Washington, DC"></textarea>
-                                    <p class="description"><?php esc_html_e( 'Format: City, State, Wikipedia URL (Wikipedia optional)', 'real-smart-seo-pro' ); ?></p>
+                                    <p class="description"><?php esc_html_e( 'Format: City, State, Wikipedia URL (Wikipedia optional)', 'real-smart-seo' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><?php esc_html_e( 'Services to assign', 'real-smart-seo-pro' ); ?></th>
+                                <th><?php esc_html_e( 'Services to assign', 'real-smart-seo' ); ?></th>
                                 <td>
                                     <?php foreach ( $all_services as $svc ) : ?>
                                         <label style="display:block;margin-bottom:4px;">
@@ -1175,22 +1175,22 @@ class RSSEO_Pro_Programmatic {
                                 </td>
                             </tr>
                             <tr>
-                                <th><label for="bulk_csv"><?php esc_html_e( 'Or upload CSV', 'real-smart-seo-pro' ); ?></label></th>
+                                <th><label for="bulk_csv"><?php esc_html_e( 'Or upload CSV', 'real-smart-seo' ); ?></label></th>
                                 <td>
                                     <input type="file" id="bulk_csv" name="bulk_csv" accept=".csv,text/csv">
-                                    <p class="description"><?php esc_html_e( 'Columns: City, State, Wikipedia URL (header row optional). Merged with the box above.', 'real-smart-seo-pro' ); ?></p>
+                                    <p class="description"><?php esc_html_e( 'Columns: City, State, Wikipedia URL (header row optional). Merged with the box above.', 'real-smart-seo' ); ?></p>
                                 </td>
                             </tr>
                             <tr>
-                                <th><?php esc_html_e( 'Publish status', 'real-smart-seo-pro' ); ?></th>
+                                <th><?php esc_html_e( 'Publish status', 'real-smart-seo' ); ?></th>
                                 <td>
-                                    <label style="margin-right:14px;"><input type="radio" name="bulk_status" value="draft" checked> <?php esc_html_e( 'Draft (review first)', 'real-smart-seo-pro' ); ?></label>
-                                    <label><input type="radio" name="bulk_status" value="publish"> <?php esc_html_e( 'Publish immediately', 'real-smart-seo-pro' ); ?></label>
-                                    <p class="description"><?php esc_html_e( 'Bulk pages default to Draft so you can review before going live. Only published pages are pinged to IndexNow.', 'real-smart-seo-pro' ); ?></p>
+                                    <label style="margin-right:14px;"><input type="radio" name="bulk_status" value="draft" checked> <?php esc_html_e( 'Draft (review first)', 'real-smart-seo' ); ?></label>
+                                    <label><input type="radio" name="bulk_status" value="publish"> <?php esc_html_e( 'Publish immediately', 'real-smart-seo' ); ?></label>
+                                    <p class="description"><?php esc_html_e( 'Bulk pages default to Draft so you can review before going live. Only published pages are pinged to IndexNow.', 'real-smart-seo' ); ?></p>
                                 </td>
                             </tr>
                         </table>
-                        <p><button type="submit" name="rsseo_bulk_generate" value="1" class="button button-primary"><?php esc_html_e( 'Bulk Generate Pages', 'real-smart-seo-pro' ); ?></button></p>
+                        <p><button type="submit" name="rsseo_bulk_generate" value="1" class="button button-primary"><?php esc_html_e( 'Bulk Generate Pages', 'real-smart-seo' ); ?></button></p>
                     </form>
                 </div>
 
@@ -1198,16 +1198,16 @@ class RSSEO_Pro_Programmatic {
 
             <?php if ( $location_posts ) : ?>
                 <hr>
-                <h2><?php printf( esc_html__( 'Existing Location Pages (%d)', 'real-smart-seo-pro' ), count( $location_posts ) ); ?></h2>
-                <p><a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=rsseo-programmatic&rsseo_export_locations=1' ), 'rsseo_export_locations' ) ); ?>"><?php esc_html_e( '⬇ Export all to CSV', 'real-smart-seo-pro' ); ?></a></p>
+                <h2><?php printf( esc_html__( 'Existing Location Pages (%d)', 'real-smart-seo' ), count( $location_posts ) ); ?></h2>
+                <p><a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=rsseo-programmatic&rsseo_export_locations=1' ), 'rsseo_export_locations' ) ); ?>"><?php esc_html_e( '⬇ Export all to CSV', 'real-smart-seo' ); ?></a></p>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
-                            <th><?php esc_html_e( 'Location', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'Status', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'Services', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'sameAs (Wikipedia)', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'URL', 'real-smart-seo-pro' ); ?></th>
+                            <th><?php esc_html_e( 'Location', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'Status', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'Services', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'sameAs (Wikipedia)', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'URL', 'real-smart-seo' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1222,7 +1222,7 @@ class RSSEO_Pro_Programmatic {
                                 </td>
                                 <td>
                                     <?php if ( 'publish' === $lp->post_status ) : ?>
-                                        <span style="display:inline-block;padding:2px 8px;background:#dcfce7;color:#166534;border-radius:3px;font-size:12px;"><?php esc_html_e( 'Published', 'real-smart-seo-pro' ); ?></span>
+                                        <span style="display:inline-block;padding:2px 8px;background:#dcfce7;color:#166534;border-radius:3px;font-size:12px;"><?php esc_html_e( 'Published', 'real-smart-seo' ); ?></span>
                                     <?php else : ?>
                                         <span style="display:inline-block;padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:3px;font-size:12px;"><?php echo esc_html( ucfirst( $lp->post_status ) ); ?></span>
                                     <?php endif; ?>
@@ -1230,9 +1230,9 @@ class RSSEO_Pro_Programmatic {
                                 <td><?php echo esc_html( implode( ', ', $lservices ) ); ?></td>
                                 <td>
                                     <?php if ( $lwiki ) : ?>
-                                        <a href="<?php echo esc_url( $lwiki ); ?>" target="_blank"><?php esc_html_e( 'Wikipedia', 'real-smart-seo-pro' ); ?></a>
+                                        <a href="<?php echo esc_url( $lwiki ); ?>" target="_blank"><?php esc_html_e( 'Wikipedia', 'real-smart-seo' ); ?></a>
                                     <?php else : ?>
-                                        <span style="color:#999;"><?php esc_html_e( 'Not set', 'real-smart-seo-pro' ); ?></span>
+                                        <span style="color:#999;"><?php esc_html_e( 'Not set', 'real-smart-seo' ); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td><a href="<?php echo esc_url( $lperma ); ?>" target="_blank"><?php echo esc_html( $lperma ); ?></a></td>
