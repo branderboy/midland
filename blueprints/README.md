@@ -30,6 +30,36 @@ https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.co
 https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/branderboy/midland/refs/heads/claude/optimistic-allen-r4wzay/blueprints/midland-suite-git.json
 ```
 
+**ALL 11 plugins (full-suite / cross-plugin check, from source):**
+
+```
+https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/branderboy/midland/refs/heads/claude/optimistic-allen-r4wzay/blueprints/all-plugins-git.json
+```
+
+### All plugins covered
+
+Verified locally on **WP 7.1-alpha / PHP 8.4 / SQLite** (clean activate + full
+lifecycle boot, individually and all-active): **all 11 pass — zero fatals, zero
+deprecations.** `all-plugins-git.json` installs every one for in-browser checks:
+
+| Plugin | Version | dist zip | In `all-plugins-git.json` |
+|---|---|---|---|
+| smart-forms-for-midland | 2.19.11 | ✅ | ✅ (installed first — CRM depends on it) |
+| smart-chat-ai | 1.9.38 | ✅ | ✅ |
+| smart-crm-pro | 2.4.2 | ✅ | ✅ |
+| real-smart-seo | 2.0.0 | ✅ | ✅ |
+| smart-reviews-pro | 1.5.3 | ✅ | ✅ |
+| content-traffic-maker | 1.8.1 | ✅ | ✅ |
+| geo-site-brain | 2.4.0 | ✅ | ✅ |
+| job-poster-wp | 1.7.1 | ✅ | ✅ |
+| midland-contractor-gallery | 1.0.0 | — (source only) | ✅ |
+| midland-pcloud-embed | 1.1.0 | — (source only) | ✅ |
+| wp-github-backup | 3.6.5 | ✅ | ✅ |
+
+To verify a **single** plugin in-browser, open `all-plugins-git.json` in the
+Blueprint Builder and delete the steps you don't want (keep `smart-forms-for-midland`
+if you're testing `smart-crm-pro`).
+
 Paste either URL into a browser. Playground boots WP, installs the four plugins,
 logs you in, and drops you on **Plugins** with all four active.
 
