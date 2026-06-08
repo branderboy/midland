@@ -1,0 +1,59 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "Midland plugin suite — from source (git:directory)",
+    "description": "Same as midland-suite.json but pulls each plugin directly from the plugins/ source tree on the branch instead of the prebuilt dist zips. Slower (clones over a CORS proxy) but always reflects the exact committed source.",
+    "author": "midland"
+  },
+  "landingPage": "/wp-admin/plugins.php",
+  "preferredVersions": { "php": "8.2", "wp": "latest" },
+  "phpExtensionBundles": ["kitchen-sink"],
+  "features": { "networking": true },
+  "login": true,
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "git:directory",
+        "url": "https://github.com/branderboy/midland",
+        "ref": "claude/optimistic-allen-r4wzay",
+        "refType": "branch",
+        "path": "plugins/smart-forms-for-midland"
+      },
+      "options": { "activate": true }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "git:directory",
+        "url": "https://github.com/branderboy/midland",
+        "ref": "claude/optimistic-allen-r4wzay",
+        "refType": "branch",
+        "path": "plugins/smart-chat-ai"
+      },
+      "options": { "activate": true }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "git:directory",
+        "url": "https://github.com/branderboy/midland",
+        "ref": "claude/optimistic-allen-r4wzay",
+        "refType": "branch",
+        "path": "plugins/smart-crm-pro"
+      },
+      "options": { "activate": true }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "git:directory",
+        "url": "https://github.com/branderboy/midland",
+        "ref": "claude/optimistic-allen-r4wzay",
+        "refType": "branch",
+        "path": "plugins/real-smart-seo"
+      },
+      "options": { "activate": true }
+    }
+  ]
+}
