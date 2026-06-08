@@ -11,7 +11,7 @@
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 6.9
  * Update URI: false
  */
 
@@ -306,28 +306,31 @@ class SCAI_Plugin {
      * Register settings
      */
     public function register_settings() {
+        // Each option registered with a type-appropriate sanitize_callback
+        // (PCP setting_sanitization). preprompt/ai_personality are multi-line,
+        // so they use sanitize_textarea_field to preserve newlines.
         $settings = array(
-            'chat_enabled',
-            'chat_position',
-            'chat_color',
-            'chat_logo',
-            'chat_title',
-            'chat_subtitle',
-            'ai_provider',
-            'perplexity_api_key',
-            'openai_api_key',
-            'ai_model',
-            'ai_temperature',
-            'lead_email',
-            'enable_email_notifications',
-            'business_name',
-            'business_type',
-            'ai_personality',
-            'preprompt',
+            'chat_enabled'               => 'absint',
+            'chat_position'              => 'sanitize_text_field',
+            'chat_color'                 => 'sanitize_hex_color',
+            'chat_logo'                  => 'esc_url_raw',
+            'chat_title'                 => 'sanitize_text_field',
+            'chat_subtitle'              => 'sanitize_text_field',
+            'ai_provider'                => 'sanitize_text_field',
+            'perplexity_api_key'         => 'sanitize_text_field',
+            'openai_api_key'             => 'sanitize_text_field',
+            'ai_model'                   => 'sanitize_text_field',
+            'ai_temperature'             => 'sanitize_text_field',
+            'lead_email'                 => 'sanitize_email',
+            'enable_email_notifications' => 'absint',
+            'business_name'              => 'sanitize_text_field',
+            'business_type'              => 'sanitize_text_field',
+            'ai_personality'             => 'sanitize_textarea_field',
+            'preprompt'                  => 'sanitize_textarea_field',
         );
 
-        foreach ($settings as $setting) {
-            register_setting('scai_settings', 'smart_chat_' . $setting);
+        foreach ($settings as $setting => $sanitizer) {
+            register_setting('scai_settings', 'smart_chat_' . $setting, array('sanitize_callback' => $sanitizer));
         }
 
         // Sitemap ingestion (Site Content) — same options the dedicated page uses,
