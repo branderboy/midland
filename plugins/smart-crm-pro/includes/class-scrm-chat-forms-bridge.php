@@ -157,6 +157,14 @@ class SCRM_Chat_Forms_Bridge {
     public function maybe_add_link_column() {
         global $wpdb;
         $table = $wpdb->prefix . 'smart_chat_leads';
+        // The smart_chat_leads table is owned by the Midland Chat plugin. When
+        // that plugin isn't active (or hasn't created its table yet), the
+        // SHOW COLUMNS / ALTER below would emit a DB error on every request.
+        // Bail unless the table actually exists — same guard pattern as
+        // maybe_create_leads_table().
+        if ( $table !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            return;
+        }
         $has   = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             "SHOW COLUMNS FROM {$table} LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             'sfco_lead_id'

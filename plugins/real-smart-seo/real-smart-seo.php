@@ -70,6 +70,9 @@ class RSSEO_Plugin {
         RSSEO_Pro_Geogrid::create_tables();
         RSSEO_Pro_AI_Rank::create_tables();
         flush_rewrite_rules();
+        // Record the schema version so maybe_upgrade_db() (admin_init) doesn't
+        // re-run a full dbDelta + flush_rewrite_rules pass on the next admin load.
+        update_option( 'rsseo_db_version', RSSEO_VERSION );
     }
 
     /**

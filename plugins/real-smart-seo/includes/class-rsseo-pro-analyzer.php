@@ -254,11 +254,31 @@ INSTRUCTIONS;
 
         preg_match_all( '/\*\*WP_FIX:\*\*\s*(.+)/i', $raw, $fix_matches );
         foreach ( $fix_matches[1] as $fix_line ) {
-            preg_match_all( '/(\w+)=\[([^\]]*)\]/', $fix_line, $kv, PREG_SET_ORDER );
-            $parts = array();
-            foreach ( $kv as $m ) {
-                $parts[ $m[1] ] = $m[2];
+            // Mirror RSSEO_Analyzer::parse_report(): the old /(\w+)=\[([^\]]*)\]/
+            // pattern broke on meta keys with hyphens and silently TRUNCATED any
+            // new_value that itself contained "]" (common in titles/HTML/JSON),
+            // then wrote the truncated value to live posts. Split on " | " and
+            // capture new_value to end-of-line so it can't be truncated.
+            $fix_line = trim( $fix_line );
+            $parts    = array();
+
+            if ( preg_match( '/new_value\s*=\s*(.*)$/i', $fix_line, $mm ) ) {
+                $val = trim( $mm[1] );
+                if ( '' !== $val && '[' === $val[0] && ']' === substr( $val, -1 ) ) {
+                    $val = substr( $val, 1, -1 );
+                }
+                $parts['new_value'] = $val;
+                $head = (string) preg_replace( '/\|\s*new_value\s*=.*$/i', '', $fix_line );
+            } else {
+                $head = $fix_line;
             }
+
+            foreach ( preg_split( '/\s*\|\s*/', $head ) as $segment ) {
+                if ( preg_match( '/^([\w-]+)\s*=\s*\[?(.*?)\]?\s*$/', trim( $segment ), $m ) ) {
+                    $parts[ strtolower( trim( $m[1] ) ) ] = trim( $m[2] );
+                }
+            }
+
             $fix = self::validate_fix( $parts );
             if ( $fix ) {
                 $fixes[] = $fix;

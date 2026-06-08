@@ -733,7 +733,11 @@ class SCRM_Pro_ServiceM8 {
         }
         check_admin_referer( 'scrm_sm8_poll_now' );
         $summary = $this->poll_active_jobs();
-        $back    = admin_url( 'admin.php?page=scrm-pro-servicem8&polled=1&checked=' . (int) ( $summary['checked'] ?? 0 ) . '&completed=' . (int) ( $summary['completed'] ?? 0 ) );
+        // Redirect straight to the unified Settings page. The legacy
+        // scrm-pro-servicem8 slug is intercepted by redirect_legacy_pages()
+        // (admin_init, pri 1) which strips these query args before render_page()
+        // can read them, so the "checked X / completed Y" notice never showed.
+        $back    = admin_url( 'admin.php?page=smart-crm&tab=servicem8&polled=1&checked=' . (int) ( $summary['checked'] ?? 0 ) . '&completed=' . (int) ( $summary['completed'] ?? 0 ) );
         wp_safe_redirect( $back );
         exit;
     }

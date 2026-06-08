@@ -60,7 +60,7 @@ class RSSEO_Pro_IndexNow {
         update_option( 'rsseo_indexnow_enabled',    isset( $_POST['indexnow_enabled'] ) ? 1 : 0 );
         update_option( 'rsseo_rui_api_key',         sanitize_text_field( wp_unslash( $_POST['rui_api_key'] ?? '' ) ) );
         update_option( 'rsseo_rui_enabled',         isset( $_POST['rui_enabled'] ) ? 1 : 0 );
-        update_option( 'rsseo_indexnow_post_types', isset( $_POST['indexnow_post_types'] ) ? array_map( 'sanitize_key', $_POST['indexnow_post_types'] ) : array() );
+        update_option( 'rsseo_indexnow_post_types', isset( $_POST['indexnow_post_types'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['indexnow_post_types'] ) ) : array() );
 
         wp_safe_redirect( admin_url( 'admin.php?page=rsseo-indexnow&saved=1' ) );
         exit;
