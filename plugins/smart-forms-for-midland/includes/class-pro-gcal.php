@@ -55,7 +55,12 @@ class SFCO_Pro_GCal {
         }
 
         update_option( 'sfco_gcal_client_id',     sanitize_text_field( wp_unslash( $_POST['gcal_client_id'] ?? '' ) ) );
-        update_option( 'sfco_gcal_client_secret', sanitize_text_field( wp_unslash( $_POST['gcal_client_secret'] ?? '' ) ) );
+        // Only overwrite the stored secret when a new one is entered; the field
+        // renders blank (masked), so an empty post means "keep existing".
+        $gcal_secret = sanitize_text_field( wp_unslash( $_POST['gcal_client_secret'] ?? '' ) );
+        if ( '' !== $gcal_secret ) {
+            update_option( 'sfco_gcal_client_secret', $gcal_secret );
+        }
         update_option( 'sfco_gcal_event_duration', absint( $_POST['gcal_event_duration'] ?? 60 ) );
         update_option( 'sfco_gcal_location',       sanitize_text_field( wp_unslash( $_POST['gcal_location'] ?? '' ) ) );
 
@@ -342,7 +347,7 @@ class SFCO_Pro_GCal {
                     </tr>
                     <tr>
                         <th><label for="gcal_client_secret"><?php esc_html_e( 'Client Secret', 'smart-forms-for-midland' ); ?></label></th>
-                        <td><input type="password" id="gcal_client_secret" name="gcal_client_secret" class="regular-text" value="<?php echo esc_attr( $client_secret ); ?>"></td>
+                        <td><input type="password" id="gcal_client_secret" name="gcal_client_secret" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) $client_secret ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : '' ); ?>"></td>
                     </tr>
                     <tr>
                         <th><label for="gcal_event_duration"><?php esc_html_e( 'Default Duration (minutes)', 'smart-forms-for-midland' ); ?></label></th>

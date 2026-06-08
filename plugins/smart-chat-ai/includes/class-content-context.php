@@ -206,10 +206,44 @@ class SCAI_Content_Context {
     }
 
     /**
+     * SSRF allow-check for a server-side fetch target. Builds on
+     * wp_http_validate_url() (scheme/port/same-host + RFC-1918 checks) and adds
+     * a resolved-IP test that also rejects link-local / reserved ranges such as
+     * the cloud metadata endpoint (169.254.169.254), which core's helper permits.
+     */
+    private function is_fetchable_url( $url ) {
+        if ( ! wp_http_validate_url( $url ) ) {
+            return false;
+        }
+        $host = wp_parse_url( $url, PHP_URL_HOST );
+        if ( ! $host ) {
+            return false;
+        }
+        $ip = filter_var( $host, FILTER_VALIDATE_IP ) ? $host : gethostbyname( $host );
+        // Reject only when we resolve to a literal IP in a private or reserved
+        // range. An unresolved host falls through to wp_remote_get(), which
+        // will simply fail to connect.
+        if ( filter_var( $ip, FILTER_VALIDATE_IP )
+            && ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Walk a sitemap, including sitemap-index files (which point at child sitemaps).
      */
     private function fetch_sitemap_urls( $sitemap_url, $depth = 0, &$errors = array() ) {
         if ( $depth > 2 ) {
+            return array();
+        }
+
+        // SSRF guard: child sitemap <loc> URLs come from external XML and are
+        // fetched server-side. Reject anything that isn't a public http(s) host
+        // so a malicious sitemap can't pivot the crawler into the internal
+        // network or the cloud metadata endpoint (169.254.169.254).
+        if ( ! $this->is_fetchable_url( $sitemap_url ) ) {
+            $errors[] = $sitemap_url . ' (blocked: non-public or invalid URL)';
             return array();
         }
 
@@ -261,6 +295,11 @@ class SCAI_Content_Context {
     }
 
     private function fetch_page_text( $url, $max_chars ) {
+        // SSRF guard (same rationale as fetch_sitemap_urls): page <loc> URLs are
+        // taken from sitemap XML and fetched server-side.
+        if ( ! $this->is_fetchable_url( $url ) ) {
+            return '';
+        }
         $response = wp_remote_get( $url, $this->request_args( 10 ) );
         if ( is_wp_error( $response ) ) {
             return '';
