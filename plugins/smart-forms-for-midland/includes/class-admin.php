@@ -900,10 +900,15 @@ class SFCO_Admin {
     }
     
     public function enqueue_admin_assets( $hook ) {
-        if ( strpos( $hook, 'smart-forms' ) === false ) {
+        // The CRM and Team pages are registered with a null parent, so their
+        // hook is admin_page_sfco-crm / admin_page_sfco-team — which does NOT
+        // contain "smart-forms". Without matching the sfco- prefix too, the Pro
+        // admin JS + sfcoProAdmin nonce never loaded there and the "Test
+        // Connection" / "Remove member" buttons threw "sfcoProAdmin is not defined".
+        if ( strpos( $hook, 'smart-forms' ) === false && strpos( $hook, 'sfco-' ) === false ) {
             return;
         }
-        
+
         wp_enqueue_style( 'sfco-admin', SFCO_PLUGIN_URL . 'assets/css/admin.css', array(), SFCO_VERSION );
         wp_enqueue_script( 'sfco-admin', SFCO_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery' ), SFCO_VERSION, true );
 
