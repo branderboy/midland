@@ -60,6 +60,19 @@ To verify a **single** plugin in-browser, open `all-plugins-git.json` in the
 Blueprint Builder and delete the steps you don't want (keep `smart-forms-for-midland`
 if you're testing `smart-crm-pro`).
 
+**PHP 7.4 compatibility check (all 11, pinned to PHP 7.4):**
+
+```
+https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/branderboy/midland/refs/heads/claude/optimistic-allen-r4wzay/blueprints/all-plugins-php74.json
+```
+
+All plugins declare `Requires PHP: 7.4`. A static scan of all 11 found **no**
+PHP 8.0+-only constructs (`str_contains`/`str_starts_with`/`str_ends_with`,
+nullsafe `?->`, `match` expressions, enums/`readonly`, `get_debug_type`/
+`array_is_list`, constructor property promotion) — so the 7.4 floor holds. This
+blueprint lets you confirm it at runtime (it would parse-error/fatal on 7.4 if a
+regression slipped in — e.g. the Smart CRM `str_contains` → `strpos` fix).
+
 Paste either URL into a browser. Playground boots WP, installs the four plugins,
 logs you in, and drops you on **Plugins** with all four active.
 
