@@ -98,8 +98,8 @@ class RSSEO_Pro_Geogrid {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Geo-Grid Tracker', 'real-smart-seo-pro' ),
-            esc_html__( 'Geo-Grid Tracker', 'real-smart-seo-pro' ),
+            esc_html__( 'Geo-Grid Tracker', 'real-smart-seo' ),
+            esc_html__( 'Geo-Grid Tracker', 'real-smart-seo' ),
             'manage_options',
             'rsseo-geogrid',
             array( $this, 'render_page' )
@@ -112,7 +112,7 @@ class RSSEO_Pro_Geogrid {
         }
         $nonce = isset( $_POST['_rsseo_geogrid_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_geogrid_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_save_geogrid' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $settings = array(
@@ -335,71 +335,71 @@ class RSSEO_Pro_Geogrid {
         $run_url = wp_nonce_url( admin_url( 'admin.php?page=rsseo-geogrid&rsseo_geogrid_run=1' ), 'rsseo_geogrid_run' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Geo-Grid Rank Tracker', 'real-smart-seo-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'NxN keyword rank scan around a center point. Weekly cron + manual run.', 'real-smart-seo-pro' ); ?></p>
+            <h1><?php esc_html_e( 'Geo-Grid Rank Tracker', 'real-smart-seo' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'NxN keyword rank scan around a center point. Weekly cron + manual run.', 'real-smart-seo' ); ?></p>
 
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Geo-Grid settings saved.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Geo-Grid settings saved.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['ran'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Scan complete.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Scan complete.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
 
             <?php if ( ! class_exists( 'RSSEO_Pro_DataForSEO' ) || ! RSSEO_Pro_DataForSEO::is_configured() ) : ?>
-                <div class="notice notice-warning"><p><?php esc_html_e( 'DataForSEO credentials not configured. Add them under Midland Smart SEO Pro > Settings.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-warning"><p><?php esc_html_e( 'DataForSEO credentials not configured. Add them under Midland Smart SEO Pro > Settings.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
                 <?php wp_nonce_field( 'rsseo_save_geogrid', '_rsseo_geogrid_nonce' ); ?>
                 <table class="form-table">
                     <tr>
-                        <th><label for="geogrid_keyword"><?php esc_html_e( 'Keyword', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="geogrid_keyword"><?php esc_html_e( 'Keyword', 'real-smart-seo' ); ?></label></th>
                         <td><input type="text" id="geogrid_keyword" name="geogrid_keyword" class="regular-text" value="<?php echo esc_attr( $settings['keyword'] ); ?>" placeholder="commercial floor cleaning"></td>
                     </tr>
                     <tr>
-                        <th><label for="geogrid_target_domain"><?php esc_html_e( 'Target Domain', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="geogrid_target_domain"><?php esc_html_e( 'Target Domain', 'real-smart-seo' ); ?></label></th>
                         <td><input type="text" id="geogrid_target_domain" name="geogrid_target_domain" class="regular-text" value="<?php echo esc_attr( $settings['target_domain'] ); ?>" placeholder="example.com"></td>
                     </tr>
                     <tr>
-                        <th><label for="geogrid_center_lat"><?php esc_html_e( 'Center Latitude', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="geogrid_center_lat"><?php esc_html_e( 'Center Latitude', 'real-smart-seo' ); ?></label></th>
                         <td><input type="number" step="0.000001" id="geogrid_center_lat" name="geogrid_center_lat" class="regular-text" value="<?php echo esc_attr( $settings['center_lat'] ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="geogrid_center_lng"><?php esc_html_e( 'Center Longitude', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="geogrid_center_lng"><?php esc_html_e( 'Center Longitude', 'real-smart-seo' ); ?></label></th>
                         <td><input type="number" step="0.000001" id="geogrid_center_lng" name="geogrid_center_lng" class="regular-text" value="<?php echo esc_attr( $settings['center_lng'] ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="geogrid_grid_size"><?php esc_html_e( 'Grid Size (N×N)', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="geogrid_grid_size"><?php esc_html_e( 'Grid Size (N×N)', 'real-smart-seo' ); ?></label></th>
                         <td>
                             <select id="geogrid_grid_size" name="geogrid_grid_size">
                                 <?php foreach ( array( 3, 5, 7, 9 ) as $n ) : ?>
                                     <option value="<?php echo esc_attr( $n ); ?>" <?php selected( $settings['grid_size'], $n ); ?>><?php echo esc_html( $n . ' x ' . $n . ' (' . ( $n * $n ) . ' cells)' ); ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <p class="description"><?php esc_html_e( 'Each cell is one DataForSEO SERP call. Mind your quota.', 'real-smart-seo-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Each cell is one DataForSEO SERP call. Mind your quota.', 'real-smart-seo' ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="geogrid_spacing_km"><?php esc_html_e( 'Spacing (km)', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="geogrid_spacing_km"><?php esc_html_e( 'Spacing (km)', 'real-smart-seo' ); ?></label></th>
                         <td><input type="number" step="0.5" min="0.5" max="50" id="geogrid_spacing_km" name="geogrid_spacing_km" value="<?php echo esc_attr( $settings['spacing_km'] ); ?>" style="width:100px;"></td>
                     </tr>
                 </table>
                 <p class="submit">
-                    <button type="submit" name="rsseo_save_geogrid" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo-pro' ); ?></button>
-                    <a href="<?php echo esc_url( $run_url ); ?>" class="button button-secondary" style="margin-left:8px;"><?php esc_html_e( 'Run Scan Now', 'real-smart-seo-pro' ); ?></a>
+                    <button type="submit" name="rsseo_save_geogrid" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo' ); ?></button>
+                    <a href="<?php echo esc_url( $run_url ); ?>" class="button button-secondary" style="margin-left:8px;"><?php esc_html_e( 'Run Scan Now', 'real-smart-seo' ); ?></a>
                 </p>
             </form>
 
             <?php if ( $latest ) : ?>
                 <hr>
-                <h2><?php esc_html_e( 'Latest Run', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Latest Run', 'real-smart-seo' ); ?></h2>
                 <p>
                     <strong><?php echo esc_html( $latest->keyword ); ?></strong>
-                    — <?php esc_html_e( 'avg rank:', 'real-smart-seo-pro' ); ?>
+                    — <?php esc_html_e( 'avg rank:', 'real-smart-seo' ); ?>
                     <strong><?php echo $latest->avg_rank ? esc_html( $latest->avg_rank ) : '—'; ?></strong>
-                    | <?php esc_html_e( 'in top 10:', 'real-smart-seo-pro' ); ?>
+                    | <?php esc_html_e( 'in top 10:', 'real-smart-seo' ); ?>
                     <strong><?php echo esc_html( (int) $latest->in_top10 . ' / ' . (int) $latest->cells_done ); ?></strong>
                     | <?php echo esc_html( $latest->created_at ); ?>
                 </p>
@@ -407,14 +407,14 @@ class RSSEO_Pro_Geogrid {
             <?php endif; ?>
 
             <?php if ( count( $runs ) > 1 ) : ?>
-                <h2><?php esc_html_e( 'History', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'History', 'real-smart-seo' ); ?></h2>
                 <table class="widefat striped">
                     <thead><tr>
-                        <th><?php esc_html_e( 'Date', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Keyword', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Grid', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'Avg Rank', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'In Top 10', 'real-smart-seo-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Date', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Keyword', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Grid', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'Avg Rank', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'In Top 10', 'real-smart-seo' ); ?></th>
                     </tr></thead>
                     <tbody>
                         <?php foreach ( $runs as $r ) : ?>
@@ -466,7 +466,7 @@ class RSSEO_Pro_Geogrid {
             echo '</div>';
         }
         echo '</div>';
-        echo '<p class="description">' . esc_html__( 'Green = top 10. Yellow = 11-20. Red = 21+. Gray = not found in top 100.', 'real-smart-seo-pro' ) . '</p>';
+        echo '<p class="description">' . esc_html__( 'Green = top 10. Yellow = 11-20. Red = 21+. Gray = not found in top 100.', 'real-smart-seo' ) . '</p>';
     }
 }
 

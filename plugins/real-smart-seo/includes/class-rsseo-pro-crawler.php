@@ -73,10 +73,10 @@ class RSSEO_Pro_Crawler {
                     'severity'     => 'high',
                     'description'  => sprintf(
                         /* translators: post title */
-                        __( '"%s" has no phone number in the page content — NAP inconsistency risk.', 'real-smart-seo-pro' ),
+                        __( '"%s" has no phone number in the page content — NAP inconsistency risk.', 'real-smart-seo' ),
                         $post->post_title
                     ),
-                    'suggestion'   => __( 'Add your business phone number to this page. NAP (Name, Address, Phone) consistency across all key pages is a core local SEO ranking factor.', 'real-smart-seo-pro' ),
+                    'suggestion'   => __( 'Add your business phone number to this page. NAP (Name, Address, Phone) consistency across all key pages is a core local SEO ranking factor.', 'real-smart-seo' ),
                     'auto_fixable' => 0,
                     'created_at'   => current_time( 'mysql' ),
                 ) );
@@ -134,10 +134,10 @@ class RSSEO_Pro_Crawler {
                 'severity'     => $is_key_page ? 'high' : 'medium',
                 'description'  => sprintf(
                     /* translators: post title */
-                    __( '"%s" has no JSON-LD schema markup.', 'real-smart-seo-pro' ),
+                    __( '"%s" has no JSON-LD schema markup.', 'real-smart-seo' ),
                     $post->post_title
                 ),
-                'suggestion'   => __( 'Add LocalBusiness, Service, FAQ, or Review schema to this page. Run a Pro scan to get AI-generated schema blocks ready to apply in one click.', 'real-smart-seo-pro' ),
+                'suggestion'   => __( 'Add LocalBusiness, Service, FAQ, or Review schema to this page. Run a Pro scan to get AI-generated schema blocks ready to apply in one click.', 'real-smart-seo' ),
                 'auto_fixable' => 0,
                 'created_at'   => current_time( 'mysql' ),
             ) );
@@ -186,11 +186,11 @@ class RSSEO_Pro_Crawler {
                     'severity'    => 'high',
                     'description' => sprintf(
                         /* translators: 1: phrase, 2: list of titles */
-                        __( 'Keyword cannibalization — "%1$s" competes with: %2$s', 'real-smart-seo-pro' ),
+                        __( 'Keyword cannibalization — "%1$s" competes with: %2$s', 'real-smart-seo' ),
                         esc_html( $phrase ),
                         esc_html( $titles )
                     ),
-                    'suggestion'  => __( 'Differentiate these pages by targeting distinct long-tail keywords. Consolidate or canonicalize weaker pages. Run a Pro scan for AI-generated differentiation recommendations.', 'real-smart-seo-pro' ),
+                    'suggestion'  => __( 'Differentiate these pages by targeting distinct long-tail keywords. Consolidate or canonicalize weaker pages. Run a Pro scan for AI-generated differentiation recommendations.', 'real-smart-seo' ),
                     'auto_fixable' => 0,
                     'created_at'  => current_time( 'mysql' ),
                 ) );
@@ -229,8 +229,8 @@ class RSSEO_Pro_Crawler {
                 'post_id'     => 0,
                 'issue_type'  => 'no_service_area_pages',
                 'severity'    => 'high',
-                'description' => __( 'No service area pages detected. Local businesses without city/area-specific pages miss the majority of "near me" and "[city] + [service]" searches.', 'real-smart-seo-pro' ),
-                'suggestion'  => __( 'Create at least one dedicated page per service area city you target. Each page should include the city name in the H1, title, meta description, and body copy. Run a Pro scan for a custom content brief.', 'real-smart-seo-pro' ),
+                'description' => __( 'No service area pages detected. Local businesses without city/area-specific pages miss the majority of "near me" and "[city] + [service]" searches.', 'real-smart-seo' ),
+                'suggestion'  => __( 'Create at least one dedicated page per service area city you target. Each page should include the city name in the H1, title, meta description, and body copy. Run a Pro scan for a custom content brief.', 'real-smart-seo' ),
                 'auto_fixable' => 0,
                 'created_at'  => current_time( 'mysql' ),
             ) );

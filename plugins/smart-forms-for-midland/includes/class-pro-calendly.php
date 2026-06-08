@@ -553,6 +553,19 @@ class SFCO_Pro_Calendly {
             <?php endif; ?>
             <?php // phpcs:enable WordPress.Security.NonceVerification.Recommended ?>
 
+            <?php
+            // Cross-plugin heads-up: Midland Chat owns a SEPARATE Calendly
+            // connection (its own API key, signing key, and webhook). If Smart
+            // Forms is connected here but the chat is active and still
+            // unconnected, flag it so chat bookings don't silently miss the CRM.
+            if (
+                '' !== (string) $signing_key
+                && class_exists( 'SCAI_Calendly' )
+                && '' === (string) get_option( 'smart_chat_calendly_signing_key', '' )
+            ) : ?>
+                <div class="notice notice-warning"><p><?php esc_html_e( 'Heads up: Midland Chat is active but its Calendly connection is separate from this one and is not connected yet. Connect Calendly in the chat settings so chat bookings also reach the CRM.', 'smart-forms-for-midland' ); ?></p></div>
+            <?php endif; ?>
+
             <?php $is_connected = '' !== (string) get_option( 'sfco_pro_calendly_signing_key', '' ); ?>
             <p>
                 <?php if ( $is_connected ) : ?>

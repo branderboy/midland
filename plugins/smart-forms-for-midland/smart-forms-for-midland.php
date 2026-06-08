@@ -104,6 +104,13 @@ class SFCO_Plugin {
     }
 
     public function maybe_install_tables() {
+        // Defensive: this runs on plugins_loaded, so a partial/failed include of
+        // the core DB class would otherwise fatal on the create_tables() call
+        // below. Bail quietly and let the next request retry once the class is
+        // present rather than white-screening the whole site.
+        if ( ! class_exists( 'SFCO_Database' ) || ! method_exists( 'SFCO_Database', 'create_tables' ) ) {
+            return;
+        }
         $current = get_option( 'sfco_db_version', '0' );
         if ( version_compare( $current, SFCO_VERSION, '>=' ) ) {
             return;

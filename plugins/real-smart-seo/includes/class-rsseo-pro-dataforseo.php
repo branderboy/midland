@@ -46,7 +46,7 @@ class RSSEO_Pro_DataForSEO {
         $password = self::get_password();
 
         if ( empty( $login ) || empty( $password ) ) {
-            return new WP_Error( 'no_credentials', __( 'DataForSEO credentials not configured.', 'real-smart-seo-pro' ) );
+            return new WP_Error( 'no_credentials', __( 'DataForSEO credentials not configured.', 'real-smart-seo' ) );
         }
 
         $response = wp_remote_post( self::BASE_URL . $endpoint, array(
