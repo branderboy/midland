@@ -67,7 +67,22 @@ class Smart_Forms_Handler {
             // DB-built form: required = whatever the field builder marked required.
             foreach ( $db_fields as $f ) {
                 $key = $f['key'] ?? '';
-                if ( $key && ! empty( $f['required'] ) && empty( $_POST[ $key ] ) ) {
+                if ( '' === $key || empty( $f['required'] ) ) {
+                    continue;
+                }
+                if ( 'file' === ( $f['type'] ?? '' ) ) {
+                    // File inputs arrive in $_FILES, not $_POST — a required file
+                    // field is satisfied when an upload is present (single or [].).
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at top of handle_submission()
+                    $fname    = isset( $_FILES[ $key ]['name'] ) ? $_FILES[ $key ]['name'] : '';
+                    $has_file = is_array( $fname ) ? ( count( array_filter( (array) $fname ) ) > 0 ) : ( '' !== (string) $fname );
+                    if ( ! $has_file ) {
+                        wp_send_json_error( array(
+                            /* translators: %s: field label */
+                            'message' => sprintf( esc_html__( '%s is required', 'smart-forms-for-midland' ), esc_html( $f['label'] ?? $key ) ),
+                        ) );
+                    }
+                } elseif ( empty( $_POST[ $key ] ) ) {
                     wp_send_json_error( array(
                         /* translators: %s: field label */
                         'message' => sprintf( esc_html__( '%s is required', 'smart-forms-for-midland' ), esc_html( $f['label'] ?? $key ) ),
