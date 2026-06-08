@@ -66,12 +66,12 @@ class SCRM_Pro_Admin {
         if ( strpos( $hook, 'scrm-' ) === false && strpos( $hook, 'smart-crm' ) === false ) {
             return;
         }
+        // Only the stylesheet is needed. The old admin.js drove a campaign
+        // launch/delete UI that no longer exists (this plugin is a passthrough
+        // with a single Settings page and no campaign builder), and the
+        // "Test connection" buttons carry their own inline nonce, so there is
+        // nothing left for a global script to do.
         wp_enqueue_style( 'scrm-pro-admin', SCRM_PRO_URL . 'admin/css/admin.css', array(), SCRM_PRO_VERSION );
-        wp_enqueue_script( 'scrm-pro-admin', SCRM_PRO_URL . 'admin/js/admin.js', array( 'jquery' ), SCRM_PRO_VERSION, true );
-        wp_localize_script( 'scrm-pro-admin', 'scrmProData', array(
-            'ajaxurl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( 'scrm_pro_nonce' ),
-        ) );
     }
 
     public function render_landing() {
