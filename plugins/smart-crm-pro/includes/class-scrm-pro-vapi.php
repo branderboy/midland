@@ -191,7 +191,7 @@ class SCRM_Pro_Vapi {
         <div class="wrap">
             <h1><?php esc_html_e( 'Vapi — Outbound AI Call', 'smart-crm-pro' ); ?></h1>
             <p class="description" style="max-width:720px;">
-                <?php esc_html_e( 'When a new lead submits the form, Vapi makes an immediate outbound call from your Midland number, plays a short message confirming receipt, and tells them a real person will follow up. Replaces the "did the form actually go through?" anxiety with a phone call before they leave the page.', 'smart-forms-for-midland' ); ?>
+                <?php esc_html_e( 'When a new lead submits the form, Vapi makes an immediate outbound call from your Midland number, plays a short message confirming receipt, and tells them a real person will follow up. Replaces the "did the form actually go through?" anxiety with a phone call before they leave the page.', 'smart-crm-pro' ); ?>
             </p>
 
             <?php if ( ! empty( $_GET['saved'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>

@@ -11,7 +11,7 @@
  * Domain Path: /languages
  * Requires at least: 5.5
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 6.9
  * Update URI: false
  */
 

@@ -136,7 +136,18 @@ Apprentice Electrician,Electrical,"Boston, MA",$18-$25/hr,part-time,"High school
         $imported = $skipped = $errors = 0;
         foreach ( $jobs as $job ) {
             if ( empty( $job['title'] ) ) { $errors++; continue; }
-            if ( $skip_dup && get_page_by_title( $job['title'], OBJECT, 'dpjp_job' ) ) { $skipped++; continue; }
+            // get_page_by_title() is deprecated since WP 6.2; use a bounded title query.
+            if ( $skip_dup ) {
+                $dup = get_posts( array(
+                    'post_type'      => 'dpjp_job',
+                    'title'          => $job['title'],
+                    'post_status'    => 'any',
+                    'posts_per_page' => 1,
+                    'fields'         => 'ids',
+                    'no_found_rows'  => true,
+                ) );
+                if ( ! empty( $dup ) ) { $skipped++; continue; }
+            }
 
             $reqs = $job['requirements'] ?? '';
             if ( is_array( $reqs ) ) $reqs = implode( "\n", $reqs );

@@ -16,7 +16,7 @@ class WGB_Claude_API {
 
 	const API_URL     = 'https://api.anthropic.com/v1/messages';
 	const API_VERSION = '2023-06-01';
-	const MODEL       = 'claude-sonnet-4-6-20250514';
+	const MODEL       = 'claude-sonnet-4-6';
 	const MAX_RETRIES = 3;
 
 	/**
@@ -242,7 +242,8 @@ class WGB_Claude_API {
 	 * @param string $key Plain text API key.
 	 */
 	public static function save_api_key( $key ) {
-		update_option( 'wgb_anthropic_api_key', WGB_Settings::encrypt( $key ) );
+		// autoload=no to match the GitHub token / webhook secret (not loaded on every request).
+		update_option( 'wgb_anthropic_api_key', WGB_Settings::encrypt( $key ), false );
 	}
 
 	/**

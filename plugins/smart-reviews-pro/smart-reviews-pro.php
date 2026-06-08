@@ -53,7 +53,10 @@ class Smart_Reviews_Pro {
         // events were left orphaned in WP-Cron.)
         wp_clear_scheduled_hook( 'srp_cron_reminders' );  // hourly survey reminders
         wp_clear_scheduled_hook( 'srp_crm_poll' );        // hourly CRM poll
-        wp_clear_scheduled_hook( 'srp_review_reminder' ); // 48h GMB review nudges
+        // srp_review_reminder is scheduled WITH an arg (the survey id), so
+        // wp_clear_scheduled_hook() (no args) would leave those events orphaned.
+        // wp_unschedule_hook() removes every event for the hook regardless of args.
+        wp_unschedule_hook( 'srp_review_reminder' );      // 48h GMB review nudges (per-survey args)
     }
 
     public function init() {

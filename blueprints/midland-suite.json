@@ -1,0 +1,47 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "Midland plugin suite — QA verification",
+    "description": "Boots WordPress and installs + activates all four Midland plugins in dependency order (Smart Forms -> Smart Chat -> Smart CRM -> Real Smart SEO). Smart CRM hard-requires Smart Forms, so order matters.",
+    "author": "midland"
+  },
+  "landingPage": "/wp-admin/plugins.php",
+  "preferredVersions": { "php": "8.2", "wp": "latest" },
+  "phpExtensionBundles": ["kitchen-sink"],
+  "features": { "networking": true },
+  "login": true,
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://raw.githubusercontent.com/branderboy/midland/refs/heads/claude/optimistic-allen-r4wzay/dist/smart-forms-for-midland.zip"
+      },
+      "options": { "activate": true }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://raw.githubusercontent.com/branderboy/midland/refs/heads/claude/optimistic-allen-r4wzay/dist/smart-chat-ai-patched-v2.zip"
+      },
+      "options": { "activate": true }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://raw.githubusercontent.com/branderboy/midland/refs/heads/claude/optimistic-allen-r4wzay/dist/smart-crm-pro-fixed.zip"
+      },
+      "options": { "activate": true }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://raw.githubusercontent.com/branderboy/midland/refs/heads/claude/optimistic-allen-r4wzay/dist/real-smart-seo-patched.zip"
+      },
+      "options": { "activate": true }
+    }
+  ]
+}
