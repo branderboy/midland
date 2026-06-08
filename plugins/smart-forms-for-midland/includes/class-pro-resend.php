@@ -54,7 +54,12 @@ class SFCO_Pro_Resend {
         }
 
         update_option( 'sfco_resend_enabled',    isset( $_POST['resend_enabled'] ) ? 1 : 0 );
-        update_option( 'sfco_resend_api_key',    sanitize_text_field( wp_unslash( $_POST['resend_api_key'] ?? '' ) ) );
+        // Only overwrite the stored key when a new one is actually entered; the
+        // field renders blank (masked), so an empty post means "keep existing".
+        $resend_key = sanitize_text_field( wp_unslash( $_POST['resend_api_key'] ?? '' ) );
+        if ( '' !== $resend_key ) {
+            update_option( 'sfco_resend_api_key', $resend_key );
+        }
         update_option( 'sfco_resend_from_name',  sanitize_text_field( wp_unslash( $_POST['resend_from_name'] ?? '' ) ) );
         update_option( 'sfco_resend_from_email', sanitize_email( wp_unslash( $_POST['resend_from_email'] ?? '' ) ) );
 
@@ -245,7 +250,7 @@ class SFCO_Pro_Resend {
                     <tr>
                         <th><label for="resend_api_key"><?php esc_html_e( 'Resend API Key', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
-                            <input type="password" id="resend_api_key" name="resend_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>">
+                            <input type="password" id="resend_api_key" name="resend_api_key" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) $api_key ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : '' ); ?>">
                             <p class="description"><?php esc_html_e( 'Get your key at resend.com → API Keys. Starts with "re_".', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>

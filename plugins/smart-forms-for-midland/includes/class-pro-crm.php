@@ -300,7 +300,7 @@ class SFCO_Pro_CRM {
                     <tr>
                         <th><label for="crm_api_key"><?php esc_html_e( 'API Key', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
-                            <input type="password" name="crm_api_key" id="crm_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" placeholder="<?php esc_attr_e( 'Enter your API key...', 'smart-forms-for-midland' ); ?>">
+                            <input type="password" name="crm_api_key" id="crm_api_key" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) $api_key ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : __( 'Enter your API key...', 'smart-forms-for-midland' ) ); ?>">
                             <button type="button" class="button" id="sfco-test-crm"><?php esc_html_e( 'Test Connection', 'smart-forms-for-midland' ); ?></button>
                             <span id="sfco-crm-test-result"></span>
                         </td>
