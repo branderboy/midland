@@ -445,23 +445,23 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         $feedback = sanitize_textarea_field( wp_unslash( $_POST['feedback'] ?? '' ) );
         SRP_DB::update_survey( $survey->id, array( 'feedback' => $feedback ) );
 
-        // Notify owner — shares the owner-alert cap with low-score alerts, so the
-        // owner gets at most EMAIL_CAP alert emails total before they stop.
-        if ( self::consume_email_cap( 'srp_owner_alert_count' ) ) {
-            // Re-sanitize DB values for the email context: strip tags/control chars
-            // so a stored name or email can't inject headers or unexpected content.
-            $owner_email       = get_option( 'admin_email' );
-            $business          = wp_strip_all_tags( self::business_name() );
-            $safe_name         = sanitize_text_field( $survey->customer_name );
-            $safe_email        = sanitize_email( $survey->customer_email );
-            $safe_score        = absint( $survey->score );
-            wp_mail(
-                $owner_email,
-                "[{$business}] Private feedback received — score {$safe_score}/5",
-                "Customer: {$safe_name} ({$safe_email})\nScore: {$safe_score}/5\n\nFeedback:\n{$feedback}",
-                array( 'Content-Type: text/plain; charset=UTF-8' )
-            );
-        }
+        // Notify the owner of every private-feedback submission. (Bounded
+        // naturally: each survey collects feedback once. The old global
+        // srp_owner_alert_count cap suppressed ALL alerts after 3 lifetime
+        // sends, silently hiding later customers' complaints — removed.)
+        // Re-sanitize DB values for the email context: strip tags/control chars
+        // so a stored name or email can't inject headers or unexpected content.
+        $owner_email       = get_option( 'admin_email' );
+        $business          = wp_strip_all_tags( self::business_name() );
+        $safe_name         = sanitize_text_field( $survey->customer_name );
+        $safe_email        = sanitize_email( $survey->customer_email );
+        $safe_score        = absint( $survey->score );
+        wp_mail(
+            $owner_email,
+            "[{$business}] Private feedback received — score {$safe_score}/5",
+            "Customer: {$safe_name} ({$safe_email})\nScore: {$safe_score}/5\n\nFeedback:\n{$feedback}",
+            array( 'Content-Type: text/plain; charset=UTF-8' )
+        );
 
         wp_send_json_success();
     }
@@ -497,10 +497,10 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         if ( ! is_email( $email ) ) {
             return;
         }
-        // Capped: after SRP_Survey::EMAIL_CAP reminder emails have gone out, stop.
-        if ( ! self::consume_email_cap( 'srp_reminder_count' ) ) {
-            return;
-        }
+        // Reminder volume is already bounded to <=3 PER SURVEY by the
+        // reminder1/2/3_at timestamp columns (see get_pending_reminders*). The
+        // old global srp_reminder_count cap stopped ALL reminders after 3
+        // lifetime sends across every survey — removed as a bug.
         $token = SRP_DB::build_token( $survey->id );
         $url   = add_query_arg( array( 'srp_survey' => $token ), home_url( '/' ) );
         $name  = $survey->customer_name ?: 'there';
