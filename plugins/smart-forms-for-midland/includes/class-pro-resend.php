@@ -35,8 +35,8 @@ class SFCO_Pro_Resend {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Email Transport', 'smart-forms-pro' ),
-            esc_html__( 'Email Transport', 'smart-forms-pro' ),
+            esc_html__( 'Email Transport', 'smart-forms-for-midland' ),
+            esc_html__( 'Email Transport', 'smart-forms-for-midland' ),
             'manage_options',
             'sfco-resend',
             array( $this, 'render_page' )
@@ -50,7 +50,7 @@ class SFCO_Pro_Resend {
 
         $nonce = isset( $_POST['_sfco_resend_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_resend_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_save_resend' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         update_option( 'sfco_resend_enabled',    isset( $_POST['resend_enabled'] ) ? 1 : 0 );
@@ -69,7 +69,7 @@ class SFCO_Pro_Resend {
 
         $nonce = isset( $_POST['_sfco_resend_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_resend_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_save_resend' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         $to = sanitize_email( wp_unslash( $_POST['test_email_to'] ?? '' ) );
@@ -215,18 +215,18 @@ class SFCO_Pro_Resend {
         // phpcs:enable
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Email Transport — Resend', 'smart-forms-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Route all WordPress emails through Resend for instant, reliable delivery. No more leads lost to spam.', 'smart-forms-pro' ); ?></p>
+            <h1><?php esc_html_e( 'Email Transport — Resend', 'smart-forms-for-midland' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Route all WordPress emails through Resend for instant, reliable delivery. No more leads lost to spam.', 'smart-forms-for-midland' ); ?></p>
 
             <?php if ( $saved ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
             <?php if ( 'ok' === $test ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Test email sent successfully via Resend.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Test email sent successfully via Resend.', 'smart-forms-for-midland' ); ?></p></div>
             <?php elseif ( 'fail' === $test ) : ?>
-                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'Test email failed. Check your API key.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'Test email failed. Check your API key.', 'smart-forms-for-midland' ); ?></p></div>
             <?php elseif ( 'invalid' === $test ) : ?>
-                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'Invalid test email address.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'Invalid test email address.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
@@ -234,56 +234,56 @@ class SFCO_Pro_Resend {
 
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'Enable Resend Transport', 'smart-forms-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Enable Resend Transport', 'smart-forms-for-midland' ); ?></th>
                         <td>
                             <label>
                                 <input type="checkbox" name="resend_enabled" value="1" <?php checked( $enabled ); ?>>
-                                <?php esc_html_e( 'Route all wp_mail through Resend SMTP', 'smart-forms-pro' ); ?>
+                                <?php esc_html_e( 'Route all wp_mail through Resend SMTP', 'smart-forms-for-midland' ); ?>
                             </label>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="resend_api_key"><?php esc_html_e( 'Resend API Key', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="resend_api_key"><?php esc_html_e( 'Resend API Key', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <input type="password" id="resend_api_key" name="resend_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>">
-                            <p class="description"><?php esc_html_e( 'Get your key at resend.com → API Keys. Starts with "re_".', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Get your key at resend.com → API Keys. Starts with "re_".', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="resend_from_name"><?php esc_html_e( 'From Name', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="resend_from_name"><?php esc_html_e( 'From Name', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="text" id="resend_from_name" name="resend_from_name" class="regular-text" value="<?php echo esc_attr( $from_name ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="resend_from_email"><?php esc_html_e( 'From Email', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="resend_from_email"><?php esc_html_e( 'From Email', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <input type="email" id="resend_from_email" name="resend_from_email" class="regular-text" value="<?php echo esc_attr( $from_email ); ?>">
-                            <p class="description"><?php esc_html_e( 'Must be from a domain verified in your Resend account.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Must be from a domain verified in your Resend account.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                 </table>
 
                 <p class="submit">
-                    <button type="submit" name="sfco_save_resend" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_save_resend" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-for-midland' ); ?></button>
                 </p>
             </form>
 
             <hr>
-            <h2><?php esc_html_e( 'Send Test Email', 'smart-forms-pro' ); ?></h2>
+            <h2><?php esc_html_e( 'Send Test Email', 'smart-forms-for-midland' ); ?></h2>
             <form method="post">
                 <?php wp_nonce_field( 'sfco_save_resend', '_sfco_resend_nonce' ); ?>
                 <table class="form-table">
                     <tr>
-                        <th><label for="test_email_to"><?php esc_html_e( 'Send Test To', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="test_email_to"><?php esc_html_e( 'Send Test To', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="email" id="test_email_to" name="test_email_to" class="regular-text" value="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>"></td>
                     </tr>
                 </table>
                 <p class="submit">
-                    <button type="submit" name="sfco_test_email" value="1" class="button"><?php esc_html_e( 'Send Test Email', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_test_email" value="1" class="button"><?php esc_html_e( 'Send Test Email', 'smart-forms-for-midland' ); ?></button>
                 </p>
             </form>
 
             <hr>
-            <h3><?php esc_html_e( 'SMTP Details (for reference)', 'smart-forms-pro' ); ?></h3>
+            <h3><?php esc_html_e( 'SMTP Details (for reference)', 'smart-forms-for-midland' ); ?></h3>
             <table class="widefat" style="max-width:500px">
                 <tr><td><strong>Host</strong></td><td>smtp.resend.com</td></tr>
                 <tr><td><strong>Port</strong></td><td>465 (SSL)</td></tr>

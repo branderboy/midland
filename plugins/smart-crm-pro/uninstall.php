@@ -15,5 +15,12 @@ $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'scrm\_pro\_%
 
 wp_clear_scheduled_hook( 'scrm_pro_daily_scan' );
 wp_clear_scheduled_hook( 'scrm_pro_send_campaign_email' );
-// The only cron the plugin actually schedules — the ServiceM8 status poller.
+// The recurring ServiceM8 status poller.
 wp_clear_scheduled_hook( 'scrm_pro_sm8_poll_jobs' );
+// Per-lead follow-up reminders are scheduled as single events WITH a lead_id
+// argument, so wp_clear_scheduled_hook() (which matches on args) would leave
+// every distinct-arg event behind. wp_unschedule_hook() clears them all
+// regardless of args, so no orphaned reminder crons survive an uninstall.
+if ( function_exists( 'wp_unschedule_hook' ) ) {
+    wp_unschedule_hook( 'scrm_pro_follow_up_reminder' );
+}

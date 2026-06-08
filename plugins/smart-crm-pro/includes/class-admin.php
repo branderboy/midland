@@ -13,7 +13,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SCRM_Pro_Admin {
 
+    /**
+     * Single shared instance. Admin is the one module the bootstrap owns
+     * directly (the others self-instantiate at load), so this accessor keeps
+     * it consistent with the rest of the suite and guards against a second
+     * `new SCRM_Pro_Admin()` registering duplicate admin_menu / enqueue hooks.
+     *
+     * @var SCRM_Pro_Admin|null
+     */
+    private static $instance = null;
+
+    /**
+     * Get (or lazily create) the shared instance.
+     *
+     * @return SCRM_Pro_Admin
+     */
+    public static function get_instance() {
+        if ( null === self::$instance ) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
     public function __construct() {
+        // Idempotency guard: if an instance already exists, do not register the
+        // hooks again. This makes a stray `new SCRM_Pro_Admin()` harmless.
+        if ( null !== self::$instance ) {
+            return;
+        }
+        self::$instance = $this;
+
         add_action( 'admin_menu', array( $this, 'add_menu' ), 40 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
     }
