@@ -113,7 +113,33 @@ class Smart_Forms_Handler {
                 );
             }
         }
-        
+
+        // Builder-created "File Upload" fields render <input type="file"
+        // name="{key}">, so their upload arrives as $_FILES[{key}] — NOT photos[].
+        // Process each declared file field and attach its stored URL(s) to the
+        // lead (under photo_urls so they surface with the other attachments, and
+        // keyed in $file_field_urls so the field association is preserved below).
+        $file_field_urls = array();
+        foreach ( $db_fields as $f ) {
+            $key = $f['key'] ?? '';
+            if ( '' === $key || 'photos' === $key || 'file' !== ( $f['type'] ?? '' ) ) {
+                continue;
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified at top of handle_submission()
+            if ( empty( $_FILES[ $key ] ) ) {
+                continue;
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- nonce verified above; files validated in store_uploaded_files()
+            $field_urls = $this->store_uploaded_files( $_FILES[ $key ] );
+            if ( is_wp_error( $field_urls ) ) {
+                wp_send_json_error( array( 'message' => esc_html( $field_urls->get_error_message() ) ) );
+            }
+            if ( ! empty( $field_urls ) ) {
+                $photo_urls = array_merge( (array) $photo_urls, $field_urls );
+                $file_field_urls[ $key ] = $field_urls;
+            }
+        }
+
         // Calculate estimate
         $square_footage = isset( $_POST['square_footage'] ) ? absint( $_POST['square_footage'] ) : 0;
         $project_type = isset( $_POST['project_type'] ) ? sanitize_text_field( wp_unslash( $_POST['project_type'] ) ) : '';
@@ -134,6 +160,12 @@ class Smart_Forms_Handler {
                 continue;
             }
             $extra_fields[ sanitize_key( $k ) ] = is_array( $v ) ? array_map( 'sanitize_text_field', $v ) : sanitize_text_field( $v );
+        }
+
+        // Uploaded file fields aren't present in $_POST, so record their stored
+        // URLs here keyed by field so the association survives on the lead.
+        foreach ( $file_field_urls as $fk => $urls ) {
+            $extra_fields[ sanitize_key( $fk ) ] = implode( ', ', array_map( 'esc_url_raw', $urls ) );
         }
 
         // Prepare lead data
@@ -338,82 +370,87 @@ class Smart_Forms_Handler {
     }
 
     private function handle_photo_uploads() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified in handle_submission(); files validated in store_uploaded_files().
+        return isset( $_FILES['photos'] ) ? $this->store_uploaded_files( $_FILES['photos'] ) : array();
+    }
+
+    /**
+     * Validate and store one $_FILES entry, whether it's a multi-file field
+     * (photos[] — array-shaped) or a single-file field (a builder "File Upload"
+     * field, name="{key}" — string-shaped). Returns an array of stored URLs, or
+     * a WP_Error on a validation failure. Empty / no-file entries return array().
+     *
+     * @param array $files A single $_FILES[...] entry.
+     * @return array|WP_Error
+     */
+    private function store_uploaded_files( $files ) {
         if ( ! function_exists( 'wp_handle_upload' ) ) {
             require_once ABSPATH . 'wp-admin/includes/file.php';
         }
-        
+
         $uploaded_files = array();
-        
-        // Check if files exist and are valid
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_submission()
-        if ( ! isset( $_FILES['photos'] ) || ! isset( $_FILES['photos']['name'] ) ) {
+
+        if ( empty( $files ) || ! isset( $files['name'] ) ) {
             return $uploaded_files;
         }
-        
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified in handle_submission(), files validated below
-        $files = $_FILES['photos'];
-        
-        // Max 5 photos, 5MB each
+
+        // Normalize single-file (string) and multi-file ([] => array) shapes into
+        // uniform lists, so indexing $names[$i] is always valid (the old code
+        // indexed a string by [0], reading one character of the filename).
+        $names = (array) $files['name'];
+        $tmps  = (array) $files['tmp_name'];
+        $errs  = (array) $files['error'];
+        $sizes = (array) $files['size'];
+
         $max_files = 5;
-        $max_size = 5 * 1024 * 1024; // 5MB
-        
-        $file_count = is_array( $files['name'] ) ? count( $files['name'] ) : 1;
-        
-        if ( $file_count > $max_files ) {
-            return new WP_Error( 'too_many_files', sprintf( 
+        $max_size  = 5 * 1024 * 1024; // 5MB
+        // Images (project photos) + common résumé/document formats (the job
+        // application posts a PDF/DOC/DOCX through this same path).
+        $allowed_types = array( 'jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx' );
+
+        if ( count( $names ) > $max_files ) {
+            return new WP_Error( 'too_many_files', sprintf(
                 /* translators: %d: maximum number of files */
-                esc_html__( 'Maximum %d photos allowed', 'smart-forms-for-midland' ), 
-                $max_files 
+                esc_html__( 'Maximum %d files allowed', 'smart-forms-for-midland' ),
+                $max_files
             ) );
         }
-        
-        for ( $i = 0; $i < $file_count; $i++ ) {
-            // Defensive checks for all array indexes
-            if ( ! isset( $files['name'][ $i ] ) || ! isset( $files['tmp_name'][ $i ] ) ) {
+
+        foreach ( $names as $i => $name ) {
+            // Skip empty / unfilled optional file inputs (UPLOAD_ERR_NO_FILE).
+            if ( '' === $name || ! isset( $tmps[ $i ] ) ) {
                 continue;
             }
-            
-            if ( ! isset( $files['error'][ $i ] ) || $files['error'][ $i ] !== UPLOAD_ERR_OK ) {
+            if ( ! isset( $errs[ $i ] ) || UPLOAD_ERR_OK !== $errs[ $i ] ) {
                 continue;
             }
-            
-            if ( ! isset( $files['size'][ $i ] ) || $files['size'][ $i ] > $max_size ) {
+            if ( ! isset( $sizes[ $i ] ) || $sizes[ $i ] > $max_size ) {
                 return new WP_Error( 'file_too_large', esc_html__( 'File size exceeds 5MB limit', 'smart-forms-for-midland' ) );
             }
-            
+
             $file = array(
-                'name' => sanitize_file_name( $files['name'][ $i ] ),
-                'tmp_name' => $files['tmp_name'][ $i ],
-                'error' => $files['error'][ $i ],
-                'size' => $files['size'][ $i ],
+                'name'     => sanitize_file_name( $name ),
+                'tmp_name' => $tmps[ $i ],
+                'error'    => $errs[ $i ],
+                'size'     => $sizes[ $i ],
             );
-            
-            // Validate file type using WordPress
+
             $filetype = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'] );
-            
             if ( ! $filetype['ext'] || ! $filetype['type'] ) {
                 return new WP_Error( 'invalid_file_type', esc_html__( 'Invalid file type', 'smart-forms-for-midland' ) );
             }
-            
-            // Allow images (project photos) and common résumé/document formats —
-            // the job-application form posts a PDF/DOC/DOCX résumé through this
-            // same photos[] field, so an images-only filter silently dropped them.
-            $allowed_types = array( 'jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx' );
             if ( ! in_array( $filetype['ext'], $allowed_types, true ) ) {
                 return new WP_Error( 'invalid_file', esc_html__( 'Only JPG, PNG, GIF images and PDF/DOC/DOCX documents are allowed', 'smart-forms-for-midland' ) );
             }
-            
             $file['type'] = $filetype['type'];
-            
+
             $upload = wp_handle_upload( $file, array( 'test_form' => false ) );
-            
             if ( isset( $upload['error'] ) ) {
                 return new WP_Error( 'upload_failed', esc_html( $upload['error'] ) );
             }
-            
             $uploaded_files[] = esc_url_raw( $upload['url'] );
         }
-        
+
         return $uploaded_files;
     }
     

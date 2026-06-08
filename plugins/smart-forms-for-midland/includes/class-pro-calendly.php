@@ -384,6 +384,35 @@ class SFCO_Pro_Calendly {
          */
         do_action( 'sfco_lead_booked', $lead, $is_rebook );
 
+        // Mirror the confirmed booking onto Google Calendar. The GCal module
+        // listens on sfco_appointment_confirmed but nothing fired it before, so
+        // events were never created. create_event() no-ops if GCal isn't
+        // connected, so this is safe to fire unconditionally when we have a time.
+        if ( '' !== $time && class_exists( 'SFCO_Pro_GCal' ) ) {
+            $service = ( isset( $lead->project_type ) && '' !== (string) $lead->project_type )
+                ? ' — ' . $lead->project_type
+                : '';
+            /**
+             * Booking-confirmed signal. Keys match SFCO_Pro_GCal::create_event().
+             *
+             * @param array $appointment Calendar event details.
+             */
+            do_action( 'sfco_appointment_confirmed', array(
+                'start'          => $time,
+                'title'          => trim( ( $name ? $name : ( $email ? $email : __( 'Appointment', 'smart-forms-for-midland' ) ) ) . $service ),
+                'description'    => sprintf(
+                    /* translators: 1: customer name, 2: email, 3: phone */
+                    __( "Booked via Calendly.\nCustomer: %1\$s\nEmail: %2\$s\nPhone: %3\$s", 'smart-forms-for-midland' ),
+                    $name,
+                    $email,
+                    isset( $lead->customer_phone ) ? $lead->customer_phone : ''
+                ),
+                'attendee_email' => $email,
+                'attendee_name'  => $name,
+                'status'         => 'confirmed',
+            ) );
+        }
+
         // Calendly's responsibility ends here: the lead is Booked, i.e. the
         // service is scheduled. We do NOT schedule any auto-completion — whether
         // the job was actually done (and paid) is reported by ServiceM8, which
