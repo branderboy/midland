@@ -201,7 +201,7 @@ class DPJP_Admin {
         } else {
             echo "<input type='{$type}' id='{$key}' name='{$key}' value='" . esc_attr( $val ) . "' class='regular-text'>";
         }
-        echo "<p class='description'>{$f['desc']}</p></td></tr>";
+        echo "<p class='description'>" . esc_html( $f['desc'] ) . "</p></td></tr>";
     }
 
     public static function save_settings(): void {

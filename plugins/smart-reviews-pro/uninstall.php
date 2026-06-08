@@ -30,7 +30,12 @@ $purge = get_option( 'srp_purge_on_uninstall', '0' ) === '1'
 if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
     wp_clear_scheduled_hook( 'srp_cron_reminders' );  // hourly survey reminders
     wp_clear_scheduled_hook( 'srp_crm_poll' );        // hourly CRM poll
-    wp_clear_scheduled_hook( 'srp_review_reminder' ); // 48h GMB review nudges
+    // Scheduled with a per-survey arg, so clear every variant regardless of args.
+    if ( function_exists( 'wp_unschedule_hook' ) ) {
+        wp_unschedule_hook( 'srp_review_reminder' );  // 48h GMB review nudges (per-survey args)
+    } else {
+        wp_clear_scheduled_hook( 'srp_review_reminder' );
+    }
 }
 
 /* ------------------------------------------------------------------ *

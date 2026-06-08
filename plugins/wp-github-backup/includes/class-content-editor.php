@@ -293,7 +293,9 @@ class WGB_Content_Editor {
 			if ( ! isset( $obj['@context'] ) ) {
 				$obj['@context'] = 'https://schema.org';
 			}
-			echo '<script type="application/ld+json">' . wp_json_encode( $obj, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n";
+			// Keep slashes escaped so a "</script>" inside any string value can't
+			// break out of the JSON-LD block. Google parses the escaped form fine.
+			echo '<script type="application/ld+json">' . wp_json_encode( $obj, JSON_UNESCAPED_UNICODE ) . '</script>' . "\n";
 		}
 	}
 }
