@@ -44,12 +44,13 @@ class SCAI_Calendly {
     }
 
     /**
-     * True once Connect has stored a signing key + webhook subscription, i.e.
-     * bookings will actually reach the chat (and therefore the CRM).
+     * True once Connect has stored a signing key — that is the secret used to
+     * verify inbound bookings, so it's the real "are we wired up" signal. The
+     * webhook URI is only bookkeeping for reconnect, so it is NOT required here
+     * (requiring it caused a false "not connected" when only the key was saved).
      */
     public static function is_connected() {
-        return '' !== (string) get_option( 'smart_chat_calendly_signing_key', '' )
-            && '' !== (string) get_option( 'smart_chat_calendly_webhook_uri', '' );
+        return '' !== (string) get_option( 'smart_chat_calendly_signing_key', '' );
     }
 
     /**
