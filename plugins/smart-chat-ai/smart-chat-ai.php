@@ -62,9 +62,11 @@ class SCAI_Plugin {
      * Initialize hooks
      */
     private function init_hooks() {
-        // Activation/Deactivation
-        register_activation_hook(__FILE__, array($this, 'activate'));
-        register_deactivation_hook(__FILE__, array($this, 'deactivate'));
+        // NOTE: activation/deactivation hooks are registered at file scope (see
+        // bottom of file), NOT here. This class is instantiated on 'plugins_loaded',
+        // which has already fired by the time WordPress runs an activation request —
+        // so a register_activation_hook() call in this method would never bind and
+        // activate() would never run on a fresh install.
 
         add_action('init', array($this, 'load_textdomain'));
 
@@ -523,7 +525,7 @@ class SCAI_Plugin {
         // Fall back to the IP-derived ID only when no token is present,
         // which happens on the very first request before JS has stored one.
         $posted_token = isset( $_POST['session_id'] ) ? sanitize_text_field( wp_unslash( $_POST['session_id'] ) ) : '';
-        $is_browser_token = ( '' !== $posted_token && preg_match( '/^sc_[a-z0-9_]+$/i', $posted_token ) );
+        $is_browser_token = ( '' !== $posted_token && strlen( $posted_token ) <= 64 && preg_match( '/^sc_[a-z0-9_]+$/i', $posted_token ) );
         $session_id = $is_browser_token ? $posted_token : $this->session_id_for_ip();
 
         // Rate limit on the hashed IP — NOT the browser token. Keying on the
@@ -907,3 +909,12 @@ function scai_init() {
 }
 
 add_action('plugins_loaded', 'scai_init');
+
+// Activation/deactivation must be registered at file scope (during the initial
+// include), because the plugin instance is created on 'plugins_loaded' — which
+// has already fired by the time an activation request reaches the activate_
+// action. Registering here guarantees activate() runs on a fresh install
+// (table creation + default options) instead of relying on the admin_init
+// self-heal fallback.
+register_activation_hook(__FILE__, function () { SCAI_Plugin::get_instance()->activate(); });
+register_deactivation_hook(__FILE__, function () { SCAI_Plugin::get_instance()->deactivate(); });
