@@ -202,7 +202,14 @@ class MLS_GMB_Optimizer {
 
 			$listing = MLS_DataForSEO::get_gmb_listing( $name, $this->lat( $identity ), $this->lng( $identity ) );
 			if ( is_wp_error( $listing ) ) {
-				echo '<div class="notice notice-error"><p>' . esc_html( $listing->get_error_message() ) . '</p></div>';
+				$msg = $listing->get_error_message();
+				if ( false !== stripos( $msg, 'not authorized' ) || false !== stripos( $msg, 'access denied' ) || false !== stripos( $msg, '40301' ) ) {
+					echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'Live GBP scoring unavailable.', 'midland-local-seo' ) . '</strong> '
+						. esc_html__( 'Your DataForSEO plan doesn’t have access to the Google Maps SERP API this needs. Enable it on your account, or use the best-practice checklist below.', 'midland-local-seo' )
+						. ' <a href="https://app.dataforseo.com/api-access" target="_blank" rel="noopener noreferrer">' . esc_html__( 'DataForSEO API access', 'midland-local-seo' ) . '</a></p></div>';
+				} else {
+					echo '<div class="notice notice-warning"><p>' . esc_html( $msg ) . '</p></div>';
+				}
 				echo '<h2>' . esc_html__( 'GMB Best-Practice Checklist', 'midland-local-seo' ) . '</h2><ul style="list-style:disc;padding-left:22px;">';
 				foreach ( self::best_practices() as $bp ) {
 					echo '<li>' . esc_html( $bp ) . '</li>';

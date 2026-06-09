@@ -45,6 +45,7 @@ class MLS_SameAs {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 12 );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_migrate_from_rsseo' ), 1 );
 		add_action( 'admin_init', array( $this, 'handle_save' ) );
+		add_action( 'admin_init', array( $this, 'handle_load_defaults' ) );
 		add_action( 'wp_head', array( $this, 'output_schema' ), 5 );
 	}
 
@@ -55,20 +56,44 @@ class MLS_SameAs {
 	 */
 	public static function defaults() {
 		return array(
-			'business_name'        => 'Midland Floors',
+			'business_name'        => 'Midland Floor Care',
 			'business_type'        => 'CleaningService',
-			'business_description' => 'Commercial & residential floor and carpet cleaning serving DC, Maryland, and Northern Virginia.',
+			'business_description' => 'Midland Floor Care is a leading commercial floor care service provider in the DMV area. We specialize in top-notch cleaning solutions for residential and commercial properties, delivering exceptional results with advanced techniques and eco-friendly products.',
 			'business_phone'       => '(240) 532-9097',
 			'business_email'       => 'support@midlandfloors.com',
 			'business_url'         => 'https://midlandfloors.com',
 			'logo_url'             => 'https://midlandfloors.com/wp-content/uploads/2026/05/midland-small-logo-16.png',
 			'price_range'          => '$$',
-			'address_street'       => '',
-			'address_city'         => '',
-			'address_state'        => '',
-			'address_zip'          => '',
+			'address_street'       => '4538 Beech Rd',
+			'address_city'         => 'Temple Hills',
+			'address_state'        => 'MD',
+			'address_zip'          => '20748',
 			'address_country'      => 'US',
+			'center_lat'           => '38.8222169',
+			'center_lng'           => '-76.9356121',
+			'opening_hours'        => array(
+				'mon' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'tue' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'wed' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'thu' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'fri' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'sat' => array( 'mode' => 'closed', 'open' => '', 'close' => '' ),
+				'sun' => array( 'mode' => 'closed', 'open' => '', 'close' => '' ),
+			),
 			'service_areas'        => "Washington, DC\nBethesda, MD\nRockville, MD\nSilver Spring, MD\nArlington, VA\nAlexandria, VA\nFairfax, VA",
+			// Verified citation/profile URLs → emitted as sameAs entity links.
+			'gmb_url'              => 'https://www.google.com/maps/place/?q=place_id:ChIJ59SJ6ue7t4kRIVMYpQVYY6Y',
+			'apple_maps_url'       => 'https://maps.apple.com/place?place-id=IAC53429102E051F4&name=Midland+Floor+Care',
+			'facebook_url'         => 'https://www.facebook.com/midlandfloorcare/',
+			'instagram_url'        => 'https://www.instagram.com/midlandfloors/',
+			'linkedin_url'         => 'https://www.linkedin.com/company/midland-floor-care-llc/',
+			'yelp_url'             => 'https://www.yelp.com/biz/midland-floor-care-temple-hills',
+			'angi_url'             => 'https://www.angi.com/companylist/us/md/temple-hills/midland-floor-care-llc-reviews-1.htm',
+			'homeadvisor_url'      => 'https://www.homeadvisor.com/rated.MidlandFloorCareLLC.88023128.html',
+			'nextdoor_url'         => 'https://nextdoor.com/pages/midland-floor-care',
+			'bing_places_url'      => 'https://www.bing.com/maps?ss=ypid.YNB7AD81AE2B17BE92',
+			// Listings without a dedicated field — one URL per line, merged into sameAs.
+			'extra_sameas'         => "https://www.mapquest.com/us/maryland/midland-floor-care-412618388\nhttps://www.yellowpages.com/temple-hills-md/mip/midland-floor-care-502822336\nhttps://www.manta.com/c/mhkty5k/midland-floor-care\nhttps://www.thebluebook.com/iProView/1330703/midland-floor-care-llc/subcontractors/\nhttps://pgcocmd.chambermaster.com/list/member/midland-floor-care-llc-2875",
 		);
 	}
 
@@ -245,6 +270,10 @@ class MLS_SameAs {
 		// Service areas — one per line.
 		$data['service_areas'] = sanitize_textarea_field( wp_unslash( $_POST['service_areas'] ?? '' ) );
 
+		// Additional listing URLs (one per line) — directories/citations without a
+		// dedicated field; all merged into sameAs.
+		$data['extra_sameas'] = sanitize_textarea_field( wp_unslash( $_POST['extra_sameas'] ?? '' ) );
+
 		// Geo coordinates — decimal. Store '' when blank so empty props are omitted.
 		$data['center_lat'] = self::sanitize_coordinate( $_POST['center_lat'] ?? '', -90, 90 );
 		$data['center_lng'] = self::sanitize_coordinate( $_POST['center_lng'] ?? '', -180, 180 );
@@ -260,6 +289,25 @@ class MLS_SameAs {
 		self::bridge_to_rsseo( $data );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=mls-sameas&saved=1' ) );
+		exit;
+	}
+
+	/**
+	 * One-click: overwrite the saved identity with the bundled Midland profile so
+	 * the operator only has to review and Save & Publish — no manual re-typing.
+	 */
+	public function handle_load_defaults() {
+		if ( ! isset( $_GET['mls_load_defaults'] ) || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'mls_load_defaults' ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'midland-local-seo' ) );
+		}
+		$defaults = self::defaults();
+		update_option( self::OPTION, $defaults );
+		self::bridge_to_rsseo( $defaults );
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-sameas&loaded=1' ) );
 		exit;
 	}
 
@@ -481,6 +529,30 @@ class MLS_SameAs {
 				$sameas[] = esc_url( $d[ $key ] );
 			}
 		}
+		// Additional listing URLs (one per line) — MapQuest, YellowPages, Manta,
+		// Blue Book and any other directory without a named field.
+		if ( ! empty( $d['extra_sameas'] ) ) {
+			foreach ( preg_split( '/\r\n|\r|\n/', (string) $d['extra_sameas'] ) as $line ) {
+				$line = trim( $line );
+				if ( '' !== $line && 0 === strpos( $line, 'http' ) ) {
+					$sameas[] = esc_url( $line );
+				}
+			}
+		}
+		// Every listing tracked in the Citation Audit also reinforces the entity —
+		// the whole point of sameAs is to force the relationship across all of them.
+		if ( class_exists( 'MLS_Citations' ) && method_exists( 'MLS_Citations', 'get_citations' ) ) {
+			$cites = MLS_Citations::get_citations();
+			if ( is_array( $cites ) ) {
+				foreach ( $cites as $cite ) {
+					$cite_url = isset( $cite['url'] ) ? trim( (string) $cite['url'] ) : '';
+					if ( '' !== $cite_url && 0 === strpos( $cite_url, 'http' ) ) {
+						$sameas[] = esc_url( $cite_url );
+					}
+				}
+			}
+		}
+		$sameas = array_values( array_unique( array_filter( $sameas ) ) );
 		if ( $sameas ) {
 			$schema['sameAs'] = $sameas;
 		}
@@ -630,6 +702,15 @@ class MLS_SameAs {
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Business identity saved. Schema is now live in your page <head>.', 'midland-local-seo' ); ?></p></div>
 			<?php endif; ?>
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['loaded'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Midland profile loaded into the form below — review it, then click Save & Publish Schema.', 'midland-local-seo' ); ?></p></div>
+			<?php endif; ?>
+
+			<p>
+				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=mls-sameas&mls_load_defaults=1' ), 'mls_load_defaults' ) ); ?>" class="button" onclick="return confirm('Overwrite every field with the Midland Floor Care profile (name, address, geo, and all listing URLs)?');"><?php esc_html_e( '⤵ Load Midland profile (fills every field)', 'midland-local-seo' ); ?></a>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'One click fills the whole form with your verified NAP + all sameAs listings.', 'midland-local-seo' ); ?></span>
+			</p>
 
 			<form method="post">
 				<?php wp_nonce_field( 'mls_save_sameas', '_mls_sameas_nonce' ); ?>
@@ -750,6 +831,17 @@ class MLS_SameAs {
 						<td>
 							<textarea id="service_areas" name="service_areas" rows="8" class="large-text" placeholder="Bethesda, MD&#10;Rockville, MD&#10;Silver Spring, MD&#10;Washington, DC"><?php echo esc_textarea( $d['service_areas'] ?? '' ); ?></textarea>
 							<p class="description"><?php esc_html_e( 'These populate the areaServed schema field and appear in AI Overview citations.', 'midland-local-seo' ); ?></p>
+						</td>
+					</tr>
+				</table>
+
+				<h2><?php esc_html_e( 'Additional Listing URLs', 'midland-local-seo' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'One URL per line. For directories/citations without a dedicated field below (MapQuest, YellowPages, Manta, Blue Book, Data Axle, etc.). Every line is merged into your sameAs schema so the whole listing footprint reinforces your entity.', 'midland-local-seo' ); ?></p>
+				<table class="form-table">
+					<tr>
+						<th><label for="extra_sameas"><?php esc_html_e( 'Extra sameAs URLs (one per line)', 'midland-local-seo' ); ?></label></th>
+						<td>
+							<textarea id="extra_sameas" name="extra_sameas" rows="6" class="large-text" placeholder="https://www.mapquest.com/...&#10;https://www.yellowpages.com/..."><?php echo esc_textarea( $d['extra_sameas'] ?? '' ); ?></textarea>
 						</td>
 					</tr>
 				</table>

@@ -97,7 +97,16 @@ class MLS_GMB_Competitors {
 
 			$competitors = MLS_DataForSEO::get_maps_competitors( $keyword, $lat, $lng, 20 );
 			if ( is_wp_error( $competitors ) ) {
-				echo '<div class="notice notice-error"><p>' . esc_html( $competitors->get_error_message() ) . '</p></div></div>';
+				$msg     = $competitors->get_error_message();
+				$is_auth = ( false !== stripos( $msg, 'not authorized' ) || false !== stripos( $msg, 'access denied' ) || false !== stripos( $msg, '40301' ) );
+				if ( $is_auth ) {
+					echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'Competitor data unavailable.', 'midland-local-seo' ) . '</strong> '
+						. esc_html__( 'Your DataForSEO plan doesn’t have access to the Google Maps SERP API this needs. Enable the SERP API (Google Maps) on your DataForSEO account, then try again.', 'midland-local-seo' )
+						. ' <a href="https://app.dataforseo.com/api-access" target="_blank" rel="noopener noreferrer">' . esc_html__( 'DataForSEO API access', 'midland-local-seo' ) . '</a></p></div></div>';
+				} else {
+					/* translators: %s: error message */
+					echo '<div class="notice notice-warning"><p>' . esc_html( sprintf( __( 'Could not pull competitors: %s', 'midland-local-seo' ), $msg ) ) . '</p></div></div>';
+				}
 				return;
 			}
 
