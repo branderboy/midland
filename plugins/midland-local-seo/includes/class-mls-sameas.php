@@ -55,7 +55,7 @@ class MLS_SameAs {
 	 */
 	public static function defaults() {
 		return array(
-			'business_name'        => 'Midland Floors',
+			'business_name'        => 'Midland Floor Care',
 			'business_type'        => 'CleaningService',
 			'business_description' => 'Commercial & residential floor and carpet cleaning serving DC, Maryland, and Northern Virginia.',
 			'business_phone'       => '(240) 532-9097',
@@ -63,12 +63,23 @@ class MLS_SameAs {
 			'business_url'         => 'https://midlandfloors.com',
 			'logo_url'             => 'https://midlandfloors.com/wp-content/uploads/2026/05/midland-small-logo-16.png',
 			'price_range'          => '$$',
-			'address_street'       => '',
-			'address_city'         => '',
-			'address_state'        => '',
-			'address_zip'          => '',
+			'address_street'       => '4540 Beech Rd',
+			'address_city'         => 'Temple Hills',
+			'address_state'        => 'MD',
+			'address_zip'          => '20748',
 			'address_country'      => 'US',
+			'center_lat'           => '38.825139',
+			'center_lng'           => '-76.939730',
 			'service_areas'        => "Washington, DC\nBethesda, MD\nRockville, MD\nSilver Spring, MD\nArlington, VA\nAlexandria, VA\nFairfax, VA",
+			// Verified citation/profile URLs → emitted as sameAs entity links.
+			'gmb_url'              => 'https://www.google.com/maps/place/?q=place_id:ChIJ59SJ6ue7t4kRIVMYpQVYY6Y',
+			'apple_maps_url'       => 'https://maps.apple.com/place?place-id=IAC53429102E051F4&name=Midland+Floor+Care',
+			'facebook_url'         => 'https://www.facebook.com/midlandfloorcare/',
+			'instagram_url'        => 'https://www.instagram.com/midlandfloors/',
+			'linkedin_url'         => 'https://www.linkedin.com/company/midland-floor-care-llc/',
+			'yelp_url'             => 'https://www.yelp.com/biz/midland-floor-care-temple-hills',
+			'angi_url'             => 'https://www.angi.com/companylist/us/md/temple-hills/midland-floor-care-llc-reviews-1.htm',
+			'homeadvisor_url'      => 'https://www.homeadvisor.com/rated.MidlandFloorCareLLC.88023128.html',
 		);
 	}
 
