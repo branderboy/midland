@@ -83,7 +83,7 @@ class MLS_SameAs {
 			'homeadvisor_url'      => 'https://www.homeadvisor.com/rated.MidlandFloorCareLLC.88023128.html',
 			'bing_places_url'      => 'https://www.bing.com/maps?ss=ypid.YNB7AD81AE2B17BE92',
 			// Listings without a dedicated field — one URL per line, merged into sameAs.
-			'extra_sameas'         => "https://www.mapquest.com/us/maryland/midland-floor-care-412618388\nhttps://www.yellowpages.com/temple-hills-md/mip/midland-floor-care-502822336\nhttps://www.manta.com/c/mhkty5k/midland-floor-care\nhttps://www.thebluebook.com/iProView/1330703/midland-floor-care-llc/subcontractors/",
+			'extra_sameas'         => "https://www.mapquest.com/us/maryland/midland-floor-care-412618388\nhttps://www.yellowpages.com/temple-hills-md/mip/midland-floor-care-502822336\nhttps://www.manta.com/c/mhkty5k/midland-floor-care\nhttps://www.thebluebook.com/iProView/1330703/midland-floor-care-llc/subcontractors/\nhttps://pgcocmd.chambermaster.com/list/member/midland-floor-care-llc-2875",
 		);
 	}
 
