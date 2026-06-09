@@ -242,6 +242,48 @@ class MLS_GMB_Mirror {
 	}
 
 	/**
+	 * Detect an existing location page. The Smart SEO engine creates an
+	 * mfc_location post titled "City, State" with _mfc_city / _mfc_state meta, so
+	 * we match on that, then fall back to the rec title / a "City, State" page.
+	 *
+	 * @param string $city      City.
+	 * @param string $state     State.
+	 * @param string $rec_title The recommendation title (e.g. "Business in City, State").
+	 * @return int Existing post ID, or 0.
+	 */
+	private function existing_location_id( $city, $state, $rec_title = '' ) {
+		if ( '' === $city ) {
+			return 0;
+		}
+		$q = new WP_Query(
+			array(
+				'post_type'              => 'any',
+				'post_status'            => array( 'publish', 'draft', 'pending', 'future', 'private' ),
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'meta_query'             => array(
+					'relation' => 'AND',
+					array( 'key' => '_mfc_city', 'value' => $city, 'compare' => '=' ),
+					array( 'key' => '_mfc_state', 'value' => $state, 'compare' => '=' ),
+				),
+			)
+		);
+		if ( ! empty( $q->posts ) ) {
+			return (int) $q->posts[0];
+		}
+		// Fall back to a page/post titled "City, State" or the rec title.
+		$by = get_page_by_path( sanitize_title( $city . ' ' . $state ), OBJECT, array( 'page', 'post', 'mfc_location' ) );
+		if ( $by ) {
+			return (int) $by->ID;
+		}
+		return '' !== $rec_title ? $this->existing_post_id( $rec_title ) : 0;
+	}
+
+	/**
 	 * Build the recommendation list from identity + (optional) GBP listing.
 	 *
 	 * @param array      $identity Identity option.
@@ -296,13 +338,17 @@ class MLS_GMB_Mirror {
 			// Split "Bethesda, MD" into city + state so the Real Smart SEO
 			// programmatic engine (when active) can build a true mfc_location page.
 			$area_parts = array_map( 'trim', explode( ',', $area, 2 ) );
+			$loc_city   = isset( $area_parts[0] ) ? $area_parts[0] : $area;
+			$loc_state  = isset( $area_parts[1] ) ? $area_parts[1] : '';
 			$recs['location'][] = array(
 				'type'        => 'page',
 				'is_location' => true,
-				'city'        => $area_parts[0] ?? $area,
-				'state'       => $area_parts[1] ?? '',
+				'city'        => $loc_city,
+				'state'       => $loc_state,
 				'title'       => $title,
-				'existing'    => $this->existing_post_id( $title ),
+				// Detect the mfc_location page the engine actually creates (titled
+				// "City, State" with _mfc_city/_mfc_state meta), not the rec title.
+				'existing'    => $this->existing_location_id( $loc_city, $loc_state, $title ),
 				'stub'        => sprintf(
 					/* translators: 1: business, 2: area */
 					__( '%1$s proudly serves %2$s. (Draft. Add local landmarks, services offered, and a call to action.)', 'midland-local-seo' ),
