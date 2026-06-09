@@ -2,7 +2,7 @@
 /**
  * Plugin Name: GEO Site Brain
  * Description: Turns your WordPress content into an AI-readable knowledge base using OpenAI embeddings (stored in Neon pgvector, with a local fallback). Scores every page for GEO/AEO/SEO, generates recommendations, and answers questions in an admin chat using retrieval first.
- * Version: 2.4.0
+ * Version: 2.4.1
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GSB_VERSION', '2.4.0' );
+define( 'GSB_VERSION', '2.4.1' );
 define( 'GSB_PLUGIN_FILE', __FILE__ );
 define( 'GSB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GSB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -90,6 +90,9 @@ final class GSB_Plugin {
 		// Self-healing schema check on admin load (cheap option compare).
 		add_action( 'admin_init', array( 'GSB_Database', 'maybe_upgrade' ) );
 
+		// One-time: seed the Midland business identity if it was never configured.
+		add_action( 'admin_init', array( $this, 'maybe_seed_identity' ) );
+
 		// Admin UI + AJAX.
 		GSB_Admin::get_instance();
 
@@ -122,6 +125,24 @@ final class GSB_Plugin {
 
 		// Schedule the email digest on its own weekly cron when enabled.
 		GSB_Monitor::sync_digest_cron( (int) GSB_Settings::get( 'enable_digest', 0 ) );
+	}
+
+	/**
+	 * One-time: fill the business identity (name, locations, services) with the
+	 * Midland Floor Care defaults if it was never set, so GEO/AEO scoring and the
+	 * knowledge graph have real data. Guarded so it runs only once.
+	 */
+	public function maybe_seed_identity() {
+		if ( get_option( 'gsb_identity_seeded' ) ) {
+			return;
+		}
+		$defaults = GSB_Settings::defaults();
+		foreach ( array( 'business_name', 'business_locations', 'core_services' ) as $key ) {
+			if ( '' === trim( (string) GSB_Settings::get( $key, '' ) ) ) {
+				GSB_Settings::set( $key, $defaults[ $key ] );
+			}
+		}
+		update_option( 'gsb_identity_seeded', 1 );
 	}
 
 	public function deactivate() {

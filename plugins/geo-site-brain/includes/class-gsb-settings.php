@@ -36,9 +36,9 @@ class GSB_Settings {
 			'embed_batch'       => 64,
 			'retrieval_k'       => 8,
 			'weekly_reindex'    => 1,
-			'business_name'     => '',
-			'business_locations'=> '',          // newline-separated cities/regions
-			'core_services'     => '',          // newline-separated services
+			'business_name'     => 'Midland Floor Care',
+			'business_locations'=> "Washington, DC\nBethesda, MD\nRockville, MD\nSilver Spring, MD\nTemple Hills, MD\nArlington, VA\nAlexandria, VA\nFairfax, VA",          // newline-separated cities/regions
+			'core_services'     => "Commercial Carpet Cleaning\nHardwood Floor Cleaning\nCarpet Installation\nTile Cleaning\nFloor Refinishing\nWood Floor Refinishing\nUpholstery Cleaning\nJanitorial Services\nFloor Maintenance and Restoration",          // newline-separated services
 			// Phase 3 — competitors, monitoring, white-label.
 			'competitor_urls'   => '',          // newline-separated competitor homepages
 			'enable_digest'     => 0,
