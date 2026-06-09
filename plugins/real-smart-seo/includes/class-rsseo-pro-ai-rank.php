@@ -54,8 +54,21 @@ class RSSEO_Pro_AI_Rank {
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY query (query(191)),
-            KEY source (source)
+            KEY source (source),
+            KEY created_at (created_at)
         ) $charset;" );
+    }
+
+    /**
+     * Keep the AI-rank history bounded — drop rows older than 180 days so the
+     * table doesn't grow unbounded across months of weekly scans.
+     */
+    private static function prune_old_rows() {
+        global $wpdb;
+        $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            "DELETE FROM {$wpdb->prefix}rsseo_pro_ai_rank WHERE created_at < %s",
+            gmdate( 'Y-m-d H:i:s', time() - 180 * DAY_IN_SECONDS )
+        ) );
     }
 
     public function maybe_schedule_cron() {
@@ -141,6 +154,9 @@ class RSSEO_Pro_AI_Rank {
         if ( empty( $queries ) || empty( $target ) ) {
             return;
         }
+
+        // Trim old history before recording a fresh scan.
+        self::prune_old_rows();
 
         $sources = apply_filters( 'rsseo_ai_rank_sources', array(
             'perplexity' => array( $this, 'check_perplexity' ),
