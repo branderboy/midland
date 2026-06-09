@@ -20,9 +20,11 @@ $mls_options = array(
 	'mls_dfs_login',
 	'mls_dfs_password',
 	'mls_identity',
+	'mls_identity_migrated',
 	'mls_citations',
 	'mls_geogrid_settings',
 	'mls_backlink_targets',
+	'mls_backlinks_seeded',
 	'mls_db_version',
 );
 foreach ( $mls_options as $mls_option ) {

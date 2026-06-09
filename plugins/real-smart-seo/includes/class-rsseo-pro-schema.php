@@ -87,25 +87,4 @@ class RSSEO_Pro_Schema {
             ) );
         }
     }
-
-    /**
-     * Parse BACKLINK lines from raw report text.
-     * Format: BACKLINK: priority=[n] | type=[.gov|.org|nonprofit|local|chamber|directory] | name=[Target Name] | url=[https://...] | rationale=[Why this link matters]
-     */
-    public static function parse_backlinks_from_report( $raw, $report_id ) {
-        preg_match_all( '/BACKLINK:\s*priority=\[(\d+)\]\s*\|\s*type=\[([^\]]+)\]\s*\|\s*name=\[([^\]]+)\]\s*\|\s*url=\[([^\]]*)\]\s*\|\s*rationale=\[([^\]]+)\]/i', $raw, $matches, PREG_SET_ORDER );
-
-        foreach ( $matches as $m ) {
-            RSSEO_Pro_Database::insert_backlink( array(
-                'report_id'   => $report_id,
-                'priority'    => (int) $m[1],
-                'link_type'   => sanitize_text_field( $m[2] ),
-                'target_name' => sanitize_text_field( $m[3] ),
-                'target_url'  => esc_url_raw( $m[4] ),
-                'rationale'   => sanitize_textarea_field( $m[5] ),
-                'status'      => 'pending',
-                'created_at'  => current_time( 'mysql' ),
-            ) );
-        }
-    }
 }

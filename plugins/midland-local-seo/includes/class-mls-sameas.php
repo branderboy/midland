@@ -43,6 +43,7 @@ class MLS_SameAs {
 	 */
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 12 );
+		add_action( 'admin_init', array( __CLASS__, 'maybe_migrate_from_rsseo' ), 1 );
 		add_action( 'admin_init', array( $this, 'handle_save' ) );
 		add_action( 'wp_head', array( $this, 'output_schema' ), 5 );
 	}
@@ -69,6 +70,94 @@ class MLS_SameAs {
 			'address_country'      => 'US',
 			'service_areas'        => "Washington, DC\nBethesda, MD\nRockville, MD\nSilver Spring, MD\nArlington, VA\nAlexandria, VA\nFairfax, VA",
 		);
+	}
+
+	/**
+	 * Ordered week days: key => schema.org dayOfWeek name.
+	 *
+	 * @return array
+	 */
+	public static function week_days() {
+		return array(
+			'mon' => 'Monday',
+			'tue' => 'Tuesday',
+			'wed' => 'Wednesday',
+			'thu' => 'Thursday',
+			'fri' => 'Friday',
+			'sat' => 'Saturday',
+			'sun' => 'Sunday',
+		);
+	}
+
+	/**
+	 * Sanitize a latitude/longitude value. Returns '' for blank/invalid so the
+	 * caller can omit the prop; otherwise a bounded float as a string.
+	 *
+	 * @param mixed $raw Posted value.
+	 * @param float $min Lower bound.
+	 * @param float $max Upper bound.
+	 * @return string
+	 */
+	public static function sanitize_coordinate( $raw, $min, $max ) {
+		$raw = is_scalar( $raw ) ? trim( (string) wp_unslash( $raw ) ) : '';
+		if ( '' === $raw || ! is_numeric( $raw ) ) {
+			return '';
+		}
+		$val = (float) $raw;
+		if ( $val < $min || $val > $max ) {
+			return '';
+		}
+		return (string) $val;
+	}
+
+	/**
+	 * Sanitize the posted 7-day opening-hours grid into a normalized structure:
+	 * [ 'mon' => [ 'mode' => 'open'|'closed'|'24h', 'open' => 'HH:MM', 'close' => 'HH:MM' ], ... ].
+	 *
+	 * @param mixed $raw Posted hours array.
+	 * @return array
+	 */
+	public static function sanitize_opening_hours( $raw ) {
+		$raw   = is_array( $raw ) ? wp_unslash( $raw ) : array();
+		$clean = array();
+
+		foreach ( array_keys( self::week_days() ) as $day ) {
+			$row  = isset( $raw[ $day ] ) && is_array( $raw[ $day ] ) ? $raw[ $day ] : array();
+			$mode = isset( $row['mode'] ) ? sanitize_key( $row['mode'] ) : 'closed';
+			if ( ! in_array( $mode, array( 'open', 'closed', '24h' ), true ) ) {
+				$mode = 'closed';
+			}
+
+			$open  = self::sanitize_time( $row['open'] ?? '' );
+			$close = self::sanitize_time( $row['close'] ?? '' );
+
+			// An "open" day with no valid times is treated as closed.
+			if ( 'open' === $mode && ( '' === $open || '' === $close ) ) {
+				$mode = 'closed';
+			}
+
+			$clean[ $day ] = array(
+				'mode'  => $mode,
+				'open'  => $open,
+				'close' => $close,
+			);
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Sanitize a HH:MM 24-hour time. Returns '' when invalid.
+	 *
+	 * @param mixed $raw Posted time.
+	 * @return string
+	 */
+	public static function sanitize_time( $raw ) {
+		$raw = is_scalar( $raw ) ? trim( (string) $raw ) : '';
+		if ( preg_match( '/^([01][0-9]|2[0-3]):[0-5][0-9]$/', $raw ) ) {
+			return $raw;
+		}
+		return '';
 	}
 
 	/**
@@ -112,8 +201,6 @@ class MLS_SameAs {
 			'address_country',
 			'price_range',
 			'area_served',
-			'center_lat',
-			'center_lng',
 			'gmb_url',
 			'facebook_url',
 			'instagram_url',
@@ -158,10 +245,106 @@ class MLS_SameAs {
 		// Service areas — one per line.
 		$data['service_areas'] = sanitize_textarea_field( wp_unslash( $_POST['service_areas'] ?? '' ) );
 
+		// Geo coordinates — decimal. Store '' when blank so empty props are omitted.
+		$data['center_lat'] = self::sanitize_coordinate( $_POST['center_lat'] ?? '', -90, 90 );
+		$data['center_lng'] = self::sanitize_coordinate( $_POST['center_lng'] ?? '', -180, 180 );
+
+		// 7-day opening hours editor. Each day: { mode: open|closed|24h, open, close }.
+		$data['opening_hours'] = self::sanitize_opening_hours( $_POST['hours'] ?? array() );
+
 		update_option( self::OPTION, $data );
+
+		// Mirror the NAP/identity into the rsseo-shaped option that the Real
+		// Smart SEO programmatic engine + content briefs read. sameAs editing now
+		// lives here (the Local Profile), so we are the writer of record.
+		self::bridge_to_rsseo( $data );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=mls-sameas&saved=1' ) );
 		exit;
+	}
+
+	/**
+	 * The rsseo_sameas_identity option consumed by Real Smart SEO
+	 * (class-rsseo-pro-programmatic.php ×4, class-rsseo-pro-content-brief.php,
+	 * class-rsseo-profile.php migrate-from-legacy). Those consumers read these
+	 * keys: business_name, business_phone, business_type, gmb_url, service_areas.
+	 * MLS uses the same key names, so the mapping is largely a direct copy; this
+	 * stays a single source of truth and tolerates future key drift.
+	 */
+	const RSSEO_OPTION = 'rsseo_sameas_identity';
+
+	/**
+	 * Map an MLS identity array to the rsseo_sameas_identity shape and persist it.
+	 *
+	 * @param array $identity Saved MLS identity (mls_identity).
+	 */
+	public static function bridge_to_rsseo( $identity ) {
+		if ( ! is_array( $identity ) ) {
+			$identity = array();
+		}
+
+		// Map MLS identity keys -> rsseo shape. left = rsseo key, right = MLS key.
+		$map = array(
+			'business_name'        => 'business_name',
+			'business_type'        => 'business_type',
+			'business_description' => 'business_description',
+			'business_phone'       => 'business_phone',
+			'business_email'       => 'business_email',
+			'business_url'         => 'business_url',
+			'logo_url'             => 'logo_url',
+			'price_range'          => 'price_range',
+			'address_street'       => 'address_street',
+			'address_city'         => 'address_city',
+			'address_state'        => 'address_state',
+			'address_zip'          => 'address_zip',
+			'address_country'      => 'address_country',
+			'service_areas'        => 'service_areas',
+			'gmb_url'              => 'gmb_url',
+		);
+
+		$mapped = array();
+		foreach ( $map as $rsseo_key => $mls_key ) {
+			if ( isset( $identity[ $mls_key ] ) && '' !== $identity[ $mls_key ] ) {
+				$mapped[ $rsseo_key ] = $identity[ $mls_key ];
+			}
+		}
+
+		update_option( self::RSSEO_OPTION, $mapped );
+	}
+
+	/**
+	 * One-time guarded migration: if this site has an existing
+	 * rsseo_sameas_identity (from when sameAs lived in Real Smart SEO) but no
+	 * mls_identity yet, seed the Local Profile from it so nothing is lost when
+	 * the editor moves here. Runs once, gated by a flag option.
+	 */
+	public static function maybe_migrate_from_rsseo() {
+		if ( get_option( 'mls_identity_migrated' ) ) {
+			return;
+		}
+
+		$mls   = get_option( self::OPTION, array() );
+		$rsseo = get_option( self::RSSEO_OPTION, array() );
+
+		if ( ( ! is_array( $mls ) || empty( $mls ) ) && is_array( $rsseo ) && ! empty( $rsseo ) ) {
+			// rsseo shares MLS key names, so the seed is a direct copy of known keys.
+			$seed = array();
+			foreach ( self::defaults() as $key => $default ) {
+				if ( isset( $rsseo[ $key ] ) && '' !== $rsseo[ $key ] ) {
+					$seed[ $key ] = $rsseo[ $key ];
+				}
+			}
+			foreach ( array( 'gmb_url', 'og_image_url' ) as $extra ) {
+				if ( isset( $rsseo[ $extra ] ) && '' !== $rsseo[ $extra ] ) {
+					$seed[ $extra ] = $rsseo[ $extra ];
+				}
+			}
+			if ( ! empty( $seed ) ) {
+				update_option( self::OPTION, $seed );
+			}
+		}
+
+		update_option( 'mls_identity_migrated', 1 );
 	}
 
 	/**
@@ -181,8 +364,12 @@ class MLS_SameAs {
 	}
 
 	/**
-	 * Build the LocalBusiness schema array. Falls back to the Midland defaults
-	 * when nothing has been saved so the schema is useful out of the box.
+	 * Build the LocalBusiness schema as a Yoast-style @graph with @id-linked
+	 * nodes. Falls back to the Midland defaults when nothing has been saved so
+	 * the schema is useful out of the box. Empty props are omitted; empty nodes
+	 * (address/logo) are never emitted.
+	 *
+	 * @return array { '@context': ..., '@graph': [ LocalBusiness, PostalAddress?, ImageObject? ] }
 	 */
 	public function build_schema() {
 		$d = get_option( self::OPTION, array() );
@@ -197,12 +384,19 @@ class MLS_SameAs {
 		$site_url = ! empty( $d['business_url'] ) ? trailingslashit( $d['business_url'] ) : trailingslashit( home_url() );
 		$type     = ! empty( $d['business_type'] ) ? $d['business_type'] : 'LocalBusiness';
 
+		// Stable @id bases keyed off home_url() so nodes resolve consistently.
+		$base        = trailingslashit( home_url() );
+		$business_id = $base . '#localbusiness';
+		$address_id  = $base . '#address';
+		$logo_id     = $base . '#logo';
+
+		$graph = array();
+
 		$schema = array(
-			'@context' => 'https://schema.org',
-			'@type'    => $type,
-			'@id'      => $site_url . '#business',
-			'name'     => $d['business_name'],
-			'url'      => $site_url,
+			'@type' => $type,
+			'@id'   => $business_id,
+			'name'  => $d['business_name'],
+			'url'   => $site_url,
 		);
 
 		if ( ! empty( $d['business_description'] ) ) {
@@ -214,27 +408,44 @@ class MLS_SameAs {
 		if ( ! empty( $d['business_email'] ) ) {
 			$schema['email'] = $d['business_email'];
 		}
-		if ( ! empty( $d['address_street'] ) ) {
-			$schema['address'] = array(
-				'@type'           => 'PostalAddress',
-				'streetAddress'   => $d['address_street'],
-				'addressLocality' => $d['address_city'] ?? '',
-				'addressRegion'   => $d['address_state'] ?? '',
-				'postalCode'      => $d['address_zip'] ?? '',
-				'addressCountry'  => ! empty( $d['address_country'] ) ? $d['address_country'] : 'US',
-			);
-		}
 		if ( ! empty( $d['price_range'] ) ) {
 			$schema['priceRange'] = $d['price_range'];
 		}
+
+		// Address → its own PostalAddress node, linked by @id.
+		$address_node = $this->build_address_node( $d, $address_id );
+		if ( ! empty( $address_node ) ) {
+			$schema['address'] = array( '@id' => $address_id );
+			$graph[]           = $address_node;
+		}
+
+		// Logo/image → its own ImageObject node, linked by @id (logo + image both
+		// reference it, as Yoast does).
 		if ( ! empty( $d['logo_url'] ) ) {
-			$schema['logo'] = array(
+			$graph[] = array(
 				'@type' => 'ImageObject',
+				'@id'   => $logo_id,
 				'url'   => $d['logo_url'],
 			);
-		}
-		if ( ! empty( $d['og_image_url'] ) ) {
+			$schema['logo']  = array( '@id' => $logo_id );
+			$schema['image'] = array( '@id' => $logo_id );
+		} elseif ( ! empty( $d['og_image_url'] ) ) {
 			$schema['image'] = $d['og_image_url'];
+		}
+
+		// Geo coordinates (inline GeoCoordinates) when both lat + lng are set.
+		if ( isset( $d['center_lat'], $d['center_lng'] ) && '' !== $d['center_lat'] && '' !== $d['center_lng'] && is_numeric( $d['center_lat'] ) && is_numeric( $d['center_lng'] ) ) {
+			$schema['geo'] = array(
+				'@type'     => 'GeoCoordinates',
+				'latitude'  => (float) $d['center_lat'],
+				'longitude' => (float) $d['center_lng'],
+			);
+		}
+
+		// Opening hours (grouped like Yoast: days sharing identical hours collapse).
+		$hours = $this->build_opening_hours( isset( $d['opening_hours'] ) ? $d['opening_hours'] : array() );
+		if ( ! empty( $hours ) ) {
+			$schema['openingHoursSpecification'] = $hours;
 		}
 
 		// Area served from line-by-line list.
@@ -274,7 +485,105 @@ class MLS_SameAs {
 			$schema['sameAs'] = $sameas;
 		}
 
-		return $schema;
+		// LocalBusiness node first in the graph.
+		array_unshift( $graph, $schema );
+
+		return array(
+			'@context' => 'https://schema.org',
+			'@graph'   => $graph,
+		);
+	}
+
+	/**
+	 * Build a PostalAddress node from identity, or empty array when no address
+	 * field is set (so we never emit an empty node).
+	 *
+	 * @param array  $d          Identity.
+	 * @param string $address_id Stable @id for the node.
+	 * @return array
+	 */
+	private function build_address_node( $d, $address_id ) {
+		$parts = array(
+			'streetAddress'   => $d['address_street'] ?? '',
+			'addressLocality' => $d['address_city'] ?? '',
+			'addressRegion'   => $d['address_state'] ?? '',
+			'postalCode'      => $d['address_zip'] ?? '',
+		);
+		$has_any = false;
+		foreach ( $parts as $val ) {
+			if ( '' !== (string) $val ) {
+				$has_any = true;
+				break;
+			}
+		}
+		if ( ! $has_any ) {
+			return array();
+		}
+
+		$node = array(
+			'@type' => 'PostalAddress',
+			'@id'   => $address_id,
+		);
+		foreach ( $parts as $prop => $val ) {
+			if ( '' !== (string) $val ) {
+				$node[ $prop ] = $val;
+			}
+		}
+		$node['addressCountry'] = ! empty( $d['address_country'] ) ? $d['address_country'] : 'US';
+
+		return $node;
+	}
+
+	/**
+	 * Build openingHoursSpecification, grouping days that share identical hours
+	 * into a single node (Yoast behaviour). Closed days are omitted entirely.
+	 *
+	 * @param array $hours Normalized opening-hours grid (see sanitize_opening_hours).
+	 * @return array List of OpeningHoursSpecification nodes.
+	 */
+	private function build_opening_hours( $hours ) {
+		if ( ! is_array( $hours ) || empty( $hours ) ) {
+			return array();
+		}
+
+		$groups = array();
+		foreach ( self::week_days() as $key => $day_name ) {
+			$row  = isset( $hours[ $key ] ) && is_array( $hours[ $key ] ) ? $hours[ $key ] : array();
+			$mode = isset( $row['mode'] ) ? $row['mode'] : 'closed';
+
+			if ( '24h' === $mode ) {
+				$opens  = '00:00';
+				$closes = '23:59';
+			} elseif ( 'open' === $mode && ! empty( $row['open'] ) && ! empty( $row['close'] ) ) {
+				$opens  = $row['open'];
+				$closes = $row['close'];
+			} else {
+				// Closed — omit.
+				continue;
+			}
+
+			$bucket = $opens . '-' . $closes;
+			if ( ! isset( $groups[ $bucket ] ) ) {
+				$groups[ $bucket ] = array(
+					'opens'  => $opens,
+					'closes' => $closes,
+					'days'   => array(),
+				);
+			}
+			$groups[ $bucket ]['days'][] = $day_name;
+		}
+
+		$output = array();
+		foreach ( $groups as $group ) {
+			$output[] = array(
+				'@type'     => 'OpeningHoursSpecification',
+				'dayOfWeek' => $group['days'],
+				'opens'     => $group['opens'],
+				'closes'    => $group['closes'],
+			);
+		}
+
+		return $output;
 	}
 
 	/**
@@ -282,7 +591,7 @@ class MLS_SameAs {
 	 */
 	public function output_schema() {
 		$schema = $this->build_schema();
-		if ( empty( $schema['name'] ) ) {
+		if ( empty( $schema['@graph'][0]['name'] ) ) {
 			return;
 		}
 		// Hex-escape <, >, &, ', " so a stray </script> can't break out of the
@@ -391,6 +700,47 @@ class MLS_SameAs {
 						<th><label for="address_zip"><?php esc_html_e( 'ZIP Code', 'midland-local-seo' ); ?></label></th>
 						<td><input type="text" id="address_zip" name="address_zip" style="width:100px;" value="<?php echo esc_attr( $d['address_zip'] ?? '' ); ?>"></td>
 					</tr>
+					<tr>
+						<th><label for="center_lat"><?php esc_html_e( 'Latitude', 'midland-local-seo' ); ?></label></th>
+						<td><input type="text" inputmode="decimal" id="center_lat" name="center_lat" style="width:160px;" value="<?php echo esc_attr( $d['center_lat'] ?? '' ); ?>" placeholder="39.0840"></td>
+					</tr>
+					<tr>
+						<th><label for="center_lng"><?php esc_html_e( 'Longitude', 'midland-local-seo' ); ?></label></th>
+						<td>
+							<input type="text" inputmode="decimal" id="center_lng" name="center_lng" style="width:160px;" value="<?php echo esc_attr( $d['center_lng'] ?? '' ); ?>" placeholder="-77.1528">
+							<p class="description"><?php esc_html_e( 'Decimal coordinates of your storefront/HQ. Emits a GeoCoordinates node in your LocalBusiness schema. Leave blank to omit.', 'midland-local-seo' ); ?></p>
+						</td>
+					</tr>
+				</table>
+
+				<h2><?php esc_html_e( 'Opening Hours', 'midland-local-seo' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'Set hours for each day. Days that share the same hours are grouped automatically in the schema. Closed days are omitted.', 'midland-local-seo' ); ?></p>
+				<table class="form-table">
+					<?php
+					$saved_hours = isset( $d['opening_hours'] ) && is_array( $d['opening_hours'] ) ? $d['opening_hours'] : array();
+					foreach ( self::week_days() as $day_key => $day_label ) :
+						$row       = isset( $saved_hours[ $day_key ] ) && is_array( $saved_hours[ $day_key ] ) ? $saved_hours[ $day_key ] : array();
+						$row_mode  = isset( $row['mode'] ) ? $row['mode'] : 'closed';
+						$row_open  = isset( $row['open'] ) ? $row['open'] : '';
+						$row_close = isset( $row['close'] ) ? $row['close'] : '';
+						?>
+						<tr>
+							<th><?php echo esc_html( $day_label ); ?></th>
+							<td>
+								<select name="hours[<?php echo esc_attr( $day_key ); ?>][mode]">
+									<option value="open" <?php selected( $row_mode, 'open' ); ?>><?php esc_html_e( 'Open', 'midland-local-seo' ); ?></option>
+									<option value="closed" <?php selected( $row_mode, 'closed' ); ?>><?php esc_html_e( 'Closed', 'midland-local-seo' ); ?></option>
+									<option value="24h" <?php selected( $row_mode, '24h' ); ?>><?php esc_html_e( 'Open 24h', 'midland-local-seo' ); ?></option>
+								</select>
+								<label><?php esc_html_e( 'From', 'midland-local-seo' ); ?>
+									<input type="time" name="hours[<?php echo esc_attr( $day_key ); ?>][open]" value="<?php echo esc_attr( $row_open ); ?>">
+								</label>
+								<label><?php esc_html_e( 'To', 'midland-local-seo' ); ?>
+									<input type="time" name="hours[<?php echo esc_attr( $day_key ); ?>][close]" value="<?php echo esc_attr( $row_close ); ?>">
+								</label>
+							</td>
+						</tr>
+					<?php endforeach; ?>
 				</table>
 
 				<h2><?php esc_html_e( 'Service Areas', 'midland-local-seo' ); ?></h2>

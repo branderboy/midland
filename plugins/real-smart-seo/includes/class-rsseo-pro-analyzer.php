@@ -79,7 +79,6 @@ class RSSEO_Pro_Analyzer {
 
         // Store pro-specific items.
         RSSEO_Pro_Schema::parse_from_report( $raw_text, $report_id );
-        RSSEO_Pro_Schema::parse_backlinks_from_report( $raw_text, $report_id );
 
         RSSEO_Database::update_scan( $scan_id, array( 'status' => 'complete' ) );
 
@@ -204,8 +203,8 @@ List 5–8 specific external links to add across the site:
 
 ## BACKLINK TARGETS
 Focus exclusively on high-authority LOCAL targets: .gov, .org, nonprofits, city/county resources, local chambers, neighborhood orgs.
-For each target use this exact format:
-BACKLINK: priority=[1-20] | type=[.gov|.org|nonprofit|chamber|local|directory] | name=[Organization Name] | url=[URL if known, else blank] | rationale=[1 sentence on why this link matters for local SEO]
+List 8–12 specific targets, highest priority first:
+- **[Organization Name]** ([.gov|.org|nonprofit|chamber|local|directory]) — [URL if known] — [1 sentence on why this link matters for local SEO]
 
 ## PEOPLE ALSO ASK OPPORTUNITIES
 List 5–8 PAA questions your site should answer, based on your keywords and market:
@@ -233,7 +232,7 @@ Numbered list, highest priority first:
 Important:
 - Reference actual data from the uploads — real URLs, real review quotes, real keyword positions.
 - SCHEMA_BLOCK json must be complete valid JSON-LD on a single line.
-- BACKLINK targets must be specific to this business's trade and location — no generic directories.
+- Backlink targets must be specific to this business's trade and location — no generic directories.
 - Active SEO plugin: {$seo_plugin}
 INSTRUCTIONS;
     }

@@ -121,7 +121,7 @@ class RSSEO_Admin {
 
         // Tabs follow the Settings → Audit → Analysis → Fix Queue → Content → Internal Links → Indexing → Reports pipeline.
         // Fix Queue = where Apply Fixes cards live.
-        // Reports   = history archive + measurement tools (rankings, geo-grid, backlinks).
+        // Reports   = history archive + measurement tools (rankings, page speed).
         $tabs = array(
             'dashboard' => __( 'Dashboard',       'real-smart-seo' ),
             'settings'  => __( 'Settings',        'real-smart-seo' ),
@@ -479,7 +479,7 @@ class RSSEO_Admin {
 
     /**
      * Reports — history of past analyses plus the measurement tools (rankings,
-     * geo-grid, backlinks). Single-report drill-down still works via ?report_id.
+     * page speed). Single-report drill-down still works via ?report_id.
      */
     public function page_reports_archive() {
         if ( ! current_user_can( 'manage_options' ) ) {
@@ -567,7 +567,7 @@ class RSSEO_Admin {
             echo '<hr style="margin:28px 0;">';
         }
 
-        // Tracking tools — rankings, geo-grid.
+        // Tracking tools — rankings, page speed.
         echo '<h2>' . esc_html__( 'Tracking', 'real-smart-seo' ) . '</h2>';
         echo '<div class="rsseo-insights-grid" style="margin-bottom:28px;">';
 

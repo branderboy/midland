@@ -140,11 +140,17 @@ class MLS_GMB_Mirror {
 				$biz_type,
 				$area
 			);
+			// Split "Bethesda, MD" into city + state so the Real Smart SEO
+			// programmatic engine (when active) can build a true mfc_location page.
+			$area_parts = array_map( 'trim', explode( ',', $area, 2 ) );
 			$recs['location'][] = array(
-				'type'     => 'page',
-				'title'    => $title,
-				'existing' => $this->existing_post_id( $title ),
-				'stub'     => sprintf(
+				'type'        => 'page',
+				'is_location' => true,
+				'city'        => $area_parts[0] ?? $area,
+				'state'       => $area_parts[1] ?? '',
+				'title'       => $title,
+				'existing'    => $this->existing_post_id( $title ),
+				'stub'        => sprintf(
 					/* translators: 1: business, 2: area */
 					__( '%1$s proudly serves %2$s. (Draft — add local landmarks, services offered, and a call to action.)', 'midland-local-seo' ),
 					$biz_type,
@@ -171,6 +177,34 @@ class MLS_GMB_Mirror {
 		if ( ! in_array( $type, array( 'page', 'post' ), true ) ) {
 			$type = 'page';
 		}
+
+		$is_location = ! empty( $_POST['mirror_is_location'] );
+		$city        = isset( $_POST['mirror_city'] ) ? sanitize_text_field( wp_unslash( $_POST['mirror_city'] ) ) : '';
+		$state       = isset( $_POST['mirror_state'] ) ? sanitize_text_field( wp_unslash( $_POST['mirror_state'] ) ) : '';
+
+		// Connect-and-drive: for a location recommendation, prefer the Real Smart
+		// SEO programmatic engine when it is active so we build a real mfc_location
+		// page (with schema, terms, IndexNow). Otherwise fall back to a plain draft.
+		if ( $is_location && '' !== $city
+			&& class_exists( 'RSSEO_Pro_Programmatic' )
+			&& method_exists( 'RSSEO_Pro_Programmatic', 'generate_location_page' ) ) {
+
+			$result = RSSEO_Pro_Programmatic::generate_location_page(
+				$city,
+				$state,
+				array(),
+				array( 'status' => 'draft', 'ping' => false )
+			);
+
+			if ( is_wp_error( $result ) || ! $result ) {
+				wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&error=1' ) );
+				exit;
+			}
+
+			wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&created=' . (int) $result . '&via=engine' ) );
+			exit;
+		}
+
 		if ( '' === $title ) {
 			wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&error=1' ) );
 			exit;
@@ -192,7 +226,7 @@ class MLS_GMB_Mirror {
 			exit;
 		}
 
-		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&created=' . (int) $post_id ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&created=' . (int) $post_id . '&via=draft' ) );
 		exit;
 	}
 
@@ -221,6 +255,11 @@ class MLS_GMB_Mirror {
 						<input type="hidden" name="mirror_type" value="<?php echo esc_attr( $rec['type'] ); ?>">
 						<input type="hidden" name="mirror_title" value="<?php echo esc_attr( $rec['title'] ); ?>">
 						<input type="hidden" name="mirror_stub" value="<?php echo esc_attr( $rec['stub'] ); ?>">
+						<?php if ( ! empty( $rec['is_location'] ) ) : ?>
+							<input type="hidden" name="mirror_is_location" value="1">
+							<input type="hidden" name="mirror_city" value="<?php echo esc_attr( $rec['city'] ); ?>">
+							<input type="hidden" name="mirror_state" value="<?php echo esc_attr( $rec['state'] ); ?>">
+						<?php endif; ?>
 						<button type="submit" class="button button-secondary"><?php esc_html_e( 'Create draft', 'midland-local-seo' ); ?></button>
 					</form>
 				<?php else : ?>
@@ -263,9 +302,18 @@ class MLS_GMB_Mirror {
 
 			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 			<?php if ( isset( $_GET['created'] ) ) : ?>
-				<?php $cid = (int) $_GET['created']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+				<?php
+				$cid = (int) $_GET['created']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$via = isset( $_GET['via'] ) ? sanitize_key( wp_unslash( $_GET['via'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				?>
 				<div class="notice notice-success is-dismissible"><p>
-					<?php esc_html_e( 'Draft created.', 'midland-local-seo' ); ?>
+					<?php
+					if ( 'engine' === $via ) {
+						esc_html_e( 'Location page created via the Real Smart SEO programmatic engine (mfc_location).', 'midland-local-seo' );
+					} else {
+						esc_html_e( 'Draft created.', 'midland-local-seo' );
+					}
+					?>
 					<a href="<?php echo esc_url( get_edit_post_link( $cid ) ); ?>"><?php esc_html_e( 'Edit it →', 'midland-local-seo' ); ?></a>
 				</p></div>
 			<?php endif; ?>

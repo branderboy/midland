@@ -13,13 +13,17 @@ $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_api_log" );        // p
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_audit_issues" );   // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_audits" );         // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
 
-// Bundled-module tables (RSSEO_Pro_Database / Geo-Grid / AI-Rank).
+// Bundled-module tables (RSSEO_Pro_Database / AI-Rank).
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_scans" );         // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_schema" );        // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_ai_rank" );       // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+
+// Legacy tables from modules that have since moved to the Midland Local SEO
+// plugin (backlinks, geo-grid). Kept as DROP IF EXISTS so upgrading-from-old
+// installs still clean up; create/CRUD code for these no longer exists here.
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_backlinks" );     // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_geogrid_runs" );  // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_geogrid_cells" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_ai_rank" );       // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
 
 // Delete all plugin options.
 $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery

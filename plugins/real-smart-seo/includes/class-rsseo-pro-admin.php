@@ -34,7 +34,6 @@ class RSSEO_Pro_Admin {
         // AJAX handlers.
         add_action( 'wp_ajax_rsseo_pro_apply_schema',       array( $this, 'ajax_apply_schema' ) );
         add_action( 'wp_ajax_rsseo_pro_apply_all_schemas',  array( $this, 'ajax_apply_all_schemas' ) );
-        add_action( 'wp_ajax_rsseo_pro_update_backlink',    array( $this, 'ajax_update_backlink' ) );
         add_action( 'wp_ajax_rsseo_pro_save_settings',      array( $this, 'ajax_save_pro_settings' ) );
         add_action( 'wp_ajax_rsseo_pro_test_dfs',           array( $this, 'ajax_test_dfs' ) );
 
@@ -166,8 +165,7 @@ class RSSEO_Pro_Admin {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
         }
-        $schemas   = RSSEO_Pro_Database::get_schemas( $report->id );
-        $backlinks = RSSEO_Pro_Database::get_backlinks( $report->id );
+        $schemas = RSSEO_Pro_Database::get_schemas( $report->id );
         require RSSEO_PRO_PATH . 'includes/views/pro-report-sections.php';
     }
 
@@ -223,25 +221,6 @@ class RSSEO_Pro_Admin {
         }
 
         wp_send_json_success( $result );
-    }
-
-    // ── AJAX: Update backlink status ──────────────────────────────────────────
-
-    public function ajax_update_backlink() {
-        check_ajax_referer( 'rsseo_pro_nonce', 'nonce' );
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
-        }
-
-        $backlink_id = isset( $_POST['backlink_id'] ) ? (int) $_POST['backlink_id'] : 0;
-        $status      = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
-
-        if ( ! $backlink_id || ! in_array( $status, array( 'pursuing', 'completed', 'skipped', 'pending' ), true ) ) {
-            wp_send_json_error( __( 'Invalid data.', 'real-smart-seo' ) );
-        }
-
-        RSSEO_Pro_Fixer::update_backlink( $backlink_id, $status );
-        wp_send_json_success();
     }
 
     // ── AJAX: Save Pro Settings ───────────────────────────────────────────────

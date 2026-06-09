@@ -95,7 +95,17 @@ class MLS_Plugin {
 		}
 		add_option( 'mls_citations', array() );
 		add_option( 'mls_geogrid_settings', array() );
-		add_option( 'mls_backlink_targets', '' );
+
+		// Seed the curated local-backlink prospect list from the bundled baseline
+		// on first activation (guarded so operator edits are never clobbered).
+		if ( ! get_option( 'mls_backlinks_seeded' ) ) {
+			require_once MLS_PATH . 'includes/class-mls-backlinks.php';
+			$existing = get_option( 'mls_backlink_targets' );
+			if ( ! is_array( $existing ) || empty( $existing ) ) {
+				MLS_Backlinks::seed_from_baseline();
+			}
+			update_option( 'mls_backlinks_seeded', 1 );
+		}
 
 		update_option( 'mls_db_version', MLS_VERSION );
 	}
