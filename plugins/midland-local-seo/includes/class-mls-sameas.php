@@ -45,6 +45,7 @@ class MLS_SameAs {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 12 );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_migrate_from_rsseo' ), 1 );
 		add_action( 'admin_init', array( $this, 'handle_save' ) );
+		add_action( 'admin_init', array( $this, 'handle_load_defaults' ) );
 		add_action( 'wp_head', array( $this, 'output_schema' ), 5 );
 	}
 
@@ -63,7 +64,7 @@ class MLS_SameAs {
 			'business_url'         => 'https://midlandfloors.com',
 			'logo_url'             => 'https://midlandfloors.com/wp-content/uploads/2026/05/midland-small-logo-16.png',
 			'price_range'          => '$$',
-			'address_street'       => '4540 Beech Rd',
+			'address_street'       => '4538 Beech Rd',
 			'address_city'         => 'Temple Hills',
 			'address_state'        => 'MD',
 			'address_zip'          => '20748',
@@ -278,6 +279,25 @@ class MLS_SameAs {
 		self::bridge_to_rsseo( $data );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=mls-sameas&saved=1' ) );
+		exit;
+	}
+
+	/**
+	 * One-click: overwrite the saved identity with the bundled Midland profile so
+	 * the operator only has to review and Save & Publish — no manual re-typing.
+	 */
+	public function handle_load_defaults() {
+		if ( ! isset( $_GET['mls_load_defaults'] ) || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'mls_load_defaults' ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'midland-local-seo' ) );
+		}
+		$defaults = self::defaults();
+		update_option( self::OPTION, $defaults );
+		self::bridge_to_rsseo( $defaults );
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-sameas&loaded=1' ) );
 		exit;
 	}
 
@@ -672,6 +692,15 @@ class MLS_SameAs {
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Business identity saved. Schema is now live in your page <head>.', 'midland-local-seo' ); ?></p></div>
 			<?php endif; ?>
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['loaded'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Midland profile loaded into the form below — review it, then click Save & Publish Schema.', 'midland-local-seo' ); ?></p></div>
+			<?php endif; ?>
+
+			<p>
+				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=mls-sameas&mls_load_defaults=1' ), 'mls_load_defaults' ) ); ?>" class="button" onclick="return confirm('Overwrite every field with the Midland Floor Care profile (name, address, geo, and all listing URLs)?');"><?php esc_html_e( '⤵ Load Midland profile (fills every field)', 'midland-local-seo' ); ?></a>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'One click fills the whole form with your verified NAP + all sameAs listings.', 'midland-local-seo' ); ?></span>
+			</p>
 
 			<form method="post">
 				<?php wp_nonce_field( 'mls_save_sameas', '_mls_sameas_nonce' ); ?>
