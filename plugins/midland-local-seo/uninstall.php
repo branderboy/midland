@@ -25,6 +25,10 @@ $mls_options = array(
 	'mls_geogrid_settings',
 	'mls_backlink_targets',
 	'mls_backlinks_seeded',
+	'mls_backlink_competitors',
+	'mls_insights_recipient',
+	'mls_insights_cadence',
+	'mls_insights_last_run',
 	'mls_db_version',
 );
 foreach ( $mls_options as $mls_option ) {
@@ -46,7 +50,10 @@ $mls_tables = array(
 	$wpdb->prefix . 'mls_geogrid_cells',
 );
 foreach ( $mls_tables as $mls_table ) {
-	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $mls_table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	// Table names are built from $wpdb->prefix (no user input). Using string
+	// interpolation rather than the %i placeholder keeps the declared
+	// "Requires at least: 5.8" floor valid (%i needs WP 6.2+).
+	$wpdb->query( "DROP TABLE IF EXISTS {$mls_table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 }
 
 // 3) Clear plugin transients (and their timeouts).

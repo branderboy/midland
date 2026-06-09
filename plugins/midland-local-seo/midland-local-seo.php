@@ -96,6 +96,13 @@ class MLS_Plugin {
 		add_option( 'mls_citations', array() );
 		add_option( 'mls_geogrid_settings', array() );
 
+		// Insights defaults + schedule the digest cron on the default cadence.
+		require_once MLS_PATH . 'includes/class-mls-insights.php';
+		MLS_Insights::set_defaults();
+		if ( 'off' !== MLS_Insights::cadence() && ! wp_next_scheduled( MLS_Insights::CRON_HOOK ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, MLS_Insights::cadence(), MLS_Insights::CRON_HOOK );
+		}
+
 		// Seed the curated local-backlink prospect list from the bundled baseline
 		// on first activation (guarded so operator edits are never clobbered).
 		if ( ! get_option( 'mls_backlinks_seeded' ) ) {
@@ -119,6 +126,7 @@ class MLS_Plugin {
 		$hooks = array(
 			'mls_geogrid_weekly_scan',  // MLS_Geogrid::CRON_HOOK.
 			'mls_geogrid_process_cell', // MLS_Geogrid::TICK_HOOK (arg-bearing).
+			'mls_insights_digest',      // MLS_Insights::CRON_HOOK.
 		);
 		foreach ( $hooks as $hook ) {
 			wp_unschedule_hook( $hook );
@@ -149,6 +157,7 @@ class MLS_Plugin {
 		require_once MLS_PATH . 'includes/class-mls-gmb-optimizer.php';
 		require_once MLS_PATH . 'includes/class-mls-backlinks.php';
 		require_once MLS_PATH . 'includes/class-mls-gmb-competitors.php';
+		require_once MLS_PATH . 'includes/class-mls-insights.php';
 	}
 
 	/**
@@ -163,6 +172,7 @@ class MLS_Plugin {
 		MLS_GMB_Optimizer::get_instance();
 		MLS_Backlinks::get_instance();
 		MLS_GMB_Competitors::get_instance();
+		MLS_Insights::get_instance();
 	}
 
 	/**
