@@ -80,6 +80,9 @@ class MLS_SameAs {
 			'yelp_url'             => 'https://www.yelp.com/biz/midland-floor-care-temple-hills',
 			'angi_url'             => 'https://www.angi.com/companylist/us/md/temple-hills/midland-floor-care-llc-reviews-1.htm',
 			'homeadvisor_url'      => 'https://www.homeadvisor.com/rated.MidlandFloorCareLLC.88023128.html',
+			'bing_places_url'      => 'https://www.bing.com/maps?ss=ypid.YNB7AD81AE2B17BE92',
+			// Listings without a dedicated field — one URL per line, merged into sameAs.
+			'extra_sameas'         => "https://www.mapquest.com/us/maryland/midland-floor-care-412618388\nhttps://www.yellowpages.com/temple-hills-md/mip/midland-floor-care-502822336\nhttps://www.manta.com/c/mhkty5k/midland-floor-care\nhttps://www.thebluebook.com/iProView/1330703/midland-floor-care-llc/subcontractors/",
 		);
 	}
 
@@ -255,6 +258,10 @@ class MLS_SameAs {
 
 		// Service areas — one per line.
 		$data['service_areas'] = sanitize_textarea_field( wp_unslash( $_POST['service_areas'] ?? '' ) );
+
+		// Additional listing URLs (one per line) — directories/citations without a
+		// dedicated field; all merged into sameAs.
+		$data['extra_sameas'] = sanitize_textarea_field( wp_unslash( $_POST['extra_sameas'] ?? '' ) );
 
 		// Geo coordinates — decimal. Store '' when blank so empty props are omitted.
 		$data['center_lat'] = self::sanitize_coordinate( $_POST['center_lat'] ?? '', -90, 90 );
@@ -492,6 +499,30 @@ class MLS_SameAs {
 				$sameas[] = esc_url( $d[ $key ] );
 			}
 		}
+		// Additional listing URLs (one per line) — MapQuest, YellowPages, Manta,
+		// Blue Book and any other directory without a named field.
+		if ( ! empty( $d['extra_sameas'] ) ) {
+			foreach ( preg_split( '/\r\n|\r|\n/', (string) $d['extra_sameas'] ) as $line ) {
+				$line = trim( $line );
+				if ( '' !== $line && 0 === strpos( $line, 'http' ) ) {
+					$sameas[] = esc_url( $line );
+				}
+			}
+		}
+		// Every listing tracked in the Citation Audit also reinforces the entity —
+		// the whole point of sameAs is to force the relationship across all of them.
+		if ( class_exists( 'MLS_Citations' ) && method_exists( 'MLS_Citations', 'get_citations' ) ) {
+			$cites = MLS_Citations::get_citations();
+			if ( is_array( $cites ) ) {
+				foreach ( $cites as $cite ) {
+					$cite_url = isset( $cite['url'] ) ? trim( (string) $cite['url'] ) : '';
+					if ( '' !== $cite_url && 0 === strpos( $cite_url, 'http' ) ) {
+						$sameas[] = esc_url( $cite_url );
+					}
+				}
+			}
+		}
+		$sameas = array_values( array_unique( array_filter( $sameas ) ) );
 		if ( $sameas ) {
 			$schema['sameAs'] = $sameas;
 		}
@@ -761,6 +792,17 @@ class MLS_SameAs {
 						<td>
 							<textarea id="service_areas" name="service_areas" rows="8" class="large-text" placeholder="Bethesda, MD&#10;Rockville, MD&#10;Silver Spring, MD&#10;Washington, DC"><?php echo esc_textarea( $d['service_areas'] ?? '' ); ?></textarea>
 							<p class="description"><?php esc_html_e( 'These populate the areaServed schema field and appear in AI Overview citations.', 'midland-local-seo' ); ?></p>
+						</td>
+					</tr>
+				</table>
+
+				<h2><?php esc_html_e( 'Additional Listing URLs', 'midland-local-seo' ); ?></h2>
+				<p class="description"><?php esc_html_e( 'One URL per line. For directories/citations without a dedicated field below (MapQuest, YellowPages, Manta, Blue Book, Data Axle, etc.). Every line is merged into your sameAs schema so the whole listing footprint reinforces your entity.', 'midland-local-seo' ); ?></p>
+				<table class="form-table">
+					<tr>
+						<th><label for="extra_sameas"><?php esc_html_e( 'Extra sameAs URLs (one per line)', 'midland-local-seo' ); ?></label></th>
+						<td>
+							<textarea id="extra_sameas" name="extra_sameas" rows="6" class="large-text" placeholder="https://www.mapquest.com/...&#10;https://www.yellowpages.com/..."><?php echo esc_textarea( $d['extra_sameas'] ?? '' ); ?></textarea>
 						</td>
 					</tr>
 				</table>
