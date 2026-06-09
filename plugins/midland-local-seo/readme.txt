@@ -4,7 +4,7 @@ Tags: local seo, google business profile, citations, schema, rank tracking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,13 @@ The Citation Audit and sameAs / Identity modules work without it. Geo-Grid, GMB 
 Encrypted with AES-256-CBC using a key derived from your site's auth salt, with a random IV per value. It is never echoed back into the settings field.
 
 == Changelog ==
+
+= 1.1.0 =
+* sameAs now links your entire listing footprint (14 profiles incl. Bing, Apple Maps, MapQuest, YellowPages, Manta, Blue Book, Chamber) and merges every Citation Audit URL.
+* New "Additional Listing URLs" field + one-click "Load Midland profile" to fill the whole identity form.
+* Backlink Priority Score (0-100, ROI-weighted) with A/B/C tiers; DataForSEO link-gap discovery; weekly Insights email.
+* Geo-Grid now tracks the true local pack (Google Maps), matching by name or domain.
+* Fixes: dashboard fatal, schema @graph (geo + opening hours), object-cache-safe transient refresh, pre-filled Midland NAP defaults.
 
 = 1.0.0 =
 * Initial release: Citation Audit, sameAs / Identity, Geo-Grid, Local Backlinks, GMB Mirror, GMB Optimizer, and GMB Competitor Audit, plus the Local SEO dashboard and DataForSEO integration.
