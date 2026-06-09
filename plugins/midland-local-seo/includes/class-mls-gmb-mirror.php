@@ -48,6 +48,7 @@ class MLS_GMB_Mirror {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 14 );
 		add_action( 'admin_post_mls_create_mirror_draft', array( $this, 'handle_create_draft' ) );
 		add_action( 'admin_post_mls_create_all_services', array( $this, 'handle_create_all_services' ) );
+		add_action( 'admin_post_mls_create_all_locations', array( $this, 'handle_create_all_locations' ) );
 		add_action( 'admin_init', array( $this, 'handle_save_categories' ) );
 	}
 
@@ -89,6 +90,59 @@ class MLS_GMB_Mirror {
 			}
 		}
 		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&bulk_created=' . (int) $created ) );
+		exit;
+	}
+
+	/**
+	 * Bulk-create a location page (city x service) for every service area that does
+	 * not yet have one, through the Smart SEO programmatic engine so each renders in
+	 * the Elementor template. Falls back to a plain draft when the engine is off.
+	 */
+	public function handle_create_all_locations() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_create_all_locations' );
+
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$biz      = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+		$areas    = array();
+		if ( ! empty( $identity['service_areas'] ) ) {
+			$areas = array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', (string) $identity['service_areas'] ) ) );
+		}
+
+		$engine  = class_exists( 'RSSEO_Pro_Programmatic' ) && method_exists( 'RSSEO_Pro_Programmatic', 'generate_location_page' );
+		$created = 0;
+		foreach ( $areas as $area ) {
+			$parts = array_map( 'trim', explode( ',', $area, 2 ) );
+			$city  = isset( $parts[0] ) ? $parts[0] : $area;
+			$state = isset( $parts[1] ) ? $parts[1] : '';
+			if ( '' === $city ) {
+				continue;
+			}
+			if ( $engine ) {
+				// The engine dedupes by city+state, so this is idempotent.
+				$post_id = RSSEO_Pro_Programmatic::generate_location_page( $city, $state, array(), array( 'status' => 'draft', 'ping' => false ) );
+			} else {
+				$title = sprintf( '%1$s in %2$s', $biz, $area );
+				if ( $this->existing_post_id( $title ) ) {
+					continue;
+				}
+				$post_id = wp_insert_post(
+					array(
+						'post_title'   => $title,
+						'post_name'    => sanitize_title( $title ),
+						'post_status'  => 'draft',
+						'post_type'    => 'page',
+					),
+					true
+				);
+			}
+			if ( ! is_wp_error( $post_id ) && $post_id ) {
+				++$created;
+			}
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&bulk_loc_created=' . (int) $created ) );
 		exit;
 	}
 
@@ -536,7 +590,23 @@ class MLS_GMB_Mirror {
 				</table>
 			<?php endif; ?>
 
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['bulk_loc_created'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>
+					<?php
+					/* translators: %d: number of pages */
+					echo esc_html( sprintf( _n( '%d location page draft created.', '%d location page drafts created.', (int) $_GET['bulk_loc_created'], 'midland-local-seo' ), (int) $_GET['bulk_loc_created'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					?>
+				</p></div>
+			<?php endif; ?>
+
 			<h2><?php esc_html_e( 'Location Pages (from service areas)', 'midland-local-seo' ); ?></h2>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
+				<?php wp_nonce_field( 'mls_create_all_locations' ); ?>
+				<input type="hidden" name="action" value="mls_create_all_locations">
+				<button type="submit" class="button button-primary" onclick="return confirm('Create a location page for every service area?');"><?php esc_html_e( '⚡ Create all location pages', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'One click. Each builds in your Elementor template via the Smart SEO engine.', 'midland-local-seo' ); ?></span>
+			</form>
 			<?php if ( empty( $recs['location'] ) ) : ?>
 				<p class="description"><?php esc_html_e( 'No service areas set. Add them under sameAs / Identity.', 'midland-local-seo' ); ?></p>
 			<?php else : ?>
