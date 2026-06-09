@@ -2,7 +2,7 @@
 /**
  * Plugin Name: GEO Site Brain
  * Description: Turns your WordPress content into an AI-readable knowledge base using OpenAI embeddings (stored in Neon pgvector, with a local fallback). Scores every page for GEO/AEO/SEO, generates recommendations, and answers questions in an admin chat using retrieval first.
- * Version: 2.4.1
+ * Version: 2.4.2
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GSB_VERSION', '2.4.1' );
+define( 'GSB_VERSION', '2.4.2' );
 define( 'GSB_PLUGIN_FILE', __FILE__ );
 define( 'GSB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GSB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -136,10 +136,14 @@ final class GSB_Plugin {
 		if ( get_option( 'gsb_identity_seeded' ) ) {
 			return;
 		}
-		$defaults = GSB_Settings::defaults();
-		foreach ( array( 'business_name', 'business_locations', 'core_services' ) as $key ) {
+		$identity = array(
+			'business_name'      => 'Midland Floor Care',
+			'business_locations' => "Washington, DC\nBethesda, MD\nRockville, MD\nSilver Spring, MD\nTemple Hills, MD\nArlington, VA\nAlexandria, VA\nFairfax, VA",
+			'core_services'      => "Commercial Carpet Cleaning\nHardwood Floor Cleaning\nCarpet Installation\nTile Cleaning\nFloor Refinishing\nWood Floor Refinishing\nUpholstery Cleaning\nJanitorial Services\nFloor Maintenance and Restoration",
+		);
+		foreach ( $identity as $key => $value ) {
 			if ( '' === trim( (string) GSB_Settings::get( $key, '' ) ) ) {
-				GSB_Settings::set( $key, $defaults[ $key ] );
+				GSB_Settings::set( $key, $value );
 			}
 		}
 		update_option( 'gsb_identity_seeded', 1 );
