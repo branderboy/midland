@@ -36,8 +36,8 @@ class SFCO_Pro_GCal {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Google Calendar', 'smart-forms-pro' ),
-            esc_html__( 'Google Calendar', 'smart-forms-pro' ),
+            esc_html__( 'Google Calendar', 'smart-forms-for-midland' ),
+            esc_html__( 'Google Calendar', 'smart-forms-for-midland' ),
             'manage_options',
             'sfco-gcal',
             array( $this, 'render_page' )
@@ -51,11 +51,16 @@ class SFCO_Pro_GCal {
 
         $nonce = isset( $_POST['_sfco_gcal_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_gcal_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_save_gcal' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         update_option( 'sfco_gcal_client_id',     sanitize_text_field( wp_unslash( $_POST['gcal_client_id'] ?? '' ) ) );
-        update_option( 'sfco_gcal_client_secret', sanitize_text_field( wp_unslash( $_POST['gcal_client_secret'] ?? '' ) ) );
+        // Only overwrite the stored secret when a new one is entered; the field
+        // renders blank (masked), so an empty post means "keep existing".
+        $gcal_secret = sanitize_text_field( wp_unslash( $_POST['gcal_client_secret'] ?? '' ) );
+        if ( '' !== $gcal_secret ) {
+            update_option( 'sfco_gcal_client_secret', $gcal_secret );
+        }
         update_option( 'sfco_gcal_event_duration', absint( $_POST['gcal_event_duration'] ?? 60 ) );
         update_option( 'sfco_gcal_location',       sanitize_text_field( wp_unslash( $_POST['gcal_location'] ?? '' ) ) );
 
@@ -98,7 +103,7 @@ class SFCO_Pro_GCal {
 
         if ( ! wp_verify_nonce( $state, 'sfco_gcal_oauth' ) ) {
             add_action( 'admin_notices', function() {
-                echo '<div class="notice notice-error"><p>' . esc_html__( 'Google OAuth state mismatch. Try again.', 'smart-forms-pro' ) . '</p></div>';
+                echo '<div class="notice notice-error"><p>' . esc_html__( 'Google OAuth state mismatch. Try again.', 'smart-forms-for-midland' ) . '</p></div>';
             } );
             return;
         }
@@ -297,83 +302,83 @@ class SFCO_Pro_GCal {
         $redirect_uri = admin_url( 'admin.php?page=sfco-gcal' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Google Calendar Integration', 'smart-forms-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Auto-create calendar events when appointments are confirmed. Client gets 24h + 2h reminders automatically.', 'smart-forms-pro' ); ?></p>
+            <h1><?php esc_html_e( 'Google Calendar Integration', 'smart-forms-for-midland' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Auto-create calendar events when appointments are confirmed. Client gets 24h + 2h reminders automatically.', 'smart-forms-for-midland' ); ?></p>
 
             <?php if ( $saved ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
             <?php if ( $just_conn ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Google Calendar connected successfully!', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Google Calendar connected successfully!', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
             <?php if ( $disconnected ) : ?>
-                <div class="notice notice-info is-dismissible"><p><?php esc_html_e( 'Google Calendar disconnected.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-info is-dismissible"><p><?php esc_html_e( 'Google Calendar disconnected.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
 
-            <h2><?php esc_html_e( 'Connection Status', 'smart-forms-pro' ); ?></h2>
+            <h2><?php esc_html_e( 'Connection Status', 'smart-forms-for-midland' ); ?></h2>
             <?php if ( $connected ) : ?>
                 <p>
                     <span style="color:#46b450;">&#10003;</span>
-                    <strong><?php esc_html_e( 'Connected', 'smart-forms-pro' ); ?></strong>
+                    <strong><?php esc_html_e( 'Connected', 'smart-forms-for-midland' ); ?></strong>
                     &nbsp;
-                    <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=sfco-gcal&sfco_gcal_disconnect=1' ), 'sfco_gcal_disconnect' ) ); ?>" class="button button-secondary button-small"><?php esc_html_e( 'Disconnect', 'smart-forms-pro' ); ?></a>
+                    <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=sfco-gcal&sfco_gcal_disconnect=1' ), 'sfco_gcal_disconnect' ) ); ?>" class="button button-secondary button-small"><?php esc_html_e( 'Disconnect', 'smart-forms-for-midland' ); ?></a>
                 </p>
             <?php else : ?>
                 <p>
                     <span style="color:#dc3232;">&#10007;</span>
-                    <strong><?php esc_html_e( 'Not connected', 'smart-forms-pro' ); ?></strong>
-                    — <?php esc_html_e( 'enter credentials below then click Connect.', 'smart-forms-pro' ); ?>
+                    <strong><?php esc_html_e( 'Not connected', 'smart-forms-for-midland' ); ?></strong>
+                    — <?php esc_html_e( 'enter credentials below then click Connect.', 'smart-forms-for-midland' ); ?>
                 </p>
             <?php endif; ?>
 
             <form method="post">
                 <?php wp_nonce_field( 'sfco_save_gcal', '_sfco_gcal_nonce' ); ?>
 
-                <h2><?php esc_html_e( 'OAuth Credentials', 'smart-forms-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'OAuth Credentials', 'smart-forms-for-midland' ); ?></h2>
                 <p class="description">
-                    <?php esc_html_e( 'Create OAuth 2.0 credentials in Google Cloud Console → APIs & Services → Credentials.', 'smart-forms-pro' ); ?><br>
-                    <?php esc_html_e( 'Authorized redirect URI:', 'smart-forms-pro' ); ?> <code><?php echo esc_html( $redirect_uri ); ?></code>
+                    <?php esc_html_e( 'Create OAuth 2.0 credentials in Google Cloud Console → APIs & Services → Credentials.', 'smart-forms-for-midland' ); ?><br>
+                    <?php esc_html_e( 'Authorized redirect URI:', 'smart-forms-for-midland' ); ?> <code><?php echo esc_html( $redirect_uri ); ?></code>
                 </p>
 
                 <table class="form-table">
                     <tr>
-                        <th><label for="gcal_client_id"><?php esc_html_e( 'Client ID', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="gcal_client_id"><?php esc_html_e( 'Client ID', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="text" id="gcal_client_id" name="gcal_client_id" class="large-text" value="<?php echo esc_attr( $client_id ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="gcal_client_secret"><?php esc_html_e( 'Client Secret', 'smart-forms-pro' ); ?></label></th>
-                        <td><input type="password" id="gcal_client_secret" name="gcal_client_secret" class="regular-text" value="<?php echo esc_attr( $client_secret ); ?>"></td>
+                        <th><label for="gcal_client_secret"><?php esc_html_e( 'Client Secret', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="password" id="gcal_client_secret" name="gcal_client_secret" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) $client_secret ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : '' ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="gcal_event_duration"><?php esc_html_e( 'Default Duration (minutes)', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="gcal_event_duration"><?php esc_html_e( 'Default Duration (minutes)', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="number" id="gcal_event_duration" name="gcal_event_duration" value="<?php echo esc_attr( $duration ); ?>" min="15" step="15" style="width:80px;"></td>
                     </tr>
                     <tr>
-                        <th><label for="gcal_location"><?php esc_html_e( 'Default Location', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="gcal_location"><?php esc_html_e( 'Default Location', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <input type="text" id="gcal_location" name="gcal_location" class="regular-text" value="<?php echo esc_attr( $location ); ?>" placeholder="e.g. Client's address">
-                            <p class="description"><?php esc_html_e( 'Appears in the calendar event. Can be overridden per appointment.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Appears in the calendar event. Can be overridden per appointment.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                 </table>
 
                 <p class="submit">
-                    <button type="submit" name="sfco_save_gcal" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_save_gcal" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'smart-forms-for-midland' ); ?></button>
 
                     <?php if ( $client_id ) : ?>
                         <a href="<?php echo esc_url( $this->get_oauth_url() ); ?>" class="button button-secondary" style="margin-left:8px;">
-                            <?php echo $connected ? esc_html__( 'Reconnect Google', 'smart-forms-pro' ) : esc_html__( 'Connect Google Calendar', 'smart-forms-pro' ); ?>
+                            <?php echo $connected ? esc_html__( 'Reconnect Google', 'smart-forms-for-midland' ) : esc_html__( 'Connect Google Calendar', 'smart-forms-for-midland' ); ?>
                         </a>
                     <?php endif; ?>
                 </p>
             </form>
 
             <hr>
-            <h3><?php esc_html_e( 'How It Works', 'smart-forms-pro' ); ?></h3>
+            <h3><?php esc_html_e( 'How It Works', 'smart-forms-for-midland' ); ?></h3>
             <ol>
-                <li><?php esc_html_e( 'Lead submits form → automation confirms appointment → GCal event created in seconds.', 'smart-forms-pro' ); ?></li>
-                <li><?php esc_html_e( 'Client receives Google Calendar invite with 24h + 2h email reminders.', 'smart-forms-pro' ); ?></li>
-                <li><?php esc_html_e( 'Owner\'s calendar stays in sync — no double bookings, no no-shows.', 'smart-forms-pro' ); ?></li>
+                <li><?php esc_html_e( 'Lead submits form → automation confirms appointment → GCal event created in seconds.', 'smart-forms-for-midland' ); ?></li>
+                <li><?php esc_html_e( 'Client receives Google Calendar invite with 24h + 2h email reminders.', 'smart-forms-for-midland' ); ?></li>
+                <li><?php esc_html_e( 'Owner\'s calendar stays in sync — no double bookings, no no-shows.', 'smart-forms-for-midland' ); ?></li>
             </ol>
         </div>
         <?php

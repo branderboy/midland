@@ -8,14 +8,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Hooks:
  *   srp_job_completed( $data ) — fire this from any plugin/theme to trigger the survey.
  *   srp_survey_response        — public AJAX handler for the survey form.
- * Cron sends at most three spaced reminders if there's no response: the first
- * ~24h after the survey, the second ~48h after that, and a final one a few days
- * (~5) later. Reminders stop the moment the customer submits a score.
+ * Cron sends at most two spaced reminders if there's no response: the first
+ * ~24h after the survey and the second ~48h after that — three emails total
+ * per customer (initial + 2 reminders). Reminders stop the moment the customer
+ * submits a score.
  */
 class SRP_Survey {
 
     const THRESHOLD = 4; // 1–5 star scale: score >= THRESHOLD (4★) → route to Google review.
     const MAX_SCORE = 5; // Top of the rating scale.
+
+    // Automated email cap: each capped email category (owner alerts, survey
+    // reminders) sends at most this many messages, then stops. Set at the
+    // owner's request to stop the inbox flood.
+    const EMAIL_CAP = 3;
 
     /**
      * Midland brand defaults — all overridable in Settings, mirroring the
@@ -111,6 +117,25 @@ class SRP_Survey {
     /** Whether the last survey email to $email was sent successfully. */
     public static function was_sent( $email ) {
         return ! empty( self::$last_send_ok[ sanitize_email( (string) $email ) ] );
+    }
+
+    /**
+     * Gate for capped automated emails. Consumes one slot from the persistent
+     * counter stored in $option_key and returns true only while fewer than
+     * EMAIL_CAP messages have been sent for that key. Once the cap is reached it
+     * returns false (until the counter is reset), so each category sends at most
+     * EMAIL_CAP emails total.
+     *
+     * @param string $option_key Counter option, e.g. 'srp_owner_alert_count'.
+     * @return bool True if another email in this category is still allowed.
+     */
+    public static function consume_email_cap( $option_key ) {
+        $sent = (int) get_option( $option_key, 0 );
+        if ( $sent >= self::EMAIL_CAP ) {
+            return false;
+        }
+        update_option( $option_key, $sent + 1, false );
+        return true;
     }
 
     public static function get_instance() {
@@ -421,9 +446,12 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         $feedback = sanitize_textarea_field( wp_unslash( $_POST['feedback'] ?? '' ) );
         SRP_DB::update_survey( $survey->id, array( 'feedback' => $feedback ) );
 
-        // Notify owner.
-        // Re-sanitize DB values for the email context: strip tags/control chars so
-        // a stored name or email can't inject headers or unexpected content.
+        // Notify the owner of every private-feedback submission. (Bounded
+        // naturally: each survey collects feedback once. The old global
+        // srp_owner_alert_count cap suppressed ALL alerts after 3 lifetime
+        // sends, silently hiding later customers' complaints — removed.)
+        // Re-sanitize DB values for the email context: strip tags/control chars
+        // so a stored name or email can't inject headers or unexpected content.
         $owner_email       = get_option( 'admin_email' );
         $business          = wp_strip_all_tags( self::business_name() );
         $safe_name         = sanitize_text_field( $survey->customer_name );
@@ -459,10 +487,9 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
             SRP_DB::update_survey( $survey->id, array( 'reminder2_at' => current_time( 'mysql' ) ) );
         }
 
-        foreach ( (array) SRP_DB::get_pending_reminders_third() as $survey ) {
-            $this->send_reminder( $survey, $business, 3 );
-            SRP_DB::update_survey( $survey->id, array( 'reminder3_at' => current_time( 'mysql' ) ) );
-        }
+        // Capped at 3 emails total per customer: the initial survey + two
+        // reminders. The third reminder was removed so a customer is never
+        // contacted more than three times.
     }
 
     private function send_reminder( $survey, $business, $which ) {
@@ -470,6 +497,10 @@ document.getElementById("srp-feedback").addEventListener("submit",function(e){
         if ( ! is_email( $email ) ) {
             return;
         }
+        // Reminder volume is already bounded to <=3 PER SURVEY by the
+        // reminder1/2/3_at timestamp columns (see get_pending_reminders*). The
+        // old global srp_reminder_count cap stopped ALL reminders after 3
+        // lifetime sends across every survey — removed as a bug.
         $token = SRP_DB::build_token( $survey->id );
         $url   = add_query_arg( array( 'srp_survey' => $token ), home_url( '/' ) );
         $name  = $survey->customer_name ?: 'there';

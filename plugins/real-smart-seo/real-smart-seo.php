@@ -12,7 +12,7 @@
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 6.9
  * Update URI: false
  */
 
@@ -70,6 +70,9 @@ class RSSEO_Plugin {
         RSSEO_Pro_Geogrid::create_tables();
         RSSEO_Pro_AI_Rank::create_tables();
         flush_rewrite_rules();
+        // Record the schema version so maybe_upgrade_db() (admin_init) doesn't
+        // re-run a full dbDelta + flush_rewrite_rules pass on the next admin load.
+        update_option( 'rsseo_db_version', RSSEO_VERSION );
     }
 
     /**
@@ -97,9 +100,6 @@ class RSSEO_Plugin {
 
     public function init() {
         load_plugin_textdomain( 'real-smart-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-        // Several bundled modules still use the 'real-smart-seo-pro' text domain;
-        // register it against the same languages folder so those strings load.
-        load_plugin_textdomain( 'real-smart-seo-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
         $this->includes();
         $this->init_classes();
         add_action( 'admin_init',        array( $this, 'maybe_upgrade_db' ) );

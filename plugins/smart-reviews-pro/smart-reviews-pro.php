@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Reviews
  * Description: Midland-branded survey-gated review collection. A 1–5 star survey fires automatically after job completion (driven by sfco_lead_completed + sfco_lead_status_changed actions from Midland Smart Forms / Smart CRM). Score ≥4★ sends the Google review link + up to 3 follow-up reminders; score <4★ captures private feedback only and emails the manager — no public review request.
- * Version: 1.5.2
+ * Version: 1.5.4
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'SRP_VERSION', '1.5.2' );
+define( 'SRP_VERSION', '1.5.4' );
 define( 'SRP_PATH',    plugin_dir_path( __FILE__ ) );
 define( 'SRP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'SRP_FILE',    __FILE__ );
@@ -53,7 +53,10 @@ class Smart_Reviews_Pro {
         // events were left orphaned in WP-Cron.)
         wp_clear_scheduled_hook( 'srp_cron_reminders' );  // hourly survey reminders
         wp_clear_scheduled_hook( 'srp_crm_poll' );        // hourly CRM poll
-        wp_clear_scheduled_hook( 'srp_review_reminder' ); // 48h GMB review nudges
+        // srp_review_reminder is scheduled WITH an arg (the survey id), so
+        // wp_clear_scheduled_hook() (no args) would leave those events orphaned.
+        // wp_unschedule_hook() removes every event for the hook regardless of args.
+        wp_unschedule_hook( 'srp_review_reminder' );      // 48h GMB review nudges (per-survey args)
     }
 
     public function init() {

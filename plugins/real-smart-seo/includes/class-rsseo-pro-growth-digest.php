@@ -138,7 +138,7 @@ class RSSEO_Pro_Growth_Digest {
 
         $subject = sprintf(
             /* translators: %s: site name */
-            __( 'Your %s growth plan — guest posts, backlinks & video ideas', 'real-smart-seo-pro' ),
+            __( 'Your %s growth plan — guest posts, backlinks & video ideas', 'real-smart-seo' ),
             get_bloginfo( 'name' )
         );
         $body = $this->build_email_html( $sections, $text );
@@ -176,10 +176,10 @@ class RSSEO_Pro_Growth_Digest {
      */
     private function parse_sections( $text ) {
         $map = array(
-            'GUEST_POSTS'    => __( 'Guest posts for more traffic', 'real-smart-seo-pro' ),
-            'LOCAL_BACKLINKS'=> __( 'Local backlinks (incl. .gov & nonprofit)', 'real-smart-seo-pro' ),
-            'VIDEO_SEO'      => __( 'TikTok & YouTube videos for SEO', 'real-smart-seo-pro' ),
-            'VIDEO_VIRAL'    => __( 'Videos to go viral', 'real-smart-seo-pro' ),
+            'GUEST_POSTS'    => __( 'Guest posts for more traffic', 'real-smart-seo' ),
+            'LOCAL_BACKLINKS'=> __( 'Local backlinks (incl. .gov & nonprofit)', 'real-smart-seo' ),
+            'VIDEO_SEO'      => __( 'TikTok & YouTube videos for SEO', 'real-smart-seo' ),
+            'VIDEO_VIRAL'    => __( 'Videos to go viral', 'real-smart-seo' ),
         );
         $out = array();
         foreach ( $map as $key => $label ) {
@@ -193,10 +193,10 @@ class RSSEO_Pro_Growth_Digest {
     private function build_email_html( $sections, $raw ) {
         $business = get_bloginfo( 'name' );
         $emojis   = array(
-            __( 'Guest posts for more traffic', 'real-smart-seo-pro' )            => '&#9997;&#65039;',
-            __( 'Local backlinks (incl. .gov & nonprofit)', 'real-smart-seo-pro' ) => '&#128279;',
-            __( 'TikTok & YouTube videos for SEO', 'real-smart-seo-pro' )          => '&#127909;',
-            __( 'Videos to go viral', 'real-smart-seo-pro' )                       => '&#128293;',
+            __( 'Guest posts for more traffic', 'real-smart-seo' )            => '&#9997;&#65039;',
+            __( 'Local backlinks (incl. .gov & nonprofit)', 'real-smart-seo' ) => '&#128279;',
+            __( 'TikTok & YouTube videos for SEO', 'real-smart-seo' )          => '&#127909;',
+            __( 'Videos to go viral', 'real-smart-seo' )                       => '&#128293;',
         );
 
         $blocks = '';
@@ -243,8 +243,8 @@ class RSSEO_Pro_Growth_Digest {
     public function add_menu() {
         add_submenu_page(
             null,
-            __( 'Growth Digest', 'real-smart-seo-pro' ),
-            __( 'Growth Digest', 'real-smart-seo-pro' ),
+            __( 'Growth Digest', 'real-smart-seo' ),
+            __( 'Growth Digest', 'real-smart-seo' ),
             'manage_options',
             'rsseo-growth-digest',
             array( $this, 'render_page' )
@@ -257,7 +257,7 @@ class RSSEO_Pro_Growth_Digest {
         }
         $nonce = isset( $_POST['_rsseo_gd_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_gd_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_save_growth_digest' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         update_option( self::OPT_ENABLED, isset( $_POST['gd_enabled'] ) ? 1 : 0 );
@@ -276,7 +276,7 @@ class RSSEO_Pro_Growth_Digest {
 
     public function handle_send_now() {
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
         check_admin_referer( 'rsseo_growth_digest_send_now' );
 
@@ -305,55 +305,55 @@ class RSSEO_Pro_Growth_Digest {
         // phpcs:enable
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Growth Digest', 'real-smart-seo-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'Growth Digest', 'real-smart-seo' ); ?></h1>
             <p class="description" style="max-width:680px;">
-                <?php esc_html_e( 'An automatic email with this period\'s growth actions: guest posts to pitch for traffic, local backlinks to pursue (including .gov and nonprofit targets), TikTok/YouTube video ideas for SEO, and video ideas built to go viral.', 'real-smart-seo-pro' ); ?>
+                <?php esc_html_e( 'An automatic email with this period\'s growth actions: guest posts to pitch for traffic, local backlinks to pursue (including .gov and nonprofit targets), TikTok/YouTube video ideas for SEO, and video ideas built to go viral.', 'real-smart-seo' ); ?>
             </p>
 
-            <?php if ( $saved ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Saved.', 'real-smart-seo-pro' ); ?></p></div><?php endif; ?>
-            <?php if ( 'ok' === $sent ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Test digest sent.', 'real-smart-seo-pro' ); ?></p></div><?php endif; ?>
-            <?php if ( 'fail' === $sent ) : ?><div class="notice notice-error is-dismissible"><p><?php echo esc_html( $msg ?: __( 'Could not send.', 'real-smart-seo-pro' ) ); ?></p></div><?php endif; ?>
-            <?php if ( ! $has_api ) : ?><div class="notice notice-warning"><p><?php esc_html_e( 'The free Real Smart SEO base plugin (Claude API) must be active to generate the digest.', 'real-smart-seo-pro' ); ?></p></div><?php endif; ?>
+            <?php if ( $saved ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Saved.', 'real-smart-seo' ); ?></p></div><?php endif; ?>
+            <?php if ( 'ok' === $sent ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Test digest sent.', 'real-smart-seo' ); ?></p></div><?php endif; ?>
+            <?php if ( 'fail' === $sent ) : ?><div class="notice notice-error is-dismissible"><p><?php echo esc_html( $msg ?: __( 'Could not send.', 'real-smart-seo' ) ); ?></p></div><?php endif; ?>
+            <?php if ( ! $has_api ) : ?><div class="notice notice-warning"><p><?php esc_html_e( 'The free Real Smart SEO base plugin (Claude API) must be active to generate the digest.', 'real-smart-seo' ); ?></p></div><?php endif; ?>
 
             <form method="post">
                 <?php wp_nonce_field( 'rsseo_save_growth_digest', '_rsseo_gd_nonce' ); ?>
                 <table class="form-table" role="presentation">
                     <tr>
-                        <th scope="row"><?php esc_html_e( 'Enable', 'real-smart-seo-pro' ); ?></th>
-                        <td><label><input type="checkbox" name="gd_enabled" value="1" <?php checked( $enabled, 1 ); ?>> <?php esc_html_e( 'Email the growth digest automatically', 'real-smart-seo-pro' ); ?></label></td>
+                        <th scope="row"><?php esc_html_e( 'Enable', 'real-smart-seo' ); ?></th>
+                        <td><label><input type="checkbox" name="gd_enabled" value="1" <?php checked( $enabled, 1 ); ?>> <?php esc_html_e( 'Email the growth digest automatically', 'real-smart-seo' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="gd_email"><?php esc_html_e( 'Send to', 'real-smart-seo-pro' ); ?></label></th>
+                        <th scope="row"><label for="gd_email"><?php esc_html_e( 'Send to', 'real-smart-seo' ); ?></label></th>
                         <td><input type="email" id="gd_email" name="gd_email" class="regular-text" value="<?php echo esc_attr( $email ); ?>" placeholder="owner@example.com">
-                            <p class="description"><?php esc_html_e( 'Recipient (the owner). Nothing is sent until this is set and Enable is on.', 'real-smart-seo-pro' ); ?></p></td>
+                            <p class="description"><?php esc_html_e( 'Recipient (the owner). Nothing is sent until this is set and Enable is on.', 'real-smart-seo' ); ?></p></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="gd_freq"><?php esc_html_e( 'Frequency', 'real-smart-seo-pro' ); ?></label></th>
+                        <th scope="row"><label for="gd_freq"><?php esc_html_e( 'Frequency', 'real-smart-seo' ); ?></label></th>
                         <td>
                             <select id="gd_freq" name="gd_freq">
-                                <option value="weekly" <?php selected( $freq, 'weekly' ); ?>><?php esc_html_e( 'Weekly (Monday morning)', 'real-smart-seo-pro' ); ?></option>
-                                <option value="daily" <?php selected( $freq, 'daily' ); ?>><?php esc_html_e( 'Daily (8am)', 'real-smart-seo-pro' ); ?></option>
+                                <option value="weekly" <?php selected( $freq, 'weekly' ); ?>><?php esc_html_e( 'Weekly (Monday morning)', 'real-smart-seo' ); ?></option>
+                                <option value="daily" <?php selected( $freq, 'daily' ); ?>><?php esc_html_e( 'Daily (8am)', 'real-smart-seo' ); ?></option>
                             </select>
                             <?php if ( $next ) : ?>
-                                <p class="description"><?php printf( esc_html__( 'Next send: %s', 'real-smart-seo-pro' ), esc_html( wp_date( 'M j, Y g:i A', $next ) ) ); ?></p>
+                                <p class="description"><?php printf( esc_html__( 'Next send: %s', 'real-smart-seo' ), esc_html( wp_date( 'M j, Y g:i A', $next ) ) ); ?></p>
                             <?php endif; ?>
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="gd_context"><?php esc_html_e( 'Business context', 'real-smart-seo-pro' ); ?></label></th>
+                        <th scope="row"><label for="gd_context"><?php esc_html_e( 'Business context', 'real-smart-seo' ); ?></label></th>
                         <td><textarea id="gd_context" name="gd_context" rows="4" class="large-text" placeholder="<?php echo esc_attr( $this->default_context() ); ?>"><?php echo esc_textarea( $context ); ?></textarea>
-                            <p class="description"><?php esc_html_e( 'Describe the business, services, and service area so the recommendations are relevant. Leave blank to use the default shown above.', 'real-smart-seo-pro' ); ?></p></td>
+                            <p class="description"><?php esc_html_e( 'Describe the business, services, and service area so the recommendations are relevant. Leave blank to use the default shown above.', 'real-smart-seo' ); ?></p></td>
                     </tr>
                 </table>
-                <p class="submit"><button type="submit" name="rsseo_save_growth_digest" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'real-smart-seo-pro' ); ?></button></p>
+                <p class="submit"><button type="submit" name="rsseo_save_growth_digest" value="1" class="button button-primary"><?php esc_html_e( 'Save', 'real-smart-seo' ); ?></button></p>
             </form>
 
             <hr>
             <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
                 <?php wp_nonce_field( 'rsseo_growth_digest_send_now' ); ?>
                 <input type="hidden" name="action" value="rsseo_growth_digest_send_now">
-                <p><button type="submit" class="button" <?php disabled( ! $has_api ); ?>><?php esc_html_e( 'Send a test digest now', 'real-smart-seo-pro' ); ?></button>
-                <span class="description" style="margin-left:8px;"><?php esc_html_e( 'Generates and emails the digest immediately to the recipient above.', 'real-smart-seo-pro' ); ?></span></p>
+                <p><button type="submit" class="button" <?php disabled( ! $has_api ); ?>><?php esc_html_e( 'Send a test digest now', 'real-smart-seo' ); ?></button>
+                <span class="description" style="margin-left:8px;"><?php esc_html_e( 'Generates and emails the digest immediately to the recipient above.', 'real-smart-seo' ); ?></span></p>
             </form>
         </div>
         <?php

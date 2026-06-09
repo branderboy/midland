@@ -43,8 +43,8 @@ class RSSEO_Pro_Speed {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Site Speed', 'real-smart-seo-pro' ),
-            esc_html__( 'Site Speed', 'real-smart-seo-pro' ),
+            esc_html__( 'Site Speed', 'real-smart-seo' ),
+            esc_html__( 'Site Speed', 'real-smart-seo' ),
             'manage_options',
             'rsseo-speed',
             array( $this, 'render_page' )
@@ -161,7 +161,7 @@ class RSSEO_Pro_Speed {
 
         $nonce = isset( $_POST['_rsseo_speed_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_speed_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_save_speed' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $toggles = array(
@@ -237,13 +237,13 @@ class RSSEO_Pro_Speed {
 
     public function render_page() {
         $toggles = array(
-            self::OPT_DEFER_SCRIPTS  => array( __( 'Defer non-critical scripts', 'real-smart-seo-pro' ), __( 'Add defer attribute to all enqueued scripts (jQuery is excluded automatically).', 'real-smart-seo-pro' ) ),
-            self::OPT_DISABLE_EMOJIS => array( __( 'Remove WP emoji scripts', 'real-smart-seo-pro' ), __( 'Strips wp-emoji JS/CSS from the front end.', 'real-smart-seo-pro' ) ),
-            self::OPT_DISABLE_EMBEDS => array( __( 'Disable wp-embed', 'real-smart-seo-pro' ), __( 'Removes the embed.min.js script and oEmbed discovery links.', 'real-smart-seo-pro' ) ),
-            self::OPT_REMOVE_MIGRATE => array( __( 'Remove jQuery Migrate', 'real-smart-seo-pro' ), __( 'Drops the jquery-migrate dependency. Verify your theme/plugins are compatible.', 'real-smart-seo-pro' ) ),
-            self::OPT_PRECONNECT     => array( __( 'Preconnect to fonts CDN', 'real-smart-seo-pro' ), __( 'Adds preconnect hints for Google Fonts.', 'real-smart-seo-pro' ) ),
-            self::OPT_LAZY_IFRAMES   => array( __( 'Lazy-load iframes', 'real-smart-seo-pro' ), __( 'Adds loading="lazy" to embedded iframes.', 'real-smart-seo-pro' ) ),
-            self::OPT_FETCHPRIORITY  => array( __( 'Prioritize first image (LCP)', 'real-smart-seo-pro' ), __( 'Adds fetchpriority="high" to the first image and disables its lazy-load.', 'real-smart-seo-pro' ) ),
+            self::OPT_DEFER_SCRIPTS  => array( __( 'Defer non-critical scripts', 'real-smart-seo' ), __( 'Add defer attribute to all enqueued scripts (jQuery is excluded automatically).', 'real-smart-seo' ) ),
+            self::OPT_DISABLE_EMOJIS => array( __( 'Remove WP emoji scripts', 'real-smart-seo' ), __( 'Strips wp-emoji JS/CSS from the front end.', 'real-smart-seo' ) ),
+            self::OPT_DISABLE_EMBEDS => array( __( 'Disable wp-embed', 'real-smart-seo' ), __( 'Removes the embed.min.js script and oEmbed discovery links.', 'real-smart-seo' ) ),
+            self::OPT_REMOVE_MIGRATE => array( __( 'Remove jQuery Migrate', 'real-smart-seo' ), __( 'Drops the jquery-migrate dependency. Verify your theme/plugins are compatible.', 'real-smart-seo' ) ),
+            self::OPT_PRECONNECT     => array( __( 'Preconnect to fonts CDN', 'real-smart-seo' ), __( 'Adds preconnect hints for Google Fonts.', 'real-smart-seo' ) ),
+            self::OPT_LAZY_IFRAMES   => array( __( 'Lazy-load iframes', 'real-smart-seo' ), __( 'Adds loading="lazy" to embedded iframes.', 'real-smart-seo' ) ),
+            self::OPT_FETCHPRIORITY  => array( __( 'Prioritize first image (LCP)', 'real-smart-seo' ), __( 'Adds fetchpriority="high" to the first image and disables its lazy-load.', 'real-smart-seo' ) ),
         );
 
         $api_key = get_option( self::OPT_PSI_API_KEY, '' );
@@ -251,22 +251,22 @@ class RSSEO_Pro_Speed {
         $psi_url = wp_nonce_url( admin_url( 'admin.php?page=rsseo-speed&rsseo_psi_run=1' ), 'rsseo_psi_run' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Site Speed Overhaul', 'real-smart-seo-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Toggle front-end optimizations and check your PageSpeed score.', 'real-smart-seo-pro' ); ?></p>
+            <h1><?php esc_html_e( 'Site Speed Overhaul', 'real-smart-seo' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Toggle front-end optimizations and check your PageSpeed score.', 'real-smart-seo' ); ?></p>
 
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Speed settings saved.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Speed settings saved.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['psi'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'PageSpeed test complete. Scroll down for results.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'PageSpeed test complete. Scroll down for results.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
                 <?php wp_nonce_field( 'rsseo_save_speed', '_rsseo_speed_nonce' ); ?>
 
-                <h2><?php esc_html_e( 'Front-end Optimizations', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Front-end Optimizations', 'real-smart-seo' ); ?></h2>
                 <table class="form-table">
                     <?php foreach ( $toggles as $opt => $info ) : ?>
                         <tr>
@@ -274,7 +274,7 @@ class RSSEO_Pro_Speed {
                             <td>
                                 <label>
                                     <input type="checkbox" name="<?php echo esc_attr( $opt ); ?>" value="1" <?php checked( get_option( $opt, 0 ) ); ?>>
-                                    <?php esc_html_e( 'Enabled', 'real-smart-seo-pro' ); ?>
+                                    <?php esc_html_e( 'Enabled', 'real-smart-seo' ); ?>
                                 </label>
                                 <p class="description"><?php echo esc_html( $info[1] ); ?></p>
                             </td>
@@ -282,31 +282,31 @@ class RSSEO_Pro_Speed {
                     <?php endforeach; ?>
                 </table>
 
-                <h2><?php esc_html_e( 'PageSpeed Insights', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'PageSpeed Insights', 'real-smart-seo' ); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><label for="<?php echo esc_attr( self::OPT_PSI_API_KEY ); ?>"><?php esc_html_e( 'PSI API Key (optional)', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="<?php echo esc_attr( self::OPT_PSI_API_KEY ); ?>"><?php esc_html_e( 'PSI API Key (optional)', 'real-smart-seo' ); ?></label></th>
                         <td>
                             <input type="password" id="<?php echo esc_attr( self::OPT_PSI_API_KEY ); ?>" name="<?php echo esc_attr( self::OPT_PSI_API_KEY ); ?>" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>">
-                            <p class="description"><?php esc_html_e( 'Higher quota with a key. Get one in Google Cloud Console (PageSpeed Insights API).', 'real-smart-seo-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Higher quota with a key. Get one in Google Cloud Console (PageSpeed Insights API).', 'real-smart-seo' ); ?></p>
                         </td>
                     </tr>
                 </table>
 
                 <p class="submit">
-                    <button type="submit" name="rsseo_save_speed" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo-pro' ); ?></button>
-                    <a href="<?php echo esc_url( $psi_url ); ?>" class="button button-secondary" style="margin-left:8px;"><?php esc_html_e( 'Run PageSpeed Test', 'real-smart-seo-pro' ); ?></a>
+                    <button type="submit" name="rsseo_save_speed" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo' ); ?></button>
+                    <a href="<?php echo esc_url( $psi_url ); ?>" class="button button-secondary" style="margin-left:8px;"><?php esc_html_e( 'Run PageSpeed Test', 'real-smart-seo' ); ?></a>
                 </p>
             </form>
 
             <?php if ( ! empty( $last['strategies'] ) ) : ?>
                 <hr>
-                <h2><?php esc_html_e( 'Last PageSpeed Result', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Last PageSpeed Result', 'real-smart-seo' ); ?></h2>
                 <p class="description">
                     <?php
                     printf(
                         /* translators: 1: tested URL, 2: timestamp */
-                        esc_html__( 'URL: %1$s — fetched %2$s', 'real-smart-seo-pro' ),
+                        esc_html__( 'URL: %1$s — fetched %2$s', 'real-smart-seo' ),
                         '<code>' . esc_html( $last['url'] ?? '' ) . '</code>',
                         ! empty( $last['fetched_at'] ) ? esc_html( wp_date( 'Y-m-d H:i', (int) $last['fetched_at'] ) ) : ''
                     );
@@ -315,8 +315,8 @@ class RSSEO_Pro_Speed {
                 <table class="widefat striped" style="max-width:780px;">
                     <thead>
                         <tr>
-                            <th><?php esc_html_e( 'Strategy', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'Score', 'real-smart-seo-pro' ); ?></th>
+                            <th><?php esc_html_e( 'Strategy', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'Score', 'real-smart-seo' ); ?></th>
                             <th>LCP</th>
                             <th>CLS</th>
                             <th>TBT</th>

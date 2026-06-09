@@ -12,8 +12,8 @@ class SFCO_Pro_Analytics {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Analytics', 'smart-forms-pro' ),
-            esc_html__( 'Analytics', 'smart-forms-pro' ),
+            esc_html__( 'Analytics', 'smart-forms-for-midland' ),
+            esc_html__( 'Analytics', 'smart-forms-for-midland' ),
             'manage_options',
             'sfco-analytics',
             array( $this, 'render_page' )
@@ -73,34 +73,34 @@ class SFCO_Pro_Analytics {
         $stats  = $this->get_stats( $period );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Analytics', 'smart-forms-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'Analytics', 'smart-forms-for-midland' ); ?></h1>
 
             <div class="sfco-analytics-period">
                 <?php foreach ( array( 7, 30, 90 ) as $p ) : ?>
-                    <a href="<?php echo esc_url( add_query_arg( 'period', $p ) ); ?>" class="button <?php echo $period === $p ? 'button-primary' : ''; ?>"><?php echo esc_html( $p ); ?> <?php esc_html_e( 'days', 'smart-forms-pro' ); ?></a>
+                    <a href="<?php echo esc_url( add_query_arg( 'period', $p ) ); ?>" class="button <?php echo $period === $p ? 'button-primary' : ''; ?>"><?php echo esc_html( $p ); ?> <?php esc_html_e( 'days', 'smart-forms-for-midland' ); ?></a>
                 <?php endforeach; ?>
             </div>
 
             <!-- Summary Cards -->
             <div class="sfco-analytics-cards">
                 <div class="sfco-stat-card">
-                    <span class="sfco-stat-label"><?php esc_html_e( 'Total Leads', 'smart-forms-pro' ); ?></span>
+                    <span class="sfco-stat-label"><?php esc_html_e( 'Total Leads', 'smart-forms-for-midland' ); ?></span>
                     <span class="sfco-stat-value"><?php echo esc_html( $stats['total'] ); ?></span>
                 </div>
                 <div class="sfco-stat-card">
-                    <span class="sfco-stat-label"><?php esc_html_e( 'Won', 'smart-forms-pro' ); ?></span>
+                    <span class="sfco-stat-label"><?php esc_html_e( 'Won', 'smart-forms-for-midland' ); ?></span>
                     <span class="sfco-stat-value sfco-stat-green"><?php echo esc_html( $stats['won'] ); ?></span>
                 </div>
                 <div class="sfco-stat-card">
-                    <span class="sfco-stat-label"><?php esc_html_e( 'Conversion Rate', 'smart-forms-pro' ); ?></span>
+                    <span class="sfco-stat-label"><?php esc_html_e( 'Conversion Rate', 'smart-forms-for-midland' ); ?></span>
                     <span class="sfco-stat-value"><?php echo esc_html( $stats['conversion'] ); ?>%</span>
                 </div>
                 <div class="sfco-stat-card">
-                    <span class="sfco-stat-label"><?php esc_html_e( 'Revenue (Won)', 'smart-forms-pro' ); ?></span>
+                    <span class="sfco-stat-label"><?php esc_html_e( 'Revenue (Won)', 'smart-forms-for-midland' ); ?></span>
                     <span class="sfco-stat-value sfco-stat-green">$<?php echo esc_html( number_format( $stats['revenue'] ) ); ?></span>
                 </div>
                 <div class="sfco-stat-card">
-                    <span class="sfco-stat-label"><?php esc_html_e( 'Pipeline Value', 'smart-forms-pro' ); ?></span>
+                    <span class="sfco-stat-label"><?php esc_html_e( 'Pipeline Value', 'smart-forms-for-midland' ); ?></span>
                     <span class="sfco-stat-value">$<?php echo esc_html( number_format( $stats['pipeline'] ) ); ?></span>
                 </div>
             </div>
@@ -108,9 +108,9 @@ class SFCO_Pro_Analytics {
             <div class="sfco-analytics-grid">
                 <!-- Leads by Status -->
                 <div class="sfco-card">
-                    <h2><?php esc_html_e( 'Leads by Status', 'smart-forms-pro' ); ?></h2>
+                    <h2><?php esc_html_e( 'Leads by Status', 'smart-forms-for-midland' ); ?></h2>
                     <?php if ( empty( $stats['by_status'] ) ) : ?>
-                        <p class="description"><?php esc_html_e( 'No data yet.', 'smart-forms-pro' ); ?></p>
+                        <p class="description"><?php esc_html_e( 'No data yet.', 'smart-forms-for-midland' ); ?></p>
                     <?php else : ?>
                         <table class="sfco-detail-table">
                             <?php foreach ( $stats['by_status'] as $row ) : ?>
@@ -130,15 +130,15 @@ class SFCO_Pro_Analytics {
 
                 <!-- Leads by Project Type -->
                 <div class="sfco-card">
-                    <h2><?php esc_html_e( 'Top Project Types', 'smart-forms-pro' ); ?></h2>
+                    <h2><?php esc_html_e( 'Top Project Types', 'smart-forms-for-midland' ); ?></h2>
                     <?php if ( empty( $stats['by_project'] ) ) : ?>
-                        <p class="description"><?php esc_html_e( 'No data yet.', 'smart-forms-pro' ); ?></p>
+                        <p class="description"><?php esc_html_e( 'No data yet.', 'smart-forms-for-midland' ); ?></p>
                     <?php else : ?>
                         <table class="sfco-detail-table">
                             <?php foreach ( $stats['by_project'] as $row ) : ?>
                                 <tr>
                                     <th><?php echo esc_html( $row->project_type ); ?></th>
-                                    <td><?php echo esc_html( $row->cnt ); ?> <?php esc_html_e( 'leads', 'smart-forms-pro' ); ?></td>
+                                    <td><?php echo esc_html( $row->cnt ); ?> <?php esc_html_e( 'leads', 'smart-forms-for-midland' ); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </table>
@@ -147,9 +147,9 @@ class SFCO_Pro_Analytics {
 
                 <!-- Leads Over Time -->
                 <div class="sfco-card sfco-card-wide">
-                    <h2><?php esc_html_e( 'Leads Over Time', 'smart-forms-pro' ); ?></h2>
+                    <h2><?php esc_html_e( 'Leads Over Time', 'smart-forms-for-midland' ); ?></h2>
                     <?php if ( empty( $stats['by_day'] ) ) : ?>
-                        <p class="description"><?php esc_html_e( 'No data yet.', 'smart-forms-pro' ); ?></p>
+                        <p class="description"><?php esc_html_e( 'No data yet.', 'smart-forms-for-midland' ); ?></p>
                     <?php else : ?>
                         <?php $max = max( array_column( (array) $stats['by_day'], 'cnt' ) ); ?>
                         <div class="sfco-bar-chart">

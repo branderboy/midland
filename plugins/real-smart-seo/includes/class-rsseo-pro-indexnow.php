@@ -38,8 +38,8 @@ class RSSEO_Pro_IndexNow {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'IndexNow', 'real-smart-seo-pro' ),
-            esc_html__( 'IndexNow', 'real-smart-seo-pro' ),
+            esc_html__( 'IndexNow', 'real-smart-seo' ),
+            esc_html__( 'IndexNow', 'real-smart-seo' ),
             'manage_options',
             'rsseo-indexnow',
             array( $this, 'render_page' )
@@ -53,14 +53,14 @@ class RSSEO_Pro_IndexNow {
 
         $nonce = isset( $_POST['_rsseo_indexnow_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_indexnow_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_save_indexnow' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         update_option( 'rsseo_indexnow_api_key',    sanitize_text_field( wp_unslash( $_POST['indexnow_api_key'] ?? '' ) ) );
         update_option( 'rsseo_indexnow_enabled',    isset( $_POST['indexnow_enabled'] ) ? 1 : 0 );
         update_option( 'rsseo_rui_api_key',         sanitize_text_field( wp_unslash( $_POST['rui_api_key'] ?? '' ) ) );
         update_option( 'rsseo_rui_enabled',         isset( $_POST['rui_enabled'] ) ? 1 : 0 );
-        update_option( 'rsseo_indexnow_post_types', isset( $_POST['indexnow_post_types'] ) ? array_map( 'sanitize_key', $_POST['indexnow_post_types'] ) : array() );
+        update_option( 'rsseo_indexnow_post_types', isset( $_POST['indexnow_post_types'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['indexnow_post_types'] ) ) : array() );
 
         wp_safe_redirect( admin_url( 'admin.php?page=rsseo-indexnow&saved=1' ) );
         exit;
@@ -73,7 +73,7 @@ class RSSEO_Pro_IndexNow {
 
         $nonce = isset( $_POST['_rsseo_indexnow_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_indexnow_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_save_indexnow' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $url    = home_url( '/' );
@@ -265,38 +265,38 @@ class RSSEO_Pro_IndexNow {
         $all_post_types = get_post_types( array( 'public' => true ), 'objects' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'IndexNow + Rapid URL Indexer', 'real-smart-seo-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Dual indexing layer: pings IndexNow (Bing, Yandex, others) and Rapid URL Indexer on every publish/update. No more waiting weeks for Googlebot to rediscover pages.', 'real-smart-seo-pro' ); ?></p>
+            <h1><?php esc_html_e( 'IndexNow + Rapid URL Indexer', 'real-smart-seo' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Dual indexing layer: pings IndexNow (Bing, Yandex, others) and Rapid URL Indexer on every publish/update. No more waiting weeks for Googlebot to rediscover pages.', 'real-smart-seo' ); ?></p>
 
             <?php if ( $saved ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
             <?php if ( 'ok' === $test_result ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'IndexNow ping successful. Your homepage URL was submitted.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'IndexNow ping successful. Your homepage URL was submitted.', 'real-smart-seo' ); ?></p></div>
             <?php elseif ( 'fail' === $test_result ) : ?>
-                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'IndexNow ping failed. Check your API key and that the key file is accessible.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-error is-dismissible"><p><?php esc_html_e( 'IndexNow ping failed. Check your API key and that the key file is accessible.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
                 <?php wp_nonce_field( 'rsseo_save_indexnow', '_rsseo_indexnow_nonce' ); ?>
 
-                <h2><?php esc_html_e( 'IndexNow', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'IndexNow', 'real-smart-seo' ); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'Enable IndexNow', 'real-smart-seo-pro' ); ?></th>
-                        <td><label><input type="checkbox" name="indexnow_enabled" value="1" <?php checked( $enabled ); ?>> <?php esc_html_e( 'Submit URLs to IndexNow on publish', 'real-smart-seo-pro' ); ?></label></td>
+                        <th><?php esc_html_e( 'Enable IndexNow', 'real-smart-seo' ); ?></th>
+                        <td><label><input type="checkbox" name="indexnow_enabled" value="1" <?php checked( $enabled ); ?>> <?php esc_html_e( 'Submit URLs to IndexNow on publish', 'real-smart-seo' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th><label for="indexnow_api_key"><?php esc_html_e( 'IndexNow API Key', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="indexnow_api_key"><?php esc_html_e( 'IndexNow API Key', 'real-smart-seo' ); ?></label></th>
                         <td>
                             <input type="text" id="indexnow_api_key" name="indexnow_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>">
                             <p class="description">
-                                <?php esc_html_e( 'Any random 32-128 char alphanumeric string. Generate one at', 'real-smart-seo-pro' ); ?>
+                                <?php esc_html_e( 'Any random 32-128 char alphanumeric string. Generate one at', 'real-smart-seo' ); ?>
                                 <a href="https://www.indexnow.org/documentation" target="_blank">indexnow.org</a>.
                             </p>
                             <?php if ( $api_key ) : ?>
                                 <p class="description">
-                                    <?php esc_html_e( 'Key file served at:', 'real-smart-seo-pro' ); ?>
+                                    <?php esc_html_e( 'Key file served at:', 'real-smart-seo' ); ?>
                                     <code><?php echo esc_html( home_url( '/' . $api_key . '.txt' ) ); ?></code>
                                 </p>
                             <?php endif; ?>
@@ -304,25 +304,25 @@ class RSSEO_Pro_IndexNow {
                     </tr>
                 </table>
 
-                <h2><?php esc_html_e( 'Rapid URL Indexer', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Rapid URL Indexer', 'real-smart-seo' ); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'Enable Rapid URL Indexer', 'real-smart-seo-pro' ); ?></th>
-                        <td><label><input type="checkbox" name="rui_enabled" value="1" <?php checked( $rui_enabled ); ?>> <?php esc_html_e( 'Also submit to Rapid URL Indexer', 'real-smart-seo-pro' ); ?></label></td>
+                        <th><?php esc_html_e( 'Enable Rapid URL Indexer', 'real-smart-seo' ); ?></th>
+                        <td><label><input type="checkbox" name="rui_enabled" value="1" <?php checked( $rui_enabled ); ?>> <?php esc_html_e( 'Also submit to Rapid URL Indexer', 'real-smart-seo' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th><label for="rui_api_key"><?php esc_html_e( 'Rapid URL Indexer API Key', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="rui_api_key"><?php esc_html_e( 'Rapid URL Indexer API Key', 'real-smart-seo' ); ?></label></th>
                         <td>
                             <input type="password" id="rui_api_key" name="rui_api_key" class="regular-text" value="<?php echo esc_attr( $rui_key ); ?>">
-                            <p class="description"><?php esc_html_e( 'Get your API key from rapidurlindexer.com — free plan available.', 'real-smart-seo-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Get your API key from rapidurlindexer.com — free plan available.', 'real-smart-seo' ); ?></p>
                         </td>
                     </tr>
                 </table>
 
-                <h2><?php esc_html_e( 'Post Types to Track', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Post Types to Track', 'real-smart-seo' ); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'Auto-submit on publish', 'real-smart-seo-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Auto-submit on publish', 'real-smart-seo' ); ?></th>
                         <td>
                             <?php foreach ( $all_post_types as $pt ) : ?>
                                 <label style="display:block;margin-bottom:4px;">
@@ -335,29 +335,29 @@ class RSSEO_Pro_IndexNow {
                 </table>
 
                 <p class="submit">
-                    <button type="submit" name="rsseo_save_indexnow" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo-pro' ); ?></button>
+                    <button type="submit" name="rsseo_save_indexnow" value="1" class="button button-primary"><?php esc_html_e( 'Save Settings', 'real-smart-seo' ); ?></button>
                 </p>
             </form>
 
-            <h2><?php esc_html_e( 'Test IndexNow Ping', 'real-smart-seo-pro' ); ?></h2>
+            <h2><?php esc_html_e( 'Test IndexNow Ping', 'real-smart-seo' ); ?></h2>
             <form method="post">
                 <?php wp_nonce_field( 'rsseo_save_indexnow', '_rsseo_indexnow_nonce' ); ?>
                 <p>
-                    <button type="submit" name="rsseo_test_indexnow" value="1" class="button"><?php esc_html_e( 'Ping Homepage Now', 'real-smart-seo-pro' ); ?></button>
-                    <span class="description" style="margin-left:8px;"><?php esc_html_e( 'Submits your homepage URL to IndexNow — confirms key file is accessible.', 'real-smart-seo-pro' ); ?></span>
+                    <button type="submit" name="rsseo_test_indexnow" value="1" class="button"><?php esc_html_e( 'Ping Homepage Now', 'real-smart-seo' ); ?></button>
+                    <span class="description" style="margin-left:8px;"><?php esc_html_e( 'Submits your homepage URL to IndexNow — confirms key file is accessible.', 'real-smart-seo' ); ?></span>
                 </p>
             </form>
 
             <?php if ( $logs ) : ?>
                 <hr>
-                <h2><?php esc_html_e( 'Submission Log (last 100)', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Submission Log (last 100)', 'real-smart-seo' ); ?></h2>
                 <table class="wp-list-table widefat fixed striped" style="font-size:12px;">
                     <thead>
                         <tr>
-                            <th style="width:160px;"><?php esc_html_e( 'Time', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'URL', 'real-smart-seo-pro' ); ?></th>
-                            <th style="width:160px;"><?php esc_html_e( 'Service', 'real-smart-seo-pro' ); ?></th>
-                            <th style="width:80px;"><?php esc_html_e( 'HTTP', 'real-smart-seo-pro' ); ?></th>
+                            <th style="width:160px;"><?php esc_html_e( 'Time', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'URL', 'real-smart-seo' ); ?></th>
+                            <th style="width:160px;"><?php esc_html_e( 'Service', 'real-smart-seo' ); ?></th>
+                            <th style="width:80px;"><?php esc_html_e( 'HTTP', 'real-smart-seo' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>

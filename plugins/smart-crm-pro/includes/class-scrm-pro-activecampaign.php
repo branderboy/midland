@@ -669,9 +669,9 @@ class SCRM_Pro_ActiveCampaign {
         if ( $sqft > 0 ) {
             $service = strtolower( (string) $this->get_field( $lead, array( 'project_type' ) ) );
             $rate = 0.30; // residential carpet baseline
-            if ( str_contains( $service, 'commercial' ) || str_contains( $service, 'stripping' ) ) $rate = 0.45;
-            if ( str_contains( $service, 'concrete' ) ) $rate = 1.20;
-            if ( str_contains( $service, 'water' ) )    $rate = 3.50;
+            if ( false !== strpos( $service, 'commercial' ) || false !== strpos( $service, 'stripping' ) ) $rate = 0.45;
+            if ( false !== strpos( $service, 'concrete' ) ) $rate = 1.20;
+            if ( false !== strpos( $service, 'water' ) )    $rate = 3.50;
             return round( $sqft * $rate, 2 );
         }
         return 0;

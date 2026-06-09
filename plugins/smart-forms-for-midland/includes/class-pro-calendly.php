@@ -34,8 +34,8 @@ class SFCO_Pro_Calendly {
         // to paste their token.
         add_submenu_page(
             'smart-forms',
-            esc_html__( 'Calendly', 'smart-forms-pro' ),
-            esc_html__( 'Calendly', 'smart-forms-pro' ),
+            esc_html__( 'Calendly', 'smart-forms-for-midland' ),
+            esc_html__( 'Calendly', 'smart-forms-for-midland' ),
             'manage_options',
             'sfco-calendar',
             array( $this, 'render_page' )
@@ -49,7 +49,7 @@ class SFCO_Pro_Calendly {
 
         $nonce = isset( $_POST['_sfco_cal_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_cal_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_save_calendly' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         $api_key      = isset( $_POST['calendly_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['calendly_api_key'] ) ) : '';
@@ -85,7 +85,7 @@ class SFCO_Pro_Calendly {
         }
         $nonce = isset( $_POST['_sfco_cal_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_cal_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_save_calendly' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         // Persist whatever the operator typed into the API key field first so
@@ -96,7 +96,7 @@ class SFCO_Pro_Calendly {
 
         $token = (string) get_option( 'sfco_pro_calendly_api_key', '' );
         if ( '' === $token ) {
-            $this->connect_redirect( 'fail', __( 'Add your Calendly API key first.', 'smart-forms-pro' ) );
+            $this->connect_redirect( 'fail', __( 'Add your Calendly API key first.', 'smart-forms-for-midland' ) );
         }
 
         $headers = array(
@@ -113,7 +113,7 @@ class SFCO_Pro_Calendly {
         $me_code = (int) wp_remote_retrieve_response_code( $me );
         $me_body = json_decode( (string) wp_remote_retrieve_body( $me ), true );
         if ( 200 !== $me_code || empty( $me_body['resource']['current_organization'] ) ) {
-            $msg = $me_body['message'] ?? sprintf( __( 'Calendly rejected the API key (HTTP %d).', 'smart-forms-pro' ), $me_code );
+            $msg = $me_body['message'] ?? sprintf( __( 'Calendly rejected the API key (HTTP %d).', 'smart-forms-for-midland' ), $me_code );
             $this->connect_redirect( 'fail', $msg );
         }
         $org_uri = (string) $me_body['resource']['current_organization'];
@@ -151,7 +151,7 @@ class SFCO_Pro_Calendly {
         }
 
         if ( 409 === $code ) {
-            $this->connect_redirect( 'exists', __( 'A webhook for this site already exists in Calendly. If bookings are not arriving, delete it in Calendly (API) and reconnect so a fresh signing key can be stored.', 'smart-forms-pro' ) );
+            $this->connect_redirect( 'exists', __( 'A webhook for this site already exists in Calendly. If bookings are not arriving, delete it in Calendly (API) and reconnect so a fresh signing key can be stored.', 'smart-forms-for-midland' ) );
         }
 
         $msg = '';
@@ -161,7 +161,7 @@ class SFCO_Pro_Calendly {
                 $msg = (string) $body['details'][0]['message'];
             }
         }
-        $this->connect_redirect( 'fail', $msg ?: sprintf( __( 'Calendly returned HTTP %d.', 'smart-forms-pro' ), $code ) );
+        $this->connect_redirect( 'fail', $msg ?: sprintf( __( 'Calendly returned HTTP %d.', 'smart-forms-for-midland' ), $code ) );
     }
 
     private function connect_redirect( $status, $message ) {
@@ -195,12 +195,12 @@ class SFCO_Pro_Calendly {
 
         // No key configured: refuse the request so attackers can't forge events.
         if ( '' === $signing_key ) {
-            return new WP_Error( 'sfco_calendly_no_key', __( 'Calendly signing key is not configured.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+            return new WP_Error( 'sfco_calendly_no_key', __( 'Calendly signing key is not configured.', 'smart-forms-for-midland' ), array( 'status' => 401 ) );
         }
 
         $header = (string) $request->get_header( 'calendly_webhook_signature' );
         if ( '' === $header ) {
-            return new WP_Error( 'sfco_calendly_missing_sig', __( 'Missing Calendly signature header.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+            return new WP_Error( 'sfco_calendly_missing_sig', __( 'Missing Calendly signature header.', 'smart-forms-for-midland' ), array( 'status' => 401 ) );
         }
 
         $parts = array();
@@ -215,19 +215,19 @@ class SFCO_Pro_Calendly {
         $signature = $parts['v1'] ?? '';
 
         if ( ! $timestamp || ! $signature ) {
-            return new WP_Error( 'sfco_calendly_bad_sig', __( 'Malformed Calendly signature.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+            return new WP_Error( 'sfco_calendly_bad_sig', __( 'Malformed Calendly signature.', 'smart-forms-for-midland' ), array( 'status' => 401 ) );
         }
 
         // Reject anything older than 5 minutes (replay protection).
         if ( abs( time() - $timestamp ) > 300 ) {
-            return new WP_Error( 'sfco_calendly_stale', __( 'Calendly webhook timestamp out of tolerance.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+            return new WP_Error( 'sfco_calendly_stale', __( 'Calendly webhook timestamp out of tolerance.', 'smart-forms-for-midland' ), array( 'status' => 401 ) );
         }
 
         $payload = $request->get_body();
         $expected = hash_hmac( 'sha256', $timestamp . '.' . $payload, $signing_key );
 
         if ( ! hash_equals( $expected, $signature ) ) {
-            return new WP_Error( 'sfco_calendly_invalid_sig', __( 'Calendly signature mismatch.', 'smart-forms-pro' ), array( 'status' => 401 ) );
+            return new WP_Error( 'sfco_calendly_invalid_sig', __( 'Calendly signature mismatch.', 'smart-forms-for-midland' ), array( 'status' => 401 ) );
         }
 
         return true;
@@ -361,10 +361,10 @@ class SFCO_Pro_Calendly {
         wp_mail(
             $admin_email,
             /* translators: %s: invitee name */
-            sprintf( __( 'Booking: %s scheduled via Calendly', 'smart-forms-pro' ), $name ?: $email ),
+            sprintf( __( 'Booking: %s scheduled via Calendly', 'smart-forms-for-midland' ), $name ?: $email ),
             sprintf(
                 /* translators: 1: name, 2: time, 3: email */
-                __( "%1\$s booked an appointment.\n\nTime: %2\$s\nEmail: %3\$s\n\nLead has been marked as Booked, pushed to ServiceM8, and tagged in ActiveCampaign.", 'smart-forms-pro' ),
+                __( "%1\$s booked an appointment.\n\nTime: %2\$s\nEmail: %3\$s\n\nLead has been marked as Booked, pushed to ServiceM8, and tagged in ActiveCampaign.", 'smart-forms-for-midland' ),
                 $name,
                 $time,
                 $email
@@ -383,6 +383,35 @@ class SFCO_Pro_Calendly {
          *                          cancellation state.
          */
         do_action( 'sfco_lead_booked', $lead, $is_rebook );
+
+        // Mirror the confirmed booking onto Google Calendar. The GCal module
+        // listens on sfco_appointment_confirmed but nothing fired it before, so
+        // events were never created. create_event() no-ops if GCal isn't
+        // connected, so this is safe to fire unconditionally when we have a time.
+        if ( '' !== $time && class_exists( 'SFCO_Pro_GCal' ) ) {
+            $service = ( isset( $lead->project_type ) && '' !== (string) $lead->project_type )
+                ? ' — ' . $lead->project_type
+                : '';
+            /**
+             * Booking-confirmed signal. Keys match SFCO_Pro_GCal::create_event().
+             *
+             * @param array $appointment Calendar event details.
+             */
+            do_action( 'sfco_appointment_confirmed', array(
+                'start'          => $time,
+                'title'          => trim( ( $name ? $name : ( $email ? $email : __( 'Appointment', 'smart-forms-for-midland' ) ) ) . $service ),
+                'description'    => sprintf(
+                    /* translators: 1: customer name, 2: email, 3: phone */
+                    __( "Booked via Calendly.\nCustomer: %1\$s\nEmail: %2\$s\nPhone: %3\$s", 'smart-forms-for-midland' ),
+                    $name,
+                    $email,
+                    isset( $lead->customer_phone ) ? $lead->customer_phone : ''
+                ),
+                'attendee_email' => $email,
+                'attendee_name'  => $name,
+                'status'         => 'confirmed',
+            ) );
+        }
 
         // Calendly's responsibility ends here: the lead is Booked, i.e. the
         // service is scheduled. We do NOT schedule any auto-completion — whether
@@ -435,13 +464,13 @@ class SFCO_Pro_Calendly {
         wp_mail(
             $admin_email,
             /* translators: %s: invitee name */
-            sprintf( __( 'Canceled: %s canceled their Calendly booking', 'smart-forms-pro' ), $name ?: $email ),
+            sprintf( __( 'Canceled: %s canceled their Calendly booking', 'smart-forms-for-midland' ), $name ?: $email ),
             sprintf(
                 /* translators: 1: name, 2: email, 3: reason */
-                __( "%1\$s canceled their appointment.\n\nEmail: %2\$s\nReason: %3\$s\n\nLead has been marked as Canceled and the booked tag/deal stage has been reversed in ActiveCampaign.", 'smart-forms-pro' ),
+                __( "%1\$s canceled their appointment.\n\nEmail: %2\$s\nReason: %3\$s\n\nLead has been marked as Canceled and the booked tag/deal stage has been reversed in ActiveCampaign.", 'smart-forms-for-midland' ),
                 $name,
                 $email,
-                $reason ?: __( '(none given)', 'smart-forms-pro' )
+                $reason ?: __( '(none given)', 'smart-forms-for-midland' )
             )
         );
 
@@ -534,31 +563,44 @@ class SFCO_Pro_Calendly {
         $webhook_url = rest_url( 'sfco-pro/v1/calendly/webhook' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Calendly Integration', 'smart-forms-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'Calendly Integration', 'smart-forms-for-midland' ); ?></h1>
 
             <?php // phpcs:disable WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Calendly settings saved.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Calendly settings saved.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
             <?php
             $connect     = isset( $_GET['connect'] ) ? sanitize_key( $_GET['connect'] ) : '';
             $connect_msg = isset( $_GET['connect_msg'] ) ? sanitize_text_field( wp_unslash( $_GET['connect_msg'] ) ) : '';
             ?>
             <?php if ( 'ok' === $connect ) : ?>
-                <div class="notice notice-success is-dismissible"><p><strong><?php esc_html_e( 'Connected to Calendly.', 'smart-forms-pro' ); ?></strong> <?php esc_html_e( 'The webhook subscription was created and the signing key was stored automatically. Bookings will now mark leads as Booked, push to ServiceM8, and tag in ActiveCampaign.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><strong><?php esc_html_e( 'Connected to Calendly.', 'smart-forms-for-midland' ); ?></strong> <?php esc_html_e( 'The webhook subscription was created and the signing key was stored automatically. Bookings will now mark leads as Booked, push to ServiceM8, and tag in ActiveCampaign.', 'smart-forms-for-midland' ); ?></p></div>
             <?php elseif ( 'exists' === $connect ) : ?>
                 <div class="notice notice-warning is-dismissible"><p><?php echo esc_html( $connect_msg ); ?></p></div>
             <?php elseif ( 'fail' === $connect ) : ?>
-                <div class="notice notice-error is-dismissible"><p><strong><?php esc_html_e( 'Calendly connection failed.', 'smart-forms-pro' ); ?></strong> <?php echo esc_html( $connect_msg ); ?></p></div>
+                <div class="notice notice-error is-dismissible"><p><strong><?php esc_html_e( 'Calendly connection failed.', 'smart-forms-for-midland' ); ?></strong> <?php echo esc_html( $connect_msg ); ?></p></div>
             <?php endif; ?>
             <?php // phpcs:enable WordPress.Security.NonceVerification.Recommended ?>
+
+            <?php
+            // Cross-plugin heads-up: Midland Chat owns a SEPARATE Calendly
+            // connection (its own API key, signing key, and webhook). If Smart
+            // Forms is connected here but the chat is active and still
+            // unconnected, flag it so chat bookings don't silently miss the CRM.
+            if (
+                '' !== (string) $signing_key
+                && class_exists( 'SCAI_Calendly' )
+                && '' === (string) get_option( 'smart_chat_calendly_signing_key', '' )
+            ) : ?>
+                <div class="notice notice-warning"><p><?php esc_html_e( 'Heads up: Midland Chat is active but its Calendly connection is separate from this one and is not connected yet. Connect Calendly in the chat settings so chat bookings also reach the CRM.', 'smart-forms-for-midland' ); ?></p></div>
+            <?php endif; ?>
 
             <?php $is_connected = '' !== (string) get_option( 'sfco_pro_calendly_signing_key', '' ); ?>
             <p>
                 <?php if ( $is_connected ) : ?>
-                    <span style="display:inline-block;padding:4px 10px;background:#dcfce7;color:#166534;border-radius:3px;font-weight:600;">✓ <?php esc_html_e( 'Webhook connected', 'smart-forms-pro' ); ?></span>
+                    <span style="display:inline-block;padding:4px 10px;background:#dcfce7;color:#166534;border-radius:3px;font-weight:600;">✓ <?php esc_html_e( 'Webhook connected', 'smart-forms-for-midland' ); ?></span>
                 <?php else : ?>
-                    <span style="display:inline-block;padding:4px 10px;background:#fef3c7;color:#92400e;border-radius:3px;font-weight:600;"><?php esc_html_e( 'Webhook not connected — add your API key and click Connect Calendly', 'smart-forms-pro' ); ?></span>
+                    <span style="display:inline-block;padding:4px 10px;background:#fef3c7;color:#92400e;border-radius:3px;font-weight:600;"><?php esc_html_e( 'Webhook not connected — add your API key and click Connect Calendly', 'smart-forms-for-midland' ); ?></span>
                 <?php endif; ?>
             </p>
 
@@ -572,12 +614,12 @@ class SFCO_Pro_Calendly {
             };
             ?>
             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:14px 18px;margin:0 0 20px;max-width:760px;">
-                <strong><?php esc_html_e( 'Booking → completion flow', 'smart-forms-pro' ); ?></strong>
+                <strong><?php esc_html_e( 'Booking → completion flow', 'smart-forms-for-midland' ); ?></strong>
                 <ul style="margin:8px 0 0;">
-                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Calendly records that the service was scheduled: a booking marks the lead Booked (pushed to ServiceM8 + tagged in ActiveCampaign); a cancellation reverses it.', 'smart-forms-pro' ); ?></li>
-                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Calendly does NOT complete the job — a calendar slot passing is not proof the work was done. The lead stays Booked until ServiceM8 reports it.', 'smart-forms-pro' ); ?></li>
-                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'ServiceM8 closing the job is the sole completion signal → Completed → review survey + floor-care plan + AC completed flow.', 'smart-forms-pro' ); ?></li>
-                    <li><?php echo $badge( $crm_on ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <strong>Smart CRM for Midland</strong> — <?php echo $crm_on ? esc_html__( 'connected: drives the ServiceM8 sync and the segment/urgency tags.', 'smart-forms-pro' ) : esc_html__( 'not active — only the Booked/Canceled status is recorded.', 'smart-forms-pro' ); ?></li>
+                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Calendly records that the service was scheduled: a booking marks the lead Booked (pushed to ServiceM8 + tagged in ActiveCampaign); a cancellation reverses it.', 'smart-forms-for-midland' ); ?></li>
+                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Calendly does NOT complete the job — a calendar slot passing is not proof the work was done. The lead stays Booked until ServiceM8 reports it.', 'smart-forms-for-midland' ); ?></li>
+                    <li><?php echo $badge( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'ServiceM8 closing the job is the sole completion signal → Completed → review survey + floor-care plan + AC completed flow.', 'smart-forms-for-midland' ); ?></li>
+                    <li><?php echo $badge( $crm_on ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <strong>Smart CRM for Midland</strong> — <?php echo $crm_on ? esc_html__( 'connected: drives the ServiceM8 sync and the segment/urgency tags.', 'smart-forms-for-midland' ) : esc_html__( 'not active — only the Booked/Canceled status is recorded.', 'smart-forms-for-midland' ); ?></li>
                 </ul>
             </div>
 
@@ -586,53 +628,53 @@ class SFCO_Pro_Calendly {
 
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'Enable', 'smart-forms-pro' ); ?></th>
-                        <td><label><input type="checkbox" name="calendly_enabled" value="1" <?php checked( $enabled ); ?>> <?php esc_html_e( 'Enable Calendly booking after form submission', 'smart-forms-pro' ); ?></label></td>
+                        <th><?php esc_html_e( 'Enable', 'smart-forms-for-midland' ); ?></th>
+                        <td><label><input type="checkbox" name="calendly_enabled" value="1" <?php checked( $enabled ); ?>> <?php esc_html_e( 'Enable Calendly booking after form submission', 'smart-forms-for-midland' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th><label for="calendly_url"><?php esc_html_e( 'Calendly URL', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="calendly_url"><?php esc_html_e( 'Calendly URL', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <input type="url" name="calendly_url" id="calendly_url" class="regular-text" value="<?php echo esc_attr( $booking_url ); ?>" placeholder="https://calendly.com/your-company/30min">
-                            <p class="description"><?php esc_html_e( 'Your Calendly scheduling page URL.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Your Calendly scheduling page URL.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="calendly_api_key"><?php esc_html_e( 'API Key', 'smart-forms-pro' ); ?> <span style="color:#b32d2e;">*</span></label></th>
+                        <th><label for="calendly_api_key"><?php esc_html_e( 'API Key', 'smart-forms-for-midland' ); ?> <span style="color:#b32d2e;">*</span></label></th>
                         <td>
                             <input type="password" name="calendly_api_key" id="calendly_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" autocomplete="off">
-                            <p class="description"><?php esc_html_e( 'Your Calendly Personal Access Token (Calendly → Integrations → API & Webhooks). Used to create the webhook subscription automatically — click "Connect Calendly" below after pasting it.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Your Calendly Personal Access Token (Calendly → Integrations → API & Webhooks). Used to create the webhook subscription automatically — click "Connect Calendly" below after pasting it.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="calendly_show_after"><?php esc_html_e( 'Show Booking', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="calendly_show_after"><?php esc_html_e( 'Show Booking', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <select name="calendly_show_after" id="calendly_show_after">
-                                <option value="submission" <?php selected( $show_after, 'submission' ); ?>><?php esc_html_e( 'After form submission (in success message)', 'smart-forms-pro' ); ?></option>
-                                <option value="email" <?php selected( $show_after, 'email' ); ?>><?php esc_html_e( 'In follow-up email only', 'smart-forms-pro' ); ?></option>
+                                <option value="submission" <?php selected( $show_after, 'submission' ); ?>><?php esc_html_e( 'After form submission (in success message)', 'smart-forms-for-midland' ); ?></option>
+                                <option value="email" <?php selected( $show_after, 'email' ); ?>><?php esc_html_e( 'In follow-up email only', 'smart-forms-for-midland' ); ?></option>
                             </select>
                         </td>
                     </tr>
                     <tr>
-                        <th><?php esc_html_e( 'Webhook URL', 'smart-forms-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Webhook URL', 'smart-forms-for-midland' ); ?></th>
                         <td>
                             <code><?php echo esc_html( $webhook_url ); ?></code>
-                            <p class="description"><?php esc_html_e( 'Add this URL in your Calendly webhook settings to auto-update lead status when appointments are booked.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Add this URL in your Calendly webhook settings to auto-update lead status when appointments are booked.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="calendly_signing_key"><?php esc_html_e( 'Webhook Signing Key', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="calendly_signing_key"><?php esc_html_e( 'Webhook Signing Key', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <input type="password" name="calendly_signing_key" id="calendly_signing_key" class="regular-text" value="<?php echo esc_attr( $signing_key ); ?>">
-                            <p class="description"><?php esc_html_e( 'Filled in automatically when you click "Connect Calendly". Without it, the webhook endpoint rejects every request. Only edit this if you created the webhook subscription manually.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Filled in automatically when you click "Connect Calendly". Without it, the webhook endpoint rejects every request. Only edit this if you created the webhook subscription manually.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                 </table>
 
                 <p class="submit">
-                    <button type="submit" name="sfco_connect_calendly" value="1" class="button button-primary"><?php esc_html_e( 'Connect Calendly', 'smart-forms-pro' ); ?></button>
-                    <button type="submit" name="sfco_save_calendly" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Save Calendly Settings', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_connect_calendly" value="1" class="button button-primary"><?php esc_html_e( 'Connect Calendly', 'smart-forms-for-midland' ); ?></button>
+                    <button type="submit" name="sfco_save_calendly" value="1" class="button" style="margin-left:8px;"><?php esc_html_e( 'Save Calendly Settings', 'smart-forms-for-midland' ); ?></button>
                 </p>
-                <p class="description" style="max-width:640px;"><?php esc_html_e( '"Connect Calendly" uses your API key to create the booking webhook and store its signing key for you (Calendly has no dashboard UI for this). "Save Calendly Settings" just stores the fields above without touching Calendly.', 'smart-forms-pro' ); ?></p>
+                <p class="description" style="max-width:640px;"><?php esc_html_e( '"Connect Calendly" uses your API key to create the booking webhook and store its signing key for you (Calendly has no dashboard UI for this). "Save Calendly Settings" just stores the fields above without touching Calendly.', 'smart-forms-for-midland' ); ?></p>
             </form>
         </div>
         <?php

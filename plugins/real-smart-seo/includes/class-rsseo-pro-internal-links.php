@@ -38,8 +38,8 @@ class RSSEO_Pro_Internal_Links {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Internal Links', 'real-smart-seo-pro' ),
-            esc_html__( 'Internal Links', 'real-smart-seo-pro' ),
+            esc_html__( 'Internal Links', 'real-smart-seo' ),
+            esc_html__( 'Internal Links', 'real-smart-seo' ),
             'manage_options',
             'rsseo-internal-links',
             array( $this, 'render_page' )
@@ -53,7 +53,7 @@ class RSSEO_Pro_Internal_Links {
             return;
         }
         if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_rsseo_il_nonce'] ?? '' ) ), 'rsseo_il_scan' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
         $types = array_map( 'sanitize_key', (array) ( $_POST['rsseo_il_types'] ?? array( 'post', 'page' ) ) );
         $results = $this->scan( $types );
@@ -178,7 +178,7 @@ class RSSEO_Pro_Internal_Links {
     public function ajax_apply() {
         check_ajax_referer( 'rsseo_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
         $source = isset( $_POST['source_id'] ) ? (int) $_POST['source_id'] : 0;
         $target = isset( $_POST['target_id'] ) ? (int) $_POST['target_id'] : 0;
@@ -187,12 +187,12 @@ class RSSEO_Pro_Internal_Links {
         $src = $source ? get_post( $source ) : null;
         $url = $target ? get_permalink( $target ) : '';
         if ( ! $src || '' === $phrase || '' === $url ) {
-            wp_send_json_error( __( 'Invalid suggestion.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Invalid suggestion.', 'real-smart-seo' ) );
         }
 
         $new_content = $this->insert_link( (string) $src->post_content, $phrase, $url );
         if ( null === $new_content ) {
-            wp_send_json_error( __( 'The phrase is no longer present unlinked — nothing changed.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'The phrase is no longer present unlinked — nothing changed.', 'real-smart-seo' ) );
         }
 
         // wp_update_post stores a revision, so this is reversible from the editor.
@@ -202,17 +202,17 @@ class RSSEO_Pro_Internal_Links {
         }
 
         $this->forget_suggestion( $source . ':' . $target );
-        wp_send_json_success( array( 'message' => __( 'Internal link added.', 'real-smart-seo-pro' ) ) );
+        wp_send_json_success( array( 'message' => __( 'Internal link added.', 'real-smart-seo' ) ) );
     }
 
     public function ajax_dismiss() {
         check_ajax_referer( 'rsseo_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Insufficient permissions.', 'real-smart-seo' ) );
         }
         $key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
         if ( '' === $key ) {
-            wp_send_json_error( __( 'Invalid key.', 'real-smart-seo-pro' ) );
+            wp_send_json_error( __( 'Invalid key.', 'real-smart-seo' ) );
         }
         $dismissed         = (array) get_option( 'rsseo_il_dismissed', array() );
         $dismissed[ $key ] = time();
@@ -245,7 +245,7 @@ class RSSEO_Pro_Internal_Links {
         $count   = count( $results );
         ?>
         <div class="wrap rsseo-il">
-            <h1 class="wp-heading-inline"><?php esc_html_e( 'Internal Link Opportunities', 'real-smart-seo-pro' ); ?></h1>
+            <h1 class="wp-heading-inline"><?php esc_html_e( 'Internal Link Opportunities', 'real-smart-seo' ); ?></h1>
             <hr class="wp-header-end">
 
             <?php if ( $scanned >= 0 ) : ?>
@@ -253,7 +253,7 @@ class RSSEO_Pro_Internal_Links {
                     <?php
                     printf(
                         /* translators: %d: number of opportunities found */
-                        esc_html( _n( 'Scan complete — %d opportunity found.', 'Scan complete — %d opportunities found.', (int) $scanned, 'real-smart-seo-pro' ) ),
+                        esc_html( _n( 'Scan complete — %d opportunity found.', 'Scan complete — %d opportunities found.', (int) $scanned, 'real-smart-seo' ) ),
                         (int) $scanned
                     );
                     ?>
@@ -261,42 +261,42 @@ class RSSEO_Pro_Internal_Links {
             <?php endif; ?>
 
             <div class="card" style="max-width:none;margin-top:16px;">
-                <h2 style="margin-top:0;"><?php esc_html_e( 'Scan your content', 'real-smart-seo-pro' ); ?></h2>
+                <h2 style="margin-top:0;"><?php esc_html_e( 'Scan your content', 'real-smart-seo' ); ?></h2>
                 <p class="description" style="margin-bottom:14px;">
-                    <?php esc_html_e( 'Finds places where one page names another page in plain text without linking to it — a missed internal link. Review each match and add the link with one click. Each change is saved as a normal WordPress revision, so you can undo it from the post editor.', 'real-smart-seo-pro' ); ?>
+                    <?php esc_html_e( 'Finds places where one page names another page in plain text without linking to it — a missed internal link. Review each match and add the link with one click. Each change is saved as a normal WordPress revision, so you can undo it from the post editor.', 'real-smart-seo' ); ?>
                 </p>
                 <form method="post">
                     <?php wp_nonce_field( 'rsseo_il_scan', '_rsseo_il_nonce' ); ?>
                     <fieldset style="margin-bottom:14px;">
-                        <legend class="screen-reader-text"><?php esc_html_e( 'Content types to scan', 'real-smart-seo-pro' ); ?></legend>
-                        <label style="margin-right:16px;"><input type="checkbox" name="rsseo_il_types[]" value="page" checked> <?php esc_html_e( 'Pages', 'real-smart-seo-pro' ); ?></label>
-                        <label><input type="checkbox" name="rsseo_il_types[]" value="post" checked> <?php esc_html_e( 'Posts', 'real-smart-seo-pro' ); ?></label>
+                        <legend class="screen-reader-text"><?php esc_html_e( 'Content types to scan', 'real-smart-seo' ); ?></legend>
+                        <label style="margin-right:16px;"><input type="checkbox" name="rsseo_il_types[]" value="page" checked> <?php esc_html_e( 'Pages', 'real-smart-seo' ); ?></label>
+                        <label><input type="checkbox" name="rsseo_il_types[]" value="post" checked> <?php esc_html_e( 'Posts', 'real-smart-seo' ); ?></label>
                     </fieldset>
-                    <button type="submit" name="rsseo_il_scan" value="1" class="button button-primary"><?php esc_html_e( 'Scan for opportunities', 'real-smart-seo-pro' ); ?></button>
+                    <button type="submit" name="rsseo_il_scan" value="1" class="button button-primary"><?php esc_html_e( 'Scan for opportunities', 'real-smart-seo' ); ?></button>
                 </form>
             </div>
 
             <?php if ( empty( $results ) ) : ?>
                 <div class="card" style="max-width:none;margin-top:16px;text-align:center;padding:32px 20px;">
-                    <p style="font-size:14px;margin:0 0 4px;"><strong><?php esc_html_e( 'No opportunities yet.', 'real-smart-seo-pro' ); ?></strong></p>
-                    <p class="description" style="margin:0;"><?php esc_html_e( 'Run a scan above to find internal-link opportunities across your pages and posts.', 'real-smart-seo-pro' ); ?></p>
+                    <p style="font-size:14px;margin:0 0 4px;"><strong><?php esc_html_e( 'No opportunities yet.', 'real-smart-seo' ); ?></strong></p>
+                    <p class="description" style="margin:0;"><?php esc_html_e( 'Run a scan above to find internal-link opportunities across your pages and posts.', 'real-smart-seo' ); ?></p>
                 </div>
             <?php else : ?>
                 <h2 style="margin-top:24px;">
                     <?php
                     printf(
                         /* translators: %d: number of opportunities */
-                        esc_html( _n( '%d opportunity', '%d opportunities', $count, 'real-smart-seo-pro' ) ),
+                        esc_html( _n( '%d opportunity', '%d opportunities', $count, 'real-smart-seo' ) ),
                         (int) $count
                     );
                     ?>
                 </h2>
                 <table class="wp-list-table widefat fixed striped">
                     <thead><tr>
-                        <th style="width:28%;"><?php esc_html_e( 'On this page', 'real-smart-seo-pro' ); ?></th>
-                        <th style="width:22%;"><?php esc_html_e( 'Link the phrase', 'real-smart-seo-pro' ); ?></th>
-                        <th><?php esc_html_e( 'To this page', 'real-smart-seo-pro' ); ?></th>
-                        <th style="width:160px;"><?php esc_html_e( 'Action', 'real-smart-seo-pro' ); ?></th>
+                        <th style="width:28%;"><?php esc_html_e( 'On this page', 'real-smart-seo' ); ?></th>
+                        <th style="width:22%;"><?php esc_html_e( 'Link the phrase', 'real-smart-seo' ); ?></th>
+                        <th><?php esc_html_e( 'To this page', 'real-smart-seo' ); ?></th>
+                        <th style="width:160px;"><?php esc_html_e( 'Action', 'real-smart-seo' ); ?></th>
                     </tr></thead>
                     <tbody>
                     <?php foreach ( $results as $row ) : ?>
@@ -309,8 +309,8 @@ class RSSEO_Pro_Internal_Links {
                                     data-key="<?php echo esc_attr( $row['key'] ); ?>"
                                     data-source="<?php echo esc_attr( $row['source_id'] ); ?>"
                                     data-target="<?php echo esc_attr( $row['target_id'] ); ?>"
-                                    data-phrase="<?php echo esc_attr( $row['phrase'] ); ?>"><?php esc_html_e( 'Add link', 'real-smart-seo-pro' ); ?></button>
-                                <button class="button button-small rsseo-il-dismiss" data-key="<?php echo esc_attr( $row['key'] ); ?>"><?php esc_html_e( 'Dismiss', 'real-smart-seo-pro' ); ?></button>
+                                    data-phrase="<?php echo esc_attr( $row['phrase'] ); ?>"><?php esc_html_e( 'Add link', 'real-smart-seo' ); ?></button>
+                                <button class="button button-small rsseo-il-dismiss" data-key="<?php echo esc_attr( $row['key'] ); ?>"><?php esc_html_e( 'Dismiss', 'real-smart-seo' ); ?></button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -326,10 +326,10 @@ class RSSEO_Pro_Internal_Links {
                     var nonce   = <?php echo wp_json_encode( wp_create_nonce( 'rsseo_nonce' ) ); ?>;
                     $(document).on('click', '.rsseo-il-apply', function(){
                         var b=$(this), r=$('#rsseo-il-'+$.escapeSelector(b.data('key')));
-                        b.prop('disabled',true).text('<?php echo esc_js( __( 'Adding…', 'real-smart-seo-pro' ) ); ?>');
+                        b.prop('disabled',true).text('<?php echo esc_js( __( 'Adding…', 'real-smart-seo' ) ); ?>');
                         $.post(ajaxUrl,{action:'rsseo_il_apply',nonce:nonce,source_id:b.data('source'),target_id:b.data('target'),phrase:b.data('phrase')},function(res){
                             if(res.success){ r.css('background','#f3fcf4').fadeOut(400,function(){r.remove();}); }
-                            else { alert(res.data||'Error'); b.prop('disabled',false).text('<?php echo esc_js( __( 'Add link', 'real-smart-seo-pro' ) ); ?>'); }
+                            else { alert(res.data||'Error'); b.prop('disabled',false).text('<?php echo esc_js( __( 'Add link', 'real-smart-seo' ) ); ?>'); }
                         });
                     });
                     $(document).on('click', '.rsseo-il-dismiss', function(){

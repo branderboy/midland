@@ -41,8 +41,8 @@ class RSSEO_Pro_Clusters {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Keyword Clusters', 'real-smart-seo-pro' ),
-            esc_html__( 'Keyword Clusters', 'real-smart-seo-pro' ),
+            esc_html__( 'Keyword Clusters', 'real-smart-seo' ),
+            esc_html__( 'Keyword Clusters', 'real-smart-seo' ),
             'manage_options',
             'rsseo-clusters',
             array( $this, 'render_page' )
@@ -54,7 +54,7 @@ class RSSEO_Pro_Clusters {
             return;
         }
         if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_rsseo_cl_nonce'] ?? '' ) ), 'rsseo_clusters' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $raw      = sanitize_textarea_field( wp_unslash( $_POST['rsseo_keywords'] ?? '' ) );
@@ -208,17 +208,17 @@ class RSSEO_Pro_Clusters {
         $results  = (array) get_option( self::OPT_RESULTS, array() );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Keyword Clusters', 'real-smart-seo-pro' ); ?></h1>
-            <p class="description"><?php esc_html_e( 'Paste your keyword list — one per line. The clusters below group related terms and point each group at the page that should own it (or flag a new pillar page).', 'real-smart-seo-pro' ); ?></p>
+            <h1><?php esc_html_e( 'Keyword Clusters', 'real-smart-seo' ); ?></h1>
+            <p class="description"><?php esc_html_e( 'Paste your keyword list — one per line. The clusters below group related terms and point each group at the page that should own it (or flag a new pillar page).', 'real-smart-seo' ); ?></p>
 
             <?php if ( $built ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php printf( esc_html__( 'Built %d clusters.', 'real-smart-seo-pro' ), count( $results ) ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php printf( esc_html__( 'Built %d clusters.', 'real-smart-seo' ), count( $results ) ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
                 <?php wp_nonce_field( 'rsseo_clusters', '_rsseo_cl_nonce' ); ?>
                 <textarea name="rsseo_keywords" rows="8" class="large-text" placeholder="carpet cleaning bethesda&#10;commercial carpet cleaning&#10;tile and grout cleaning&#10;hardwood floor refinishing cost"><?php echo esc_textarea( $keywords ); ?></textarea>
-                <p><button type="submit" name="rsseo_build_clusters" value="1" class="button button-primary"><?php esc_html_e( 'Build Clusters', 'real-smart-seo-pro' ); ?></button></p>
+                <p><button type="submit" name="rsseo_build_clusters" value="1" class="button button-primary"><?php esc_html_e( 'Build Clusters', 'real-smart-seo' ); ?></button></p>
             </form>
 
             <?php if ( $results ) : ?>
@@ -228,12 +228,12 @@ class RSSEO_Pro_Clusters {
                     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 18px;margin:14px 0;">
                         <h2 style="margin:0 0 4px;"><?php echo esc_html( $cluster['label'] ); ?> <span style="color:#888;font-weight:400;">(<?php echo (int) $cluster['count']; ?>)</span></h2>
                         <p style="margin:0 0 8px;">
-                            <strong><?php esc_html_e( 'Target:', 'real-smart-seo-pro' ); ?></strong>
+                            <strong><?php esc_html_e( 'Target:', 'real-smart-seo' ); ?></strong>
                             <?php if ( 'existing' === $target['type'] ) : ?>
                                 <a href="<?php echo esc_url( $target['url'] ); ?>" target="_blank"><?php echo esc_html( $target['title'] ); ?></a>
-                                <span style="color:#888;">(<?php echo esc_html( $target['score'] ); ?> <?php esc_html_e( 'match', 'real-smart-seo-pro' ); ?>)</span>
+                                <span style="color:#888;">(<?php echo esc_html( $target['score'] ); ?> <?php esc_html_e( 'match', 'real-smart-seo' ); ?>)</span>
                             <?php else : ?>
-                                <span style="display:inline-block;padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:3px;font-size:12px;"><?php printf( esc_html__( 'New pillar page needed: %s', 'real-smart-seo-pro' ), esc_html( $target['title'] ) ); ?></span>
+                                <span style="display:inline-block;padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:3px;font-size:12px;"><?php printf( esc_html__( 'New pillar page needed: %s', 'real-smart-seo' ), esc_html( $target['title'] ) ); ?></span>
                             <?php endif; ?>
                         </p>
                         <div>

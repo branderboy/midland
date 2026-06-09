@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart CRM
  * Description: Passthrough between Smart Forms and the integrations (ActiveCampaign, ServiceM8, Vapi, Google Calendar, Floor Care Plan). One sidebar entry: Smart CRM → Settings.
- * Version: 2.4.1
+ * Version: 2.4.2
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -11,7 +11,7 @@
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 6.9
  * Update URI: false
  */
 
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'SCRM_PRO_VERSION', '2.4.1' );
+define( 'SCRM_PRO_VERSION', '2.4.2' );
 define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
 
@@ -54,9 +54,10 @@ function smart_crm_pro_init() {
 
     // Each module's class file self-instantiates its singleton at load
     // time. Instantiating again here would create duplicate admin_menu
-    // hooks and double-render the page. The bootstrap only owns Admin
-    // (which has no singleton accessor).
-    new SCRM_Pro_Admin();
+    // hooks and double-render the page. The bootstrap owns Admin, which
+    // now exposes get_instance() and an idempotency guard so a stray
+    // second instantiation anywhere can't double-register its hooks.
+    SCRM_Pro_Admin::get_instance();
 }
 
 register_deactivation_hook( __FILE__, 'scrm_pro_deactivate' );
@@ -64,4 +65,10 @@ function scrm_pro_deactivate() {
     wp_clear_scheduled_hook( 'scrm_pro_daily_scan' );
     wp_clear_scheduled_hook( 'scrm_pro_send_campaign_email' );
     wp_clear_scheduled_hook( 'scrm_pro_sm8_poll_jobs' );
+    // Per-lead follow-up reminders are single events scheduled WITH a lead_id
+    // arg; clear them all regardless of args so deactivation leaves nothing in
+    // the cron schedule.
+    if ( function_exists( 'wp_unschedule_hook' ) ) {
+        wp_unschedule_hook( 'scrm_pro_follow_up_reminder' );
+    }
 }

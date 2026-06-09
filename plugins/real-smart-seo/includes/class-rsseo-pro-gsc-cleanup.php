@@ -47,8 +47,8 @@ class RSSEO_Pro_GSC_Cleanup {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'GSC Cleanup', 'real-smart-seo-pro' ),
-            esc_html__( 'GSC Cleanup', 'real-smart-seo-pro' ),
+            esc_html__( 'GSC Cleanup', 'real-smart-seo' ),
+            esc_html__( 'GSC Cleanup', 'real-smart-seo' ),
             'manage_options',
             'rsseo-gsc-cleanup',
             array( $this, 'render_page' )
@@ -65,7 +65,7 @@ class RSSEO_Pro_GSC_Cleanup {
 
         $nonce = isset( $_POST['_rsseo_gsc_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_gsc_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_gsc_upload' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         if ( empty( $_FILES['gsc_csv']['tmp_name'] ) ) {
@@ -231,7 +231,7 @@ class RSSEO_Pro_GSC_Cleanup {
 
         $nonce = isset( $_POST['_rsseo_gsc_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_rsseo_gsc_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'rsseo_gsc_upload' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
         $fixes = array(
@@ -314,125 +314,125 @@ class RSSEO_Pro_GSC_Cleanup {
         // phpcs:enable
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'GSC Cleanup — Kill URL Bloat', 'real-smart-seo-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'GSC Cleanup — Kill URL Bloat', 'real-smart-seo' ); ?></h1>
             <p class="description">
-                <?php esc_html_e( 'Upload your GSC Pages or Coverage CSV to categorize junk URLs and generate fixes. Bloated URL pools dilute crawl budget and keep real pages from getting indexed.', 'real-smart-seo-pro' ); ?>
+                <?php esc_html_e( 'Upload your GSC Pages or Coverage CSV to categorize junk URLs and generate fixes. Bloated URL pools dilute crawl budget and keep real pages from getting indexed.', 'real-smart-seo' ); ?>
             </p>
 
             <?php if ( $analyzed ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'CSV analyzed. Review categories below.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'CSV analyzed. Review categories below.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
             <?php if ( $fixes_applied ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Fixes applied. Noindex rules are now live.', 'real-smart-seo-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Fixes applied. Noindex rules are now live.', 'real-smart-seo' ); ?></p></div>
             <?php endif; ?>
             <?php if ( $error ) : ?>
                 <div class="notice notice-error is-dismissible"><p><?php echo esc_html( $this->error_label( $error ) ); ?></p></div>
             <?php endif; ?>
 
-            <h2><?php esc_html_e( 'Upload GSC Export', 'real-smart-seo-pro' ); ?></h2>
-            <p class="description"><?php esc_html_e( 'In GSC: Performance → Pages → Export CSV  OR  Index → Coverage → Export CSV.', 'real-smart-seo-pro' ); ?></p>
+            <h2><?php esc_html_e( 'Upload GSC Export', 'real-smart-seo' ); ?></h2>
+            <p class="description"><?php esc_html_e( 'In GSC: Performance → Pages → Export CSV  OR  Index → Coverage → Export CSV.', 'real-smart-seo' ); ?></p>
 
             <form method="post" enctype="multipart/form-data">
                 <?php wp_nonce_field( 'rsseo_gsc_upload', '_rsseo_gsc_nonce' ); ?>
                 <table class="form-table">
                     <tr>
-                        <th><label for="gsc_csv"><?php esc_html_e( 'GSC CSV File', 'real-smart-seo-pro' ); ?></label></th>
+                        <th><label for="gsc_csv"><?php esc_html_e( 'GSC CSV File', 'real-smart-seo' ); ?></label></th>
                         <td>
                             <input type="file" id="gsc_csv" name="gsc_csv" accept=".csv">
                             <?php if ( $uploaded_at ) : ?>
-                                <p class="description"><?php printf( esc_html__( 'Last uploaded: %s', 'real-smart-seo-pro' ), esc_html( $uploaded_at ) ); ?></p>
+                                <p class="description"><?php printf( esc_html__( 'Last uploaded: %s', 'real-smart-seo' ), esc_html( $uploaded_at ) ); ?></p>
                             <?php endif; ?>
                         </td>
                     </tr>
                 </table>
-                <p class="submit"><button type="submit" name="rsseo_upload_gsc" value="1" class="button button-primary"><?php esc_html_e( 'Analyze CSV', 'real-smart-seo-pro' ); ?></button></p>
+                <p class="submit"><button type="submit" name="rsseo_upload_gsc" value="1" class="button button-primary"><?php esc_html_e( 'Analyze CSV', 'real-smart-seo' ); ?></button></p>
             </form>
 
             <?php if ( ! empty( $analysis['summary'] ) ) : ?>
                 <hr>
-                <h2><?php esc_html_e( 'URL Audit Results', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'URL Audit Results', 'real-smart-seo' ); ?></h2>
 
                 <table class="widefat" style="max-width:600px;margin-bottom:20px;">
                     <thead>
                         <tr>
-                            <th><?php esc_html_e( 'Category', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'Count', 'real-smart-seo-pro' ); ?></th>
-                            <th><?php esc_html_e( 'Action', 'real-smart-seo-pro' ); ?></th>
+                            <th><?php esc_html_e( 'Category', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'Count', 'real-smart-seo' ); ?></th>
+                            <th><?php esc_html_e( 'Action', 'real-smart-seo' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><?php esc_html_e( 'Total URLs in export', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Total URLs in export', 'real-smart-seo' ); ?></td>
                             <td><strong><?php echo esc_html( $analysis['summary']['total'] ); ?></strong></td>
                             <td>—</td>
                         </tr>
                         <tr>
-                            <td><?php esc_html_e( 'Real content pages', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Real content pages', 'real-smart-seo' ); ?></td>
                             <td><strong style="color:#46b450;"><?php echo esc_html( $analysis['summary']['real_content'] ); ?></strong></td>
-                            <td><?php esc_html_e( 'Keep as-is', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Keep as-is', 'real-smart-seo' ); ?></td>
                         </tr>
                         <tr>
-                            <td><?php esc_html_e( 'Attachment pages', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Attachment pages', 'real-smart-seo' ); ?></td>
                             <td><strong style="color:#dc3232;"><?php echo esc_html( count( $analysis['attachment_pages'] ?? array() ) ); ?></strong></td>
-                            <td><?php esc_html_e( 'Noindex + 410', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Noindex + 410', 'real-smart-seo' ); ?></td>
                         </tr>
                         <tr>
-                            <td><?php esc_html_e( 'Query string URLs', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Query string URLs', 'real-smart-seo' ); ?></td>
                             <td><strong style="color:#dc3232;"><?php echo esc_html( count( $analysis['query_string_urls'] ?? array() ) ); ?></strong></td>
-                            <td><?php esc_html_e( 'Noindex', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Noindex', 'real-smart-seo' ); ?></td>
                         </tr>
                         <tr>
-                            <td><?php esc_html_e( 'Paginated / archive URLs', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Paginated / archive URLs', 'real-smart-seo' ); ?></td>
                             <td><strong style="color:#f56e28;"><?php echo esc_html( count( $analysis['paginated_urls'] ?? array() ) ); ?></strong></td>
-                            <td><?php esc_html_e( 'Noindex', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Noindex', 'real-smart-seo' ); ?></td>
                         </tr>
                         <tr>
-                            <td><?php esc_html_e( 'Feed URLs', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Feed URLs', 'real-smart-seo' ); ?></td>
                             <td><strong><?php echo esc_html( count( $analysis['feed_urls'] ?? array() ) ); ?></strong></td>
-                            <td><?php esc_html_e( 'Noindex', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Noindex', 'real-smart-seo' ); ?></td>
                         </tr>
                         <tr>
-                            <td><?php esc_html_e( 'Not found (404)', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Not found (404)', 'real-smart-seo' ); ?></td>
                             <td><strong style="color:#dc3232;"><?php echo esc_html( $analysis['summary']['not_found'] ); ?></strong></td>
-                            <td><?php esc_html_e( 'Review manually', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Review manually', 'real-smart-seo' ); ?></td>
                         </tr>
                         <tr>
-                            <td><?php esc_html_e( 'Robots-blocked (verify intentional)', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Robots-blocked (verify intentional)', 'real-smart-seo' ); ?></td>
                             <td><strong><?php echo esc_html( $analysis['summary']['robots_blocked'] ); ?></strong></td>
-                            <td><?php esc_html_e( 'Verify', 'real-smart-seo-pro' ); ?></td>
+                            <td><?php esc_html_e( 'Verify', 'real-smart-seo' ); ?></td>
                         </tr>
                     </tbody>
                 </table>
 
-                <h2><?php esc_html_e( 'Apply Fixes', 'real-smart-seo-pro' ); ?></h2>
+                <h2><?php esc_html_e( 'Apply Fixes', 'real-smart-seo' ); ?></h2>
                 <form method="post">
                     <?php wp_nonce_field( 'rsseo_gsc_upload', '_rsseo_gsc_nonce' ); ?>
                     <table class="form-table">
                         <?php
                         $fix_options = array(
                             'fix_noindex_attachments'    => array(
-                                __( 'Noindex + 410 attachment pages', 'real-smart-seo-pro' ),
-                                __( 'Sends HTTP 410 Gone for WP attachment URLs — signals to Google they are permanently removed.', 'real-smart-seo-pro' ),
+                                __( 'Noindex + 410 attachment pages', 'real-smart-seo' ),
+                                __( 'Sends HTTP 410 Gone for WP attachment URLs — signals to Google they are permanently removed.', 'real-smart-seo' ),
                                 'noindex_attachments',
                             ),
                             'fix_noindex_query_strings'  => array(
-                                __( 'Noindex query-string URLs', 'real-smart-seo-pro' ),
-                                __( 'Adds noindex meta to any page request with ?query=string parameters.', 'real-smart-seo-pro' ),
+                                __( 'Noindex query-string URLs', 'real-smart-seo' ),
+                                __( 'Adds noindex meta to any page request with ?query=string parameters.', 'real-smart-seo' ),
                                 'noindex_query_strings',
                             ),
                             'fix_noindex_pagination'     => array(
-                                __( 'Noindex paginated / archive pages', 'real-smart-seo-pro' ),
-                                __( 'Adds noindex to /page/2/, /page/3/, category archives with low traffic.', 'real-smart-seo-pro' ),
+                                __( 'Noindex paginated / archive pages', 'real-smart-seo' ),
+                                __( 'Adds noindex to /page/2/, /page/3/, category archives with low traffic.', 'real-smart-seo' ),
                                 'noindex_pagination',
                             ),
                             'fix_noindex_feeds'          => array(
-                                __( 'Noindex feed URLs', 'real-smart-seo-pro' ),
-                                __( 'Blocks /feed/, /rss/, /atom/ URLs from being indexed.', 'real-smart-seo-pro' ),
+                                __( 'Noindex feed URLs', 'real-smart-seo' ),
+                                __( 'Blocks /feed/, /rss/, /atom/ URLs from being indexed.', 'real-smart-seo' ),
                                 'noindex_feeds',
                             ),
                             'fix_block_attachments_robots' => array(
-                                __( 'Block /*/attachment/ in robots.txt', 'real-smart-seo-pro' ),
-                                __( 'Adds Disallow: /*/attachment/ to the virtual robots.txt — stops Googlebot from crawling them at all.', 'real-smart-seo-pro' ),
+                                __( 'Block /*/attachment/ in robots.txt', 'real-smart-seo' ),
+                                __( 'Adds Disallow: /*/attachment/ to the virtual robots.txt — stops Googlebot from crawling them at all.', 'real-smart-seo' ),
                                 'block_attachments_robots',
                             ),
                         );
@@ -450,13 +450,13 @@ class RSSEO_Pro_GSC_Cleanup {
                             </tr>
                         <?php endforeach; ?>
                     </table>
-                    <p class="submit"><button type="submit" name="rsseo_apply_gsc_fixes" value="1" class="button button-primary"><?php esc_html_e( 'Apply Selected Fixes', 'real-smart-seo-pro' ); ?></button></p>
+                    <p class="submit"><button type="submit" name="rsseo_apply_gsc_fixes" value="1" class="button button-primary"><?php esc_html_e( 'Apply Selected Fixes', 'real-smart-seo' ); ?></button></p>
                 </form>
 
                 <?php if ( ! empty( $analysis['not_found_urls'] ) ) : ?>
                     <hr>
-                    <h3><?php esc_html_e( '404 URLs — Review for Redirects', 'real-smart-seo-pro' ); ?></h3>
-                    <p class="description"><?php esc_html_e( 'If any of these had real content, set up 301 redirects. Otherwise they will naturally drop from the index.', 'real-smart-seo-pro' ); ?></p>
+                    <h3><?php esc_html_e( '404 URLs — Review for Redirects', 'real-smart-seo' ); ?></h3>
+                    <p class="description"><?php esc_html_e( 'If any of these had real content, set up 301 redirects. Otherwise they will naturally drop from the index.', 'real-smart-seo' ); ?></p>
                     <textarea readonly rows="8" class="large-text" style="font-family:monospace;font-size:12px;"><?php echo esc_textarea( implode( "\n", $analysis['not_found_urls'] ) ); ?></textarea>
                 <?php endif; ?>
             <?php endif; ?>
@@ -466,11 +466,11 @@ class RSSEO_Pro_GSC_Cleanup {
 
     private function error_label( $error ) {
         $labels = array(
-            'no_file'   => __( 'No file selected.', 'real-smart-seo-pro' ),
-            'not_csv'   => __( 'File must be a .csv export from Google Search Console.', 'real-smart-seo-pro' ),
-            'read_fail' => __( 'Could not read the uploaded file.', 'real-smart-seo-pro' ),
+            'no_file'   => __( 'No file selected.', 'real-smart-seo' ),
+            'not_csv'   => __( 'File must be a .csv export from Google Search Console.', 'real-smart-seo' ),
+            'read_fail' => __( 'Could not read the uploaded file.', 'real-smart-seo' ),
         );
-        return $labels[ $error ] ?? __( 'Unknown error.', 'real-smart-seo-pro' );
+        return $labels[ $error ] ?? __( 'Unknown error.', 'real-smart-seo' );
     }
 }
 

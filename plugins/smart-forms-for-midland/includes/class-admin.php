@@ -588,6 +588,41 @@ class SFCO_Admin {
                                 <label><input type="checkbox" name="crm_push" <?php checked( ! empty( $settings['crm_push'] ) ); ?>> <?php esc_html_e( 'Auto-create a contact + lead in Smart CRM Pro on every submission', 'smart-forms-for-midland' ); ?></label>
                             </td>
                         </tr>
+                        <tr>
+                            <th><?php esc_html_e( 'Tags this form passes', 'smart-forms-for-midland' ); ?></th>
+                            <td>
+                                <?php
+                                // Read-only view of the CRM lifecycle tags a submission from
+                                // THIS form distributes, so an operator can see at a glance
+                                // what each form sends to ActiveCampaign. Source is always
+                                // "form"; {segment} resolves to commercial/residential per lead.
+                                $books = '' !== ( $settings['booking_url'] ?? '' );
+                                $form_tag_groups = array(
+                                    __( 'New lead', 'smart-forms-for-midland' )  => array( 'midland-segment-new-lead', 'midland-segment-new-lead-{segment}', 'midland-source-form' ),
+                                    __( 'Booked', 'smart-forms-for-midland' )    => array( 'midland-job-booked', 'midland-job-booked-{segment}', 'midland-onsite-booked-commercial' ),
+                                    __( 'Completed', 'smart-forms-for-midland' ) => array( 'midland-job-completed', 'midland-job-completed-{segment}', 'midland-floor-care-plan-offer' ),
+                                    __( 'Canceled', 'smart-forms-for-midland' )  => array( 'midland-job-canceled', 'midland-job-canceled-{segment}' ),
+                                );
+                                if ( empty( $settings['crm_push'] ) ) {
+                                    echo '<p class="description" style="margin:0 0 8px;color:#b26200;">' . esc_html__( 'Enable "Push to Smart CRM Pro" above for this form to send these tags.', 'smart-forms-for-midland' ) . '</p>';
+                                }
+                                foreach ( $form_tag_groups as $label => $tags ) {
+                                    // Booked/Completed/Canceled only happen when the form sends to
+                                    // Calendly; flag that for forms without a booking link.
+                                    $needs_booking = in_array( $label, array( __( 'Booked', 'smart-forms-for-midland' ), __( 'Completed', 'smart-forms-for-midland' ), __( 'Canceled', 'smart-forms-for-midland' ) ), true );
+                                    echo '<div style="margin:0 0 6px;opacity:' . ( ( $needs_booking && ! $books ) ? '0.45' : '1' ) . ';">';
+                                    echo '<span style="display:inline-block;min-width:80px;font-weight:600;font-size:12px;color:#5b6b60;">' . esc_html( $label ) . '</span>';
+                                    foreach ( $tags as $t ) {
+                                        echo '<code style="display:inline-block;background:#F3FCF4;border:1px solid #cdeccf;border-radius:3px;padding:2px 7px;margin:2px 4px 2px 0;font-size:12px;">' . esc_html( $t ) . '</code>';
+                                    }
+                                    echo '</div>';
+                                }
+                                if ( ! $books ) {
+                                    echo '<p class="description" style="margin:6px 0 0;">' . esc_html__( 'Booked / Completed / Canceled tags apply only when this form sends people to a Calendly booking link (set above).', 'smart-forms-for-midland' ) . '</p>';
+                                }
+                                ?>
+                            </td>
+                        </tr>
                     </table>
 
                     <h3 style="margin-top:32px;"><?php esc_html_e( 'Form Basics', 'smart-forms-for-midland' ); ?></h3>
@@ -865,10 +900,15 @@ class SFCO_Admin {
     }
     
     public function enqueue_admin_assets( $hook ) {
-        if ( strpos( $hook, 'smart-forms' ) === false ) {
+        // The CRM and Team pages are registered with a null parent, so their
+        // hook is admin_page_sfco-crm / admin_page_sfco-team — which does NOT
+        // contain "smart-forms". Without matching the sfco- prefix too, the Pro
+        // admin JS + sfcoProAdmin nonce never loaded there and the "Test
+        // Connection" / "Remove member" buttons threw "sfcoProAdmin is not defined".
+        if ( strpos( $hook, 'smart-forms' ) === false && strpos( $hook, 'sfco-' ) === false ) {
             return;
         }
-        
+
         wp_enqueue_style( 'sfco-admin', SFCO_PLUGIN_URL . 'assets/css/admin.css', array(), SFCO_VERSION );
         wp_enqueue_script( 'sfco-admin', SFCO_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery' ), SFCO_VERSION, true );
 

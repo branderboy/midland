@@ -1,0 +1,165 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "meta": {
+        "title": "Midland \u2014 all 11 plugins",
+        "description": "Installs + activates every Midland plugin from source, dependency-ordered (Smart Forms before Smart CRM). For full-suite/cross-plugin verification.",
+        "author": "midland"
+    },
+    "landingPage": "/wp-admin/plugins.php",
+    "preferredVersions": {
+        "php": "8.2",
+        "wp": "latest"
+    },
+    "phpExtensionBundles": [
+        "kitchen-sink"
+    ],
+    "features": {
+        "networking": true
+    },
+    "login": true,
+    "steps": [
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/smart-forms-for-midland"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/smart-chat-ai"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/smart-crm-pro"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/real-smart-seo"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/smart-reviews-pro"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/content-traffic-maker"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/geo-site-brain"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/job-poster-wp"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/midland-contractor-gallery"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/midland-pcloud-embed"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "git:directory",
+                "url": "https://github.com/branderboy/midland",
+                "ref": "claude/optimistic-allen-r4wzay",
+                "refType": "branch",
+                "path": "plugins/wp-github-backup"
+            },
+            "options": {
+                "activate": true
+            }
+        }
+    ]
+}

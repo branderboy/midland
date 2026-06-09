@@ -116,6 +116,7 @@ class CTM_Generator {
         if ( 200 !== $code ) {
             $msg = is_array( $data ) && ! empty( $data['error']['message'] )
                 ? $data['error']['message']
+                /* translators: %d: HTTP status code returned by the Perplexity API. */
                 : sprintf( __( 'Perplexity returned HTTP %d.', 'content-traffic-maker' ), $code );
             return new WP_Error( 'ctm_api_error', $msg );
         }

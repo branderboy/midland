@@ -39,8 +39,8 @@ class SFCO_Pro_CRM {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'CRM Integration', 'smart-forms-pro' ),
-            esc_html__( 'CRM Integration', 'smart-forms-pro' ),
+            esc_html__( 'CRM Integration', 'smart-forms-for-midland' ),
+            esc_html__( 'CRM Integration', 'smart-forms-for-midland' ),
             'manage_options',
             'sfco-crm',
             array( $this, 'render_page' )
@@ -54,7 +54,7 @@ class SFCO_Pro_CRM {
 
         $nonce = isset( $_POST['_sfco_crm_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_crm_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_save_crm' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         $crm_mode = isset( $_POST['crm_mode'] ) ? sanitize_key( $_POST['crm_mode'] ) : 'none';
@@ -93,7 +93,7 @@ class SFCO_Pro_CRM {
         $api_url = get_option( 'sfco_pro_crm_api_url', '' );
 
         if ( empty( $api_key ) ) {
-            wp_send_json_error( array( 'message' => __( 'No CRM configured.', 'smart-forms-pro' ) ) );
+            wp_send_json_error( array( 'message' => __( 'No CRM configured.', 'smart-forms-for-midland' ) ) );
         }
 
         $result = $this->test_connection( $api_key, $api_url );
@@ -107,7 +107,7 @@ class SFCO_Pro_CRM {
 
     private function test_connection( $api_key, $api_url ) {
         if ( empty( $api_url ) ) {
-            return array( 'success' => false, 'message' => __( 'ActiveCampaign requires an API URL (e.g. https://your-account.api-us1.com).', 'smart-forms-pro' ) );
+            return array( 'success' => false, 'message' => __( 'ActiveCampaign requires an API URL (e.g. https://your-account.api-us1.com).', 'smart-forms-for-midland' ) );
         }
 
         $response = wp_remote_get( untrailingslashit( $api_url ) . '/api/3/users/me', array(
@@ -125,10 +125,10 @@ class SFCO_Pro_CRM {
         $code = wp_remote_retrieve_response_code( $response );
 
         if ( 200 === $code ) {
-            return array( 'success' => true, 'message' => __( 'Connected to ActiveCampaign successfully!', 'smart-forms-pro' ) );
+            return array( 'success' => true, 'message' => __( 'Connected to ActiveCampaign successfully!', 'smart-forms-for-midland' ) );
         }
 
-        return array( 'success' => false, 'message' => sprintf( __( 'Connection failed (HTTP %d). Check your API key and URL.', 'smart-forms-pro' ), $code ) );
+        return array( 'success' => false, 'message' => sprintf( __( 'Connection failed (HTTP %d). Check your API key and URL.', 'smart-forms-for-midland' ), $code ) );
     }
 
     /**
@@ -238,7 +238,7 @@ class SFCO_Pro_CRM {
         }
 
         $this->sync_lead( $lead );
-        wp_send_json_success( array( 'message' => __( 'Lead synced to CRM.', 'smart-forms-pro' ) ) );
+        wp_send_json_success( array( 'message' => __( 'Lead synced to CRM.', 'smart-forms-for-midland' ) ) );
     }
 
     public function render_page() {
@@ -250,11 +250,11 @@ class SFCO_Pro_CRM {
         $scrm_active = defined( 'SCRM_PRO_VERSION' );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'CRM Integration', 'smart-forms-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'CRM Integration', 'smart-forms-for-midland' ); ?></h1>
 
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'CRM settings saved.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'CRM settings saved.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
@@ -262,27 +262,27 @@ class SFCO_Pro_CRM {
 
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e( 'CRM Mode', 'smart-forms-pro' ); ?></th>
+                        <th><?php esc_html_e( 'CRM Mode', 'smart-forms-for-midland' ); ?></th>
                         <td>
                             <label style="display:block;margin-bottom:6px;">
                                 <input type="radio" name="crm_mode" value="none" <?php checked( $crm_mode, 'none' ); ?>>
-                                <strong><?php esc_html_e( 'None', 'smart-forms-pro' ); ?></strong>
-                                — <?php esc_html_e( 'Leads stay in Smart Forms only. No external sync.', 'smart-forms-pro' ); ?>
+                                <strong><?php esc_html_e( 'None', 'smart-forms-for-midland' ); ?></strong>
+                                — <?php esc_html_e( 'Leads stay in Smart Forms only. No external sync.', 'smart-forms-for-midland' ); ?>
                             </label>
                             <label style="display:block;margin-bottom:6px;">
                                 <input type="radio" name="crm_mode" value="internal" <?php checked( $crm_mode, 'internal' ); ?>>
-                                <strong><?php esc_html_e( 'Use Smart CRM Pro (internal)', 'smart-forms-pro' ); ?></strong>
+                                <strong><?php esc_html_e( 'Use Smart CRM Pro (internal)', 'smart-forms-for-midland' ); ?></strong>
                                 <?php if ( $scrm_active ) : ?>
-                                    <span style="color:#00a32a;">&#10003; <?php esc_html_e( 'Detected & active', 'smart-forms-pro' ); ?></span>
+                                    <span style="color:#00a32a;">&#10003; <?php esc_html_e( 'Detected & active', 'smart-forms-for-midland' ); ?></span>
                                 <?php else : ?>
-                                    <span style="color:#d63638;">&#10005; <?php esc_html_e( 'Not installed', 'smart-forms-pro' ); ?></span>
+                                    <span style="color:#d63638;">&#10005; <?php esc_html_e( 'Not installed', 'smart-forms-for-midland' ); ?></span>
                                 <?php endif; ?>
-                                <p class="description" style="margin-left:24px;"><?php esc_html_e( 'Smart CRM Pro reads leads from wp_sfco_leads directly for reactivation campaigns. No push needed.', 'smart-forms-pro' ); ?></p>
+                                <p class="description" style="margin-left:24px;"><?php esc_html_e( 'Smart CRM Pro reads leads from wp_sfco_leads directly for reactivation campaigns. No push needed.', 'smart-forms-for-midland' ); ?></p>
                             </label>
                             <label style="display:block;">
                                 <input type="radio" name="crm_mode" value="external" <?php checked( $crm_mode, 'external' ); ?>>
-                                <strong><?php esc_html_e( 'ActiveCampaign', 'smart-forms-pro' ); ?></strong>
-                                — <?php esc_html_e( 'Push leads to ActiveCampaign as contacts.', 'smart-forms-pro' ); ?>
+                                <strong><?php esc_html_e( 'ActiveCampaign', 'smart-forms-for-midland' ); ?></strong>
+                                — <?php esc_html_e( 'Push leads to ActiveCampaign as contacts.', 'smart-forms-for-midland' ); ?>
                             </label>
                         </td>
                     </tr>
@@ -291,24 +291,24 @@ class SFCO_Pro_CRM {
                 <div id="sfco-crm-external-section" style="<?php echo 'external' === $crm_mode ? '' : 'display:none;'; ?>">
                 <table class="form-table">
                     <tr>
-                        <th><label for="crm_api_url"><?php esc_html_e( 'API URL', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="crm_api_url"><?php esc_html_e( 'API URL', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <input type="url" name="crm_api_url" id="crm_api_url" class="regular-text" value="<?php echo esc_attr( $api_url ); ?>" placeholder="https://your-account.api-us1.com" required>
-                            <p class="description"><?php esc_html_e( 'ActiveCampaign account URL. Found in Settings → Developer.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'ActiveCampaign account URL. Found in Settings → Developer.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="crm_api_key"><?php esc_html_e( 'API Key', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="crm_api_key"><?php esc_html_e( 'API Key', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
-                            <input type="password" name="crm_api_key" id="crm_api_key" class="regular-text" value="<?php echo esc_attr( $api_key ); ?>" placeholder="<?php esc_attr_e( 'Enter your API key...', 'smart-forms-pro' ); ?>">
-                            <button type="button" class="button" id="sfco-test-crm"><?php esc_html_e( 'Test Connection', 'smart-forms-pro' ); ?></button>
+                            <input type="password" name="crm_api_key" id="crm_api_key" class="regular-text" value="" autocomplete="off" placeholder="<?php echo esc_attr( '' !== (string) $api_key ? __( '•••••••• saved — leave blank to keep', 'smart-forms-for-midland' ) : __( 'Enter your API key...', 'smart-forms-for-midland' ) ); ?>">
+                            <button type="button" class="button" id="sfco-test-crm"><?php esc_html_e( 'Test Connection', 'smart-forms-for-midland' ); ?></button>
                             <span id="sfco-crm-test-result"></span>
                         </td>
                     </tr>
                     <tr>
-                        <th><?php esc_html_e( 'Auto-Sync', 'smart-forms-pro' ); ?></th>
+                        <th><?php esc_html_e( 'Auto-Sync', 'smart-forms-for-midland' ); ?></th>
                         <td>
-                            <label><input type="checkbox" name="crm_active" value="1" <?php checked( $active ); ?>> <?php esc_html_e( 'Automatically push new leads to CRM', 'smart-forms-pro' ); ?></label>
+                            <label><input type="checkbox" name="crm_active" value="1" <?php checked( $active ); ?>> <?php esc_html_e( 'Automatically push new leads to CRM', 'smart-forms-for-midland' ); ?></label>
                         </td>
                     </tr>
                 </table>
@@ -327,7 +327,7 @@ class SFCO_Pro_CRM {
                 </script>
 
                 <p class="submit">
-                    <button type="submit" name="sfco_save_crm" value="1" class="button button-primary"><?php esc_html_e( 'Save CRM Settings', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_save_crm" value="1" class="button button-primary"><?php esc_html_e( 'Save CRM Settings', 'smart-forms-for-midland' ); ?></button>
                 </p>
             </form>
         </div>

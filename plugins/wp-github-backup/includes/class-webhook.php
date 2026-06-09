@@ -206,7 +206,9 @@ class WGB_Webhook {
 		$repo  = WGB_Settings::get( 'repo_name' );
 
 		if ( empty( $token ) || empty( $owner ) || empty( $repo ) ) {
-			error_log( 'WGB async deploy aborted: missing token/owner/repo.' );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'WGB async deploy aborted: missing token/owner/repo.' );
+			}
 			return;
 		}
 
@@ -214,6 +216,8 @@ class WGB_Webhook {
 		$deployer = new WGB_Deployer( $github, $branch );
 		$result   = $deployer->run( $target );
 
-		error_log( 'WGB async deploy complete: ' . wp_json_encode( $result ) );
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'WGB async deploy complete: ' . wp_json_encode( $result ) );
+		}
 	}
 }

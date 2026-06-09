@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.31
+ * Version: 1.9.39
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -11,7 +11,7 @@
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 6.9
  * Update URI: false
  */
 
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.31');
+define('SCAI_VERSION', '1.9.39');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -49,17 +49,24 @@ class SCAI_Plugin {
      * Constructor
      */
     private function __construct() {
-        $this->init_hooks();
+        // Dependencies first: load_dependencies() pulls in SCAI_Content_Context
+        // (and the other module classes) and instantiates the singletons that the
+        // hook callbacks reference. Registering hooks before the classes exist is
+        // the inverted pattern from the rest of the suite and a latent landmine if
+        // any callback ever touches a class constant at registration time.
         $this->load_dependencies();
+        $this->init_hooks();
     }
     
     /**
      * Initialize hooks
      */
     private function init_hooks() {
-        // Activation/Deactivation
-        register_activation_hook(__FILE__, array($this, 'activate'));
-        register_deactivation_hook(__FILE__, array($this, 'deactivate'));
+        // NOTE: activation/deactivation hooks are registered at file scope (see
+        // bottom of file), NOT here. This class is instantiated on 'plugins_loaded',
+        // which has already fired by the time WordPress runs an activation request —
+        // so a register_activation_hook() call in this method would never bind and
+        // activate() would never run on a fresh install.
 
         add_action('init', array($this, 'load_textdomain'));
 
@@ -94,7 +101,12 @@ class SCAI_Plugin {
         require_once SCAI_PLUGIN_DIR . 'includes/class-lead-manager.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-analytics.php';
         require_once SCAI_PLUGIN_DIR . 'includes/class-content-context.php';
+        require_once SCAI_PLUGIN_DIR . 'includes/class-calendly.php';
         SCAI_Content_Context::get_instance();
+
+        // The chat owns its Calendly connection (API key, webhook, signing key)
+        // so a booking flows chat → Calendly → CRM with no Smart Forms in the loop.
+        new SCAI_Calendly();
 
         // WhatsApp is now click-to-chat only (wa.me link inside the widget). The
         // old Cloud API + Smart Messages admin layer was removed in 1.9.0 — clients
@@ -294,28 +306,31 @@ class SCAI_Plugin {
      * Register settings
      */
     public function register_settings() {
+        // Each option registered with a type-appropriate sanitize_callback
+        // (PCP setting_sanitization). preprompt/ai_personality are multi-line,
+        // so they use sanitize_textarea_field to preserve newlines.
         $settings = array(
-            'chat_enabled',
-            'chat_position',
-            'chat_color',
-            'chat_logo',
-            'chat_title',
-            'chat_subtitle',
-            'ai_provider',
-            'perplexity_api_key',
-            'openai_api_key',
-            'ai_model',
-            'ai_temperature',
-            'lead_email',
-            'enable_email_notifications',
-            'business_name',
-            'business_type',
-            'ai_personality',
-            'preprompt',
+            'chat_enabled'               => 'absint',
+            'chat_position'              => 'sanitize_text_field',
+            'chat_color'                 => 'sanitize_hex_color',
+            'chat_logo'                  => 'esc_url_raw',
+            'chat_title'                 => 'sanitize_text_field',
+            'chat_subtitle'              => 'sanitize_text_field',
+            'ai_provider'                => 'sanitize_text_field',
+            'perplexity_api_key'         => 'sanitize_text_field',
+            'openai_api_key'             => 'sanitize_text_field',
+            'ai_model'                   => 'sanitize_text_field',
+            'ai_temperature'             => 'sanitize_text_field',
+            'lead_email'                 => 'sanitize_email',
+            'enable_email_notifications' => 'absint',
+            'business_name'              => 'sanitize_text_field',
+            'business_type'              => 'sanitize_text_field',
+            'ai_personality'             => 'sanitize_textarea_field',
+            'preprompt'                  => 'sanitize_textarea_field',
         );
 
-        foreach ($settings as $setting) {
-            register_setting('scai_settings', 'smart_chat_' . $setting);
+        foreach ($settings as $setting => $sanitizer) {
+            register_setting('scai_settings', 'smart_chat_' . $setting, array('sanitize_callback' => $sanitizer));
         }
 
         // Sitemap ingestion (Site Content) — same options the dedicated page uses,
@@ -331,6 +346,12 @@ class SCAI_Plugin {
 
         // Calendly / booking link, pasted directly in Settings.
         register_setting( 'scai_settings', 'smart_chat_booking_url', array( 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ) );
+
+        // Chat-owned Calendly connection. The API key is entered here; the
+        // signing key + webhook URI are written by the one-click Connect.
+        register_setting( 'scai_settings', 'smart_chat_calendly_api_key', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+        register_setting( 'scai_settings', 'smart_chat_calendly_signing_key', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
+        register_setting( 'scai_settings', 'smart_chat_calendly_webhook_uri', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
 
         // Resend email delivery for lead notifications.
         register_setting( 'scai_settings', 'smart_chat_resend_api_key', array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ) );
@@ -398,22 +419,12 @@ class SCAI_Plugin {
         
         $wa_number = preg_replace( '/[^0-9]/', '', (string) get_option( 'smart_chat_whatsapp_number', '' ) );
 
-        // Booking link comes from the Booking / Calendly field in Settings.
-        // If that's empty, fall back to the Smart Forms Calendly URL (the
-        // Calendar settings page), so the link works wherever it's configured.
-        // This reads an option only — no form is embedded.
-        $booking_url = (string) get_option( 'smart_chat_booking_url', '' );
-        if ( '' === $booking_url ) {
-            if ( class_exists( 'SFCO_Pro_Calendly' ) && method_exists( 'SFCO_Pro_Calendly', 'get_booking_url' ) ) {
-                $booking_url = (string) SFCO_Pro_Calendly::get_booking_url();
-            }
-            if ( '' === $booking_url ) {
-                // Direct option read in case the class isn't loaded on the front end.
-                if ( get_option( 'sfco_pro_calendly_enabled', 0 ) ) {
-                    $booking_url = (string) get_option( 'sfco_pro_calendly_url', '' );
-                }
-            }
-        }
+        // Booking link comes from the Booking / Calendly field in Settings,
+        // falling back to the Smart Forms Calendly URL. This is the bare link;
+        // once a lead is captured mid-conversation the AJAX response upgrades
+        // it to a per-lead decorated link (see session_booking_url()) so the
+        // Calendly webhook can attribute the booking to the CRM lead.
+        $booking_url = $this->resolve_booking_url();
 
         // Suggested starter questions, one per line in Settings. Defaults give
         // useful shortcuts out of the box.
@@ -517,7 +528,7 @@ class SCAI_Plugin {
         // Fall back to the IP-derived ID only when no token is present,
         // which happens on the very first request before JS has stored one.
         $posted_token = isset( $_POST['session_id'] ) ? sanitize_text_field( wp_unslash( $_POST['session_id'] ) ) : '';
-        $is_browser_token = ( '' !== $posted_token && preg_match( '/^sc_[a-z0-9_]+$/i', $posted_token ) );
+        $is_browser_token = ( '' !== $posted_token && strlen( $posted_token ) <= 64 && preg_match( '/^sc_[a-z0-9_]+$/i', $posted_token ) );
         $session_id = $is_browser_token ? $posted_token : $this->session_id_for_ip();
 
         // Rate limit on the hashed IP — NOT the browser token. Keying on the
@@ -578,6 +589,19 @@ class SCAI_Plugin {
             $this->maybe_capture_lead( $session_id );
         } catch ( \Throwable $e ) {
             error_log( 'Smart Chat lead capture failed: ' . $e->getMessage() );
+        }
+
+        // Once this session has a lead, hand the widget a Calendly link stamped
+        // with the CRM lead id so a booking made from chat is attributed back to
+        // the lead and tagged by the Calendly webhook. Runs every turn so the
+        // link is decorated whether the lead was captured this turn or earlier.
+        try {
+            $booking_url = $this->session_booking_url( $session_id );
+            if ( '' !== $booking_url ) {
+                $response['booking_url'] = esc_url_raw( $booking_url );
+            }
+        } catch ( \Throwable $e ) {
+            error_log( 'Smart Chat booking URL build failed: ' . $e->getMessage() );
         }
 
         wp_send_json_success($response);
@@ -711,6 +735,46 @@ class SCAI_Plugin {
         if ( $lead_id && get_option( 'smart_chat_enable_email_notifications', true ) ) {
             $this->send_lead_notification( $lead_id );
         }
+    }
+
+    /**
+     * Resolve the bare Calendly booking URL from the chat's own settings.
+     * Returns '' when none is configured. No Smart Forms dependency.
+     */
+    private function resolve_booking_url() {
+        return SCAI_Calendly::get_booking_url();
+    }
+
+    /**
+     * Per-session Calendly link decorated with the CHAT lead id, or '' when the
+     * session has no captured lead to attribute a booking to.
+     *
+     * Stamping utm_content=LEAD_<chat_lead_id> on the link is what lets the
+     * chat's OWN Calendly webhook (SCAI_Calendly::match_lead) match the booking
+     * 1:1 and fire scai_lead_booked, which Smart CRM tags in ActiveCampaign.
+     * This keeps the whole chat → Calendly → CRM path inside the chat plugin.
+     */
+    private function session_booking_url( $session_id ) {
+        $base = $this->resolve_booking_url();
+        if ( '' === $base ) {
+            return '';
+        }
+
+        global $wpdb;
+        $lead = $wpdb->get_row( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT * FROM {$wpdb->prefix}smart_chat_leads WHERE message LIKE %s ORDER BY id DESC LIMIT 1",
+            '%' . $wpdb->esc_like( '[sid:' . $session_id . ']' ) . '%'
+        ) );
+        if ( ! $lead ) {
+            return '';
+        }
+
+        return (string) SCAI_Calendly::decorate_booking_url(
+            $base,
+            (int) $lead->id,
+            (string) ( $lead->name ?? '' ),
+            (string) ( $lead->email ?? '' )
+        );
     }
 
     /**
@@ -848,3 +912,12 @@ function scai_init() {
 }
 
 add_action('plugins_loaded', 'scai_init');
+
+// Activation/deactivation must be registered at file scope (during the initial
+// include), because the plugin instance is created on 'plugins_loaded' — which
+// has already fired by the time an activation request reaches the activate_
+// action. Registering here guarantees activate() runs on a fresh install
+// (table creation + default options) instead of relying on the admin_init
+// self-heal fallback.
+register_activation_hook(__FILE__, function () { SCAI_Plugin::get_instance()->activate(); });
+register_deactivation_hook(__FILE__, function () { SCAI_Plugin::get_instance()->deactivate(); });

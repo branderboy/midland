@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Forms
  * Description: Multi-form lead capture for Midland Floor Care — floor-care templates, per-form shortcodes, file uploads, automation, Smart CRM Pro sync, Resend email, Google Calendar, branding, analytics, team management. (Formerly Smart Forms Basic + Smart Forms PRO, combined into one.)
- * Version: 2.19.10
+ * Version: 2.19.11
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -11,7 +11,7 @@
  * Domain Path: /languages
  * Requires at least: 5.5
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 6.9
  * Update URI: false
  */
 
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Plugin constants. Internal SFCO_/SFCO_PRO_ prefixes preserved so all
 // existing class code keeps working with zero changes when we merged the
 // Pro plugin into this folder.
-define( 'SFCO_VERSION', '2.19.10' );
+define( 'SFCO_VERSION', '2.19.11' );
 define( 'SFCO_PLUGIN_FILE', __FILE__ );
 define( 'SFCO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SFCO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -104,6 +104,13 @@ class SFCO_Plugin {
     }
 
     public function maybe_install_tables() {
+        // Defensive: this runs on plugins_loaded, so a partial/failed include of
+        // the core DB class would otherwise fatal on the create_tables() call
+        // below. Bail quietly and let the next request retry once the class is
+        // present rather than white-screening the whole site.
+        if ( ! class_exists( 'SFCO_Database' ) || ! method_exists( 'SFCO_Database', 'create_tables' ) ) {
+            return;
+        }
         $current = get_option( 'sfco_db_version', '0' );
         if ( version_compare( $current, SFCO_VERSION, '>=' ) ) {
             return;

@@ -14,8 +14,8 @@ class SFCO_Pro_Branding {
     public function add_menu() {
         add_submenu_page(
             null,
-            esc_html__( 'Branding', 'smart-forms-pro' ),
-            esc_html__( 'Branding', 'smart-forms-pro' ),
+            esc_html__( 'Branding', 'smart-forms-for-midland' ),
+            esc_html__( 'Branding', 'smart-forms-for-midland' ),
             'manage_options',
             'sfco-branding',
             array( $this, 'render_page' )
@@ -29,7 +29,7 @@ class SFCO_Pro_Branding {
 
         $nonce = isset( $_POST['_sfco_brand_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_sfco_brand_nonce'] ) ) : '';
         if ( ! wp_verify_nonce( $nonce, 'sfco_save_branding' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'smart-forms-pro' ) );
+            wp_die( esc_html__( 'Security check failed.', 'smart-forms-for-midland' ) );
         }
 
         // Merge over the existing array so we don't wipe keys written by the
@@ -91,11 +91,11 @@ class SFCO_Pro_Branding {
         wp_enqueue_media();
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Custom Branding', 'smart-forms-pro' ); ?></h1>
+            <h1><?php esc_html_e( 'Custom Branding', 'smart-forms-for-midland' ); ?></h1>
 
             <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Branding saved.', 'smart-forms-pro' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Branding saved.', 'smart-forms-for-midland' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post">
@@ -103,42 +103,42 @@ class SFCO_Pro_Branding {
 
                 <table class="form-table">
                     <tr>
-                        <th><label for="brand_company"><?php esc_html_e( 'Company Name', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="brand_company"><?php esc_html_e( 'Company Name', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="text" name="brand_company" id="brand_company" class="regular-text" value="<?php echo esc_attr( $company ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="brand_logo"><?php esc_html_e( 'Logo URL', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="brand_logo"><?php esc_html_e( 'Logo URL', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <input type="url" name="brand_logo" id="brand_logo" class="regular-text" value="<?php echo esc_attr( $logo ); ?>">
-                            <button type="button" class="button" id="sfco-upload-logo"><?php esc_html_e( 'Upload', 'smart-forms-pro' ); ?></button>
+                            <button type="button" class="button" id="sfco-upload-logo"><?php esc_html_e( 'Upload', 'smart-forms-for-midland' ); ?></button>
                             <?php if ( $logo ) : ?>
                                 <br><img src="<?php echo esc_url( $logo ); ?>" alt="" style="max-height:60px;margin-top:8px;">
                             <?php endif; ?>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="brand_primary"><?php esc_html_e( 'Primary Color', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="brand_primary"><?php esc_html_e( 'Primary Color', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="color" name="brand_primary" id="brand_primary" value="<?php echo esc_attr( $primary ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="brand_button"><?php esc_html_e( 'Button Color', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="brand_button"><?php esc_html_e( 'Button Color', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="color" name="brand_button" id="brand_button" value="<?php echo esc_attr( $button ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="brand_text"><?php esc_html_e( 'Text Color', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="brand_text"><?php esc_html_e( 'Text Color', 'smart-forms-for-midland' ); ?></label></th>
                         <td><input type="color" name="brand_text" id="brand_text" value="<?php echo esc_attr( $text ); ?>"></td>
                     </tr>
                     <tr>
-                        <th><label for="brand_css"><?php esc_html_e( 'Custom CSS', 'smart-forms-pro' ); ?></label></th>
+                        <th><label for="brand_css"><?php esc_html_e( 'Custom CSS', 'smart-forms-for-midland' ); ?></label></th>
                         <td>
                             <textarea name="brand_css" id="brand_css" class="large-text code" rows="6"><?php echo esc_textarea( $css ); ?></textarea>
-                            <p class="description"><?php esc_html_e( 'Advanced: add custom CSS for your forms.', 'smart-forms-pro' ); ?></p>
+                            <p class="description"><?php esc_html_e( 'Advanced: add custom CSS for your forms.', 'smart-forms-for-midland' ); ?></p>
                         </td>
                     </tr>
                 </table>
 
                 <p class="submit">
-                    <button type="submit" name="sfco_save_branding" value="1" class="button button-primary"><?php esc_html_e( 'Save Branding', 'smart-forms-pro' ); ?></button>
+                    <button type="submit" name="sfco_save_branding" value="1" class="button button-primary"><?php esc_html_e( 'Save Branding', 'smart-forms-for-midland' ); ?></button>
                 </p>
             </form>
         </div>
