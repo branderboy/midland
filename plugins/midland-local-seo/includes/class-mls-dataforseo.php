@@ -499,6 +499,16 @@ class MLS_DataForSEO {
 		);
 
 		set_transient( $cache_key, $gap, HOUR_IN_SECONDS * 6 );
+		// Track the key so MLS_Backlinks::handle_refresh() can clear it via
+		// delete_transient() (object-cache safe).
+		$keys = get_option( 'mls_linkgap_keys', array() );
+		if ( ! is_array( $keys ) ) {
+			$keys = array();
+		}
+		if ( ! in_array( $cache_key, $keys, true ) ) {
+			$keys[] = $cache_key;
+			update_option( 'mls_linkgap_keys', $keys, false );
+		}
 		return $gap;
 	}
 

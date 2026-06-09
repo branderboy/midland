@@ -234,7 +234,7 @@ return array(
 	array(
 		'category' => 'Educational institutions & government pages',
 		'org' => 'Arlington County Supplier Portal',
-		'url' => '(PRISM+ portal)',
+		'url' => 'https://www.arlingtonva.us/Government/Departments/Management-and-Finance/Procurement/Vendor-Information',
 		'how_to' => 'Register as supplier; used for bids and vendor records.',
 		'paid_free' => 'Free',
 		'priority' => 'High authority / Low effort',
@@ -244,7 +244,7 @@ return array(
 	array(
 		'category' => 'Educational institutions & government pages',
 		'org' => 'Montgomery County Vendor Resources',
-		'url' => '(CVRS page)',
+		'url' => 'https://www.montgomerycountymd.gov/vendor/',
 		'how_to' => 'Register in vendor system; listed in public directory.',
 		'paid_free' => 'Free',
 		'priority' => 'High authority / Low effort',

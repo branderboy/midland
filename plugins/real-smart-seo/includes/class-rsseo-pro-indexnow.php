@@ -93,7 +93,9 @@ class RSSEO_Pro_IndexNow {
             return;
         }
 
-        $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+        // Compared against a fixed key path, never echoed — don't run it through
+        // sanitize_text_field, which would mangle an encoded request path.
+        $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
         if ( '/' . $api_key . '.txt' === $request_uri ) {
             header( 'Content-Type: text/plain' );

@@ -108,11 +108,27 @@ class MLS_Dashboard {
 		$identity    = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
 		$sameas_live = ! empty( $identity['business_name'] );
 		$geo_run     = class_exists( 'MLS_Geogrid' ) ? MLS_Geogrid::latest_run() : null;
-		$backlinks   = class_exists( 'MLS_Backlinks' ) ? MLS_Backlinks::score( MLS_Backlinks::parse_targets() ) : array(
-			'score' => 0,
-			'live'  => 0,
-			'total' => 0,
-		);
+		if ( class_exists( 'MLS_Backlinks' ) ) {
+			$bl_targets = MLS_Backlinks::get_targets();
+			$bl_total   = count( $bl_targets );
+			$bl_live    = 0;
+			foreach ( $bl_targets as $bl_row ) {
+				if ( 'live' === ( isset( $bl_row['status'] ) ? $bl_row['status'] : '' ) ) {
+					++$bl_live;
+				}
+			}
+			$backlinks = array(
+				'score' => $bl_total > 0 ? (int) round( ( $bl_live / $bl_total ) * 100 ) : 0,
+				'live'  => $bl_live,
+				'total' => $bl_total,
+			);
+		} else {
+			$backlinks = array(
+				'score' => 0,
+				'live'  => 0,
+				'total' => 0,
+			);
+		}
 		$configured  = MLS_DataForSEO::is_configured();
 		$has_secret  = '' !== MLS_DataForSEO::get_password();
 		$test_url    = wp_nonce_url( admin_url( 'admin.php?page=' . MLS_Plugin::MENU_SLUG . '&mls_test_connection=1' ), 'mls_test_connection' );

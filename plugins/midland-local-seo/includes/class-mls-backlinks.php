@@ -421,10 +421,16 @@ class MLS_Backlinks {
 		$target = preg_replace( '#^https?://#', '', rtrim( home_url(), '/' ) );
 		delete_transient( 'mls_backlinks_summary_' . md5( $target ) );
 		delete_transient( 'mls_referring_' . md5( $target . '|100' ) );
-		// Also clear the link-gap discovery cache (keyed per competitor set) so the
-		// next render re-runs discovery instead of serving a stale snapshot.
-		global $wpdb;
-		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_mls_linkgap_%' OR option_name LIKE '_transient_timeout_mls_linkgap_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// Clear the link-gap discovery cache (keyed per competitor set) via
+		// delete_transient() so object-cache installs invalidate correctly
+		// (a raw wp_options DELETE would miss the object cache entirely).
+		$linkgap_keys = get_option( 'mls_linkgap_keys', array() );
+		if ( is_array( $linkgap_keys ) ) {
+			foreach ( $linkgap_keys as $linkgap_key ) {
+				delete_transient( (string) $linkgap_key );
+			}
+		}
+		delete_option( 'mls_linkgap_keys' );
 		wp_safe_redirect( admin_url( 'admin.php?page=mls-backlinks&refreshed=1' ) );
 		exit;
 	}
