@@ -4,7 +4,7 @@
  * Plugin URI:  https://tagglefish.com/
  * Description: Embed a pCloud public folder/file viewer in any page via the [pcloud_embed code="..."] shortcode. Hides pCloud's header/footer chrome by default.
  * Version:     1.1.0
- * Author:      TaggleFish
+ * Author:      Midland Floor Care
  * License:     GPL v2 or later
  * Text Domain: midland-pcloud-embed
  * Requires at least: 5.8

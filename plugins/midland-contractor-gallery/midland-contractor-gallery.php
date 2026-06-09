@@ -4,7 +4,7 @@
  * Plugin URI:  https://tagglefish.com/
  * Description: Native WordPress gallery for a contractor's work photos hosted on pCloud public links. Renders a responsive grid + lightbox via the [contractor_gallery code="..."] shortcode. No pCloud OAuth needed — uses the public-link endpoints.
  * Version:     1.0.0
- * Author:      TaggleFish
+ * Author:      Midland Floor Care
  * License:     GPL v2 or later
  * Text Domain: midland-contractor-gallery
  * Requires at least: 5.8
