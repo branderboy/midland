@@ -178,7 +178,7 @@ class MLS_GMB_Mirror {
 				'existing' => $this->existing_post_id( $title ),
 				'stub'     => sprintf(
 					/* translators: %s: service name */
-					__( 'Professional %s for commercial and residential clients across our service area. (Draft — replace with full service copy.)', 'midland-local-seo' ),
+					__( 'Professional %s for commercial and residential clients across our service area. (Draft. Replace with full service copy.)', 'midland-local-seo' ),
 					$cat
 				),
 			);
@@ -209,7 +209,7 @@ class MLS_GMB_Mirror {
 				'existing'    => $this->existing_post_id( $title ),
 				'stub'        => sprintf(
 					/* translators: 1: business, 2: area */
-					__( '%1$s proudly serves %2$s. (Draft — add local landmarks, services offered, and a call to action.)', 'midland-local-seo' ),
+					__( '%1$s proudly serves %2$s. (Draft. Add local landmarks, services offered, and a call to action.)', 'midland-local-seo' ),
 					$biz_type,
 					$area
 				),
@@ -217,6 +217,43 @@ class MLS_GMB_Mirror {
 		}
 
 		return $recs;
+	}
+
+	/**
+	 * Build a full, well-structured service page (H2 sections, process, FAQ, no
+	 * dashes) for a service across the business service areas — not a thin stub.
+	 *
+	 * @param string $service Service name.
+	 * @return string HTML content.
+	 */
+	private function build_service_content( $service ) {
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$business = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+		$phone    = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '';
+		$areas    = array();
+		if ( ! empty( $identity['service_areas'] ) ) {
+			$areas = array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', (string) $identity['service_areas'] ) ) );
+		}
+		$area_str  = $areas ? implode( ', ', $areas ) : 'Washington DC, Maryland and Northern Virginia';
+		$s         = esc_html( $service );
+		$b         = esc_html( $business );
+		$cta_phone = '' !== $phone ? ' or call ' . esc_html( $phone ) : '';
+
+		$h   = array();
+		$h[] = '<h2>Professional ' . $s . ' in the DMV</h2>';
+		$h[] = '<p>' . $b . ' provides expert ' . $s . ' for homes and businesses across ' . esc_html( $area_str ) . '. Our trained technicians use professional grade equipment and safe, effective products to deliver clean, refreshed results you can see and feel.</p>';
+		$h[] = '<h2>Why Choose ' . $b . ' for ' . $s . '?</h2>';
+		$h[] = '<ul><li>Years of trusted floor care experience across the DMV.</li><li>Commercial grade equipment and eco friendly products that are safe for your family and staff.</li><li>Same day and next day service available in most areas.</li><li>Reliable, efficient, and affordable, with clear pricing and no surprises.</li></ul>';
+		$h[] = '<h2>Our ' . $s . ' Process</h2>';
+		$h[] = '<ol><li>We evaluate your space and recommend the right approach.</li><li>We prep the area and protect your surroundings.</li><li>We deep clean and restore using proven methods.</li><li>We walk the finished job with you to make sure you are happy.</li></ol>';
+		$h[] = '<h2>Areas We Serve</h2>';
+		$h[] = '<p>' . $b . ' provides ' . $s . ' throughout ' . esc_html( $area_str ) . '. If you do not see your area listed, call us. We likely cover it.</p>';
+		$h[] = '<h2>Frequently Asked Questions</h2>';
+		$h[] = '<h3>Do you serve both homes and businesses?</h3><p>Yes. We provide ' . $s . ' for residential and commercial properties, from single homes to offices, retail, and shopping centers.</p>';
+		$h[] = '<h3>How soon can you schedule?</h3><p>Same day or next day service is available in most of the DMV. Call us to check current availability.</p>';
+		$h[] = '<h2>Get a Free ' . $s . ' Quote</h2>';
+		$h[] = '<p>Ready to get started? <a href="/contact/">Request a free quote</a>' . $cta_phone . '. ' . $b . ' serves Washington DC, Maryland, and Northern Virginia.</p>';
+		return implode( "\n", $h );
 	}
 
 	/**
@@ -265,6 +302,15 @@ class MLS_GMB_Mirror {
 		if ( '' === $title ) {
 			wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&error=1' ) );
 			exit;
+		}
+
+		// Service-page recommendation: replace the thin stub with full, structured
+		// content (the same H2/process/FAQ structure as the programmatic engine).
+		if ( ! $is_location ) {
+			$full = $this->build_service_content( $title );
+			if ( '' !== trim( $full ) ) {
+				$stub = $full;
+			}
 		}
 
 		$post_id = wp_insert_post(
