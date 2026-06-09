@@ -99,7 +99,9 @@ class RSSEO_Database {
             output_tokens int NOT NULL DEFAULT 0,
             cost_estimate decimal(10,6) NOT NULL DEFAULT 0,
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            KEY created_at (created_at),
+            KEY scan_id (scan_id)
         ) $charset;" );
     }
 
@@ -189,6 +191,12 @@ class RSSEO_Database {
         $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             "DELETE FROM {$wpdb->prefix}rsseo_scans WHERE id IN ($placeholders)",
             $stale_ids
+        ) );
+        // Trim the API cost log on the same cadence — drop rows older than 90 days
+        // so the table (and the cost-report query over it) stays bounded.
+        $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NoCaching
+            "DELETE FROM {$wpdb->prefix}rsseo_api_log WHERE created_at < %s",
+            gmdate( 'Y-m-d H:i:s', time() - 90 * DAY_IN_SECONDS )
         ) );
         return count( $stale_ids );
     }

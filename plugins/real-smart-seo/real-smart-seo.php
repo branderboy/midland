@@ -58,17 +58,17 @@ class RSSEO_Plugin {
         return $schedules;
     }
 
-    public function activate() {
+    public static function activate() {
         require_once RSSEO_PATH . 'includes/class-rsseo-database.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-pro-database.php';
         require_once RSSEO_PATH . 'includes/class-rsseo-pro-ai-rank.php';
         RSSEO_Database::create_tables();
         RSSEO_Pro_Database::create_tables();
         RSSEO_Pro_AI_Rank::create_tables();
-        flush_rewrite_rules();
-        // Record the schema version so maybe_upgrade_db() (admin_init) doesn't
-        // re-run a full dbDelta + flush_rewrite_rules pass on the next admin load.
+        // Record the schema version BEFORE the flush so an interrupted/failed
+        // flush can't keep re-triggering the expensive pass on every admin load.
         update_option( 'rsseo_db_version', RSSEO_VERSION );
+        flush_rewrite_rules();
     }
 
     /**
@@ -77,7 +77,7 @@ class RSSEO_Plugin {
      * a hook regardless of the args they were scheduled with (covers the
      * per-URL / per-scan single events too).
      */
-    public function deactivate() {
+    public static function deactivate() {
         $hooks = array(
             'rsseo_ai_rank_weekly_scan',   // RSSEO_Pro_AI_Rank::CRON_HOOK
             'rsseo_ai_rank_process_one',   // RSSEO_Pro_AI_Rank::TICK_HOOK
@@ -155,8 +155,10 @@ class RSSEO_Plugin {
         if ( class_exists( 'RSSEO_Database' ) )     { RSSEO_Database::create_tables(); }
         if ( class_exists( 'RSSEO_Pro_Database' ) ) { RSSEO_Pro_Database::create_tables(); }
         if ( class_exists( 'RSSEO_Pro_AI_Rank' ) )  { RSSEO_Pro_AI_Rank::create_tables(); }
-        flush_rewrite_rules();
+        // Record the version BEFORE flushing so a failed/interrupted flush can't
+        // re-trigger the full create + flush pass on every subsequent admin load.
         update_option( 'rsseo_db_version', RSSEO_VERSION );
+        flush_rewrite_rules();
     }
 
     /** Brand layout CSS for hand-built + programmatic pages. */
@@ -177,5 +179,5 @@ RSSEO_Plugin::get_instance();
 
 // Lifecycle hooks registered at file scope (not in the constructor) so they
 // always bind during the activation/deactivation request.
-register_activation_hook( __FILE__, array( RSSEO_Plugin::get_instance(), 'activate' ) );
-register_deactivation_hook( __FILE__, array( RSSEO_Plugin::get_instance(), 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'RSSEO_Plugin', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'RSSEO_Plugin', 'deactivate' ) );

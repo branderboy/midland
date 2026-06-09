@@ -256,7 +256,7 @@ class MLS_DataForSEO {
 			),
 		);
 
-		$result = self::post( 'business_data/google/maps/live/advanced', $payload );
+		$result = self::post( 'serp/google/maps/live/advanced', $payload );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
@@ -271,12 +271,20 @@ class MLS_DataForSEO {
 				continue;
 			}
 			$type = isset( $row['type'] ) ? (string) $row['type'] : '';
-			if ( '' !== $type && 'maps_search' !== $type ) {
+			// SERP-Maps returns several item types for ranked map listings.
+			$allowed_types = array( 'maps_search', 'local_pack', 'maps' );
+			if ( '' !== $type && ! in_array( $type, $allowed_types, true ) ) {
+				continue;
+			}
+			$title = (string) ( isset( $row['title'] ) ? $row['title'] : '' );
+			$rank  = (int) ( isset( $row['rank_absolute'] ) ? $row['rank_absolute'] : 0 );
+			// A usable listing needs at least a title or a rank.
+			if ( '' === $title && 0 === $rank ) {
 				continue;
 			}
 			$output[] = array(
-				'rank'   => (int) ( isset( $row['rank_absolute'] ) ? $row['rank_absolute'] : 0 ),
-				'title'  => (string) ( isset( $row['title'] ) ? $row['title'] : '' ),
+				'rank'   => $rank,
+				'title'  => $title,
 				'domain' => (string) ( isset( $row['domain'] ) ? $row['domain'] : '' ),
 				'url'    => (string) ( isset( $row['url'] ) ? $row['url'] : '' ),
 			);
@@ -608,8 +616,8 @@ class MLS_DataForSEO {
 	/**
 	 * Fetch Google Maps competitors for a category/keyword at a coordinate.
 	 *
-	 * Uses DataForSEO Business Data Google Maps live endpoint:
-	 *   business_data/google/maps/live/advanced
+	 * Uses DataForSEO SERP Google Maps live endpoint:
+	 *   serp/google/maps/live/advanced
 	 * Documented payload fields: keyword, location_coordinate ("lat,lng,zoom"),
 	 * language_code, depth. Each "maps_search" item carries title, rating
 	 * (value + votes_count), category, additional_categories, work_hours,
@@ -648,7 +656,7 @@ class MLS_DataForSEO {
 			),
 		);
 
-		$result = self::post( 'business_data/google/maps/live/advanced', $payload );
+		$result = self::post( 'serp/google/maps/live/advanced', $payload );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
@@ -663,7 +671,15 @@ class MLS_DataForSEO {
 				continue;
 			}
 			$type = isset( $row['type'] ) ? (string) $row['type'] : '';
-			if ( '' !== $type && 'maps_search' !== $type ) {
+			// SERP-Maps returns several item types for ranked map listings.
+			$allowed_types = array( 'maps_search', 'local_pack', 'maps' );
+			if ( '' !== $type && ! in_array( $type, $allowed_types, true ) ) {
+				continue;
+			}
+			$title = (string) ( isset( $row['title'] ) ? $row['title'] : '' );
+			$rank  = (int) ( isset( $row['rank_absolute'] ) ? $row['rank_absolute'] : 0 );
+			// A usable listing needs at least a title or a rank.
+			if ( '' === $title && 0 === $rank ) {
 				continue;
 			}
 			$rating          = isset( $row['rating'] ) && is_array( $row['rating'] ) ? $row['rating'] : array();
@@ -678,7 +694,7 @@ class MLS_DataForSEO {
 				$address = (string) $row['address_info']['address'];
 			}
 			$out[] = array(
-				'title'                 => (string) ( isset( $row['title'] ) ? $row['title'] : '' ),
+				'title'                 => $title,
 				'rating'                => isset( $rating['value'] ) ? (float) $rating['value'] : null,
 				'rating_votes'          => isset( $rating['votes_count'] ) ? (int) $rating['votes_count'] : 0,
 				'category'              => (string) ( isset( $row['category'] ) ? $row['category'] : '' ),
@@ -689,7 +705,7 @@ class MLS_DataForSEO {
 				'address'               => $address,
 				'url'                   => (string) ( isset( $row['url'] ) ? $row['url'] : '' ),
 				'domain'                => (string) ( isset( $row['domain'] ) ? $row['domain'] : '' ),
-				'rank'                  => (int) ( isset( $row['rank_absolute'] ) ? $row['rank_absolute'] : 0 ),
+				'rank'                  => $rank,
 			);
 		}
 
