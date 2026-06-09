@@ -161,6 +161,12 @@ class RSSEO_Plugin {
 
     /** Brand layout CSS for hand-built + programmatic pages. */
     public function enqueue_brand_layout() {
+        // Only load on the programmatic location pages this CSS styles — not on
+        // every public page of the site.
+        $cpt = class_exists( 'RSSEO_Pro_Programmatic' ) ? RSSEO_Pro_Programmatic::CPT : 'mfc_location';
+        if ( ! is_singular( $cpt ) && ! is_post_type_archive( $cpt ) ) {
+            return;
+        }
         if ( file_exists( RSSEO_PATH . 'assets/css/brand-layout.css' ) ) {
             wp_enqueue_style( 'midland-brand-layout', RSSEO_URL . 'assets/css/brand-layout.css', array(), RSSEO_VERSION );
         }
