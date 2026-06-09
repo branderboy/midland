@@ -69,8 +69,8 @@ class MLS_SameAs {
 			'address_state'        => 'MD',
 			'address_zip'          => '20748',
 			'address_country'      => 'US',
-			'center_lat'           => '38.825139',
-			'center_lng'           => '-76.939730',
+			'center_lat'           => '38.8222169',
+			'center_lng'           => '-76.9356121',
 			'opening_hours'        => array(
 				'mon' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
 				'tue' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
