@@ -3,7 +3,7 @@
  * Plugin Name: Midland Smart SEO
  * Plugin URI: https://midlandfloors.com/smart-seo
  * Description: Midland's organic SEO suite — audit, AI-powered analysis, one-click fixes with rollback, programmatic city × service pages, internal link suggestions, keyword clustering, content briefs, schema, GSC cleanup, IndexNow, page speed, and rank tracking.
- * Version: 2.1.0
+ * Version: 2.1.1
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'RSSEO_VERSION',  '2.1.0' );
+define( 'RSSEO_VERSION',  '2.1.1' );
 define( 'RSSEO_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'RSSEO_URL',      plugin_dir_url( __FILE__ ) );
 define( 'RSSEO_FILE',     __FILE__ );
