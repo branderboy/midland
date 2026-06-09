@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Midland GitHub Vault & Deploy
  * Description:       GitHub backup + deploy for Midland Floors (midlandfloors.com). Backs up WordPress content, DB, themes, plugins, and uploads to a GitHub repository; deploys page/post content from GitHub back into WordPress with automatic cache-purge and live-render verification. Includes a one-click "Register webhook on GitHub" connect flow and a synthetic test-ping for round-trip verification.
- * Version:           3.6.5
+ * Version:           3.6.6
  * Author:            Midland Floor Care
  * Author URI:        https://midlandfloors.com
  * License:           GPL-2.0-or-later
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WGB_VERSION', '3.6.5' );
+define( 'WGB_VERSION', '3.6.6' );
 define( 'WGB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WGB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WGB_PLUGIN_FILE', __FILE__ );
