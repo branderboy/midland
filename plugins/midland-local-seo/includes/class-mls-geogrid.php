@@ -53,7 +53,7 @@ class MLS_Geogrid {
 
 		add_action( self::CRON_HOOK, array( $this, 'cron_scan' ) );
 		add_action( self::TICK_HOOK, array( $this, 'process_next_cell' ), 10, 1 );
-		add_action( 'init', array( $this, 'maybe_schedule_cron' ) );
+		add_action( 'admin_init', array( $this, 'maybe_schedule_cron' ) );
 	}
 
 	/**
@@ -196,6 +196,13 @@ class MLS_Geogrid {
 			return;
 		}
 
+		// Guard against overlapping runs: if any cell is still pending (scanned_at
+		// IS NULL), a scan is already in progress — do not stack another one.
+		global $wpdb;
+		if ( (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}mls_geogrid_cells WHERE scanned_at IS NULL" ) > 0 ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return;
+		}
+
 		$cells = $this->enumerate_cells(
 			(float) $settings['center_lat'],
 			(float) $settings['center_lng'],
@@ -203,7 +210,6 @@ class MLS_Geogrid {
 			(float) $settings['spacing_km']
 		);
 
-		global $wpdb;
 		$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prefix . 'mls_geogrid_runs',
 			array(
@@ -234,9 +240,11 @@ class MLS_Geogrid {
 			);
 		}
 
-		wp_schedule_single_event( time(), self::TICK_HOOK, array( $run_id ) );
-		if ( function_exists( 'spawn_cron' ) ) {
-			spawn_cron();
+		if ( ! wp_next_scheduled( self::TICK_HOOK, array( $run_id ) ) ) {
+			wp_schedule_single_event( time(), self::TICK_HOOK, array( $run_id ) );
+			if ( function_exists( 'spawn_cron' ) ) {
+				spawn_cron();
+			}
 		}
 	}
 

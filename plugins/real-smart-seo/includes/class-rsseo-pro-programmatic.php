@@ -188,6 +188,10 @@ class RSSEO_Pro_Programmatic {
         $status   = ( isset( $args['status'] ) && 'publish' === $args['status'] ) ? 'publish' : 'draft';
         $wiki_url = isset( $args['wiki_url'] ) ? esc_url_raw( (string) $args['wiki_url'] ) : '';
         $ping     = ! isset( $args['ping'] ) || (bool) $args['ping'];
+        // Only re-generate post_content / post_status for an EXISTING page when the
+        // caller explicitly opts in. Without this, manual edits would be wiped on
+        // every regen (e.g. the GMB mirror connect path must never overwrite).
+        $overwrite = isset( $args['overwrite'] ) && true === $args['overwrite'];
 
         if ( '' === $city ) {
             return new WP_Error( 'rsseo_no_city', __( 'A city is required to generate a location page.', 'real-smart-seo' ) );
@@ -208,16 +212,20 @@ class RSSEO_Pro_Programmatic {
             'numberposts' => 1,
         ) );
 
-        $content = $self->generate_location_content( $city, $state, $services );
-
         if ( $existing ) {
-            $post_id = $existing[0];
-            wp_update_post( array(
-                'ID'           => $post_id,
-                'post_status'  => $status,
-                'post_content' => $content,
-            ) );
+            $post_id = (int) $existing[0];
+            // Preserve the existing page's content and status unless an overwrite
+            // was explicitly requested. Meta/terms are still refreshed below.
+            if ( $overwrite ) {
+                $content = $self->generate_location_content( $city, $state, $services );
+                wp_update_post( array(
+                    'ID'           => $post_id,
+                    'post_status'  => $status,
+                    'post_content' => $content,
+                ) );
+            }
         } else {
+            $content = $self->generate_location_content( $city, $state, $services );
             $post_id = wp_insert_post( array(
                 'post_type'    => self::CPT,
                 'post_title'   => $city . ', ' . $state,
@@ -242,7 +250,10 @@ class RSSEO_Pro_Programmatic {
         }
         update_post_meta( $post_id, '_mfc_services', $services );
 
-        if ( $self->get_templates()['use_elementor'] ) {
+        // Re-applying the Elementor template rewrites the page layout from the
+        // generated content, so only do it for a brand-new page or an explicit
+        // overwrite — never silently for an existing, possibly hand-edited page.
+        if ( ( ! $existing || $overwrite ) && $self->get_templates()['use_elementor'] ) {
             $self->apply_elementor_template( $post_id, $city, $state, $services );
         }
 

@@ -36,7 +36,7 @@ class RSSEO_Pro_Growth_Digest {
 
     private function __construct() {
         add_action( self::CRON_HOOK,        array( $this, 'run_digest' ) );
-        add_action( 'init',                 array( $this, 'maybe_schedule_cron' ) );
+        add_action( 'admin_init',           array( $this, 'maybe_schedule_cron' ) );
         add_action( 'admin_menu',           array( $this, 'add_menu' ), 31 );
         add_action( 'admin_init',           array( $this, 'handle_save' ) );
         add_action( 'admin_post_rsseo_growth_digest_send_now', array( $this, 'handle_send_now' ) );

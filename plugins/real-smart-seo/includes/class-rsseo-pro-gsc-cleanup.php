@@ -102,10 +102,17 @@ class RSSEO_Pro_GSC_Cleanup {
                 $header = array_map( 'strtolower', array_map( 'trim', $row ) );
                 continue;
             }
-            if ( count( $row ) < 1 ) {
+            if ( empty( $header ) || count( $row ) < 1 ) {
                 continue;
             }
-            $mapped = array_combine( $header, array_pad( $row, count( $header ), '' ) );
+            // Normalize the row to EXACTLY count($header) cells: truncate extras
+            // (array_pad alone won't shorten a too-long row, so array_combine would
+            // return false and a bad row would be stored), then pad short rows.
+            $normalized = array_pad( array_slice( $row, 0, count( $header ) ), count( $header ), '' );
+            $mapped     = array_combine( $header, $normalized );
+            if ( false === $mapped ) {
+                continue;
+            }
             $rows[] = $mapped;
         }
         fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose

@@ -58,7 +58,7 @@ class MLS_Insights {
 		add_action( 'admin_init', array( $this, 'handle_save' ) );
 		add_action( 'admin_init', array( $this, 'handle_test' ) );
 		add_action( self::CRON_HOOK, array( $this, 'run_digest' ) );
-		add_action( 'init', array( $this, 'maybe_schedule_cron' ) );
+		add_action( 'admin_init', array( $this, 'maybe_schedule_cron' ) );
 	}
 
 	/**
@@ -227,7 +227,10 @@ class MLS_Insights {
 			return false;
 		}
 
-		$html    = self::build_digest_html( $is_test );
+		// send_digest is only ever invoked by the cron digest (run_digest) and the
+		// "Send test now" handler — both intentional, billable sends — so live
+		// (competitor + GMB) sections are included here.
+		$html    = self::build_digest_html( $is_test, true );
 		$subject = $is_test
 			? __( '[TEST] Midland Local SEO — Insights digest', 'midland-local-seo' )
 			: __( 'Midland Local SEO — Insights digest', 'midland-local-seo' );
@@ -253,12 +256,18 @@ class MLS_Insights {
 
 	/**
 	 * Aggregate ranked, actionable insights from every module. Returns an ordered
-	 * list of sections: each { title, lines[ { text, url } ] }. Pure read — no
-	 * side effects — so it is safe to call from the settings page for a preview.
+	 * list of sections: each { title, lines[ { text, url } ] }.
 	 *
+	 * Sections backed by stored options/DB rows (backlinks, citations, geo-grid)
+	 * are always included — they perform no live API calls. The GMB-optimizer and
+	 * competitor sections call billable DataForSEO/GMB endpoints, so they are only
+	 * built when $live is true (cron digest / explicit test send) and are skipped
+	 * entirely on the settings-page preview to avoid spending API credits on load.
+	 *
+	 * @param bool $live Whether to perform live (billable) API calls.
 	 * @return array
 	 */
-	public static function collect_insights() {
+	public static function collect_insights( $live = false ) {
 		$sections = array();
 
 		// 1) Backlinks — top 5 Tier-A prospects still in 'target' status.
@@ -327,7 +336,8 @@ class MLS_Insights {
 		}
 
 		// 3) GMB Optimizer — failing/warn checks (reuse its scorecard logic).
-		if ( class_exists( 'MLS_GMB_Optimizer' ) && class_exists( 'MLS_DataForSEO' ) && MLS_DataForSEO::is_configured() ) {
+		// Live only: get_gmb_listing() is a billable DataForSEO call.
+		if ( $live && class_exists( 'MLS_GMB_Optimizer' ) && class_exists( 'MLS_DataForSEO' ) && MLS_DataForSEO::is_configured() ) {
 			$lines    = array();
 			$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
 			$name     = isset( $identity['business_name'] ) && '' !== $identity['business_name'] ? $identity['business_name'] : get_bloginfo( 'name' );
@@ -353,7 +363,8 @@ class MLS_Insights {
 		}
 
 		// 4) GMB Competitors — rivals beating you on rating/reviews (if data present).
-		$comp_lines = self::competitor_insights();
+		// Live only: competitor_insights() calls billable get_maps_competitors().
+		$comp_lines = $live ? self::competitor_insights() : null;
 		if ( null !== $comp_lines ) {
 			$sections[] = array(
 				'title' => __( 'Competitors', 'midland-local-seo' ),
@@ -511,10 +522,13 @@ class MLS_Insights {
 	 * Render the digest as a clean HTML document.
 	 *
 	 * @param bool $is_test Whether this is a manual test render.
+	 * @param bool $live    Whether to allow live (billable) API calls. The
+	 *                      settings-page preview passes false; the cron digest and
+	 *                      the "Send test now" handler pass true.
 	 * @return string
 	 */
-	public static function build_digest_html( $is_test = false ) {
-		$sections = self::collect_insights();
+	public static function build_digest_html( $is_test = false, $live = false ) {
+		$sections = self::collect_insights( $live );
 		$site     = get_bloginfo( 'name' );
 
 		$html  = '<div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;color:#1d2327;">';
@@ -634,7 +648,7 @@ class MLS_Insights {
 			<hr>
 			<h2><?php esc_html_e( 'Preview', 'midland-local-seo' ); ?></h2>
 			<div style="background:#fff;border:1px solid #e2e4e7;border-radius:6px;padding:16px;max-width:680px;">
-				<?php echo wp_kses_post( self::build_digest_html( false ) ); ?>
+				<?php echo wp_kses_post( self::build_digest_html( false, false ) ); ?>
 			</div>
 		</div>
 		<?php
