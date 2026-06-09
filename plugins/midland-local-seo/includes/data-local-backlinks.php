@@ -7,7 +7,11 @@
  * any external file. MLS_Backlinks seeds mls_backlink_targets from this on first
  * load and via the "Reset to baseline" action.
  *
- * Each row: category, org, url, how_to, paid_free, priority, notes.
+ * Each row: category, org, url, how_to, paid_free, priority, notes, scores.
+ *
+ * The "scores" array holds five 1-5 sub-scores (authority, relevance, roi, ease,
+ * free) used by MLS_Backlinks to compute a 0-100 ROI-weighted Priority Score. The
+ * authority sub-score is overridden by live DataForSEO domain rank when available.
  *
  * @package Midland_Local_SEO
  */
@@ -25,6 +29,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High authority / Low effort',
 		'notes' => 'Apply online; add profile link after approval',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 4, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Local organizations & community groups',
@@ -34,6 +39,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 4, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Local organizations & community groups',
@@ -43,6 +49,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 4, 'roi' => 3, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Local organizations & community groups',
@@ -52,6 +59,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 3, 'roi' => 3, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Local organizations & community groups',
@@ -61,6 +69,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 4, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Local organizations & community groups',
@@ -70,6 +79,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 4, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Local organizations & community groups',
@@ -79,6 +89,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 3, 'roi' => 3, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Events & sponsorship opportunities',
@@ -88,6 +99,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High visibility / Medium effort',
 		'notes' => 'Apply early; high demand',
+		'scores' => array( 'authority' => 3, 'relevance' => 3, 'roi' => 2, 'ease' => 2, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Events & sponsorship opportunities',
@@ -97,6 +109,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High visibility / Medium effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 3, 'relevance' => 3, 'roi' => 2, 'ease' => 3, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Events & sponsorship opportunities',
@@ -106,6 +119,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High visibility / Medium effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 3, 'relevance' => 2, 'roi' => 2, 'ease' => 3, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Events & sponsorship opportunities',
@@ -115,6 +129,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High visibility / Medium effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 3, 'relevance' => 2, 'roi' => 2, 'ease' => 3, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Events & sponsorship opportunities',
@@ -124,6 +139,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High visibility / Medium effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 3, 'roi' => 2, 'ease' => 3, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Events & sponsorship opportunities',
@@ -133,6 +149,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'High visibility / Medium effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 3, 'roi' => 2, 'ease' => 3, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Local media outlets & publications',
@@ -142,6 +159,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'Media / Sponsored content',
 		'notes' => 'Request 2025 media kit',
+		'scores' => array( 'authority' => 5, 'relevance' => 3, 'roi' => 3, 'ease' => 2, 'free' => 3 ),
 	),
 	array(
 		'category' => 'Local media outlets & publications',
@@ -151,6 +169,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'Media / Sponsored content',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 3, 'roi' => 3, 'ease' => 3, 'free' => 3 ),
 	),
 	array(
 		'category' => 'Local media outlets & publications',
@@ -160,6 +179,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'Media / Sponsored content',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 3, 'roi' => 3, 'ease' => 3, 'free' => 3 ),
 	),
 	array(
 		'category' => 'Local media outlets & publications',
@@ -169,6 +189,7 @@ return array(
 		'paid_free' => 'Paid',
 		'priority' => 'Media / Sponsored content',
 		'notes' => '',
+		'scores' => array( 'authority' => 3, 'relevance' => 3, 'roi' => 2, 'ease' => 3, 'free' => 3 ),
 	),
 	array(
 		'category' => 'Local media outlets & publications',
@@ -178,6 +199,7 @@ return array(
 		'paid_free' => 'Mixed',
 		'priority' => 'Media / Sponsored content',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 3, 'roi' => 3, 'ease' => 4, 'free' => 4 ),
 	),
 	array(
 		'category' => 'Educational institutions & government pages',
@@ -187,6 +209,7 @@ return array(
 		'paid_free' => 'Free',
 		'priority' => 'High authority / Low effort',
 		'notes' => 'Add NAICS and DUNS numbers',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 5, 'ease' => 3, 'free' => 5 ),
 	),
 	array(
 		'category' => 'Educational institutions & government pages',
@@ -196,6 +219,7 @@ return array(
 		'paid_free' => 'Free',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 5, 'ease' => 3, 'free' => 5 ),
 	),
 	array(
 		'category' => 'Educational institutions & government pages',
@@ -205,6 +229,7 @@ return array(
 		'paid_free' => 'Free',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 5, 'ease' => 3, 'free' => 5 ),
 	),
 	array(
 		'category' => 'Educational institutions & government pages',
@@ -214,6 +239,7 @@ return array(
 		'paid_free' => 'Free',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 5, 'ease' => 3, 'free' => 5 ),
 	),
 	array(
 		'category' => 'Educational institutions & government pages',
@@ -223,6 +249,7 @@ return array(
 		'paid_free' => 'Free',
 		'priority' => 'High authority / Low effort',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 5, 'ease' => 3, 'free' => 5 ),
 	),
 	array(
 		'category' => 'Educational institutions & government pages',
@@ -232,6 +259,7 @@ return array(
 		'paid_free' => 'Paid/Free',
 		'priority' => 'Community / High trust',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 5, 'ease' => 3, 'free' => 5 ),
 	),
 	array(
 		'category' => 'Business directories & industry platforms',
@@ -241,6 +269,7 @@ return array(
 		'paid_free' => 'Free/Paid',
 		'priority' => 'Lead gen / High ROI',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 5, 'roi' => 4, 'ease' => 4, 'free' => 3 ),
 	),
 	array(
 		'category' => 'Business directories & industry platforms',
@@ -250,6 +279,7 @@ return array(
 		'paid_free' => 'Free/Paid',
 		'priority' => 'Lead gen / High ROI',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 4, 'ease' => 4, 'free' => 3 ),
 	),
 	array(
 		'category' => 'Business directories & industry platforms',
@@ -259,6 +289,7 @@ return array(
 		'paid_free' => 'Free/Paid',
 		'priority' => 'Lead gen / High ROI',
 		'notes' => '',
+		'scores' => array( 'authority' => 5, 'relevance' => 4, 'roi' => 4, 'ease' => 4, 'free' => 2 ),
 	),
 	array(
 		'category' => 'Business directories & industry platforms',
@@ -268,6 +299,7 @@ return array(
 		'paid_free' => 'Free/Paid',
 		'priority' => 'Lead gen / High ROI',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 4, 'roi' => 3, 'ease' => 4, 'free' => 4 ),
 	),
 	array(
 		'category' => 'Business directories & industry platforms',
@@ -277,5 +309,6 @@ return array(
 		'paid_free' => 'Free/Paid',
 		'priority' => 'Lead gen / High ROI',
 		'notes' => '',
+		'scores' => array( 'authority' => 4, 'relevance' => 4, 'roi' => 3, 'ease' => 4, 'free' => 4 ),
 	),
 );

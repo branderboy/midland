@@ -224,6 +224,7 @@ class RSSEO_Pro_Programmatic {
                 'post_name'    => $self->build_slug( $city, $state, $services ),
                 'post_status'  => $status,
                 'post_content' => $content,
+                'post_author'  => get_current_user_id(),
             ) );
         }
 

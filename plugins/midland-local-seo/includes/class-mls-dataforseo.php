@@ -229,6 +229,63 @@ class MLS_DataForSEO {
 	}
 
 	/**
+	 * Local-pack (Google Maps) ranking at a coordinate — the actual local-finder
+	 * results, NOT organic SERP. This is what the Geo-Grid must use so it reports
+	 * true map-pack position; organic results would report the wrong number.
+	 *
+	 * @param string $keyword Search term.
+	 * @param float  $lat     Latitude.
+	 * @param float  $lng     Longitude.
+	 * @param int    $depth   Number of map results to scan (1-100).
+	 * @return array|WP_Error List of { rank, title, domain, url }.
+	 */
+	public static function get_local_pack_at_coordinate( $keyword, $lat, $lng, $depth = 100 ) {
+		$keyword = sanitize_text_field( $keyword );
+		if ( '' === $keyword ) {
+			return new WP_Error( 'no_keyword', __( 'A keyword is required.', 'midland-local-seo' ) );
+		}
+
+		$depth   = max( 1, min( 100, (int) $depth ) );
+		$payload = array(
+			array(
+				// Google Maps "location_coordinate" is "lat,lng,zoom" (zoom 0-21).
+				'keyword'             => $keyword,
+				'location_coordinate' => sprintf( '%F,%F,%d', (float) $lat, (float) $lng, 14 ),
+				'language_code'       => 'en',
+				'depth'               => $depth,
+			),
+		);
+
+		$result = self::post( 'business_data/google/maps/live/advanced', $payload );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$items = isset( $result['tasks'][0]['result'][0]['items'] ) && is_array( $result['tasks'][0]['result'][0]['items'] )
+			? $result['tasks'][0]['result'][0]['items']
+			: array();
+
+		$output = array();
+		foreach ( $items as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$type = isset( $row['type'] ) ? (string) $row['type'] : '';
+			if ( '' !== $type && 'maps_search' !== $type ) {
+				continue;
+			}
+			$output[] = array(
+				'rank'   => (int) ( isset( $row['rank_absolute'] ) ? $row['rank_absolute'] : 0 ),
+				'title'  => (string) ( isset( $row['title'] ) ? $row['title'] : '' ),
+				'domain' => (string) ( isset( $row['domain'] ) ? $row['domain'] : '' ),
+				'url'    => (string) ( isset( $row['url'] ) ? $row['url'] : '' ),
+			);
+		}
+
+		return $output;
+	}
+
+	/**
 	 * Backlinks summary: total backlinks, referring domains, lost / gained,
 	 * anchor distribution. Cached in a transient because DataForSEO charges
 	 * per call.
@@ -322,6 +379,119 @@ class MLS_DataForSEO {
 		}
 		set_transient( $cache_key, $out, HOUR_IN_SECONDS * 6 );
 		return $out;
+	}
+
+	/**
+	 * Normalize a host/domain for set comparison: lowercase, strip scheme, path
+	 * and a leading "www.".
+	 *
+	 * @param string $host Raw host or URL.
+	 * @return string
+	 */
+	public static function normalize_host( $host ) {
+		$host = strtolower( trim( (string) $host ) );
+		if ( '' === $host ) {
+			return '';
+		}
+		$host = preg_replace( '#^https?://#', '', $host );
+		$host = preg_replace( '#/.*$#', '', $host );
+		$host = preg_replace( '#^www\.#', '', $host );
+		return $host;
+	}
+
+	/**
+	 * Link-gap discovery: find referring domains that link to >= 1 competitor but
+	 * NOT to you. For each competitor domain we pull its referring domains (via the
+	 * existing get_referring_domains()), union them, pull YOUR OWN referring
+	 * domains (home host), and return the gap with each domain's DFS rank and which
+	 * competitor(s) it links to. Cached per competitor set; WP_Error/empty-safe;
+	 * never fatal.
+	 *
+	 * @param array $competitor_domains Competitor hosts/domains.
+	 * @param int   $limit              Max referring domains pulled per target.
+	 * @return array Map of domain => { rank:int, competitors:array } (gap only).
+	 */
+	public static function discover_link_prospects( $competitor_domains, $limit = 50 ) {
+		if ( ! is_array( $competitor_domains ) ) {
+			return array();
+		}
+		$limit = max( 1, min( 1000, (int) $limit ) );
+
+		// Normalize + de-dupe the competitor set.
+		$competitors = array();
+		foreach ( $competitor_domains as $d ) {
+			$n = self::normalize_host( $d );
+			if ( '' !== $n ) {
+				$competitors[ $n ] = true;
+			}
+		}
+		$competitors = array_keys( $competitors );
+		if ( empty( $competitors ) ) {
+			return array();
+		}
+
+		$own_host  = self::normalize_host( wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$cache_key = 'mls_linkgap_' . md5( implode( ',', $competitors ) . '|' . $own_host . '|' . $limit );
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		// Your own referring domains (the set to subtract).
+		$own_refs = array();
+		$mine     = self::get_referring_domains( $own_host, $limit );
+		if ( ! is_wp_error( $mine ) && is_array( $mine ) ) {
+			foreach ( $mine as $row ) {
+				$h = self::normalize_host( isset( $row['domain'] ) ? $row['domain'] : '' );
+				if ( '' !== $h ) {
+					$own_refs[ $h ] = true;
+				}
+			}
+		}
+
+		// Union of competitor referring domains, tracking provenance.
+		$gap = array();
+		foreach ( $competitors as $competitor ) {
+			$refs = self::get_referring_domains( $competitor, $limit );
+			if ( is_wp_error( $refs ) || ! is_array( $refs ) ) {
+				continue;
+			}
+			foreach ( $refs as $row ) {
+				$h = self::normalize_host( isset( $row['domain'] ) ? $row['domain'] : '' );
+				if ( '' === $h ) {
+					continue;
+				}
+				// Skip domains that already link to you, the competitor itself, or you.
+				if ( isset( $own_refs[ $h ] ) || $h === $own_host || in_array( $h, $competitors, true ) ) {
+					continue;
+				}
+				$rank = isset( $row['rank'] ) ? (int) $row['rank'] : 0;
+				if ( ! isset( $gap[ $h ] ) ) {
+					$gap[ $h ] = array(
+						'rank'        => $rank,
+						'competitors' => array(),
+					);
+				}
+				$gap[ $h ]['rank'] = max( $gap[ $h ]['rank'], $rank );
+				if ( ! in_array( $competitor, $gap[ $h ]['competitors'], true ) ) {
+					$gap[ $h ]['competitors'][] = $competitor;
+				}
+			}
+		}
+
+		// Sort the gap by rank desc so the best prospects lead.
+		uasort(
+			$gap,
+			static function ( $a, $b ) {
+				if ( $a['rank'] === $b['rank'] ) {
+					return 0;
+				}
+				return ( $a['rank'] > $b['rank'] ) ? -1 : 1;
+			}
+		);
+
+		set_transient( $cache_key, $gap, HOUR_IN_SECONDS * 6 );
+		return $gap;
 	}
 
 	/**

@@ -189,6 +189,11 @@ class RSSEO_Pro_Internal_Links {
         if ( ! $src || '' === $phrase || '' === $url ) {
             wp_send_json_error( __( 'Invalid suggestion.', 'real-smart-seo' ) );
         }
+        // Capability must be tied to the specific post being edited, not just
+        // a blanket manage_options check.
+        if ( ! current_user_can( 'edit_post', $source ) ) {
+            wp_send_json_error( __( 'You are not allowed to edit this post.', 'real-smart-seo' ) );
+        }
 
         $new_content = $this->insert_link( (string) $src->post_content, $phrase, $url );
         if ( null === $new_content ) {

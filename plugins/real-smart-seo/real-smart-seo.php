@@ -43,8 +43,6 @@ class RSSEO_Plugin {
     }
 
     private function __construct() {
-        register_activation_hook( __FILE__, array( $this, 'activate' ) );
-        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
         add_action( 'plugins_loaded', array( $this, 'init' ) );
         add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
     }
@@ -163,6 +161,12 @@ class RSSEO_Plugin {
 
     /** Brand layout CSS for hand-built + programmatic pages. */
     public function enqueue_brand_layout() {
+        // Only load on the programmatic location pages this CSS styles — not on
+        // every public page of the site.
+        $cpt = class_exists( 'RSSEO_Pro_Programmatic' ) ? RSSEO_Pro_Programmatic::CPT : 'mfc_location';
+        if ( ! is_singular( $cpt ) && ! is_post_type_archive( $cpt ) ) {
+            return;
+        }
         if ( file_exists( RSSEO_PATH . 'assets/css/brand-layout.css' ) ) {
             wp_enqueue_style( 'midland-brand-layout', RSSEO_URL . 'assets/css/brand-layout.css', array(), RSSEO_VERSION );
         }
@@ -170,3 +174,8 @@ class RSSEO_Plugin {
 }
 
 RSSEO_Plugin::get_instance();
+
+// Lifecycle hooks registered at file scope (not in the constructor) so they
+// always bind during the activation/deactivation request.
+register_activation_hook( __FILE__, array( RSSEO_Plugin::get_instance(), 'activate' ) );
+register_deactivation_hook( __FILE__, array( RSSEO_Plugin::get_instance(), 'deactivate' ) );

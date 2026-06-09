@@ -32,7 +32,9 @@ class RSSEO_Pro_AI_Rank {
         add_action( 'admin_init', array( $this, 'handle_run_now' ) );
         add_action( self::CRON_HOOK, array( $this, 'run_scan' ) );
         add_action( self::TICK_HOOK, array( $this, 'process_one' ), 10, 1 );
-        add_action( 'init', array( $this, 'maybe_schedule_cron' ) );
+        // Cron scheduling only needs admin context; running it on every
+        // front-end request is a needless wp_next_scheduled() lookup.
+        add_action( 'admin_init', array( $this, 'maybe_schedule_cron' ) );
     }
 
     public static function create_tables() {

@@ -260,8 +260,12 @@ class RSSEO_Pro_Growth_Digest {
             wp_die( esc_html__( 'Security check failed.', 'real-smart-seo' ) );
         }
 
-        update_option( self::OPT_ENABLED, isset( $_POST['gd_enabled'] ) ? 1 : 0 );
-        update_option( self::OPT_EMAIL,   sanitize_email( wp_unslash( $_POST['gd_email'] ?? '' ) ) );
+        // Only enable when a valid recipient is present — otherwise the cron
+        // would fire every run with nowhere to send.
+        $email   = sanitize_email( wp_unslash( $_POST['gd_email'] ?? '' ) );
+        $enabled = ( isset( $_POST['gd_enabled'] ) && is_email( $email ) ) ? 1 : 0;
+        update_option( self::OPT_ENABLED, $enabled );
+        update_option( self::OPT_EMAIL,   $email );
         $freq = sanitize_key( wp_unslash( $_POST['gd_freq'] ?? 'weekly' ) );
         update_option( self::OPT_FREQ, in_array( $freq, array( 'weekly', 'daily' ), true ) ? $freq : 'weekly' );
         update_option( self::OPT_CONTEXT, sanitize_textarea_field( wp_unslash( $_POST['gd_context'] ?? '' ) ) );

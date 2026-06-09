@@ -272,12 +272,18 @@ class MLS_Geogrid {
 			return;
 		}
 
-		$serp = MLS_DataForSEO::get_serp_at_coordinate(
+		// Local-pack (Google Maps) results, NOT organic — this is what local SEO
+		// ranking actually means for a map-pack/GBP business.
+		$serp = MLS_DataForSEO::get_local_pack_at_coordinate(
 			$run->keyword,
 			(float) $cell->lat,
-			(float) $cell->lng,
-			max( 1, (int) round( ( (float) $run->spacing_km ) / 2 ) )
+			(float) $cell->lng
 		);
+
+		// Map listings reliably carry the GBP business name but not always the
+		// website domain, so match on either signal.
+		$identity    = get_option( 'mls_identity', array() );
+		$target_name = isset( $identity['business_name'] ) ? (string) $identity['business_name'] : '';
 
 		$rank       = null;
 		$target_url = null;
@@ -287,7 +293,10 @@ class MLS_Geogrid {
 			$error_msg = substr( $serp->get_error_message(), 0, 250 );
 		} else {
 			foreach ( $serp as $row ) {
-				if ( $this->domain_matches( isset( $row['domain'] ) ? $row['domain'] : '', $run->target_domain ) ) {
+				$row_domain = isset( $row['domain'] ) ? $row['domain'] : '';
+				$row_title  = isset( $row['title'] ) ? $row['title'] : '';
+				if ( $this->domain_matches( $row_domain, $run->target_domain )
+					|| ( '' !== $target_name && $this->name_matches( $row_title, $target_name ) ) ) {
 					$rank       = (int) ( isset( $row['rank'] ) ? $row['rank'] : 0 );
 					$target_url = isset( $row['url'] ) ? $row['url'] : '';
 					break;
@@ -381,7 +390,31 @@ class MLS_Geogrid {
 		$target = strtolower( preg_replace( '#^https?://#', '', (string) $target ) );
 		$found  = preg_replace( '#^www\.#', '', $found );
 		$target = preg_replace( '#^www\.#', '', $target );
+		// Strip any path/query and trailing slash so a user entering
+		// "https://midlandfloors.com/" still matches "midlandfloors.com".
+		$found  = preg_replace( '#[/?].*$#', '', $found );
+		$target = preg_replace( '#[/?].*$#', '', $target );
+		if ( '' === $found || '' === $target ) {
+			return false;
+		}
 		return $found === $target || ( false !== strpos( $found, '.' . $target ) );
+	}
+
+	/**
+	 * Compare a found map-listing title to the target business name, ignoring
+	 * case, punctuation and spacing.
+	 *
+	 * @param string $found  Listing title from the map pack.
+	 * @param string $target Configured business name.
+	 * @return bool
+	 */
+	private function name_matches( $found, $target ) {
+		$found  = preg_replace( '/[^a-z0-9]+/', '', strtolower( (string) $found ) );
+		$target = preg_replace( '/[^a-z0-9]+/', '', strtolower( (string) $target ) );
+		if ( '' === $found || '' === $target ) {
+			return false;
+		}
+		return $found === $target || false !== strpos( $found, $target ) || false !== strpos( $target, $found );
 	}
 
 	/**
