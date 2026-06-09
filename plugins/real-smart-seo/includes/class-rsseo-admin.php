@@ -305,7 +305,7 @@ class RSSEO_Admin {
             $counts = wp_count_posts( 'mfc_location' );
             $stats['pages_built'] = (int) ( $counts->publish ?? 0 );
         }
-        $logs = get_option( 'rsseo_indexnow_logs', array() );
+        $logs = get_transient( 'rsseo_indexnow_logs' );
         $stats['urls_submitted'] = is_array( $logs ) ? count( $logs ) : 0;
 
         return $stats;
