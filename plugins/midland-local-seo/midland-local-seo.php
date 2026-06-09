@@ -3,7 +3,7 @@
  * Plugin Name: Midland Local SEO
  * Plugin URI: https://midlandfloors.com/local-seo
  * Description: Local SEO toolkit for Midland Floors — citation audit, LocalBusiness sameAs identity schema, Local Falcon geo-grid rank tracking, local backlink tracking, Google Business Profile mirror, GBP optimizer, and GMB competitor audit. Powered by DataForSEO (bring your own key).
- * Version: 1.1.8
+ * Version: 1.2.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL-2.0-or-later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MLS_VERSION', '1.1.8' );
+define( 'MLS_VERSION', '1.2.0' );
 define( 'MLS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MLS_URL', plugin_dir_url( __FILE__ ) );
 define( 'MLS_FILE', __FILE__ );
@@ -210,6 +210,20 @@ class MLS_Plugin {
 		}
 		if ( class_exists( 'MLS_Geogrid' ) ) {
 			MLS_Geogrid::create_tables();
+		}
+		// One-time on this update: overlay the canonical Midland identity over any
+		// stale saved profile (fixes the old name/coords and blank listing URLs),
+		// while preserving any extra keys the operator added. Guarded so it runs
+		// only once and never clobbers later edits.
+		if ( class_exists( 'MLS_SameAs' ) && ! get_option( 'mls_identity_refreshed_119' ) ) {
+			$current = get_option( 'mls_identity', array() );
+			$current = is_array( $current ) ? $current : array();
+			$merged  = array_merge( $current, MLS_SameAs::defaults() );
+			update_option( 'mls_identity', $merged );
+			if ( method_exists( 'MLS_SameAs', 'bridge_to_rsseo' ) ) {
+				MLS_SameAs::bridge_to_rsseo( $merged );
+			}
+			update_option( 'mls_identity_refreshed_119', 1 );
 		}
 		update_option( 'mls_db_version', MLS_VERSION );
 	}

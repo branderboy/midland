@@ -58,15 +58,17 @@ class MLS_GMB_Mirror {
 	 * @return array
 	 */
 	public static function default_categories() {
+		// Real, page-worthy services (the generic "Contractor"/"Flooring contractor"
+		// GBP categories are dropped — they don't make a useful service page).
 		return array(
-			'Flooring contractor',
-			'Contractor',
-			'Janitorial service',
-			'Tile cleaning service',
 			'Carpet cleaning service',
+			'Carpet installation',
+			'Hardwood floor cleaning',
+			'Tile cleaning service',
 			'Floor refinishing service',
-			'Upholstery cleaning service',
 			'Wood floor refinishing service',
+			'Upholstery cleaning service',
+			'Janitorial service',
 		);
 	}
 

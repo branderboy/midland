@@ -4,7 +4,7 @@ Tags: local seo, google business profile, citations, schema, rank tracking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.8
+Stable tag: 1.2.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,12 @@ The Citation Audit and sameAs / Identity modules work without it. Geo-Grid, GMB 
 Encrypted with AES-256-CBC using a key derived from your site's auth salt, with a random IV per value. It is never echoed back into the settings field.
 
 == Changelog ==
+
+= 1.2.0 =
+* Service Pages list cleaned up: dropped generic "Contractor" categories, added Carpet Installation + Hardwood Floor Cleaning.
+
+= 1.1.9 =
+* On update, force-refresh the saved profile to the canonical Midland data (one-time) so stale name/coords and blank listing URLs are corrected automatically.
 
 = 1.1.8 =
 * sameAs form now auto-fills every blank field with your Midland profile (existing installs no longer show empty profile URLs).
