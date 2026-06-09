@@ -58,7 +58,7 @@ class MLS_SameAs {
 		return array(
 			'business_name'        => 'Midland Floor Care',
 			'business_type'        => 'CleaningService',
-			'business_description' => 'Commercial & residential floor and carpet cleaning serving DC, Maryland, and Northern Virginia.',
+			'business_description' => 'Midland Floor Care is a leading commercial floor care service provider in the DMV area. We specialize in top-notch cleaning solutions for residential and commercial properties, delivering exceptional results with advanced techniques and eco-friendly products.',
 			'business_phone'       => '(240) 532-9097',
 			'business_email'       => 'support@midlandfloors.com',
 			'business_url'         => 'https://midlandfloors.com',

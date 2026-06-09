@@ -4,7 +4,7 @@ Tags: local seo, google business profile, citations, schema, rank tracking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,9 @@ The Citation Audit and sameAs / Identity modules work without it. Geo-Grid, GMB 
 Encrypted with AES-256-CBC using a key derived from your site's auth salt, with a random IV per value. It is never echoed back into the settings field.
 
 == Changelog ==
+
+= 1.1.3 =
+* GMB Mirror now drives Service Page recommendations from your REAL, editable GBP category list (pre-filled with your actual categories) instead of live API guesses. Profile description synced to your GBP description.
 
 = 1.1.2 =
 * GMB Mirror/Optimizer now pull listing data from the SERP Maps API (serp/google/maps) instead of the Business Data API, so plans without Business Data access work. Authorization errors degrade to a friendly notice; location-page recommendations always render.

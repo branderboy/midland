@@ -42,9 +42,63 @@ class MLS_GMB_Mirror {
 	/**
 	 * Bind hooks.
 	 */
+	const CATEGORIES_OPTION = 'mls_gmb_categories';
+
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 14 );
 		add_action( 'admin_post_mls_create_mirror_draft', array( $this, 'handle_create_draft' ) );
+		add_action( 'admin_init', array( $this, 'handle_save_categories' ) );
+	}
+
+	/**
+	 * Midland Floor Care's actual Google Business Profile categories (primary +
+	 * additional). Used so Service Page recommendations reflect the real listing,
+	 * never API guesses. Operator-editable on the Mirror page.
+	 *
+	 * @return array
+	 */
+	public static function default_categories() {
+		return array(
+			'Flooring contractor',
+			'Contractor',
+			'Janitorial service',
+			'Tile cleaning service',
+			'Carpet cleaning service',
+			'Floor refinishing service',
+			'Upholstery cleaning service',
+			'Wood floor refinishing service',
+		);
+	}
+
+	/**
+	 * Stored GBP categories (newline list), falling back to the real defaults so
+	 * the list is never empty.
+	 *
+	 * @return array
+	 */
+	public static function get_categories() {
+		$raw = get_option( self::CATEGORIES_OPTION, '' );
+		if ( ! is_string( $raw ) || '' === trim( $raw ) ) {
+			return self::default_categories();
+		}
+		$cats = array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', $raw ) ) );
+		return $cats ? array_values( $cats ) : self::default_categories();
+	}
+
+	/**
+	 * Persist the operator-edited GBP category list.
+	 */
+	public function handle_save_categories() {
+		if ( ! isset( $_POST['mls_save_gmb_categories'] ) || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$nonce = isset( $_POST['_mls_gmb_cats_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_mls_gmb_cats_nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'mls_save_gmb_categories' ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'midland-local-seo' ) );
+		}
+		update_option( self::CATEGORIES_OPTION, sanitize_textarea_field( wp_unslash( $_POST['gmb_categories'] ?? '' ) ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&cats_saved=1' ) );
+		exit;
 	}
 
 	/**
@@ -102,8 +156,9 @@ class MLS_GMB_Mirror {
 			'location' => array(),
 		);
 
-		// Service pages from primary + additional GBP categories.
-		$categories = array();
+		// Service pages from your REAL GBP categories (stored/editable), merged with
+		// anything the live listing returns — real data, never made up.
+		$categories = self::get_categories();
 		if ( is_array( $listing ) ) {
 			if ( ! empty( $listing['category'] ) ) {
 				$categories[] = (string) $listing['category'];
@@ -336,6 +391,19 @@ class MLS_GMB_Mirror {
 					<?php endif; ?>
 				</p></div>
 			<?php endif; ?>
+
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['cats_saved'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'GBP categories saved.', 'midland-local-seo' ); ?></p></div>
+			<?php endif; ?>
+
+			<h2><?php esc_html_e( 'Your GBP Categories', 'midland-local-seo' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Your real Google Business Profile categories, one per line. These drive the Service Page recommendations below, so they match your listing exactly. Pre-filled with your current categories — edit anytime.', 'midland-local-seo' ); ?></p>
+			<form method="post">
+				<?php wp_nonce_field( 'mls_save_gmb_categories', '_mls_gmb_cats_nonce' ); ?>
+				<textarea name="gmb_categories" rows="8" class="large-text" style="max-width:600px;"><?php echo esc_textarea( implode( "\n", self::get_categories() ) ); ?></textarea>
+				<p><button type="submit" name="mls_save_gmb_categories" value="1" class="button"><?php esc_html_e( 'Save categories', 'midland-local-seo' ); ?></button></p>
+			</form>
 
 			<h2><?php esc_html_e( 'Service Pages (from GBP categories)', 'midland-local-seo' ); ?></h2>
 			<?php if ( empty( $recs['service'] ) ) : ?>
