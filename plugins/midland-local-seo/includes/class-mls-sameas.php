@@ -677,7 +677,17 @@ class MLS_SameAs {
 	public function render_page() {
 		$defaults = self::defaults();
 		$stored   = get_option( self::OPTION, array() );
-		$d        = is_array( $stored ) && ! empty( $stored ) ? $stored : $defaults;
+		$stored   = is_array( $stored ) ? $stored : array();
+		// Pre-fill EVERY blank/missing field with the bundled Midland default so the
+		// form is always populated — existing installs have a partial saved profile,
+		// which is why the sameAs URLs looked empty. Non-empty saved values win.
+		$d = $stored;
+		foreach ( $defaults as $key => $value ) {
+			$is_blank = ! isset( $d[ $key ] ) || '' === $d[ $key ] || ( is_array( $value ) && empty( $d[ $key ] ) );
+			if ( $is_blank ) {
+				$d[ $key ] = $value;
+			}
+		}
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$saved = isset( $_GET['saved'] );
 
