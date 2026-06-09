@@ -4,7 +4,7 @@ Tags: seo, ai seo, content analysis, google search console, pagespeed, seo repor
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,9 @@ No. Your data is stored in your WordPress database and sent only to Perplexity's
 The free version crawls up to 500 URLs, which is sufficient for most small to medium sites.
 
 == Changelog ==
+
+= 2.1.0 =
+* Refocused on organic SEO. The sameAs / Identity schema, Geo-Grid (Local Falcon) rank tracking, and Backlinks modules have moved to the separate **Midland Local SEO** plugin. All organic features remain: audit, AI analysis, one-click fixes with rollback, programmatic city × service pages, internal links, keyword clustering, content briefs, schema, GSC cleanup, IndexNow, page speed, and rank tracking.
 
 = 1.0.1 =
 * Docs only: replaced stale Anthropic / Claude mentions with Perplexity Sonar. The underlying code has been Perplexity-backed since the switch; readme.txt was the last leftover.
