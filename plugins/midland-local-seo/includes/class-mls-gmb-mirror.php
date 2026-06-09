@@ -47,7 +47,49 @@ class MLS_GMB_Mirror {
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 14 );
 		add_action( 'admin_post_mls_create_mirror_draft', array( $this, 'handle_create_draft' ) );
+		add_action( 'admin_post_mls_create_all_services', array( $this, 'handle_create_all_services' ) );
 		add_action( 'admin_init', array( $this, 'handle_save_categories' ) );
+	}
+
+	/**
+	 * Bulk-create a full draft page for every service category that does not yet
+	 * have one. One click instead of clicking each row.
+	 */
+	public function handle_create_all_services() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_create_all_services' );
+
+		// Prefer the Smart SEO programmatic engine so pages render in the site's
+		// Elementor template; fall back to a plain page when it is not active.
+		$engine  = class_exists( 'RSSEO_Pro_Programmatic' ) && method_exists( 'RSSEO_Pro_Programmatic', 'generate_service_page' );
+		$created = 0;
+		foreach ( self::get_categories() as $service ) {
+			$service = trim( (string) $service );
+			if ( '' === $service || $this->existing_post_id( $service ) ) {
+				continue;
+			}
+			if ( $engine ) {
+				$post_id = RSSEO_Pro_Programmatic::generate_service_page( $service, array( 'status' => 'draft', 'ping' => false ) );
+			} else {
+				$post_id = wp_insert_post(
+					array(
+						'post_title'   => $service,
+						'post_name'    => sanitize_title( $service ),
+						'post_content' => $this->build_service_content( $service ),
+						'post_status'  => 'draft',
+						'post_type'    => 'page',
+					),
+					true
+				);
+			}
+			if ( ! is_wp_error( $post_id ) && $post_id ) {
+				++$created;
+			}
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&bulk_created=' . (int) $created ) );
+		exit;
 	}
 
 	/**
@@ -304,9 +346,19 @@ class MLS_GMB_Mirror {
 			exit;
 		}
 
-		// Service-page recommendation: replace the thin stub with full, structured
-		// content (the same H2/process/FAQ structure as the programmatic engine).
+		// Service-page recommendation: prefer the Smart SEO programmatic engine so
+		// the page renders in the site's Elementor template; fall back to a full
+		// structured HTML page when the engine is not active.
 		if ( ! $is_location ) {
+			if ( class_exists( 'RSSEO_Pro_Programmatic' ) && method_exists( 'RSSEO_Pro_Programmatic', 'generate_service_page' ) ) {
+				$result = RSSEO_Pro_Programmatic::generate_service_page( $title, array( 'status' => 'draft', 'ping' => false ) );
+				if ( is_wp_error( $result ) || ! $result ) {
+					wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&error=1' ) );
+					exit;
+				}
+				wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&created=' . (int) $result . '&via=engine' ) );
+				exit;
+			}
 			$full = $this->build_service_content( $title );
 			if ( '' !== trim( $full ) ) {
 				$stub = $full;
@@ -453,7 +505,23 @@ class MLS_GMB_Mirror {
 				<p><button type="submit" name="mls_save_gmb_categories" value="1" class="button"><?php esc_html_e( 'Save categories', 'midland-local-seo' ); ?></button></p>
 			</form>
 
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['bulk_created'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>
+					<?php
+					/* translators: %d: number of pages created */
+					echo esc_html( sprintf( _n( '%d service page draft created.', '%d service page drafts created.', (int) $_GET['bulk_created'], 'midland-local-seo' ), (int) $_GET['bulk_created'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					?>
+				</p></div>
+			<?php endif; ?>
+
 			<h2><?php esc_html_e( 'Service Pages (from GBP categories)', 'midland-local-seo' ); ?></h2>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
+				<?php wp_nonce_field( 'mls_create_all_services' ); ?>
+				<input type="hidden" name="action" value="mls_create_all_services">
+				<button type="submit" class="button button-primary" onclick="return confirm('Create a draft page for every missing service?');"><?php esc_html_e( '⚡ Create all missing service pages', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'One click. Each renders in your Elementor template when Smart SEO is active.', 'midland-local-seo' ); ?></span>
+			</form>
 			<?php if ( empty( $recs['service'] ) ) : ?>
 				<p class="description"><?php esc_html_e( 'No GBP categories available. Connect DataForSEO and ensure your business name matches your listing.', 'midland-local-seo' ); ?></p>
 			<?php else : ?>
