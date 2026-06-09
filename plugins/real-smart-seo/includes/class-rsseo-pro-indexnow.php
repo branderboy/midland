@@ -251,7 +251,10 @@ class RSSEO_Pro_IndexNow {
     }
 
     private function log( $url, $service, $code ) {
-        $logs   = get_option( 'rsseo_indexnow_logs', array() );
+        $logs = get_transient( 'rsseo_indexnow_logs' );
+        if ( ! is_array( $logs ) ) {
+            $logs = array();
+        }
         $logs[] = array(
             'time'    => current_time( 'mysql' ),
             'url'     => substr( $url, 0, 200 ),
@@ -262,7 +265,9 @@ class RSSEO_Pro_IndexNow {
         if ( count( $logs ) > 100 ) {
             $logs = array_slice( $logs, -100 );
         }
-        update_option( 'rsseo_indexnow_logs', $logs );
+        // Stored as a (non-autoloaded) transient so a ping firing on every post
+        // publish doesn't rewrite an autoloaded option and thrash the cache.
+        set_transient( 'rsseo_indexnow_logs', $logs, YEAR_IN_SECONDS );
     }
 
     public function render_page() {
@@ -271,7 +276,8 @@ class RSSEO_Pro_IndexNow {
         $rui_key    = get_option( 'rsseo_rui_api_key', '' );
         $rui_enabled = get_option( 'rsseo_rui_enabled', 0 );
         $post_types = get_option( 'rsseo_indexnow_post_types', array( 'post', 'page', 'mfc_location' ) );
-        $logs       = array_reverse( get_option( 'rsseo_indexnow_logs', array() ) );
+        $logs_raw   = get_transient( 'rsseo_indexnow_logs' );
+        $logs       = array_reverse( is_array( $logs_raw ) ? $logs_raw : array() );
 
         // phpcs:disable WordPress.Security.NonceVerification.Recommended
         $saved       = isset( $_GET['saved'] );

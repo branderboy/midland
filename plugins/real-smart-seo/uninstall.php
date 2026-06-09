@@ -30,3 +30,12 @@ $wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
     "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
     $wpdb->esc_like( 'rsseo_' ) . '%'
 ) );
+
+// Transients (e.g. the IndexNow ping log) live under the _transient_ prefix, so
+// the rsseo_ wildcard above doesn't reach them.
+delete_transient( 'rsseo_indexnow_logs' );
+$wpdb->query( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+    $wpdb->esc_like( '_transient_rsseo_' ) . '%',
+    $wpdb->esc_like( '_transient_timeout_rsseo_' ) . '%'
+) );
