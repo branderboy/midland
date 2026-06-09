@@ -4,7 +4,7 @@ Tags: local seo, google business profile, citations, schema, rank tracking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,9 @@ The Citation Audit and sameAs / Identity modules work without it. Geo-Grid, GMB 
 Encrypted with AES-256-CBC using a key derived from your site's auth salt, with a random IV per value. It is never echoed back into the settings field.
 
 == Changelog ==
+
+= 1.1.6 =
+* GMB Competitor Audit + Optimizer now show a clear, actionable notice on DataForSEO authorization errors (instead of a raw error); checklists still render.
 
 = 1.1.5 =
 * More precise business coordinates (38.8222169, -76.9356121) for geo + geo-grid center.
