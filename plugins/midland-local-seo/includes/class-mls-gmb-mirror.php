@@ -325,7 +325,16 @@ class MLS_GMB_Mirror {
 			<?php if ( ! $configured ) : ?>
 				<div class="notice notice-warning"><p><?php esc_html_e( 'DataForSEO is not configured, so GBP categories/posts cannot be pulled. Location-page recommendations from your service areas are still shown below. Connect DataForSEO on the dashboard for full mirroring.', 'midland-local-seo' ); ?></p></div>
 			<?php elseif ( '' !== $listing_error ) : ?>
-				<div class="notice notice-error"><p><?php echo esc_html( $listing_error ); ?></p></div>
+				<?php $is_auth = ( false !== stripos( $listing_error, 'not authorized' ) || false !== stripos( $listing_error, 'access denied' ) || false !== stripos( $listing_error, '40301' ) ); ?>
+				<div class="notice notice-warning"><p>
+					<?php if ( $is_auth ) : ?>
+						<strong><?php esc_html_e( 'Live GBP data unavailable.', 'midland-local-seo' ); ?></strong>
+						<?php esc_html_e( 'Your DataForSEO plan doesn’t have access to the Maps API this needs. Enable it in your DataForSEO API access — or ignore this, the location-page recommendations below work without it.', 'midland-local-seo' ); ?>
+						<a href="https://app.dataforseo.com/api-access" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'DataForSEO API access', 'midland-local-seo' ); ?></a>
+					<?php else : ?>
+						<?php /* translators: %s: error message */ echo esc_html( sprintf( __( 'GBP data could not be pulled: %s. Recommendations below still work.', 'midland-local-seo' ), $listing_error ) ); ?>
+					<?php endif; ?>
+				</p></div>
 			<?php endif; ?>
 
 			<h2><?php esc_html_e( 'Service Pages (from GBP categories)', 'midland-local-seo' ); ?></h2>

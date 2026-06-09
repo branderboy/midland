@@ -515,11 +515,10 @@ class MLS_DataForSEO {
 	/**
 	 * Fetch a Google Business Profile listing for the GMB optimizer.
 	 *
-	 * Uses DataForSEO Business Data: business_data/business_listings/search/live.
-	 * The endpoint filters business listings by a "title" filter and (optionally)
-	 * a location_coordinate. Field names below follow the documented
-	 * business_listings response; anything missing degrades to null/empty so the
-	 * optimizer never fatals.
+	 * Uses the SERP Maps endpoint (serp/google/maps/live/advanced) and name-matches
+	 * the listing — the Business Data API is a separate DataForSEO product many plans
+	 * don't include. Field names follow the maps_search response; anything missing
+	 * degrades to null/empty so the optimizer/mirror never fatals.
 	 *
 	 * @param string     $name Business name to match.
 	 * @param float|null $lat  Optional latitude to bias the search.
@@ -538,19 +537,23 @@ class MLS_DataForSEO {
 			return $cached;
 		}
 
-		$task = array(
-			'filters'  => array(
-				array( 'title', 'like', '%' . $name . '%' ),
+		// Use the SERP Maps endpoint (serp/google/maps/live/advanced) rather than the
+		// Business Data API. Many DataForSEO plans include SERP but NOT Business Data,
+		// and the maps_search items carry the same listing fields we need (rating,
+		// category, additional_categories, photos, hours, address, phone, url).
+		$payload = array(
+			array(
+				'keyword'       => $name,
+				'language_code' => 'en',
+				'depth'         => 20,
 			),
-			'order_by' => array( 'rating.value,desc' ),
-			'limit'    => 5,
 		);
 		if ( null !== $lat && null !== $lng ) {
-			// Documented format: "lat,lng,radius_in_meters".
-			$task['location_coordinate'] = sprintf( '%F,%F,%d', (float) $lat, (float) $lng, 50000 );
+			// Maps "location_coordinate" is "lat,lng,zoom" (zoom 0-21).
+			$payload[0]['location_coordinate'] = sprintf( '%F,%F,%d', (float) $lat, (float) $lng, 14 );
 		}
 
-		$result = self::post( 'business_data/business_listings/search/live', array( $task ) );
+		$result = self::post( 'serp/google/maps/live/advanced', $payload );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
