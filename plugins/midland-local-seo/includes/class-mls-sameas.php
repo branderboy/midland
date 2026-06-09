@@ -90,6 +90,7 @@ class MLS_SameAs {
 			'yelp_url'             => 'https://www.yelp.com/biz/midland-floor-care-temple-hills',
 			'angi_url'             => 'https://www.angi.com/companylist/us/md/temple-hills/midland-floor-care-llc-reviews-1.htm',
 			'homeadvisor_url'      => 'https://www.homeadvisor.com/rated.MidlandFloorCareLLC.88023128.html',
+			'nextdoor_url'         => 'https://nextdoor.com/pages/midland-floor-care',
 			'bing_places_url'      => 'https://www.bing.com/maps?ss=ypid.YNB7AD81AE2B17BE92',
 			// Listings without a dedicated field — one URL per line, merged into sameAs.
 			'extra_sameas'         => "https://www.mapquest.com/us/maryland/midland-floor-care-412618388\nhttps://www.yellowpages.com/temple-hills-md/mip/midland-floor-care-502822336\nhttps://www.manta.com/c/mhkty5k/midland-floor-care\nhttps://www.thebluebook.com/iProView/1330703/midland-floor-care-llc/subcontractors/\nhttps://pgcocmd.chambermaster.com/list/member/midland-floor-care-llc-2875",
