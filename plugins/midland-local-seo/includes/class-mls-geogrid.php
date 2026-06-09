@@ -474,13 +474,18 @@ class MLS_Geogrid {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
 		}
+		// Default the center to the business location from the Profile, and the
+		// keyword to the top real search term, so the grid is ready to run.
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$def_lat  = ( isset( $identity['center_lat'] ) && '' !== $identity['center_lat'] ) ? (float) $identity['center_lat'] : 38.9847;
+		$def_lng  = ( isset( $identity['center_lng'] ) && '' !== $identity['center_lng'] ) ? (float) $identity['center_lng'] : -77.0947;
 		$settings = wp_parse_args(
 			get_option( 'mls_geogrid_settings', array() ),
 			array(
-				'keyword'       => '',
+				'keyword'       => 'commercial carpet cleaning',
 				'target_domain' => wp_parse_url( home_url(), PHP_URL_HOST ),
-				'center_lat'    => 38.9847,
-				'center_lng'    => -77.0947,
+				'center_lat'    => $def_lat,
+				'center_lng'    => $def_lng,
 				'grid_size'     => 5,
 				'spacing_km'    => 1.5,
 			)
