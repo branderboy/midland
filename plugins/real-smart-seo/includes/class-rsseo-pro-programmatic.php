@@ -86,12 +86,36 @@ class RSSEO_Pro_Programmatic {
     private function default_templates() {
         return array(
             'title' => '{service} in {city}, {state} | {business}',
-            'meta'  => 'Expert {services} in {city}, {state}. {business} serves the DMV area — licensed, insured, same-day available. Free quote.',
+            'meta'  => 'Professional {services} in {city}, {state}. {business} serves the DMV with reliable, affordable floor care and same day service. Request your free quote today.',
             'slug'  => '{service}-{city}-{state}',
             'body'  => "<h2>Professional {service} in {city}, {state}</h2>\n"
-                . "<p>{business} proudly serves {city} and the surrounding {state} area with expert floor care — including {services}. Our certified technicians bring professional-grade equipment to your home or business.</p>\n"
-                . "<h3>Services available in {city}, {state}</h3>\n{services_list}\n"
-                . "<p>Ready to start? <a href=\"/contact/\">Request a free quote</a> or call {phone}. We serve {city} and every surrounding neighborhood in {state}.</p>",
+                . "<p>{business} provides expert {service} for homes and businesses throughout {city} and the surrounding {state} area. Our trained technicians use professional grade equipment and safe, effective products to deliver clean, refreshed results you can see and feel.</p>\n"
+                . "<h2>Our {service} Services in {city}</h2>\n"
+                . "<p>We tailor every job to your space, whether it is a single room or a large commercial property. Services we offer in {city} include:</p>\n"
+                . "{services_list}\n"
+                . "<h2>Why Choose {business} for {service}?</h2>\n"
+                . "<ul>\n"
+                . "<li>Years of trusted floor care experience across {city} and the DMV.</li>\n"
+                . "<li>Commercial grade equipment and eco friendly products that are safe for your family and staff.</li>\n"
+                . "<li>Same day and next day service available in most areas.</li>\n"
+                . "<li>Reliable, efficient, and affordable, with clear pricing and no surprises.</li>\n"
+                . "</ul>\n"
+                . "<h2>Our {service} Process</h2>\n"
+                . "<ol>\n"
+                . "<li>We evaluate your space and recommend the right approach.</li>\n"
+                . "<li>We prep the area and protect your surroundings.</li>\n"
+                . "<li>We deep clean and restore using proven methods.</li>\n"
+                . "<li>We walk the finished job with you to make sure you are happy.</li>\n"
+                . "</ol>\n"
+                . "<h2>{service} Across {city} and Nearby</h2>\n"
+                . "<p>{business} proudly serves {city}, {state} and every surrounding neighborhood. If you do not see your area listed, call us. We likely cover it.</p>\n"
+                . "<h2>Frequently Asked Questions</h2>\n"
+                . "<h3>How soon can you schedule {service} in {city}?</h3>\n"
+                . "<p>Same day or next day service is available in most of {city} and the surrounding {state} area. Call us to check current availability.</p>\n"
+                . "<h3>Do you serve both homes and businesses?</h3>\n"
+                . "<p>Yes. We provide {service} for residential and commercial properties, from single homes to offices, retail, and shopping centers.</p>\n"
+                . "<h2>Get a Free {service} Quote in {city}</h2>\n"
+                . "<p>Ready to get started? <a href=\"/contact/\">Request a free quote</a> or call {phone}. {business} serves {city}, {state} and the entire DMV.</p>",
             'use_elementor' => 1,
         );
     }

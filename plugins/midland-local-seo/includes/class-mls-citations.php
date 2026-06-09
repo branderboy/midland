@@ -150,7 +150,35 @@ class MLS_Citations {
 	 */
 	public static function get_citations() {
 		$stored = get_option( self::OPTION, array() );
-		return is_array( $stored ) ? $stored : array();
+		if ( ! is_array( $stored ) || empty( $stored ) ) {
+			return self::default_citations();
+		}
+		return $stored;
+	}
+
+	/**
+	 * Midland Floor Care's known citations, so the audit is populated out of the
+	 * box instead of showing an empty table. Operator edits (saved option) win.
+	 *
+	 * @return array slug => { status, url, nap }
+	 */
+	public static function default_citations() {
+		$nap = 'Midland Floor Care | (240) 532-9097';
+		return array(
+			'google_business' => array( 'status' => 'verified', 'url' => 'https://www.google.com/maps/place/?q=place_id:ChIJ59SJ6ue7t4kRIVMYpQVYY6Y', 'nap' => $nap ),
+			'bing_places'     => array( 'status' => 'listed', 'url' => 'https://www.bing.com/maps?ss=ypid.YNB7AD81AE2B17BE92', 'nap' => $nap ),
+			'apple_maps'      => array( 'status' => 'listed', 'url' => 'https://maps.apple.com/place?place-id=IAC53429102E051F4&name=Midland+Floor+Care', 'nap' => $nap ),
+			'facebook'        => array( 'status' => 'listed', 'url' => 'https://www.facebook.com/midlandfloorcare/', 'nap' => $nap ),
+			'yelp'            => array( 'status' => 'listed', 'url' => 'https://www.yelp.com/biz/midland-floor-care-temple-hills', 'nap' => $nap ),
+			'nextdoor'        => array( 'status' => 'listed', 'url' => 'https://nextdoor.com/pages/midland-floor-care', 'nap' => $nap ),
+			'angi'            => array( 'status' => 'listed', 'url' => 'https://www.angi.com/companylist/us/md/temple-hills/midland-floor-care-llc-reviews-1.htm', 'nap' => $nap ),
+			'homeadvisor'     => array( 'status' => 'listed', 'url' => 'https://www.homeadvisor.com/rated.MidlandFloorCareLLC.88023128.html', 'nap' => $nap ),
+			'yellowpages'     => array( 'status' => 'inconsistent', 'url' => 'https://www.yellowpages.com/temple-hills-md/mip/midland-floor-care-502822336', 'nap' => 'Midland Floor Care | (240) 455-6495' ),
+			'manta'           => array( 'status' => 'listed', 'url' => 'https://www.manta.com/c/mhkty5k/midland-floor-care', 'nap' => $nap ),
+			'chamber'         => array( 'status' => 'listed', 'url' => 'https://pgcocmd.chambermaster.com/list/member/midland-floor-care-llc-2875', 'nap' => 'Midland Floor Care, LLC | (240) 532-9097' ),
+			'linkedin'        => array( 'status' => 'listed', 'url' => 'https://www.linkedin.com/company/midland-floor-care-llc/', 'nap' => $nap ),
+			'instagram'       => array( 'status' => 'verified', 'url' => 'https://www.instagram.com/midlandfloors/', 'nap' => 'Midland Floors | (240) 532-9097' ),
+		);
 	}
 
 	/**
