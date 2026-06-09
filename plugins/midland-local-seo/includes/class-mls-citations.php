@@ -131,9 +131,15 @@ class MLS_Citations {
 			if ( ! array_key_exists( $status, $statuses ) ) {
 				$status = '';
 			}
+			$url = isset( $row['url'] ) ? esc_url_raw( $row['url'] ) : '';
+			// If a listing URL was entered but the status was left blank, mark it
+			// Listed automatically — a URL means the listing exists.
+			if ( '' !== $url && '' === $status ) {
+				$status = 'listed';
+			}
 			$clean[ $slug ] = array(
 				'status' => $status,
-				'url'    => isset( $row['url'] ) ? esc_url_raw( $row['url'] ) : '',
+				'url'    => $url,
 				'nap'    => isset( $row['nap'] ) ? sanitize_text_field( $row['nap'] ) : '',
 			);
 		}
@@ -193,7 +199,10 @@ class MLS_Citations {
 		$listed   = 0;
 		foreach ( $registry as $slug => $info ) {
 			$status = isset( $cites[ $slug ]['status'] ) ? $cites[ $slug ]['status'] : '';
-			if ( 'listed' === $status || 'verified' === $status ) {
+			$url    = isset( $cites[ $slug ]['url'] ) ? trim( (string) $cites[ $slug ]['url'] ) : '';
+			// Count it as covered if marked Listed/Verified OR if a listing URL has
+			// been added (you can't have a listing URL without being listed there).
+			if ( 'listed' === $status || 'verified' === $status || '' !== $url ) {
 				++$listed;
 			}
 		}
