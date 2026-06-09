@@ -161,6 +161,117 @@ class RSSEO_Pro_Programmatic {
     /* ============================================================ */
 
     /**
+     * Create or update a single mfc_location page via the programmatic engine.
+     *
+     * Public + static so the Midland Local SEO plugin can drive this engine to
+     * produce a real location page (instead of its own draft fallback). This is
+     * the single reusable path used by handle_save_location(), handle_bulk_generate(),
+     * and external callers. Callers MUST enforce their own capability + nonce
+     * checks before calling — this method performs no auth.
+     *
+     * @param string $city     City name (already sanitized by caller).
+     * @param string $state    State / region (already sanitized by caller).
+     * @param array  $services Service names to attach (mfc_service terms + meta).
+     * @param array  $args     Optional: 'status' (draft|publish, default publish),
+     *                         'wiki_url' (string), 'ping' (bool, default true).
+     * @return int|WP_Error    New/existing post ID, or WP_Error on failure.
+     */
+    public static function generate_location_page( $city, $state, $services = array() ) {
+        $args = func_num_args() > 3 ? func_get_arg( 3 ) : array();
+        if ( ! is_array( $args ) ) {
+            $args = array();
+        }
+
+        $city     = sanitize_text_field( (string) $city );
+        $state    = sanitize_text_field( (string) $state );
+        $services = array_values( array_filter( array_map( 'sanitize_text_field', (array) $services ) ) );
+        $status   = ( isset( $args['status'] ) && 'publish' === $args['status'] ) ? 'publish' : 'draft';
+        $wiki_url = isset( $args['wiki_url'] ) ? esc_url_raw( (string) $args['wiki_url'] ) : '';
+        $ping     = ! isset( $args['ping'] ) || (bool) $args['ping'];
+
+        if ( '' === $city ) {
+            return new WP_Error( 'rsseo_no_city', __( 'A city is required to generate a location page.', 'real-smart-seo' ) );
+        }
+
+        $self = self::get_instance();
+
+        // Match on city+state meta so "Bethesda, MD" and "Bethesda, OH" don't collide.
+        $existing = get_posts( array(
+            'post_type'   => self::CPT,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+            'meta_query'  => array(
+                'relation' => 'AND',
+                array( 'key' => '_mfc_city', 'value' => $city, 'compare' => '=' ),
+                array( 'key' => '_mfc_state', 'value' => $state, 'compare' => '=' ),
+            ),
+            'fields'      => 'ids',
+            'numberposts' => 1,
+        ) );
+
+        $content = $self->generate_location_content( $city, $state, $services );
+
+        if ( $existing ) {
+            $post_id = $existing[0];
+            wp_update_post( array(
+                'ID'           => $post_id,
+                'post_status'  => $status,
+                'post_content' => $content,
+            ) );
+        } else {
+            $post_id = wp_insert_post( array(
+                'post_type'    => self::CPT,
+                'post_title'   => $city . ', ' . $state,
+                'post_name'    => $self->build_slug( $city, $state, $services ),
+                'post_status'  => $status,
+                'post_content' => $content,
+            ) );
+        }
+
+        if ( is_wp_error( $post_id ) ) {
+            return $post_id;
+        }
+        if ( ! $post_id ) {
+            return new WP_Error( 'rsseo_insert_fail', __( 'Could not create the location page.', 'real-smart-seo' ) );
+        }
+
+        update_post_meta( $post_id, '_mfc_city', $city );
+        update_post_meta( $post_id, '_mfc_state', $state );
+        if ( '' !== $wiki_url ) {
+            update_post_meta( $post_id, '_mfc_wiki_url', $wiki_url );
+        }
+        update_post_meta( $post_id, '_mfc_services', $services );
+
+        if ( $self->get_templates()['use_elementor'] ) {
+            $self->apply_elementor_template( $post_id, $city, $state, $services );
+        }
+
+        // Assign mfc_service terms (create missing).
+        $term_ids = array();
+        foreach ( $services as $service ) {
+            $term = get_term_by( 'name', $service, self::TAXONOMY );
+            if ( ! $term ) {
+                $term = wp_insert_term( $service, self::TAXONOMY );
+                if ( ! is_wp_error( $term ) ) {
+                    $term_ids[] = $term['term_id'];
+                }
+            } else {
+                $term_ids[] = $term->term_id;
+            }
+        }
+        wp_set_post_terms( $post_id, array_filter( $term_ids ), self::TAXONOMY );
+
+        // IndexNow only for published pages — never announce a draft.
+        if ( $ping && 'publish' === get_post_status( $post_id ) ) {
+            $permalink = get_permalink( $post_id );
+            if ( $permalink ) {
+                do_action( 'rsseo_indexnow_ping', $permalink );
+            }
+        }
+
+        return (int) $post_id;
+    }
+
+    /**
      * Save or update a single location's meta (city, state, Wikipedia URL, service list).
      */
     public function handle_save_location() {
@@ -189,58 +300,14 @@ class RSSEO_Pro_Programmatic {
             exit;
         }
 
-        // Check if location CPT post exists.
-        $existing = get_posts( array(
-            'post_type'  => self::CPT,
-            'title'      => $city . ', ' . $state,
-            'fields'     => 'ids',
-            'numberposts' => 1,
+        $post_id = self::generate_location_page( $city, $state, $services, array(
+            'status'   => $status,
+            'wiki_url' => $wiki_url,
         ) );
-
-        if ( $existing ) {
-            $post_id = $existing[0];
-        } else {
-            $post_id = wp_insert_post( array(
-                'post_type'   => self::CPT,
-                'post_title'  => $city . ', ' . $state,
-                'post_name'   => $this->build_slug( $city, $state, $services ),
-                'post_status' => $status,
-                'post_content' => $this->generate_location_content( $city, $state, $services ),
-            ) );
-        }
 
         if ( is_wp_error( $post_id ) ) {
             wp_safe_redirect( admin_url( 'admin.php?page=rsseo-programmatic&error=insert_fail' ) );
             exit;
-        }
-
-        update_post_meta( $post_id, '_mfc_city', $city );
-        update_post_meta( $post_id, '_mfc_state', $state );
-        update_post_meta( $post_id, '_mfc_wiki_url', $wiki_url );
-        update_post_meta( $post_id, '_mfc_services', $services );
-
-        if ( $this->get_templates()['use_elementor'] ) {
-            $this->apply_elementor_template( $post_id, $city, $state, $services );
-        }
-
-        // Assign service terms.
-        $term_ids = array();
-        foreach ( $services as $service ) {
-            $term = get_term_by( 'name', $service, self::TAXONOMY );
-            if ( ! $term ) {
-                $term = wp_insert_term( $service, self::TAXONOMY );
-                if ( ! is_wp_error( $term ) ) {
-                    $term_ids[] = $term['term_id'];
-                }
-            } else {
-                $term_ids[] = $term->term_id;
-            }
-        }
-        wp_set_post_terms( $post_id, $term_ids, self::TAXONOMY );
-
-        // Trigger IndexNow only for published pages — never announce a draft.
-        if ( 'publish' === get_post_status( $post_id ) ) {
-            do_action( 'rsseo_indexnow_ping', get_permalink( $post_id ) );
         }
 
         wp_safe_redirect( admin_url( 'admin.php?page=rsseo-programmatic&location_saved=1&post_id=' . $post_id ) );
@@ -263,7 +330,6 @@ class RSSEO_Pro_Programmatic {
         $raw_locations = sanitize_textarea_field( wp_unslash( $_POST['bulk_locations'] ?? '' ) );
         $bulk_services = isset( $_POST['bulk_services'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bulk_services'] ) ) : array();
         $status        = ( 'publish' === sanitize_key( wp_unslash( $_POST['bulk_status'] ?? 'draft' ) ) ) ? 'publish' : 'draft';
-        $use_elementor = (bool) $this->get_templates()['use_elementor'];
 
         // Quality guard: generating pages with no services = thin doorway pages.
         if ( empty( $bulk_services ) ) {
@@ -297,7 +363,8 @@ class RSSEO_Pro_Programmatic {
                 continue;
             }
 
-            // Match on city+state so "Bethesda, MD" and "Bethesda, OH" don't collide.
+            // Detect existing so we can keep the created/updated tally; the page
+            // create/update itself is delegated to the shared engine method.
             $existing = get_posts( array(
                 'post_type'   => self::CPT,
                 // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
@@ -310,53 +377,22 @@ class RSSEO_Pro_Programmatic {
                 'numberposts' => 1,
             ) );
 
-            if ( $existing ) {
-                $post_id = $existing[0];
-                // Refresh content and status so re-running with an updated template
-                // or a new status (draft → publish) takes effect on existing pages.
-                wp_update_post( array(
-                    'ID'           => $post_id,
-                    'post_status'  => $status,
-                    'post_content' => $this->generate_location_content( $city, $state, $bulk_services ),
-                ) );
-                $updated++;
-            } else {
-                $post_id = wp_insert_post( array(
-                    'post_type'    => self::CPT,
-                    'post_title'   => $city . ', ' . $state,
-                    'post_name'    => $this->build_slug( $city, $state, $bulk_services ),
-                    'post_status'  => $status,
-                    'post_content' => $this->generate_location_content( $city, $state, $bulk_services ),
-                ) );
-                $created++;
-            }
+            // ping=false: IndexNow is batched once after the loop.
+            $post_id = self::generate_location_page( $city, $state, $bulk_services, array(
+                'status'   => $status,
+                'wiki_url' => $wiki,
+                'ping'     => false,
+            ) );
 
             if ( is_wp_error( $post_id ) ) {
                 continue;
             }
 
-            update_post_meta( $post_id, '_mfc_city', $city );
-            update_post_meta( $post_id, '_mfc_state', $state );
-            if ( $wiki ) {
-                update_post_meta( $post_id, '_mfc_wiki_url', esc_url_raw( $wiki ) );
+            if ( $existing ) {
+                $updated++;
+            } else {
+                $created++;
             }
-            update_post_meta( $post_id, '_mfc_services', $bulk_services );
-
-            if ( $use_elementor ) {
-                $this->apply_elementor_template( $post_id, $city, $state, $bulk_services );
-            }
-
-            $term_ids = array();
-            foreach ( $bulk_services as $service ) {
-                $term = get_term_by( 'name', $service, self::TAXONOMY );
-                if ( ! $term ) {
-                    $term = wp_insert_term( $service, self::TAXONOMY );
-                    $term_ids[] = is_wp_error( $term ) ? 0 : $term['term_id'];
-                } else {
-                    $term_ids[] = $term->term_id;
-                }
-            }
-            wp_set_post_terms( $post_id, array_filter( $term_ids ), self::TAXONOMY );
 
             // Only announce published pages to IndexNow — never drafts.
             if ( 'publish' === get_post_status( $post_id ) ) {

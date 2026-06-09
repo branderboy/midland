@@ -121,7 +121,7 @@ class RSSEO_Admin {
 
         // Tabs follow the Settings → Audit → Analysis → Fix Queue → Content → Internal Links → Indexing → Reports pipeline.
         // Fix Queue = where Apply Fixes cards live.
-        // Reports   = history archive + measurement tools (rankings, geo-grid, backlinks).
+        // Reports   = history archive + measurement tools (rankings, page speed).
         $tabs = array(
             'dashboard' => __( 'Dashboard',       'real-smart-seo' ),
             'settings'  => __( 'Settings',        'real-smart-seo' ),
@@ -479,7 +479,7 @@ class RSSEO_Admin {
 
     /**
      * Reports — history of past analyses plus the measurement tools (rankings,
-     * geo-grid, backlinks). Single-report drill-down still works via ?report_id.
+     * page speed). Single-report drill-down still works via ?report_id.
      */
     public function page_reports_archive() {
         if ( ! current_user_can( 'manage_options' ) ) {
@@ -552,7 +552,6 @@ class RSSEO_Admin {
                 echo '<div class="rsseo-insights-card">';
                 echo '<h3>' . esc_html__( 'Schema applied', 'real-smart-seo' ) . '</h3>';
                 echo '<p><strong>' . esc_html( $schema_count ) . '</strong> ' . esc_html__( 'schema blocks active', 'real-smart-seo' ) . '</p>';
-                echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=rsseo-sameas' ) ) . '">' . esc_html__( 'Manage Schema →', 'real-smart-seo' ) . '</a>';
                 echo '</div>';
             }
 
@@ -568,17 +567,13 @@ class RSSEO_Admin {
             echo '<hr style="margin:28px 0;">';
         }
 
-        // Tracking tools — rankings, geo-grid.
+        // Tracking tools — rankings, page speed.
         echo '<h2>' . esc_html__( 'Tracking', 'real-smart-seo' ) . '</h2>';
         echo '<div class="rsseo-insights-grid" style="margin-bottom:28px;">';
 
         echo '<div class="rsseo-insights-card"><h3>' . esc_html__( 'Keyword Rankings', 'real-smart-seo' ) . '</h3>';
         echo '<p>' . esc_html__( 'Track where you rank for each target keyword across Google and Bing.', 'real-smart-seo' ) . '</p>';
         echo '<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=rsseo-ai-rank' ) ) . '">' . esc_html__( 'Open AI Rank →', 'real-smart-seo' ) . '</a></div>';
-
-        echo '<div class="rsseo-insights-card"><h3>' . esc_html__( 'Local Rank Grid', 'real-smart-seo' ) . '</h3>';
-        echo '<p>' . esc_html__( 'Map-pack rank measured at a grid of points around your service area.', 'real-smart-seo' ) . '</p>';
-        echo '<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=rsseo-geogrid' ) ) . '">' . esc_html__( 'Open Geo-Grid →', 'real-smart-seo' ) . '</a></div>';
 
         echo '<div class="rsseo-insights-card"><h3>' . esc_html__( 'Page Speed', 'real-smart-seo' ) . '</h3>';
         echo '<p>' . esc_html__( 'Core Web Vitals and speed diagnostics for your key pages.', 'real-smart-seo' ) . '</p>';

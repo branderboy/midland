@@ -147,7 +147,7 @@ $overall_color = RSSEO_Profile::status_color( $overall );
         <hr style="margin:28px 0;">
         <div class="rsseo-settings-section">
             <h2><?php esc_html_e( 'Connections (Pro)', 'real-smart-seo' ); ?></h2>
-            <p class="description"><?php esc_html_e( 'Optional — connect DataForSEO to power rank tracking, the geo-grid, and the backlinks dashboard.', 'real-smart-seo' ); ?></p>
+            <p class="description"><?php esc_html_e( 'Optional — connect DataForSEO to power keyword volume, SERP data, and rank tracking.', 'real-smart-seo' ); ?></p>
             <?php do_action( 'rsseo_render_pro_settings_panel' ); ?>
         </div>
     <?php endif; ?>

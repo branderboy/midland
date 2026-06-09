@@ -47,7 +47,7 @@ $source_meta = array(
         </span>
         <span class="rsseo-legend__row">
             <?php echo $badge( 'DataForSEO', 'dfs' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-            <span class="rsseo-legend__hint"><?php esc_html_e( 'Pro tier — backlinks, SERPs, keyword volume', 'real-smart-seo' ); ?></span>
+            <span class="rsseo-legend__hint"><?php esc_html_e( 'Pro tier — SERPs, keyword volume, trends', 'real-smart-seo' ); ?></span>
         </span>
     </div>
     <p class="rsseo-muted"><?php esc_html_e( 'Every report can stack all three layers. Rolling window of the 10 most recent — older runs are auto-pruned.', 'real-smart-seo' ); ?></p>

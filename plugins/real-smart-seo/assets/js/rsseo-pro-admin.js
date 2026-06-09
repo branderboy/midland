@@ -56,20 +56,6 @@
         });
     });
 
-    // Backlink status change
-    $(document).on('change', '.rsseo-bl-status', function() {
-        var $sel       = $(this);
-        var backlinkId = $sel.data('backlink-id');
-        var status     = $sel.val();
-
-        $.post(ajaxUrl, {
-            action:      'rsseo_pro_update_backlink',
-            nonce:       nonce,
-            backlink_id: backlinkId,
-            status:      status
-        });
-    });
-
     // Save DataForSEO credentials
     $('#rsseo-save-dfs').on('click', function() {
         var $btn = $(this);

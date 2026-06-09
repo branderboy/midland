@@ -7,8 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Pro crawler extension.
  *
  * Hooks into the free plugin's do_action('rsseo_after_audit') and appends
- * pro-level checks: NAP consistency, schema presence, keyword cannibalization,
- * and service area page coverage.
+ * pro-level checks: schema presence, keyword cannibalization, and service
+ * area page coverage.
  */
 class RSSEO_Pro_Crawler {
 
@@ -27,61 +27,9 @@ class RSSEO_Pro_Crawler {
      * @param string $seo_plugin 'yoast', 'rankmath', or 'none'.
      */
     public static function run_pro_checks( $audit_id, $posts, $seo_plugin ) {
-        self::check_nap_consistency( $audit_id, $posts );
         self::check_schema_presence( $audit_id, $posts, $seo_plugin );
         self::check_keyword_cannibalization( $audit_id, $posts, $seo_plugin );
         self::check_service_area_pages( $audit_id, $posts );
-    }
-
-    // ── NAP Consistency ────────────────────────────────────────────────────────
-
-    /**
-     * Check that Name / Address / Phone appear consistently across key pages.
-     * Looks for phone number patterns; flags pages with no phone anywhere in content.
-     *
-     * @param int   $audit_id
-     * @param array $posts
-     */
-    private static function check_nap_consistency( $audit_id, $posts ) {
-        // Phone pattern: US-style (123) 456-7890, 123-456-7890, +1-800-555-0100, etc.
-        $phone_pattern = '/(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/';
-
-        $key_page_types = array( 'page' );
-        $pages_without_phone = array();
-
-        foreach ( $posts as $post ) {
-            if ( ! in_array( $post->post_type, $key_page_types, true ) ) {
-                continue;
-            }
-            $content = $post->post_content;
-            if ( ! preg_match( $phone_pattern, $content ) ) {
-                $pages_without_phone[] = $post;
-            }
-        }
-
-        if ( count( $pages_without_phone ) > 3 ) {
-            // Only flag if most pages are missing it (home + about + contact are the critical ones).
-            foreach ( $pages_without_phone as $post ) {
-                $slug = $post->post_name;
-                if ( ! in_array( $slug, array( 'home', 'about', 'about-us', 'contact', 'contact-us' ), true ) ) {
-                    continue;
-                }
-                RSSEO_Database::insert_audit_issue( array(
-                    'audit_id'     => $audit_id,
-                    'post_id'      => $post->ID,
-                    'issue_type'   => 'nap_missing_phone',
-                    'severity'     => 'high',
-                    'description'  => sprintf(
-                        /* translators: post title */
-                        __( '"%s" has no phone number in the page content — NAP inconsistency risk.', 'real-smart-seo' ),
-                        $post->post_title
-                    ),
-                    'suggestion'   => __( 'Add your business phone number to this page. NAP (Name, Address, Phone) consistency across all key pages is a core local SEO ranking factor.', 'real-smart-seo' ),
-                    'auto_fixable' => 0,
-                    'created_at'   => current_time( 'mysql' ),
-                ) );
-            }
-        }
     }
 
     // ── Schema Presence ────────────────────────────────────────────────────────

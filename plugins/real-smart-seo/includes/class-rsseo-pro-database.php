@@ -41,27 +41,12 @@ class RSSEO_Pro_Database {
             KEY report_id (report_id),
             KEY post_id (post_id)
         ) $charset;" );
-
-        dbDelta( "CREATE TABLE {$wpdb->prefix}rsseo_pro_backlinks (
-            id bigint(20) NOT NULL AUTO_INCREMENT,
-            report_id bigint(20) NOT NULL,
-            priority int NOT NULL DEFAULT 0,
-            link_type varchar(20) NOT NULL DEFAULT '',
-            target_name varchar(200) NOT NULL DEFAULT '',
-            target_url varchar(500) NOT NULL DEFAULT '',
-            rationale text NOT NULL DEFAULT '',
-            status varchar(20) NOT NULL DEFAULT 'pending',
-            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY report_id (report_id)
-        ) $charset;" );
     }
 
     public static function drop_tables() {
         global $wpdb;
         $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_scans" );    // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
         $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_schema" );   // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
-        $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}rsseo_pro_backlinks" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
     }
 
     public static function insert_pro_scan( $data ) {
@@ -96,28 +81,6 @@ class RSSEO_Pro_Database {
         global $wpdb;
         $wpdb->update( $wpdb->prefix . 'rsseo_pro_schema', // phpcs:ignore WordPress.DB.DirectDatabaseQuery
             array( 'applied' => 1, 'applied_at' => current_time( 'mysql' ) ),
-            array( 'id' => $id )
-        );
-    }
-
-    public static function insert_backlink( $data ) {
-        global $wpdb;
-        $wpdb->insert( $wpdb->prefix . 'rsseo_pro_backlinks', $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-        return $wpdb->insert_id;
-    }
-
-    public static function get_backlinks( $report_id ) {
-        global $wpdb;
-        return $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            "SELECT * FROM {$wpdb->prefix}rsseo_pro_backlinks WHERE report_id = %d ORDER BY priority ASC",
-            $report_id
-        ) );
-    }
-
-    public static function update_backlink_status( $id, $status ) {
-        global $wpdb;
-        $wpdb->update( $wpdb->prefix . 'rsseo_pro_backlinks', // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            array( 'status' => sanitize_text_field( $status ) ),
             array( 'id' => $id )
         );
     }

@@ -170,9 +170,9 @@ class RSSEO_Profile {
         );
         $items[] = array(
             'key'    => 'dataforseo',
-            'label'  => __( 'DataForSEO (rank + backlinks)', 'real-smart-seo' ),
+            'label'  => __( 'DataForSEO (rank tracking)', 'real-smart-seo' ),
             'status' => $dfs_ready ? self::READY : self::ATTENTION,
-            'hint'   => __( 'Optional — powers geo-grid, rank tracking, and backlinks.', 'real-smart-seo' ),
+            'hint'   => __( 'Optional — powers keyword volume, SERP data, and rank tracking.', 'real-smart-seo' ),
         );
         $items[] = array(
             'key'    => 'seo_plugin',

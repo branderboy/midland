@@ -53,14 +53,4 @@ class RSSEO_Pro_Fixer {
 
         return array( 'applied' => $applied, 'errors' => $errors );
     }
-
-    /**
-     * Mark a backlink as pursued / completed.
-     *
-     * @param int    $backlink_id
-     * @param string $status 'pursuing'|'completed'|'skipped'
-     */
-    public static function update_backlink( $backlink_id, $status ) {
-        RSSEO_Pro_Database::update_backlink_status( $backlink_id, $status );
-    }
 }
