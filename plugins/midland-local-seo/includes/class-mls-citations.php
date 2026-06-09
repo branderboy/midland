@@ -303,7 +303,6 @@ class MLS_Citations {
 						<th><?php esc_html_e( 'Status', 'midland-local-seo' ); ?></th>
 						<th><?php esc_html_e( 'Listing URL', 'midland-local-seo' ); ?></th>
 						<th><?php esc_html_e( 'NAP as listed (Name | Phone)', 'midland-local-seo' ); ?></th>
-						<th><?php esc_html_e( 'Consistency', 'midland-local-seo' ); ?></th>
 					</tr></thead>
 					<tbody>
 						<?php foreach ( $registry as $slug => $info ) : ?>
@@ -312,19 +311,6 @@ class MLS_Citations {
 							$status  = isset( $row['status'] ) ? $row['status'] : '';
 							$url     = isset( $row['url'] ) ? $row['url'] : '';
 							$nap     = isset( $row['nap'] ) ? $row['nap'] : '';
-							$flag    = '';
-							$flag_bg = '';
-							if ( '' !== $nap && ( '' !== $canon_name_n || '' !== $canon_ph_n ) ) {
-								$nap_name_ok  = '' === $canon_name_n || false !== strpos( self::norm_name( $nap ), $canon_name_n );
-								$nap_phone_ok = '' === $canon_ph_n || false !== strpos( self::norm_phone( $nap ), $canon_ph_n );
-								if ( $nap_name_ok && $nap_phone_ok ) {
-									$flag    = __( 'Match', 'midland-local-seo' );
-									$flag_bg = '#1e7e34';
-								} else {
-									$flag    = __( 'Mismatch', 'midland-local-seo' );
-									$flag_bg = '#b32d2e';
-								}
-							}
 							?>
 							<tr>
 								<td>
@@ -342,14 +328,7 @@ class MLS_Citations {
 									</select>
 								</td>
 								<td><input type="url" name="citation[<?php echo esc_attr( $slug ); ?>][url]" value="<?php echo esc_attr( $url ); ?>" class="regular-text" placeholder="https://..."></td>
-								<td><input type="text" name="citation[<?php echo esc_attr( $slug ); ?>][nap]" value="<?php echo esc_attr( $nap ); ?>" class="regular-text" placeholder="Midland Floors | (240) 532-9097"></td>
-								<td>
-									<?php if ( '' !== $flag ) : ?>
-										<span style="color:#fff;background:<?php echo esc_attr( $flag_bg ); ?>;padding:2px 8px;border-radius:3px;font-size:12px;"><?php echo esc_html( $flag ); ?></span>
-									<?php else : ?>
-										<span class="description">&mdash;</span>
-									<?php endif; ?>
-								</td>
+								<td><input type="text" name="citation[<?php echo esc_attr( $slug ); ?>][nap]" value="<?php echo esc_attr( $nap ); ?>" class="regular-text" placeholder="Midland Floor Care | (240) 532-9097"></td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
