@@ -71,6 +71,15 @@ class MLS_SameAs {
 			'address_country'      => 'US',
 			'center_lat'           => '38.825139',
 			'center_lng'           => '-76.939730',
+			'opening_hours'        => array(
+				'mon' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'tue' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'wed' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'thu' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'fri' => array( 'mode' => 'open', 'open' => '09:00', 'close' => '17:00' ),
+				'sat' => array( 'mode' => 'closed', 'open' => '', 'close' => '' ),
+				'sun' => array( 'mode' => 'closed', 'open' => '', 'close' => '' ),
+			),
 			'service_areas'        => "Washington, DC\nBethesda, MD\nRockville, MD\nSilver Spring, MD\nArlington, VA\nAlexandria, VA\nFairfax, VA",
 			// Verified citation/profile URLs → emitted as sameAs entity links.
 			'gmb_url'              => 'https://www.google.com/maps/place/?q=place_id:ChIJ59SJ6ue7t4kRIVMYpQVYY6Y',
