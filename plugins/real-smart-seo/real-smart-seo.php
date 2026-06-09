@@ -43,8 +43,6 @@ class RSSEO_Plugin {
     }
 
     private function __construct() {
-        register_activation_hook( __FILE__, array( $this, 'activate' ) );
-        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
         add_action( 'plugins_loaded', array( $this, 'init' ) );
         add_filter( 'cron_schedules', array( $this, 'add_cron_schedules' ) );
     }
@@ -170,3 +168,8 @@ class RSSEO_Plugin {
 }
 
 RSSEO_Plugin::get_instance();
+
+// Lifecycle hooks registered at file scope (not in the constructor) so they
+// always bind during the activation/deactivation request.
+register_activation_hook( __FILE__, array( RSSEO_Plugin::get_instance(), 'activate' ) );
+register_deactivation_hook( __FILE__, array( RSSEO_Plugin::get_instance(), 'deactivate' ) );

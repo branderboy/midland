@@ -172,14 +172,20 @@ class RSSEO_Pro_IndexNow {
             return false;
         }
 
+        // add_query_arg() already URL-encodes values; pre-encoding with
+        // rawurlencode() would double-encode and send a malformed IndexNow URL.
         $endpoint = add_query_arg( array(
-            'url'     => rawurlencode( $url ),
-            'key'     => $api_key,
-            'keyLocation' => rawurlencode( home_url( '/' . $api_key . '.txt' ) ),
+            'url'         => $url,
+            'key'         => $api_key,
+            'keyLocation' => home_url( '/' . $api_key . '.txt' ),
         ), self::INDEXNOW_ENDPOINT );
 
         $response = wp_remote_get( $endpoint, array( 'timeout' => 10 ) );
-        $code     = wp_remote_retrieve_response_code( $response );
+        if ( is_wp_error( $response ) ) {
+            $this->log( $url, 'indexnow', 'error: ' . $response->get_error_message() );
+            return false;
+        }
+        $code = wp_remote_retrieve_response_code( $response );
 
         $this->log( $url, 'indexnow', $code );
 
@@ -208,6 +214,10 @@ class RSSEO_Pro_IndexNow {
             'timeout' => 15,
         ) );
 
+        if ( is_wp_error( $response ) ) {
+            $this->log( implode( ', ', array_slice( $urls, 0, 3 ) ) . '...', 'indexnow_batch', 'error: ' . $response->get_error_message() );
+            return;
+        }
         $code = wp_remote_retrieve_response_code( $response );
         $this->log( implode( ', ', array_slice( $urls, 0, 3 ) ) . '...', 'indexnow_batch', $code );
     }
@@ -230,6 +240,10 @@ class RSSEO_Pro_IndexNow {
             'timeout' => 15,
         ) );
 
+        if ( is_wp_error( $response ) ) {
+            $this->log( implode( ', ', array_slice( $urls, 0, 3 ) ) . '...', 'rapid_url_indexer', 'error: ' . $response->get_error_message() );
+            return;
+        }
         $code = wp_remote_retrieve_response_code( $response );
         $this->log( implode( ', ', array_slice( $urls, 0, 3 ) ) . '...', 'rapid_url_indexer', $code );
     }
