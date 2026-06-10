@@ -50,19 +50,23 @@ class MLS_Link_Hub {
 	 * @return string Unchanged HTML.
 	 */
 	public static function detect_menu_render( $nav_menu, $args ) {
-		$menu = isset( $args->menu ) ? $args->menu : null;
-		$name = '';
-		if ( $menu instanceof WP_Term ) {
-			$name = $menu->name;
-		} elseif ( is_object( $menu ) && isset( $menu->name ) ) {
-			$name = (string) $menu->name;
-		} elseif ( is_string( $menu ) ) {
-			$name = $menu;
-		} elseif ( is_numeric( $menu ) ) {
-			$term = wp_get_nav_menu_object( (int) $menu );
-			$name = $term ? $term->name : '';
+		$selected = (int) get_option( 'mls_links_menu_id', 0 );
+		if ( ! $selected ) {
+			return $nav_menu;
 		}
-		if ( 'service links' === strtolower( trim( $name ) ) || 'service-links' === sanitize_title( $name ) ) {
+		$menu    = isset( $args->menu ) ? $args->menu : null;
+		$term_id = 0;
+		if ( $menu instanceof WP_Term ) {
+			$term_id = (int) $menu->term_id;
+		} elseif ( is_object( $menu ) && isset( $menu->term_id ) ) {
+			$term_id = (int) $menu->term_id;
+		} elseif ( is_numeric( $menu ) ) {
+			$term_id = (int) $menu;
+		} elseif ( is_string( $menu ) && '' !== $menu ) {
+			$term    = wp_get_nav_menu_object( $menu );
+			$term_id = $term ? (int) $term->term_id : 0;
+		}
+		if ( $term_id && $term_id === $selected ) {
 			self::$rendered = true;
 		}
 		return $nav_menu;
