@@ -62,6 +62,26 @@ class MLS_Elementor {
 		update_post_meta( $post_id, '_elementor_version', '3.21.0' );
 		// Keep the theme/Elementor Pro header + footer wrapped around the page.
 		update_post_meta( $post_id, '_wp_page_template', 'elementor_header_footer' );
+
+		self::refresh_css( $post_id );
+	}
+
+	/**
+	 * Regenerate the page's Elementor CSS. Writing _elementor_data directly
+	 * leaves the old generated stylesheet in place, and without this the
+	 * section colors (CTA background, buttons) fall back to theme globals.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	private static function refresh_css( $post_id ) {
+		delete_post_meta( $post_id, '_elementor_css' );
+
+		if ( class_exists( '\Elementor\Core\Files\CSS\Post' ) ) {
+			$css = \Elementor\Core\Files\CSS\Post::create( (int) $post_id );
+			$css->update();
+		} elseif ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
+			\Elementor\Plugin::$instance->files_manager->clear_cache();
+		}
 	}
 
 	/**
