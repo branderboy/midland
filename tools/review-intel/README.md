@@ -5,15 +5,23 @@ Mirror the market: pull competitors' Google/Yelp reviews with **Outscraper**
 them in-session to produce keywords, trends, problems, opportunities, and new
 site pages built directly into `content/services/`.
 
-## Workflow
+## Workflow (automated — DataForSEO)
 
-1. **Outscraper** (app.outscraper.com) → *Google Maps Reviews* task.
-   Paste the queries from `competitors.json` (10–15 businesses per run is fine).
-   Set reviews limit ~100 per business, sort by newest. Export **CSV or XLSX**.
-   For Yelp, use the *Yelp Reviews* task with the business page URLs.
-2. **Drop the export(s) into `tools/review-intel/data/`** — or just copy/paste
-   the review text into the Claude session, either works.
-3. **Claude analyzes** and delivers:
+```bash
+export DATAFORSEO_LOGIN=...       # app.dataforseo.com -> API Access
+export DATAFORSEO_PASSWORD=...
+python3 tools/review-intel/fetch_dataforseo.py --only "PriceCo"   # cheap one-company test
+python3 tools/review-intel/fetch_dataforseo.py                    # full 14-company run
+```
+
+One command pulls every Google review for all companies in `competitors.json`
+into `data/reviews.csv` — no manual copying. Stdlib only, no packages to install.
+
+Manual fallback: Outscraper export or straight GMB copy/paste into
+`data/` (or into the Claude session) works the same.
+
+Then **Claude analyzes in-session** (no client-side AI subscription needed —
+output is plain markdown + HTML in the repo) and delivers:
    - **Keywords** — the actual language customers use (service terms, pain
      terms, neighborhood/city mentions) mapped against the programmatic SEO
      plan in `programmatic-content.md`
