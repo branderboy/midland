@@ -646,6 +646,18 @@ class MLS_GMB_Mirror {
 		MLS_Elementor::apply( (int) $post_id, $args );
 		update_post_meta( (int) $post_id, '_mls_mirror_generated', 1 );
 
+		// SEO meta (Yoast fields). Never clobbers a hand-written value.
+		$phone = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '(240) 532-9097';
+		if ( $is_location ) {
+			$place      = trim( $city . ( '' !== $state ? ', ' . $state : '' ) );
+			$meta_title = sprintf( '%1$s in %2$s | Floor Care & Flooring', $business, '' !== $place ? $place : 'the DMV' );
+			$meta_desc  = sprintf( '%1$s provides commercial and residential floor care in %2$s. Carpet, hardwood, tile and janitorial. On time crews and clear pricing. Call %3$s.', $business, '' !== $place ? $place : 'the DMV', $phone );
+		} else {
+			$meta_title = sprintf( '%1$s in Washington DC, MD & VA | %2$s', $title, $business );
+			$meta_desc  = sprintf( 'Professional %1$s for homes and businesses across Washington DC, Maryland and Northern Virginia. On time crews, clear pricing, free quotes. Call %2$s.', strtolower( $title ), $phone );
+		}
+		$this->set_seo_meta( (int) $post_id, $meta_title, $meta_desc );
+
 		// Group under the right parent so the pages live under /services/ or
 		// /service-areas/ instead of floating at the root.
 		$this->assign_parent( (int) $post_id, $is_location );
@@ -788,6 +800,22 @@ class MLS_GMB_Mirror {
 	}
 
 	/**
+	 * Write Yoast title/description, only into empty fields.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $title   Meta title.
+	 * @param string $desc    Meta description.
+	 */
+	private function set_seo_meta( $post_id, $title, $desc ) {
+		if ( '' === (string) get_post_meta( $post_id, '_yoast_wpseo_title', true ) ) {
+			update_post_meta( $post_id, '_yoast_wpseo_title', sanitize_text_field( $title ) );
+		}
+		if ( '' === (string) get_post_meta( $post_id, '_yoast_wpseo_metadesc', true ) ) {
+			update_post_meta( $post_id, '_yoast_wpseo_metadesc', sanitize_text_field( $desc ) );
+		}
+	}
+
+	/**
 	 * Parent the page under "Our Services" (/services/) or "Service Areas"
 	 * (/service-areas/), creating the hub page if needed. WordPress 301s the
 	 * old top-level URL to the new nested one automatically.
@@ -839,6 +867,16 @@ class MLS_GMB_Mirror {
 			)
 		);
 		remove_filter( 'option_nav_menu_options', array( $this, 'suppress_menu_auto_add' ) );
+
+		if ( ! is_wp_error( $parent_id ) && $parent_id ) {
+			$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+			$business = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+			if ( $is_location ) {
+				$this->set_seo_meta( (int) $parent_id, 'Service Areas | ' . $business, 'Every city and neighborhood ' . $business . ' serves across Washington DC, Maryland and Northern Virginia. Find floor care near you.' );
+			} else {
+				$this->set_seo_meta( (int) $parent_id, 'Commercial & Residential Floor Care Services | ' . $business, 'All floor care services from ' . $business . ': carpet cleaning, hardwood refinishing, tile and grout, janitorial and more across the DMV. Free quotes.' );
+			}
+		}
 
 		return is_wp_error( $parent_id ) ? 0 : (int) $parent_id;
 	}
