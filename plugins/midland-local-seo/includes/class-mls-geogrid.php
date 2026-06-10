@@ -184,17 +184,15 @@ class MLS_Geogrid {
 		$lng      = isset( $settings['center_lng'] ) ? (float) $settings['center_lng'] : -77.0;
 		$keyword  = ! empty( $settings['keyword'] ) ? (string) $settings['keyword'] : 'carpet cleaning';
 
-		$login  = class_exists( 'MLS_DataForSEO' ) ? MLS_DataForSEO::get_login() : '';
-		$source = 'NOT CONFIGURED';
-		if ( class_exists( 'RSSEO_Pro_DataForSEO' ) && RSSEO_Pro_DataForSEO::is_configured() ) {
-			$source = 'Smart SEO connection (the working one)';
-		} elseif ( '' !== (string) get_option( 'mls_dfs_login', '' ) ) {
-			$source = 'Local SEO settings';
-		}
-		$masked    = '' !== $login ? substr( $login, 0, 3 ) . '***' . substr( $login, -6 ) : '(empty)';
-
+		delete_transient( 'mls_dfs_resolved' ); // Diagnostics always re-verify fresh.
+		$resolved  = MLS_DataForSEO::resolve_credentials();
 		$results   = array();
-		$results[] = array( 'check' => 'Credentials in use', 'result' => $source . ' — login ' . $masked );
+		if ( is_wp_error( $resolved ) ) {
+			$results[] = array( 'check' => 'Credentials in use', 'result' => 'FAIL: ' . $resolved->get_error_message() );
+		} else {
+			$masked    = substr( $resolved['login'], 0, 3 ) . '***' . substr( $resolved['login'], -6 );
+			$results[] = array( 'check' => 'Credentials in use', 'result' => $resolved['source'] . ' (verified live, free check) — login ' . $masked );
+		}
 
 		$conn      = MLS_DataForSEO::test_connection();
 		$results[] = array(
