@@ -25,13 +25,84 @@ class MLS_DataForSEO {
 	 * @return string
 	 */
 	public static function get_login() {
-		// Prefer Smart SEO's connection when it is configured: on this site it
-		// is the verified-working one, and both plugins share one DataForSEO
-		// account. Local SEO's own copy is the backup.
-		if ( class_exists( 'RSSEO_Pro_DataForSEO' ) && RSSEO_Pro_DataForSEO::is_configured() ) {
-			return (string) RSSEO_Pro_DataForSEO::get_login();
+		$resolved = self::resolve_credentials();
+		return is_wp_error( $resolved ) ? get_option( 'mls_dfs_login', '' ) : $resolved['login'];
+	}
+
+	/**
+	 * All stored credential pairs, cleaned (trimmed, non-printables stripped —
+	 * a corrupted decrypt produces binary junk that must never reach the API).
+	 *
+	 * @return array source => [login, password].
+	 */
+	private static function credential_candidates() {
+		$list = array();
+
+		$own_login = trim( (string) get_option( 'mls_dfs_login', '' ) );
+		$own_pass  = preg_replace( '/[^\x20-\x7E]/', '', trim( self::decrypt( get_option( 'mls_dfs_password', '' ) ) ) );
+		if ( '' !== $own_login && '' !== $own_pass ) {
+			$list['Local SEO settings'] = array( $own_login, $own_pass );
 		}
-		return get_option( 'mls_dfs_login', '' );
+
+		if ( class_exists( 'RSSEO_Pro_DataForSEO' ) && RSSEO_Pro_DataForSEO::is_configured() ) {
+			$rs_login = trim( (string) RSSEO_Pro_DataForSEO::get_login() );
+			$rs_pass  = preg_replace( '/[^\x20-\x7E]/', '', trim( (string) RSSEO_Pro_DataForSEO::get_password() ) );
+			if ( '' !== $rs_login && '' !== $rs_pass ) {
+				$list['Smart SEO settings'] = array( $rs_login, $rs_pass );
+			}
+		}
+
+		return $list;
+	}
+
+	/**
+	 * Find a credential pair that ACTUALLY authenticates, using DataForSEO's
+	 * free user_data endpoint (no charge). Winner is cached for 12 hours and
+	 * re-verified after that or when credentials are saved.
+	 *
+	 * @return array|WP_Error { login, password, source } or error listing every rejection.
+	 */
+	public static function resolve_credentials() {
+		$cached = get_transient( 'mls_dfs_resolved' );
+		if ( is_array( $cached ) && ! empty( $cached['login'] ) ) {
+			return $cached;
+		}
+
+		$candidates = self::credential_candidates();
+		if ( empty( $candidates ) ) {
+			return new WP_Error( 'no_credentials', __( 'DataForSEO credentials not configured.', 'midland-local-seo' ) );
+		}
+
+		$failures = array();
+		foreach ( $candidates as $source => $pair ) {
+			$response = wp_remote_get(
+				self::BASE_URL . 'appendix/user_data',
+				array(
+					'timeout' => 20,
+					'headers' => array(
+						'Authorization' => 'Basic ' . base64_encode( $pair[0] . ':' . $pair[1] ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+					),
+				)
+			);
+			if ( is_wp_error( $response ) ) {
+				$failures[] = $source . ': ' . $response->get_error_message();
+				continue;
+			}
+			$body = json_decode( wp_remote_retrieve_body( $response ), true );
+			$code = (int) ( $body['status_code'] ?? 0 );
+			if ( 20000 === $code ) {
+				$resolved = array(
+					'login'    => $pair[0],
+					'password' => $pair[1],
+					'source'   => $source,
+				);
+				set_transient( 'mls_dfs_resolved', $resolved, 12 * HOUR_IN_SECONDS );
+				return $resolved;
+			}
+			$failures[] = $source . ': ' . (string) ( $body['status_message'] ?? ( 'HTTP ' . wp_remote_retrieve_response_code( $response ) ) );
+		}
+
+		return new WP_Error( 'dfs_auth', implode( ' | ', $failures ) );
 	}
 
 	/**
@@ -40,10 +111,8 @@ class MLS_DataForSEO {
 	 * @return string
 	 */
 	public static function get_password() {
-		if ( class_exists( 'RSSEO_Pro_DataForSEO' ) && RSSEO_Pro_DataForSEO::is_configured() ) {
-			return (string) RSSEO_Pro_DataForSEO::get_password();
-		}
-		return self::decrypt( get_option( 'mls_dfs_password', '' ) );
+		$resolved = self::resolve_credentials();
+		return is_wp_error( $resolved ) ? self::decrypt( get_option( 'mls_dfs_password', '' ) ) : $resolved['password'];
 	}
 
 	/**
@@ -64,6 +133,7 @@ class MLS_DataForSEO {
 	public static function save_credentials( $login, $password ) {
 		update_option( 'mls_dfs_login', sanitize_text_field( $login ) );
 		update_option( 'mls_dfs_password', self::encrypt( $password ) );
+		delete_transient( 'mls_dfs_resolved' );
 	}
 
 	// ── Self-contained AES-256-CBC crypto (key derived from wp_salt) ──────────
@@ -134,12 +204,12 @@ class MLS_DataForSEO {
 	 * @return array|WP_Error
 	 */
 	private static function post( $endpoint, $payload ) {
-		$login    = self::get_login();
-		$password = self::get_password();
-
-		if ( empty( $login ) || empty( $password ) ) {
-			return new WP_Error( 'no_credentials', __( 'DataForSEO credentials not configured.', 'midland-local-seo' ) );
+		$resolved = self::resolve_credentials();
+		if ( is_wp_error( $resolved ) ) {
+			return $resolved;
 		}
+		$login    = $resolved['login'];
+		$password = $resolved['password'];
 
 		$response = wp_remote_post(
 			self::BASE_URL . $endpoint,
@@ -160,9 +230,22 @@ class MLS_DataForSEO {
 		$code = wp_remote_retrieve_response_code( $response );
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( $code >= 400 ) {
-			$msg = $data['status_message'] ?? 'DataForSEO API error (HTTP ' . $code . ')';
+		if ( $code >= 400 || ! is_array( $data ) ) {
+			$msg = is_array( $data ) && isset( $data['status_message'] ) ? $data['status_message'] : 'DataForSEO API error (HTTP ' . $code . ')';
 			return new WP_Error( 'dfs_error', $msg );
+		}
+
+		// DataForSEO returns HTTP 200 even when the request FAILS. The real
+		// verdict is status_code at the top level and inside each task. Only
+		// 2xxxx codes are success; anything else must surface as an error,
+		// never as an empty "success".
+		$top = (int) ( $data['status_code'] ?? 0 );
+		if ( $top < 20000 || $top >= 30000 ) {
+			return new WP_Error( 'dfs_error', (string) ( $data['status_message'] ?? ( 'DataForSEO status ' . $top ) ) );
+		}
+		$task_code = (int) ( $data['tasks'][0]['status_code'] ?? 20000 );
+		if ( $task_code < 20000 || $task_code >= 30000 ) {
+			return new WP_Error( 'dfs_error', (string) ( $data['tasks'][0]['status_message'] ?? ( 'DataForSEO task status ' . $task_code ) ) );
 		}
 
 		return $data;

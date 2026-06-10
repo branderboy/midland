@@ -3,7 +3,7 @@
  * Plugin Name: Midland Review Intel
  * Plugin URI: https://midlandfloors.com/review-intel
  * Description: Competitor review intelligence — pulls Google reviews for MD/DC flooring & carpet competitors via DataForSEO (reuses the Midland Local SEO key), mines the market's own language and discontent, and feeds keywords + page opportunities into Midland Smart SEO's clusters and programmatic page generator.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MRI_VERSION', '1.0.0' );
+define( 'MRI_VERSION', '1.0.1' );
 define( 'MRI_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MRI_URL', plugin_dir_url( __FILE__ ) );
 define( 'MRI_FILE', __FILE__ );
