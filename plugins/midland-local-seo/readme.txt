@@ -4,7 +4,7 @@ Tags: local seo, google business profile, citations, schema, rank tracking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,9 @@ The Citation Audit and sameAs / Identity modules work without it. Geo-Grid, GMB 
 Encrypted with AES-256-CBC using a key derived from your site's auth salt, with a random IV per value. It is never echoed back into the settings field.
 
 == Changelog ==
+
+= 1.3.0 =
+* Location + service pages are now fully self-contained in Local SEO (no Smart SEO dependency). Fixes location pages stuck on "Missing". New "Location Pages" module clones a page you designed so generated pages match your site exactly.
 
 = 1.2.9 =
 * Fix: location pages stayed marked "Missing" after creation. The list now detects the mfc_location page the engine creates (by city/state) and shows "Have it" correctly.
