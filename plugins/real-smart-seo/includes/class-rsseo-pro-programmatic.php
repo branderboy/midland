@@ -144,7 +144,7 @@ class RSSEO_Pro_Programmatic {
         }
         $list_html = $list_html ? '<ul>' . $list_html . '</ul>' : '';
 
-        return strtr( (string) $tpl, array(
+        $out = strtr( (string) $tpl, array(
             '{city}'          => $city,
             '{state}'         => $state,
             '{service}'       => $primary,
@@ -154,6 +154,8 @@ class RSSEO_Pro_Programmatic {
             '{phone}'         => $phone,
             '{year}'          => gmdate( 'Y' ),
         ) );
+        // House rule: generated copy never ships em or en dashes.
+        return class_exists( 'RSSEO_Service_Copy' ) ? RSSEO_Service_Copy::no_dashes( $out ) : $out;
     }
 
     /** Render the slug template into a safe, non-empty post slug. */
@@ -341,7 +343,11 @@ class RSSEO_Pro_Programmatic {
             return (int) $existing->ID;
         }
 
-        $content = $self->render_template( $self->get_templates()['body'], $city, $state, array( $service ) );
+        // Done-for-you, service-specific copy (falls back to the generic template
+        // only if the copy library is unavailable).
+        $content = class_exists( 'RSSEO_Service_Copy' )
+            ? RSSEO_Service_Copy::body_for( $service )
+            : $self->render_template( $self->get_templates()['body'], $city, $state, array( $service ) );
 
         $postarr = array(
             'post_type'    => 'page',
@@ -368,7 +374,7 @@ class RSSEO_Pro_Programmatic {
         update_post_meta( $post_id, '_mfc_service_page', $service );
 
         if ( ( ! $existing || $overwrite ) && $self->get_templates()['use_elementor'] ) {
-            $self->apply_elementor_template( $post_id, $city, $state, array( $service ) );
+            $self->apply_elementor_template( $post_id, $city, $state, array( $service ), $content );
         }
 
         if ( $ping && 'publish' === get_post_status( $post_id ) ) {
@@ -379,6 +385,23 @@ class RSSEO_Pro_Programmatic {
         }
 
         return (int) $post_id;
+    }
+
+    /**
+     * Public wrapper so other plugins (GMB Mirror, Review Intel) can wrap an
+     * EXISTING post in the Elementor template with full body copy.
+     *
+     * @param int    $post_id   Post to apply the template to.
+     * @param string $city      City for the hero.
+     * @param string $state     State for the hero.
+     * @param array  $services  Service names.
+     * @param string $body_html Full body copy for the content section.
+     */
+    public static function apply_template_to_post( $post_id, $city, $state, $services, $body_html = '' ) {
+        $self = self::get_instance();
+        if ( $self->get_templates()['use_elementor'] ) {
+            $self->apply_elementor_template( (int) $post_id, $city, $state, (array) $services, (string) $body_html );
+        }
     }
 
     /**
@@ -655,8 +678,8 @@ class RSSEO_Pro_Programmatic {
      * Write Elementor builder data so location pages render with the same
      * Hero / Content / CTA layout used by the Midland Elementor Kit service pages.
      */
-    private function apply_elementor_template( $post_id, $city, $state, $services ) {
-        $data = $this->generate_elementor_data( $city, $state, $services );
+    private function apply_elementor_template( $post_id, $city, $state, $services, $body_html = '' ) {
+        $data = $this->generate_elementor_data( $city, $state, $services, $body_html );
 
         // wp_slash because update_post_meta runs through wp_unslash on read,
         // and Elementor expects the JSON to survive that round-trip intact.
@@ -675,7 +698,7 @@ class RSSEO_Pro_Programmatic {
      * Build the three-section Elementor structure (Hero, Content, CTA) that
      * mirrors templates/commercial-carpet-cleaning-services.json from the kit.
      */
-    private function generate_elementor_data( $city, $state, $services ) {
+    private function generate_elementor_data( $city, $state, $services, $body_override = '' ) {
         $identity = get_option( 'rsseo_sameas_identity', array() );
         $profile  = class_exists( 'RSSEO_Profile' ) ? RSSEO_Profile::get() : array();
         $business = ! empty( $profile['business_name'] )
@@ -689,6 +712,11 @@ class RSSEO_Pro_Programmatic {
         $services_list = ! empty( $services ) ? implode( ', ', $services ) : 'floor care services';
         $intro         = "Professional {$services_list} for businesses and property managers in {$city}, {$state}. Same-day quotes, after-hours service, and the Midland Shine Standard on every visit.";
 
+        if ( '' !== trim( (string) $body_override ) ) {
+            // Full done-for-you copy supplied by the caller (service pages, GMB
+            // Mirror rewrites). The hero and CTA sections still frame it.
+            $body_html = $body_override;
+        } else {
         $body_html  = "<h2><strong>{$primary} in {$city}, {$state} That Protects Your Brand Image and Investment</strong></h2>";
         $body_html .= "<p>{$business} serves {$city} and the surrounding {$state} area with commercial-grade floor care. From high-traffic lobbies to back-of-house corridors, we keep your facility looking sharp and operating safely.</p>";
 
@@ -709,6 +737,12 @@ class RSSEO_Pro_Programmatic {
             . '</ul>';
 
         $body_html .= '<p><a href="/schedule-a-visit/"><strong>Ready to schedule an on-site visit in ' . esc_html( $city ) . '?</strong></a><br />Call us or request a visit online and we&rsquo;ll build a plan around your facility.</p>';
+        }
+
+        if ( class_exists( 'RSSEO_Service_Copy' ) ) {
+            $body_html = RSSEO_Service_Copy::no_dashes( $body_html );
+            $intro     = RSSEO_Service_Copy::no_dashes( $intro );
+        }
 
         $flex_gap_20 = array( 'column' => '20', 'row' => '20', 'isLinked' => true, 'unit' => 'px', 'size' => 20 );
         $pad_zero    = array( 'unit' => 'px', 'top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0', 'isLinked' => true );
