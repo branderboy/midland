@@ -38,6 +38,34 @@ class MLS_Link_Hub {
 		add_shortcode( 'mls_location_links', array( __CLASS__, 'location_links' ) );
 		add_shortcode( 'mls_footer_links', array( __CLASS__, 'footer_links' ) );
 		add_action( 'wp_footer', array( __CLASS__, 'auto_footer' ), 5 );
+		add_filter( 'wp_nav_menu', array( __CLASS__, 'detect_menu_render' ), 10, 2 );
+	}
+
+	/**
+	 * If the "Service Links" menu renders anywhere on the page (e.g. through
+	 * the theme's navigation widget in the footer), skip the automatic bar.
+	 *
+	 * @param string $nav_menu Rendered menu HTML.
+	 * @param object $args     wp_nav_menu args.
+	 * @return string Unchanged HTML.
+	 */
+	public static function detect_menu_render( $nav_menu, $args ) {
+		$menu = isset( $args->menu ) ? $args->menu : null;
+		$name = '';
+		if ( $menu instanceof WP_Term ) {
+			$name = $menu->name;
+		} elseif ( is_object( $menu ) && isset( $menu->name ) ) {
+			$name = (string) $menu->name;
+		} elseif ( is_string( $menu ) ) {
+			$name = $menu;
+		} elseif ( is_numeric( $menu ) ) {
+			$term = wp_get_nav_menu_object( (int) $menu );
+			$name = $term ? $term->name : '';
+		}
+		if ( 'service links' === strtolower( trim( $name ) ) || 'service-links' === sanitize_title( $name ) ) {
+			self::$rendered = true;
+		}
+		return $nav_menu;
 	}
 
 	/**

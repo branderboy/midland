@@ -848,6 +848,7 @@ class MLS_GMB_Mirror {
 	public function maybe_ensure_hubs() {
 		if ( get_option( 'mls_hubs_checked' ) !== MLS_VERSION ) {
 			$this->ensure_hubs();
+			$this->sync_links_menu();
 			update_option( 'mls_hubs_checked', MLS_VERSION, false );
 		}
 	}
