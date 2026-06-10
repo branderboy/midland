@@ -288,6 +288,23 @@ class MLS_Geogrid {
 			(float) $cell->lng
 		);
 
+		// Plans without the Maps API: measure ORGANIC rank at the same
+		// coordinate instead of returning an empty grid.
+		if ( is_wp_error( $serp ) ) {
+			$msg     = $serp->get_error_message();
+			$is_auth = ( false !== stripos( $msg, 'not authorized' ) || false !== stripos( $msg, 'access denied' ) || false !== stripos( $msg, '40301' ) );
+			if ( $is_auth ) {
+				$serp = MLS_DataForSEO::get_serp_at_coordinate(
+					$run->keyword,
+					(float) $cell->lat,
+					(float) $cell->lng
+				);
+				if ( ! is_wp_error( $serp ) ) {
+					update_option( 'mls_geogrid_mode', 'organic', false );
+				}
+			}
+		}
+
 		// Map listings reliably carry the GBP business name but not always the
 		// website domain, so match on either signal.
 		$identity    = get_option( 'mls_identity', array() );
@@ -565,6 +582,21 @@ class MLS_Geogrid {
 					<strong><?php echo esc_html( (int) $latest->in_top10 . ' / ' . (int) $latest->cells_done ); ?></strong>
 					| <?php echo esc_html( $latest->created_at ); ?>
 				</p>
+				<?php if ( 'organic' === get_option( 'mls_geogrid_mode' ) ) : ?>
+					<div class="notice notice-info inline"><p><?php esc_html_e( 'Measuring ORGANIC rank at each point: your DataForSEO plan does not include the Maps API, so map-pack rank is unavailable. Enable Maps in your DataForSEO dashboard for true local-pack tracking.', 'midland-local-seo' ); ?></p></div>
+				<?php endif; ?>
+				<?php
+				$mls_cell_error = '';
+				foreach ( $cells as $mls_cell ) {
+					if ( ! empty( $mls_cell->error_msg ) ) {
+						$mls_cell_error = (string) $mls_cell->error_msg;
+						break;
+					}
+				}
+				if ( '' !== $mls_cell_error ) :
+					?>
+					<div class="notice notice-error inline"><p><strong><?php esc_html_e( 'Scan error:', 'midland-local-seo' ); ?></strong> <?php echo esc_html( $mls_cell_error ); ?></p></div>
+				<?php endif; ?>
 				<?php $this->render_heatmap( $cells, (int) $latest->grid_size ); ?>
 			<?php endif; ?>
 
