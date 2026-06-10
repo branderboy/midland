@@ -1,0 +1,88 @@
+{
+  "market": "Commercial flooring & residential carpeting — Maryland / Washington DC",
+  "own_business": {
+    "name": "Midland Floor Care",
+    "google_query": "Midland Floor Care, Maryland",
+    "segment": "commercial-floor-care"
+  },
+  "competitors": [
+    {
+      "name": "CB Flooring",
+      "google_query": "CB Flooring, Columbia, MD",
+      "segment": "commercial-flooring",
+      "notes": "Large commercial flooring/tile contractor, HQ Columbia MD, serves MD/DC/VA/PA/DE"
+    },
+    {
+      "name": "Metro Flooring Contractors",
+      "google_query": "Metro Flooring Contractors, Baltimore, MD",
+      "segment": "commercial-flooring",
+      "notes": "Commercial sales + install out of Baltimore, serves MD/DC/DE/VA/WV/PA"
+    },
+    {
+      "name": "Precision Flooring Services",
+      "google_query": "Precision Flooring Services, Northern VA",
+      "segment": "commercial-flooring",
+      "notes": "Turnkey commercial flooring, NoVA/DC/Baltimore corridor"
+    },
+    {
+      "name": "GreenEdge Commercial Interiors",
+      "google_query": "GreenEdge Commercial Interiors, Washington DC",
+      "segment": "commercial-flooring",
+      "notes": "Full-service commercial flooring contractor, Metro DC"
+    },
+    {
+      "name": "Abbey Commercial Flooring",
+      "google_query": "Abbey Commercial Flooring, Washington DC",
+      "segment": "commercial-flooring",
+      "notes": "30+ yrs commercial flooring in DC region; hospitality/corporate/healthcare/education"
+    },
+    {
+      "name": "Direct Solutions Flooring",
+      "google_query": "Direct Solutions Flooring, Washington DC",
+      "segment": "commercial-flooring",
+      "notes": "Commercial flooring contractor, DC metro"
+    },
+    {
+      "name": "JG Carpet Contractors",
+      "google_query": "JG Carpet Contractors, Essex, MD",
+      "segment": "residential-carpet",
+      "notes": "BBB-accredited; Baltimore, Silver Spring, Gaithersburg, Rockville"
+    },
+    {
+      "name": "Maryland Carpet and Tile",
+      "google_query": "Maryland Carpet and Tile, Gaithersburg, MD",
+      "segment": "residential-carpet",
+      "notes": "Since 1992; carpet, hardwood, laminate, tile — residential + commercial"
+    },
+    {
+      "name": "PriceCo Floors",
+      "google_query": "PriceCo Floors, Maryland",
+      "segment": "residential-carpet",
+      "notes": "High-volume residential carpet/flooring installer, Baltimore + Rockville markets"
+    },
+    {
+      "name": "Moe's Carpet and Flooring Services",
+      "google_query": "Moe's Carpet and Flooring Services, Maryland",
+      "segment": "residential-carpet",
+      "notes": "Top-rated on Yelp in Rockville and Baltimore"
+    },
+    {
+      "name": "The Carpet Center",
+      "google_query": "The Carpet Center, Maryland",
+      "segment": "residential-carpet",
+      "notes": "Carpet sales + install, Rockville/Baltimore"
+    },
+    {
+      "name": "Aladdin Carpet and Floors",
+      "google_query": "Aladdin Carpet and Floors, Rockville, MD",
+      "segment": "residential-carpet",
+      "notes": "Rockville-based carpet and flooring store"
+    },
+    {
+      "name": "Classic Carpets Inc",
+      "google_query": "Classic Carpets, Jessup, MD",
+      "segment": "residential-carpet",
+      "notes": "Family-owned since 1976, Jessup MD"
+    }
+  ]
+}
