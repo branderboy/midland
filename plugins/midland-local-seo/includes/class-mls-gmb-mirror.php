@@ -710,8 +710,18 @@ class MLS_GMB_Mirror {
 	 * @return string
 	 */
 	private function page_url( $post_id ) {
+		// Published posts: the REAL permalink. Works for pages AND custom post
+		// types (location pages). Building URLs by hand from the page URI
+		// produced wrong, 404ing links for CPT locations.
+		if ( 'publish' === get_post_status( $post_id ) ) {
+			$link = get_permalink( $post_id );
+			if ( $link ) {
+				return $link;
+			}
+		}
+		// Drafts (only ever linked in admin previews): predicted pretty URL.
 		$uri = get_page_uri( $post_id );
-		return $uri ? home_url( user_trailingslashit( $uri ) ) : get_permalink( $post_id );
+		return $uri ? home_url( user_trailingslashit( $uri ) ) : (string) get_permalink( $post_id );
 	}
 
 	/**
