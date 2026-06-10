@@ -157,6 +157,7 @@ class MLS_Geogrid {
 			'center_lng'    => (float) ( isset( $_POST['geogrid_center_lng'] ) ? wp_unslash( $_POST['geogrid_center_lng'] ) : 0 ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			'grid_size'     => max( 3, min( 9, (int) ( isset( $_POST['geogrid_grid_size'] ) ? wp_unslash( $_POST['geogrid_grid_size'] ) : 5 ) ) ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			'spacing_km'    => max( 0.5, min( 50, (float) ( isset( $_POST['geogrid_spacing_km'] ) ? wp_unslash( $_POST['geogrid_spacing_km'] ) : 1.5 ) ) ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			'measure'       => ( isset( $_POST['geogrid_measure'] ) && 'organic' === $_POST['geogrid_measure'] ) ? 'organic' : 'map_pack',
 		);
 		if ( 0 === $settings['grid_size'] % 2 ) {
 			$settings['grid_size'] += 1;
@@ -280,27 +281,37 @@ class MLS_Geogrid {
 			return;
 		}
 
-		// Local-pack (Google Maps) results, NOT organic — this is what local SEO
-		// ranking actually means for a map-pack/GBP business.
-		$serp = MLS_DataForSEO::get_local_pack_at_coordinate(
-			$run->keyword,
-			(float) $cell->lat,
-			(float) $cell->lng
-		);
+		// Measurement source is a setting: map_pack (Local Falcon style, the
+		// default) or organic Google search results at each coordinate.
+		$settings = get_option( 'mls_geogrid_settings', array() );
+		$measure  = isset( $settings['measure'] ) && 'organic' === $settings['measure'] ? 'organic' : 'map_pack';
 
-		// Plans without the Maps API: measure ORGANIC rank at the same
-		// coordinate instead of returning an empty grid.
-		if ( is_wp_error( $serp ) ) {
-			$msg     = $serp->get_error_message();
-			$is_auth = ( false !== stripos( $msg, 'not authorized' ) || false !== stripos( $msg, 'access denied' ) || false !== stripos( $msg, '40301' ) );
-			if ( $is_auth ) {
-				$serp = MLS_DataForSEO::get_serp_at_coordinate(
-					$run->keyword,
-					(float) $cell->lat,
-					(float) $cell->lng
-				);
-				if ( ! is_wp_error( $serp ) ) {
-					update_option( 'mls_geogrid_mode', 'organic', false );
+		if ( 'organic' === $measure ) {
+			$serp = MLS_DataForSEO::get_serp_at_coordinate(
+				$run->keyword,
+				(float) $cell->lat,
+				(float) $cell->lng
+			);
+		} else {
+			$serp = MLS_DataForSEO::get_local_pack_at_coordinate(
+				$run->keyword,
+				(float) $cell->lat,
+				(float) $cell->lng
+			);
+			// Plans without the Maps API: fall back to organic rather than
+			// returning an empty grid.
+			if ( is_wp_error( $serp ) ) {
+				$msg     = $serp->get_error_message();
+				$is_auth = ( false !== stripos( $msg, 'not authorized' ) || false !== stripos( $msg, 'access denied' ) || false !== stripos( $msg, '40301' ) );
+				if ( $is_auth ) {
+					$serp = MLS_DataForSEO::get_serp_at_coordinate(
+						$run->keyword,
+						(float) $cell->lat,
+						(float) $cell->lng
+					);
+					if ( ! is_wp_error( $serp ) ) {
+						update_option( 'mls_geogrid_mode', 'organic', false );
+					}
 				}
 			}
 		}
@@ -563,6 +574,15 @@ class MLS_Geogrid {
 					<tr>
 						<th><label for="geogrid_spacing_km"><?php esc_html_e( 'Spacing (km)', 'midland-local-seo' ); ?></label></th>
 						<td><input type="number" step="0.5" min="0.5" max="50" id="geogrid_spacing_km" name="geogrid_spacing_km" value="<?php echo esc_attr( $settings['spacing_km'] ); ?>" style="width:100px;"></td>
+					</tr>
+					<tr>
+						<th><label for="geogrid_measure"><?php esc_html_e( 'Measure', 'midland-local-seo' ); ?></label></th>
+						<td>
+							<select id="geogrid_measure" name="geogrid_measure">
+								<option value="map_pack" <?php selected( isset( $settings['measure'] ) ? $settings['measure'] : 'map_pack', 'map_pack' ); ?>><?php esc_html_e( 'Map pack rank (Google Maps, Local Falcon style)', 'midland-local-seo' ); ?></option>
+								<option value="organic" <?php selected( isset( $settings['measure'] ) ? $settings['measure'] : 'map_pack', 'organic' ); ?>><?php esc_html_e( 'Organic rank (Google Search results)', 'midland-local-seo' ); ?></option>
+							</select>
+						</td>
 					</tr>
 				</table>
 				<p class="submit">
