@@ -22,8 +22,10 @@ class CTM_Cron {
 
     private function __construct() {
         add_action( self::HOOK, array( __CLASS__, 'run' ) );
-        // Self-heal the schedule on each load (e.g. after an update).
-        add_action( 'init', array( __CLASS__, 'maybe_schedule' ) );
+        // Self-heal the schedule on admin loads (e.g. after an update). Running
+        // this on front-end 'init' would cost a wp_next_scheduled() DB lookup on
+        // every visitor request.
+        add_action( 'admin_init', array( __CLASS__, 'maybe_schedule' ) );
     }
 
     /** Register the custom "weekly" recurrence (core only ships up to daily). */
