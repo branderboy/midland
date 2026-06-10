@@ -510,7 +510,61 @@ class MLS_GMB_Mirror {
 		if ( false !== strpos( $content, '(Draft' ) ) {
 			return true;
 		}
-		return strlen( trim( wp_strip_all_tags( $content ) ) ) < 400;
+		// Elementor pages keep their real copy in the layout, not post_content.
+		// Measure whichever holds more text, or hand-built pages get nuked.
+		$text    = trim( wp_strip_all_tags( $content ) );
+		$el_text = $this->elementor_text( $post_id );
+		if ( false !== strpos( $el_text, '(Draft' ) ) {
+			return true;
+		}
+		return max( strlen( $text ), strlen( $el_text ) ) < 400;
+	}
+
+	/**
+	 * All human-readable text inside a page's Elementor layout.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string
+	 */
+	private function elementor_text( $post_id ) {
+		$raw = (string) get_post_meta( $post_id, '_elementor_data', true );
+		if ( '' === $raw ) {
+			return '';
+		}
+		$data = json_decode( $raw, true );
+		if ( ! is_array( $data ) ) {
+			return '';
+		}
+		$text  = '';
+		$stack = $data;
+		while ( $stack ) {
+			$node = array_pop( $stack );
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			foreach ( array( 'editor', 'title', 'text', 'description_text', 'item_description' ) as $key ) {
+				if ( ! empty( $node['settings'][ $key ] ) && is_string( $node['settings'][ $key ] ) ) {
+					$text .= ' ' . wp_strip_all_tags( $node['settings'][ $key ] );
+				}
+			}
+			if ( ! empty( $node['elements'] ) && is_array( $node['elements'] ) ) {
+				foreach ( $node['elements'] as $child ) {
+					$stack[] = $child;
+				}
+			}
+		}
+		return trim( $text );
+	}
+
+	/**
+	 * Whether the Mirror generated/last wrote this page. Hand-built pages do
+	 * not carry the marker and are never auto-rewritten.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	private function is_mirror_page( $post_id ) {
+		return (bool) get_post_meta( (int) $post_id, '_mls_mirror_generated', true );
 	}
 
 	/**
@@ -524,6 +578,11 @@ class MLS_GMB_Mirror {
 	 * @param string $state       State (locations).
 	 */
 	private function rewrite_post_full( $post_id, $title, $is_location, $city = '', $state = '' ) {
+		// Hand-built page with its own Elementor layout and real content:
+		// leave it completely alone.
+		if ( ! $this->is_mirror_page( $post_id ) && ! $this->is_thin( $post_id ) && $this->has_template( $post_id ) ) {
+			return;
+		}
 		if ( $this->is_thin( $post_id ) ) {
 			// Stub or near-empty: replace with full done-for-you copy.
 			$content = $is_location
@@ -583,6 +642,7 @@ class MLS_GMB_Mirror {
 		$args['links_html'] = $this->build_links_html( (int) $post_id );
 
 		MLS_Elementor::apply( (int) $post_id, $args );
+		update_post_meta( (int) $post_id, '_mls_mirror_generated', 1 );
 
 		// Group under the right parent so the pages live under /services/ or
 		// /service-areas/ instead of floating at the root.
@@ -622,6 +682,22 @@ class MLS_GMB_Mirror {
 			$id    = $this->existing_post_id( $title );
 			if ( $id ) {
 				$targets['locations'][ $id ] = $area;
+			}
+		}
+		// Location pages built as the Smart SEO location type count too.
+		if ( post_type_exists( 'mfc_location' ) ) {
+			$cpt = get_posts(
+				array(
+					'post_type'   => 'mfc_location',
+					'post_status' => array( 'publish', 'draft' ),
+					'numberposts' => 100,
+					'fields'      => 'ids',
+				)
+			);
+			foreach ( $cpt as $id ) {
+				if ( ! isset( $targets['locations'][ $id ] ) ) {
+					$targets['locations'][ $id ] = get_the_title( $id );
+				}
 			}
 		}
 		return $targets;
@@ -710,38 +786,8 @@ class MLS_GMB_Mirror {
 		if ( 'page' !== get_post_type( $post_id ) ) {
 			return; // CPT location pages keep their own structure.
 		}
-		// Never let WP's "automatically add new top-level pages" menu option
-		// put the hub pages into the header nav.
-		add_filter( 'option_nav_menu_options', array( $this, 'suppress_menu_auto_add' ) );
-		$slug  = $is_location ? 'service-areas' : 'services';
-		$title = $is_location ? __( 'Service Areas', 'midland-local-seo' ) : __( 'Our Services', 'midland-local-seo' );
-
-		$parent = get_page_by_path( $slug, OBJECT, 'page' );
-		if ( ! $parent ) {
-			$parent_id = wp_insert_post(
-				array(
-					'post_title'   => $title,
-					'post_name'    => $slug,
-					'post_status'  => 'publish',
-					'post_type'    => 'page',
-					'post_content' => '',
-				)
-			);
-			if ( is_wp_error( $parent_id ) || ! $parent_id ) {
-				return;
-			}
-			// The hub page lists everything below it.
-			wp_update_post(
-				array(
-					'ID'           => $parent_id,
-					'post_content' => '[' . ( $is_location ? 'mls_location_links' : 'mls_service_links' ) . ']',
-				)
-			);
-		} else {
-			$parent_id = (int) $parent->ID;
-		}
-
-		if ( (int) get_post_field( 'post_parent', $post_id ) !== (int) $parent_id ) {
+		$parent_id = $this->ensure_hub_page( $is_location );
+		if ( $parent_id && (int) get_post_field( 'post_parent', $post_id ) !== (int) $parent_id ) {
 			wp_update_post(
 				array(
 					'ID'          => (int) $post_id,
@@ -749,7 +795,52 @@ class MLS_GMB_Mirror {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Create (or fetch) a hub page: /services/ or /service-areas/. Published,
+	 * lists its children via shortcode, never added to the header nav.
+	 *
+	 * @param bool $is_location Service Areas hub when true, Services hub when false.
+	 * @return int Hub page ID, or 0.
+	 */
+	private function ensure_hub_page( $is_location ) {
+		$slug  = $is_location ? 'service-areas' : 'services';
+		$title = $is_location ? __( 'Service Areas', 'midland-local-seo' ) : __( 'Our Services', 'midland-local-seo' );
+
+		$parent = get_page_by_path( $slug, OBJECT, 'page' );
+		if ( $parent ) {
+			return (int) $parent->ID;
+		}
+
+		// Never let WP's "automatically add new top-level pages" menu option
+		// put the hub pages into the header nav.
+		add_filter( 'option_nav_menu_options', array( $this, 'suppress_menu_auto_add' ) );
+		$parent_id = wp_insert_post(
+			array(
+				'post_title'   => $title,
+				'post_name'    => $slug,
+				'post_status'  => 'publish',
+				'post_type'    => 'page',
+				'post_content' => '[' . ( $is_location ? 'mls_location_links' : 'mls_service_links' ) . ']',
+			)
+		);
 		remove_filter( 'option_nav_menu_options', array( $this, 'suppress_menu_auto_add' ) );
+
+		return is_wp_error( $parent_id ) ? 0 : (int) $parent_id;
+	}
+
+	/**
+	 * Make sure both hub pages exist when there is anything for them to list.
+	 */
+	public function ensure_hubs() {
+		$targets = $this->link_targets();
+		if ( ! empty( $targets['services'] ) ) {
+			$this->ensure_hub_page( false );
+		}
+		if ( ! empty( $targets['locations'] ) ) {
+			$this->ensure_hub_page( true );
+		}
 	}
 
 	/**
@@ -770,6 +861,7 @@ class MLS_GMB_Mirror {
 	 * assign to a footer menu location or an Elementor nav-menu widget.
 	 */
 	private function sync_links_menu() {
+		$this->ensure_hubs();
 		$menu_name = 'Service Links';
 		$menu      = wp_get_nav_menu_object( $menu_name );
 		$menu_id   = $menu ? (int) $menu->term_id : (int) wp_create_nav_menu( $menu_name );
@@ -831,13 +923,13 @@ class MLS_GMB_Mirror {
 		$count    = 0;
 
 		foreach ( $recs['service'] as $rec ) {
-			if ( $rec['existing'] && ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
+			if ( $rec['existing'] && ( $this->is_mirror_page( $rec['existing'] ) || $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
 				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], false );
 				++$count;
 			}
 		}
 		foreach ( $recs['location'] as $rec ) {
-			if ( $rec['existing'] && ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
+			if ( $rec['existing'] && ( $this->is_mirror_page( $rec['existing'] ) || $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
 				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], true, $rec['city'], $rec['state'] );
 				++$count;
 			}
@@ -879,7 +971,7 @@ class MLS_GMB_Mirror {
 						<?php endif; ?>
 						<button type="submit" class="button button-secondary"><?php esc_html_e( 'Create draft', 'midland-local-seo' ); ?></button>
 					</form>
-				<?php elseif ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) : ?>
+				<?php elseif ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) || $this->is_mirror_page( $rec['existing'] ) ) : ?>
 					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0;">
 						<?php wp_nonce_field( 'mls_rewrite_page' ); ?>
 						<input type="hidden" name="action" value="mls_rewrite_page">
@@ -891,7 +983,15 @@ class MLS_GMB_Mirror {
 							<input type="hidden" name="mirror_state" value="<?php echo esc_attr( $rec['state'] ); ?>">
 						<?php endif; ?>
 						<button type="submit" class="button button-secondary" onclick="return confirm('Apply your Elementor template to this page<?php echo $this->is_thin( $rec['existing'] ) ? ' and replace the thin content with full copy' : ' (keeps the current copy)'; ?>?');">
-							<?php $this->is_thin( $rec['existing'] ) ? esc_html_e( 'Rewrite with full copy', 'midland-local-seo' ) : esc_html_e( 'Apply Elementor template', 'midland-local-seo' ); ?>
+							<?php
+							if ( $this->is_thin( $rec['existing'] ) ) {
+								esc_html_e( 'Rewrite with full copy', 'midland-local-seo' );
+							} elseif ( $this->is_mirror_page( $rec['existing'] ) ) {
+								esc_html_e( 'Refresh copy + links', 'midland-local-seo' );
+							} else {
+								esc_html_e( 'Apply Elementor template', 'midland-local-seo' );
+							}
+							?>
 						</button>
 					</form>
 				<?php else : ?>
