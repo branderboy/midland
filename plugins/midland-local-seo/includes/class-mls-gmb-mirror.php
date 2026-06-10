@@ -732,9 +732,10 @@ class MLS_GMB_Mirror {
 		}
 
 		// Plus up to 3 sibling pages for crawl depth, not the whole site.
+		// Published only: a draft link is a 404 for visitors.
 		$count = 0;
 		foreach ( $targets[ $group ] as $id => $label ) {
-			if ( (int) $id === (int) $exclude_id || $count >= 3 ) {
+			if ( (int) $id === (int) $exclude_id || $count >= 3 || 'publish' !== get_post_status( $id ) ) {
 				continue;
 			}
 			$text   = 'locations' === $group ? 'Floor Care in ' . $label : $label;
