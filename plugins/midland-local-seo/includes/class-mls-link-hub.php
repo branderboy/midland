@@ -23,12 +23,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 class MLS_Link_Hub {
 
 	/**
-	 * Hook the shortcodes.
+	 * Whether the footer links already rendered on this request (via the
+	 * shortcode placed in a footer template). Suppresses the automatic bar.
+	 *
+	 * @var bool
+	 */
+	private static $rendered = false;
+
+	/**
+	 * Hook the shortcodes + the automatic pre-footer bar.
 	 */
 	public static function init() {
 		add_shortcode( 'mls_service_links', array( __CLASS__, 'service_links' ) );
 		add_shortcode( 'mls_location_links', array( __CLASS__, 'location_links' ) );
 		add_shortcode( 'mls_footer_links', array( __CLASS__, 'footer_links' ) );
+		add_action( 'wp_footer', array( __CLASS__, 'auto_footer' ), 5 );
+	}
+
+	/**
+	 * Automatic core-links bar at the end of every page. Zero setup: no
+	 * shortcode, no menu, no footer editing required. If [mls_footer_links]
+	 * already rendered on this request (footer template has it), skip.
+	 */
+	public static function auto_footer() {
+		if ( self::$rendered || is_admin() ) {
+			return;
+		}
+		if ( ! class_exists( 'MLS_GMB_Mirror' ) ) {
+			return;
+		}
+		$core = MLS_GMB_Mirror::get_instance()->core_pages();
+		if ( empty( $core ) ) {
+			return;
+		}
+		$links = array();
+		foreach ( $core as $url => $label ) {
+			$links[] = '<a href="' . esc_url( $url ) . '" style="color:#B7E5BD;text-decoration:none;font-weight:700;margin:0 16px;display:inline-block;">' . esc_html( $label ) . '</a>';
+		}
+		echo '<div class="mls-auto-footer" style="background:#0E2F14;text-align:center;padding:18px 24px;font-size:15px;line-height:2;">'
+			. implode( '<span style="color:#2F8137;">|</span>', $links )
+			. '</div>';
 	}
 
 	/**
@@ -95,6 +129,7 @@ class MLS_Link_Hub {
 	 * @return string
 	 */
 	public static function footer_links() {
+		self::$rendered = true;
 		if ( ! class_exists( 'MLS_GMB_Mirror' ) ) {
 			return '';
 		}

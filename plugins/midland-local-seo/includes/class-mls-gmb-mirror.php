@@ -52,6 +52,7 @@ class MLS_GMB_Mirror {
 		add_action( 'admin_post_mls_rewrite_page', array( $this, 'handle_rewrite_page' ) );
 		add_action( 'admin_post_mls_rewrite_all_thin', array( $this, 'handle_rewrite_all_thin' ) );
 		add_action( 'admin_init', array( $this, 'handle_save_categories' ) );
+		add_action( 'admin_init', array( $this, 'maybe_ensure_hubs' ) );
 	}
 
 	/**
@@ -839,6 +840,16 @@ class MLS_GMB_Mirror {
 		remove_filter( 'option_nav_menu_options', array( $this, 'suppress_menu_auto_add' ) );
 
 		return is_wp_error( $parent_id ) ? 0 : (int) $parent_id;
+	}
+
+	/**
+	 * Run ensure_hubs once per plugin version on any wp-admin visit.
+	 */
+	public function maybe_ensure_hubs() {
+		if ( get_option( 'mls_hubs_checked' ) !== MLS_VERSION ) {
+			$this->ensure_hubs();
+			update_option( 'mls_hubs_checked', MLS_VERSION, false );
+		}
 	}
 
 	/**
