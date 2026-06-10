@@ -510,7 +510,61 @@ class MLS_GMB_Mirror {
 		if ( false !== strpos( $content, '(Draft' ) ) {
 			return true;
 		}
-		return strlen( trim( wp_strip_all_tags( $content ) ) ) < 400;
+		// Elementor pages keep their real copy in the layout, not post_content.
+		// Measure whichever holds more text, or hand-built pages get nuked.
+		$text    = trim( wp_strip_all_tags( $content ) );
+		$el_text = $this->elementor_text( $post_id );
+		if ( false !== strpos( $el_text, '(Draft' ) ) {
+			return true;
+		}
+		return max( strlen( $text ), strlen( $el_text ) ) < 400;
+	}
+
+	/**
+	 * All human-readable text inside a page's Elementor layout.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string
+	 */
+	private function elementor_text( $post_id ) {
+		$raw = (string) get_post_meta( $post_id, '_elementor_data', true );
+		if ( '' === $raw ) {
+			return '';
+		}
+		$data = json_decode( $raw, true );
+		if ( ! is_array( $data ) ) {
+			return '';
+		}
+		$text  = '';
+		$stack = $data;
+		while ( $stack ) {
+			$node = array_pop( $stack );
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			foreach ( array( 'editor', 'title', 'text', 'description_text', 'item_description' ) as $key ) {
+				if ( ! empty( $node['settings'][ $key ] ) && is_string( $node['settings'][ $key ] ) ) {
+					$text .= ' ' . wp_strip_all_tags( $node['settings'][ $key ] );
+				}
+			}
+			if ( ! empty( $node['elements'] ) && is_array( $node['elements'] ) ) {
+				foreach ( $node['elements'] as $child ) {
+					$stack[] = $child;
+				}
+			}
+		}
+		return trim( $text );
+	}
+
+	/**
+	 * Whether the Mirror generated/last wrote this page. Hand-built pages do
+	 * not carry the marker and are never auto-rewritten.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	private function is_mirror_page( $post_id ) {
+		return (bool) get_post_meta( (int) $post_id, '_mls_mirror_generated', true );
 	}
 
 	/**
@@ -524,6 +578,11 @@ class MLS_GMB_Mirror {
 	 * @param string $state       State (locations).
 	 */
 	private function rewrite_post_full( $post_id, $title, $is_location, $city = '', $state = '' ) {
+		// Hand-built page with its own Elementor layout and real content:
+		// leave it completely alone.
+		if ( ! $this->is_mirror_page( $post_id ) && ! $this->is_thin( $post_id ) && $this->has_template( $post_id ) ) {
+			return;
+		}
 		if ( $this->is_thin( $post_id ) ) {
 			// Stub or near-empty: replace with full done-for-you copy.
 			$content = $is_location
@@ -583,6 +642,7 @@ class MLS_GMB_Mirror {
 		$args['links_html'] = $this->build_links_html( (int) $post_id );
 
 		MLS_Elementor::apply( (int) $post_id, $args );
+		update_post_meta( (int) $post_id, '_mls_mirror_generated', 1 );
 
 		// Group under the right parent so the pages live under /services/ or
 		// /service-areas/ instead of floating at the root.
@@ -831,13 +891,13 @@ class MLS_GMB_Mirror {
 		$count    = 0;
 
 		foreach ( $recs['service'] as $rec ) {
-			if ( $rec['existing'] && ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
+			if ( $rec['existing'] && ( $this->is_mirror_page( $rec['existing'] ) || $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
 				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], false );
 				++$count;
 			}
 		}
 		foreach ( $recs['location'] as $rec ) {
-			if ( $rec['existing'] && ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
+			if ( $rec['existing'] && ( $this->is_mirror_page( $rec['existing'] ) || $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
 				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], true, $rec['city'], $rec['state'] );
 				++$count;
 			}
@@ -879,7 +939,7 @@ class MLS_GMB_Mirror {
 						<?php endif; ?>
 						<button type="submit" class="button button-secondary"><?php esc_html_e( 'Create draft', 'midland-local-seo' ); ?></button>
 					</form>
-				<?php elseif ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) : ?>
+				<?php elseif ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) || $this->is_mirror_page( $rec['existing'] ) ) : ?>
 					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0;">
 						<?php wp_nonce_field( 'mls_rewrite_page' ); ?>
 						<input type="hidden" name="action" value="mls_rewrite_page">
@@ -891,7 +951,15 @@ class MLS_GMB_Mirror {
 							<input type="hidden" name="mirror_state" value="<?php echo esc_attr( $rec['state'] ); ?>">
 						<?php endif; ?>
 						<button type="submit" class="button button-secondary" onclick="return confirm('Apply your Elementor template to this page<?php echo $this->is_thin( $rec['existing'] ) ? ' and replace the thin content with full copy' : ' (keeps the current copy)'; ?>?');">
-							<?php $this->is_thin( $rec['existing'] ) ? esc_html_e( 'Rewrite with full copy', 'midland-local-seo' ) : esc_html_e( 'Apply Elementor template', 'midland-local-seo' ); ?>
+							<?php
+							if ( $this->is_thin( $rec['existing'] ) ) {
+								esc_html_e( 'Rewrite with full copy', 'midland-local-seo' );
+							} elseif ( $this->is_mirror_page( $rec['existing'] ) ) {
+								esc_html_e( 'Refresh copy + links', 'midland-local-seo' );
+							} else {
+								esc_html_e( 'Apply Elementor template', 'midland-local-seo' );
+							}
+							?>
 						</button>
 					</form>
 				<?php else : ?>
