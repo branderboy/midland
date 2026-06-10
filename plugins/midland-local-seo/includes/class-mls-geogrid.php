@@ -53,6 +53,7 @@ class MLS_Geogrid {
 
 		add_action( self::CRON_HOOK, array( $this, 'cron_scan' ) );
 		add_action( self::TICK_HOOK, array( $this, 'process_next_cell' ), 10, 1 );
+		add_action( 'admin_post_mls_geogrid_diag', array( $this, 'handle_diagnostics' ) );
 		add_action( 'admin_init', array( $this, 'maybe_schedule_cron' ) );
 	}
 
@@ -165,6 +166,56 @@ class MLS_Geogrid {
 
 		update_option( 'mls_geogrid_settings', $settings );
 		wp_safe_redirect( admin_url( 'admin.php?page=mls-geogrid&saved=1' ) );
+		exit;
+	}
+
+	/**
+	 * One-click API diagnostics: tests every DataForSEO call the geo-grid
+	 * depends on and stores raw results for display.
+	 */
+	public function handle_diagnostics() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_geogrid_diag' );
+
+		$settings = get_option( 'mls_geogrid_settings', array() );
+		$lat      = isset( $settings['center_lat'] ) ? (float) $settings['center_lat'] : 38.9;
+		$lng      = isset( $settings['center_lng'] ) ? (float) $settings['center_lng'] : -77.0;
+		$keyword  = ! empty( $settings['keyword'] ) ? (string) $settings['keyword'] : 'carpet cleaning';
+
+		$login  = class_exists( 'MLS_DataForSEO' ) ? MLS_DataForSEO::get_login() : '';
+		$source = 'NOT CONFIGURED';
+		if ( class_exists( 'RSSEO_Pro_DataForSEO' ) && RSSEO_Pro_DataForSEO::is_configured() ) {
+			$source = 'Smart SEO connection (the working one)';
+		} elseif ( '' !== (string) get_option( 'mls_dfs_login', '' ) ) {
+			$source = 'Local SEO settings';
+		}
+		$masked    = '' !== $login ? substr( $login, 0, 3 ) . '***' . substr( $login, -6 ) : '(empty)';
+
+		$results   = array();
+		$results[] = array( 'check' => 'Credentials in use', 'result' => $source . ' — login ' . $masked );
+
+		$conn      = MLS_DataForSEO::test_connection();
+		$results[] = array(
+			'check'  => 'Auth test (Keywords Data live)',
+			'result' => is_wp_error( $conn ) ? 'FAIL: ' . $conn->get_error_message() : 'OK',
+		);
+
+		$organic   = MLS_DataForSEO::get_serp_at_coordinate( $keyword, $lat, $lng, 5, 'en', 20 );
+		$results[] = array(
+			'check'  => 'Organic SERP at center point',
+			'result' => is_wp_error( $organic ) ? 'FAIL: ' . $organic->get_error_message() : 'OK — ' . count( $organic ) . ' results, #1: ' . ( $organic[0]['domain'] ?? '?' ),
+		);
+
+		$maps      = MLS_DataForSEO::get_local_pack_at_coordinate( $keyword, $lat, $lng, 20 );
+		$results[] = array(
+			'check'  => 'Maps / local pack at center point',
+			'result' => is_wp_error( $maps ) ? 'FAIL: ' . $maps->get_error_message() : 'OK — ' . count( $maps ) . ' listings, #1: ' . ( $maps[0]['title'] ?? '?' ),
+		);
+
+		set_transient( 'mls_geogrid_diag', $results, HOUR_IN_SECONDS );
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-geogrid&diag=1' ) );
 		exit;
 	}
 
@@ -619,6 +670,24 @@ class MLS_Geogrid {
 
 			<?php if ( $latest ) : ?>
 				<hr>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:12px 0;">
+				<?php wp_nonce_field( 'mls_geogrid_diag' ); ?>
+				<input type="hidden" name="action" value="mls_geogrid_diag">
+				<button type="submit" class="button"><?php esc_html_e( 'Run API Diagnostics', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'Live-tests every DataForSEO call the grid uses and prints the raw result of each.', 'midland-local-seo' ); ?></span>
+			</form>
+			<?php $mls_diag = get_transient( 'mls_geogrid_diag' ); ?>
+			<?php if ( ! empty( $mls_diag ) && is_array( $mls_diag ) ) : ?>
+				<table class="widefat striped" style="max-width:900px;margin-bottom:16px;">
+					<thead><tr><th style="width:280px;"><?php esc_html_e( 'Check', 'midland-local-seo' ); ?></th><th><?php esc_html_e( 'Result', 'midland-local-seo' ); ?></th></tr></thead>
+					<tbody>
+						<?php foreach ( $mls_diag as $mls_d ) : ?>
+							<tr><td><?php echo esc_html( $mls_d['check'] ); ?></td><td style="<?php echo 0 === strpos( $mls_d['result'], 'FAIL' ) ? 'color:#b32d2e;font-weight:600;' : ''; ?>"><?php echo esc_html( $mls_d['result'] ); ?></td></tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			<?php endif; ?>
+
 				<h2><?php esc_html_e( 'Latest Run', 'midland-local-seo' ); ?></h2>
 				<p>
 					<strong><?php echo esc_html( $latest->keyword ); ?></strong>
