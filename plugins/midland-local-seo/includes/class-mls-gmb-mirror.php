@@ -49,6 +49,8 @@ class MLS_GMB_Mirror {
 		add_action( 'admin_post_mls_create_mirror_draft', array( $this, 'handle_create_draft' ) );
 		add_action( 'admin_post_mls_create_all_services', array( $this, 'handle_create_all_services' ) );
 		add_action( 'admin_post_mls_create_all_locations', array( $this, 'handle_create_all_locations' ) );
+		add_action( 'admin_post_mls_rewrite_page', array( $this, 'handle_rewrite_page' ) );
+		add_action( 'admin_post_mls_rewrite_all_thin', array( $this, 'handle_rewrite_all_thin' ) );
 		add_action( 'admin_init', array( $this, 'handle_save_categories' ) );
 	}
 
@@ -68,16 +70,21 @@ class MLS_GMB_Mirror {
 			if ( '' === $service || $this->existing_post_id( $service ) ) {
 				continue;
 			}
-			$post_id = wp_insert_post(
-				array(
-					'post_title'   => $service,
-					'post_name'    => sanitize_title( $service ),
-					'post_content' => $this->build_service_content( $service ),
-					'post_status'  => 'draft',
-					'post_type'    => 'page',
-				),
-				true
-			);
+			if ( class_exists( 'RSSEO_Pro_Programmatic' ) ) {
+				// Smart SEO engine: full copy + Elementor template + schema.
+				$post_id = RSSEO_Pro_Programmatic::generate_service_page( $service, array( 'status' => 'draft', 'ping' => false ) );
+			} else {
+				$post_id = wp_insert_post(
+					array(
+						'post_title'   => $service,
+						'post_name'    => sanitize_title( $service ),
+						'post_content' => $this->build_service_content( $service ),
+						'post_status'  => 'draft',
+						'post_type'    => 'page',
+					),
+					true
+				);
+			}
 			if ( ! is_wp_error( $post_id ) && $post_id ) {
 				++$created;
 			}
@@ -113,16 +120,21 @@ class MLS_GMB_Mirror {
 			if ( '' === $city || $this->existing_post_id( $title ) ) {
 				continue;
 			}
-			$post_id = wp_insert_post(
-				array(
-					'post_title'   => $title,
-					'post_name'    => sanitize_title( $title ),
-					'post_content' => $this->build_location_content( $title, $city, $state ),
-					'post_status'  => 'draft',
-					'post_type'    => 'page',
-				),
-				true
-			);
+			if ( class_exists( 'RSSEO_Pro_Programmatic' ) ) {
+				// Smart SEO engine: mfc_location CPT + Elementor template.
+				$post_id = RSSEO_Pro_Programmatic::generate_location_page( $city, $state, self::get_categories(), array( 'status' => 'draft', 'ping' => false ) );
+			} else {
+				$post_id = wp_insert_post(
+					array(
+						'post_title'   => $title,
+						'post_name'    => sanitize_title( $title ),
+						'post_content' => $this->build_location_content( $title, $city, $state ),
+						'post_status'  => 'draft',
+						'post_type'    => 'page',
+					),
+					true
+				);
+			}
 			if ( ! is_wp_error( $post_id ) && $post_id ) {
 				++$created;
 			}
@@ -352,6 +364,10 @@ class MLS_GMB_Mirror {
 	 * @return string HTML content.
 	 */
 	private function build_service_content( $service ) {
+		// Smart SEO ships the done-for-you, service-specific copy library.
+		if ( class_exists( 'RSSEO_Service_Copy' ) ) {
+			return RSSEO_Service_Copy::body_for( $service );
+		}
 		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
 		$business = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
 		$phone    = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '';
@@ -447,24 +463,31 @@ class MLS_GMB_Mirror {
 			exit;
 		}
 
-		// Build full content, self-contained. No other plugin required.
-		$full = $is_location
-			? $this->build_location_content( $title, $city, $state )
-			: $this->build_service_content( $title );
-		if ( '' !== trim( $full ) ) {
-			$stub = $full;
-		}
+		// Smart SEO engine first: full copy + Elementor template + schema.
+		if ( class_exists( 'RSSEO_Pro_Programmatic' ) ) {
+			$post_id = $is_location
+				? RSSEO_Pro_Programmatic::generate_location_page( $city, $state, self::get_categories(), array( 'status' => 'draft', 'ping' => false ) )
+				: RSSEO_Pro_Programmatic::generate_service_page( $title, array( 'status' => 'draft', 'ping' => false ) );
+		} else {
+			// Fallback: self-contained full content, no other plugin required.
+			$full = $is_location
+				? $this->build_location_content( $title, $city, $state )
+				: $this->build_service_content( $title );
+			if ( '' !== trim( $full ) ) {
+				$stub = $full;
+			}
 
-		$post_id = wp_insert_post(
-			array(
-				'post_title'   => $title,
-				'post_name'    => sanitize_title( $title ),
-				'post_content' => $stub,
-				'post_status'  => 'draft',
-				'post_type'    => $type,
-			),
-			true
-		);
+			$post_id = wp_insert_post(
+				array(
+					'post_title'   => $title,
+					'post_name'    => sanitize_title( $title ),
+					'post_content' => $stub,
+					'post_status'  => 'draft',
+					'post_type'    => $type,
+				),
+				true
+			);
+		}
 
 		if ( is_wp_error( $post_id ) || ! $post_id ) {
 			wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&error=1' ) );
@@ -472,6 +495,103 @@ class MLS_GMB_Mirror {
 		}
 
 		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&created=' . (int) $post_id . '&via=draft' ) );
+		exit;
+	}
+
+	/**
+	 * A page is "thin" when it still carries the old one-line stub or has
+	 * almost no body text.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	private function is_thin( $post_id ) {
+		$content = (string) get_post_field( 'post_content', $post_id );
+		if ( false !== strpos( $content, '(Draft' ) ) {
+			return true;
+		}
+		return strlen( trim( wp_strip_all_tags( $content ) ) ) < 400;
+	}
+
+	/**
+	 * Replace a page's content with full done-for-you copy and re-apply the
+	 * Elementor template so it renders in the site design.
+	 *
+	 * @param int    $post_id     Post ID.
+	 * @param string $title       Service name or location title.
+	 * @param bool   $is_location Whether this is a location page.
+	 * @param string $city        City (locations).
+	 * @param string $state       State (locations).
+	 */
+	private function rewrite_post_full( $post_id, $title, $is_location, $city = '', $state = '' ) {
+		$content = $is_location
+			? $this->build_location_content( $title, $city, $state )
+			: $this->build_service_content( $title );
+
+		wp_update_post(
+			array(
+				'ID'           => (int) $post_id,
+				'post_content' => $content,
+			)
+		);
+
+		if ( class_exists( 'RSSEO_Pro_Programmatic' ) && method_exists( 'RSSEO_Pro_Programmatic', 'apply_template_to_post' ) ) {
+			$hero_city  = $is_location && '' !== $city ? $city : 'Washington DC';
+			$hero_state = $is_location && '' !== $state ? $state : 'Maryland and Northern Virginia';
+			$services   = $is_location ? self::get_categories() : array( $title );
+			RSSEO_Pro_Programmatic::apply_template_to_post( (int) $post_id, $hero_city, $hero_state, $services, $content );
+		}
+	}
+
+	/**
+	 * Rewrite ONE existing page with full copy + Elementor template.
+	 */
+	public function handle_rewrite_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_rewrite_page' );
+
+		$post_id     = isset( $_POST['mirror_post_id'] ) ? (int) $_POST['mirror_post_id'] : 0;
+		$title       = isset( $_POST['mirror_title'] ) ? sanitize_text_field( wp_unslash( $_POST['mirror_title'] ) ) : '';
+		$is_location = ! empty( $_POST['mirror_is_location'] );
+		$city        = isset( $_POST['mirror_city'] ) ? sanitize_text_field( wp_unslash( $_POST['mirror_city'] ) ) : '';
+		$state       = isset( $_POST['mirror_state'] ) ? sanitize_text_field( wp_unslash( $_POST['mirror_state'] ) ) : '';
+
+		if ( $post_id && '' !== $title ) {
+			$this->rewrite_post_full( $post_id, $title, $is_location, $city, $state );
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&rewritten=' . (int) $post_id ) );
+		exit;
+	}
+
+	/**
+	 * Rewrite EVERY existing thin/stub page in one click.
+	 */
+	public function handle_rewrite_all_thin() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_rewrite_all_thin' );
+
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$recs     = $this->build_recommendations( $identity, null );
+		$count    = 0;
+
+		foreach ( $recs['service'] as $rec ) {
+			if ( $rec['existing'] && $this->is_thin( $rec['existing'] ) ) {
+				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], false );
+				++$count;
+			}
+		}
+		foreach ( $recs['location'] as $rec ) {
+			if ( $rec['existing'] && $this->is_thin( $rec['existing'] ) ) {
+				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], true, $rec['city'], $rec['state'] );
+				++$count;
+			}
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&bulk_rewritten=' . (int) $count ) );
 		exit;
 	}
 
@@ -507,8 +627,21 @@ class MLS_GMB_Mirror {
 						<?php endif; ?>
 						<button type="submit" class="button button-secondary"><?php esc_html_e( 'Create draft', 'midland-local-seo' ); ?></button>
 					</form>
+				<?php elseif ( $this->is_thin( $rec['existing'] ) ) : ?>
+					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0;">
+						<?php wp_nonce_field( 'mls_rewrite_page' ); ?>
+						<input type="hidden" name="action" value="mls_rewrite_page">
+						<input type="hidden" name="mirror_post_id" value="<?php echo esc_attr( $rec['existing'] ); ?>">
+						<input type="hidden" name="mirror_title" value="<?php echo esc_attr( $rec['title'] ); ?>">
+						<?php if ( ! empty( $rec['is_location'] ) ) : ?>
+							<input type="hidden" name="mirror_is_location" value="1">
+							<input type="hidden" name="mirror_city" value="<?php echo esc_attr( $rec['city'] ); ?>">
+							<input type="hidden" name="mirror_state" value="<?php echo esc_attr( $rec['state'] ); ?>">
+						<?php endif; ?>
+						<button type="submit" class="button button-secondary" onclick="return confirm('Replace this page\'s thin content with full copy in your Elementor template?');"><?php esc_html_e( 'Rewrite with full copy', 'midland-local-seo' ); ?></button>
+					</form>
 				<?php else : ?>
-					<span class="description">&mdash;</span>
+					<span class="description"><?php esc_html_e( 'Looks good', 'midland-local-seo' ); ?></span>
 				<?php endif; ?>
 			</td>
 		</tr>
@@ -604,6 +737,30 @@ class MLS_GMB_Mirror {
 					?>
 				</p></div>
 			<?php endif; ?>
+
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['bulk_rewritten'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>
+					<?php
+					/* translators: %d: number of pages rewritten */
+					echo esc_html( sprintf( _n( '%d thin page rewritten with full copy in your Elementor template.', '%d thin pages rewritten with full copy in your Elementor template.', (int) $_GET['bulk_rewritten'], 'midland-local-seo' ), (int) $_GET['bulk_rewritten'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					?>
+				</p></div>
+			<?php endif; ?>
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['rewritten'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>
+					<?php esc_html_e( 'Page rewritten with full copy in your Elementor template.', 'midland-local-seo' ); ?>
+					<a href="<?php echo esc_url( get_edit_post_link( (int) $_GET['rewritten'] ) ); ?>"><?php esc_html_e( 'Review it', 'midland-local-seo' ); ?></a> <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+				</p></div>
+			<?php endif; ?>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
+				<?php wp_nonce_field( 'mls_rewrite_all_thin' ); ?>
+				<input type="hidden" name="action" value="mls_rewrite_all_thin">
+				<button type="submit" class="button button-primary" onclick="return confirm('Rewrite every thin or stub page with full done-for-you copy in your Elementor template?');"><?php esc_html_e( '⚡ Rewrite all thin pages with full copy', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'Fixes pages that still carry the old one-line draft stub.', 'midland-local-seo' ); ?></span>
+			</form>
 
 			<h2><?php esc_html_e( 'Service Pages (from GBP categories)', 'midland-local-seo' ); ?></h2>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
