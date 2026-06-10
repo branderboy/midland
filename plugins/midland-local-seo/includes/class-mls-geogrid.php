@@ -318,8 +318,11 @@ class MLS_Geogrid {
 
 		// Map listings reliably carry the GBP business name but not always the
 		// website domain, so match on either signal.
-		$identity    = get_option( 'mls_identity', array() );
+		$identity    = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : get_option( 'mls_identity', array() );
 		$target_name = isset( $identity['business_name'] ) ? (string) $identity['business_name'] : '';
+		if ( '' === $target_name ) {
+			$target_name = (string) get_bloginfo( 'name' );
+		}
 
 		$rank       = null;
 		$target_url = null;
@@ -328,6 +331,29 @@ class MLS_Geogrid {
 		if ( is_wp_error( $serp ) ) {
 			$error_msg = substr( $serp->get_error_message(), 0, 250 );
 		} else {
+			// First cell of the run: keep a sample of the top 10 so the page
+			// can show exactly what Google returned (debuggable, not mystery).
+			if ( 0 === (int) $run->cells_done ) {
+				$sample = array();
+				foreach ( array_slice( $serp, 0, 10 ) as $sr ) {
+					$sample[] = array(
+						'rank'   => (int) ( $sr['rank'] ?? 0 ),
+						'title'  => (string) ( $sr['title'] ?? '' ),
+						'domain' => (string) ( $sr['domain'] ?? '' ),
+					);
+				}
+				update_option(
+					'mls_geogrid_sample_' . (int) $run_id,
+					array(
+						'measure' => $measure,
+						'matching' => array( 'domain' => (string) $run->target_domain, 'name' => $target_name ),
+						'results' => $sample,
+					),
+					false
+				);
+			}
+		}
+		if ( ! is_wp_error( $serp ) ) {
 			foreach ( $serp as $row ) {
 				$row_domain = isset( $row['domain'] ) ? $row['domain'] : '';
 				$row_title  = isset( $row['title'] ) ? $row['title'] : '';
@@ -618,6 +644,23 @@ class MLS_Geogrid {
 					<div class="notice notice-error inline"><p><strong><?php esc_html_e( 'Scan error:', 'midland-local-seo' ); ?></strong> <?php echo esc_html( $mls_cell_error ); ?></p></div>
 				<?php endif; ?>
 				<?php $this->render_heatmap( $cells, (int) $latest->grid_size ); ?>
+				<?php $mls_sample = get_option( 'mls_geogrid_sample_' . (int) $latest->id, array() ); ?>
+				<?php if ( ! empty( $mls_sample['results'] ) ) : ?>
+					<details style="margin-top:12px;">
+						<summary><strong><?php esc_html_e( 'What Google returned at the first scanned point', 'midland-local-seo' ); ?></strong>
+							(<?php echo esc_html( 'organic' === ( $mls_sample['measure'] ?? '' ) ? __( 'organic results', 'midland-local-seo' ) : __( 'map pack results', 'midland-local-seo' ) ); ?>)
+						</summary>
+						<p class="description"><?php echo esc_html( sprintf( /* translators: 1: domain 2: name */ __( 'Matching against domain "%1$s" or business name "%2$s".', 'midland-local-seo' ), $mls_sample['matching']['domain'] ?? '', $mls_sample['matching']['name'] ?? '' ) ); ?></p>
+						<table class="widefat striped" style="max-width:700px;">
+							<thead><tr><th>#</th><th><?php esc_html_e( 'Listing', 'midland-local-seo' ); ?></th><th><?php esc_html_e( 'Domain', 'midland-local-seo' ); ?></th></tr></thead>
+							<tbody>
+								<?php foreach ( $mls_sample['results'] as $mls_row ) : ?>
+									<tr><td><?php echo esc_html( $mls_row['rank'] ); ?></td><td><?php echo esc_html( $mls_row['title'] ); ?></td><td><?php echo esc_html( $mls_row['domain'] ); ?></td></tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</details>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<?php if ( count( $runs ) > 1 ) : ?>
