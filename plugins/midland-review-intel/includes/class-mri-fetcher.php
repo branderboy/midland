@@ -98,6 +98,12 @@ class MRI_Fetcher {
 		if ( $code >= 400 || ! is_array( $data ) ) {
 			return new WP_Error( 'dfs_error', $data['status_message'] ?? ( 'DataForSEO HTTP ' . $code ) );
 		}
+		// HTTP 200 does not mean success: check the API's own status code.
+		// Task-level codes are left to the poller (queue states are normal).
+		$top = (int) ( $data['status_code'] ?? 0 );
+		if ( $top < 20000 || $top >= 30000 ) {
+			return new WP_Error( 'dfs_error', (string) ( $data['status_message'] ?? ( 'DataForSEO status ' . $top ) ) );
+		}
 		return $data;
 	}
 

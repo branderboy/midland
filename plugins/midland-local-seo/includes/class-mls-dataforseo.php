@@ -230,9 +230,22 @@ class MLS_DataForSEO {
 		$code = wp_remote_retrieve_response_code( $response );
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( $code >= 400 ) {
-			$msg = $data['status_message'] ?? 'DataForSEO API error (HTTP ' . $code . ')';
+		if ( $code >= 400 || ! is_array( $data ) ) {
+			$msg = is_array( $data ) && isset( $data['status_message'] ) ? $data['status_message'] : 'DataForSEO API error (HTTP ' . $code . ')';
 			return new WP_Error( 'dfs_error', $msg );
+		}
+
+		// DataForSEO returns HTTP 200 even when the request FAILS. The real
+		// verdict is status_code at the top level and inside each task. Only
+		// 2xxxx codes are success; anything else must surface as an error,
+		// never as an empty "success".
+		$top = (int) ( $data['status_code'] ?? 0 );
+		if ( $top < 20000 || $top >= 30000 ) {
+			return new WP_Error( 'dfs_error', (string) ( $data['status_message'] ?? ( 'DataForSEO status ' . $top ) ) );
+		}
+		$task_code = (int) ( $data['tasks'][0]['status_code'] ?? 20000 );
+		if ( $task_code < 20000 || $task_code >= 30000 ) {
+			return new WP_Error( 'dfs_error', (string) ( $data['tasks'][0]['status_message'] ?? ( 'DataForSEO task status ' . $task_code ) ) );
 		}
 
 		return $data;
