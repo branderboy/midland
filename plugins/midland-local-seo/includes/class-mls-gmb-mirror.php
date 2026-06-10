@@ -499,6 +499,16 @@ class MLS_GMB_Mirror {
 	}
 
 	/**
+	 * Whether the page already has Elementor layout data.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	private function has_template( $post_id ) {
+		return '' !== (string) get_post_meta( (int) $post_id, '_elementor_data', true );
+	}
+
+	/**
 	 * A page is "thin" when it still carries the old one-line stub or has
 	 * almost no body text.
 	 *
@@ -524,16 +534,22 @@ class MLS_GMB_Mirror {
 	 * @param string $state       State (locations).
 	 */
 	private function rewrite_post_full( $post_id, $title, $is_location, $city = '', $state = '' ) {
-		$content = $is_location
-			? $this->build_location_content( $title, $city, $state )
-			: $this->build_service_content( $title );
+		if ( $this->is_thin( $post_id ) ) {
+			// Stub or near-empty: replace with full done-for-you copy.
+			$content = $is_location
+				? $this->build_location_content( $title, $city, $state )
+				: $this->build_service_content( $title );
 
-		wp_update_post(
-			array(
-				'ID'           => (int) $post_id,
-				'post_content' => $content,
-			)
-		);
+			wp_update_post(
+				array(
+					'ID'           => (int) $post_id,
+					'post_content' => $content,
+				)
+			);
+		} else {
+			// Real copy already on the page: keep it, just apply the template.
+			$content = (string) get_post_field( 'post_content', $post_id );
+		}
 
 		if ( class_exists( 'RSSEO_Pro_Programmatic' ) && method_exists( 'RSSEO_Pro_Programmatic', 'apply_template_to_post' ) ) {
 			$hero_city  = $is_location && '' !== $city ? $city : 'Washington DC';
@@ -579,13 +595,13 @@ class MLS_GMB_Mirror {
 		$count    = 0;
 
 		foreach ( $recs['service'] as $rec ) {
-			if ( $rec['existing'] && $this->is_thin( $rec['existing'] ) ) {
+			if ( $rec['existing'] && ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
 				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], false );
 				++$count;
 			}
 		}
 		foreach ( $recs['location'] as $rec ) {
-			if ( $rec['existing'] && $this->is_thin( $rec['existing'] ) ) {
+			if ( $rec['existing'] && ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) ) {
 				$this->rewrite_post_full( (int) $rec['existing'], $rec['title'], true, $rec['city'], $rec['state'] );
 				++$count;
 			}
@@ -627,7 +643,7 @@ class MLS_GMB_Mirror {
 						<?php endif; ?>
 						<button type="submit" class="button button-secondary"><?php esc_html_e( 'Create draft', 'midland-local-seo' ); ?></button>
 					</form>
-				<?php elseif ( $this->is_thin( $rec['existing'] ) ) : ?>
+				<?php elseif ( $this->is_thin( $rec['existing'] ) || ! $this->has_template( $rec['existing'] ) ) : ?>
 					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0;">
 						<?php wp_nonce_field( 'mls_rewrite_page' ); ?>
 						<input type="hidden" name="action" value="mls_rewrite_page">
@@ -638,7 +654,9 @@ class MLS_GMB_Mirror {
 							<input type="hidden" name="mirror_city" value="<?php echo esc_attr( $rec['city'] ); ?>">
 							<input type="hidden" name="mirror_state" value="<?php echo esc_attr( $rec['state'] ); ?>">
 						<?php endif; ?>
-						<button type="submit" class="button button-secondary" onclick="return confirm('Replace this page\'s thin content with full copy in your Elementor template?');"><?php esc_html_e( 'Rewrite with full copy', 'midland-local-seo' ); ?></button>
+						<button type="submit" class="button button-secondary" onclick="return confirm('Apply your Elementor template to this page<?php echo $this->is_thin( $rec['existing'] ) ? ' and replace the thin content with full copy' : ' (keeps the current copy)'; ?>?');">
+							<?php $this->is_thin( $rec['existing'] ) ? esc_html_e( 'Rewrite with full copy', 'midland-local-seo' ) : esc_html_e( 'Apply Elementor template', 'midland-local-seo' ); ?>
+						</button>
 					</form>
 				<?php else : ?>
 					<span class="description"><?php esc_html_e( 'Looks good', 'midland-local-seo' ); ?></span>
@@ -758,8 +776,8 @@ class MLS_GMB_Mirror {
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
 				<?php wp_nonce_field( 'mls_rewrite_all_thin' ); ?>
 				<input type="hidden" name="action" value="mls_rewrite_all_thin">
-				<button type="submit" class="button button-primary" onclick="return confirm('Rewrite every thin or stub page with full done-for-you copy in your Elementor template?');"><?php esc_html_e( '⚡ Rewrite all thin pages with full copy', 'midland-local-seo' ); ?></button>
-				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'Fixes pages that still carry the old one-line draft stub.', 'midland-local-seo' ); ?></span>
+				<button type="submit" class="button button-primary" onclick="return confirm('Apply your Elementor template to every page missing it? Thin stub pages also get full done-for-you copy; pages with real copy keep their copy.');"><?php esc_html_e( '⚡ Apply template + full copy to all pages', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'Every page renders in your Elementor template. Stubs get rewritten; real copy is kept.', 'midland-local-seo' ); ?></span>
 			</form>
 
 			<h2><?php esc_html_e( 'Service Pages (from GBP categories)', 'midland-local-seo' ); ?></h2>
