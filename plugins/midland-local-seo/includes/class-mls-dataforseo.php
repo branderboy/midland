@@ -25,6 +25,12 @@ class MLS_DataForSEO {
 	 * @return string
 	 */
 	public static function get_login() {
+		// Prefer Smart SEO's connection when it is configured: on this site it
+		// is the verified-working one, and both plugins share one DataForSEO
+		// account. Local SEO's own copy is the backup.
+		if ( class_exists( 'RSSEO_Pro_DataForSEO' ) && RSSEO_Pro_DataForSEO::is_configured() ) {
+			return (string) RSSEO_Pro_DataForSEO::get_login();
+		}
 		return get_option( 'mls_dfs_login', '' );
 	}
 
@@ -34,6 +40,9 @@ class MLS_DataForSEO {
 	 * @return string
 	 */
 	public static function get_password() {
+		if ( class_exists( 'RSSEO_Pro_DataForSEO' ) && RSSEO_Pro_DataForSEO::is_configured() ) {
+			return (string) RSSEO_Pro_DataForSEO::get_password();
+		}
 		return self::decrypt( get_option( 'mls_dfs_password', '' ) );
 	}
 
