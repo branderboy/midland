@@ -433,7 +433,87 @@ class MLS_Geogrid {
 			)
 		);
 
+		// Warm the neighborhood/ZIP cache for this cell (free, cached forever).
+		self::locate_cell( (float) $cell->lat, (float) $cell->lng );
+
 		wp_schedule_single_event( time() + self::TICK_DELAY, self::TICK_HOOK, array( $run_id ) );
+	}
+
+	/**
+	 * Reverse-geocode a cell to neighborhood + city + ZIP. Cached forever per
+	 * coordinate (the grid is fixed), warmed during scans at 1 lookup per cell.
+	 *
+	 * @param float $lat        Latitude.
+	 * @param float $lng        Longitude.
+	 * @param bool  $cache_only Skip the HTTP lookup (render-time fast path).
+	 * @return array { label, zip }
+	 */
+	public static function locate_cell( $lat, $lng, $cache_only = false ) {
+		$key   = round( (float) $lat, 4 ) . ',' . round( (float) $lng, 4 );
+		$cache = get_option( 'mls_geogrid_geo', array() );
+		if ( isset( $cache[ $key ] ) ) {
+			return $cache[ $key ];
+		}
+		if ( $cache_only ) {
+			return array( 'label' => '', 'zip' => '' );
+		}
+
+		$url      = add_query_arg(
+			array(
+				'lat'    => (float) $lat,
+				'lon'    => (float) $lng,
+				'format' => 'jsonv2',
+				'zoom'   => 16,
+			),
+			'https://nominatim.openstreetmap.org/reverse'
+		);
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout' => 10,
+				'headers' => array( 'User-Agent' => 'MidlandLocalSEO/' . MLS_VERSION . ' (midlandfloors.com)' ),
+			)
+		);
+
+		$place = array( 'label' => '', 'zip' => '' );
+		if ( ! is_wp_error( $response ) ) {
+			$json    = json_decode( wp_remote_retrieve_body( $response ), true );
+			$address = is_array( $json ) && isset( $json['address'] ) ? $json['address'] : array();
+			$hood    = $address['neighbourhood'] ?? ( $address['suburb'] ?? ( $address['hamlet'] ?? '' ) );
+			$city    = $address['city'] ?? ( $address['town'] ?? ( $address['village'] ?? ( $address['county'] ?? '' ) ) );
+			$label   = trim( implode( ', ', array_filter( array( $hood, $city ) ) ) );
+			$place   = array(
+				'label' => $label,
+				'zip'   => (string) ( $address['postcode'] ?? '' ),
+			);
+		}
+
+		if ( '' !== $place['label'] || '' !== $place['zip'] ) {
+			$cache[ $key ] = $place;
+			update_option( 'mls_geogrid_geo', $cache, false );
+		}
+		return $place;
+	}
+
+	/**
+	 * Compass direction of a cell from the run center.
+	 *
+	 * @param float $lat Cell latitude.
+	 * @param float $lng Cell longitude.
+	 * @param float $clat Center latitude.
+	 * @param float $clng Center longitude.
+	 * @return string N/NE/E/... or "center".
+	 */
+	private static function cell_direction( $lat, $lng, $clat, $clng ) {
+		$dy = (float) $lat - (float) $clat;
+		$dx = (float) $lng - (float) $clng;
+		if ( abs( $dy ) < 0.0005 && abs( $dx ) < 0.0005 ) {
+			return 'center';
+		}
+		$angle = rad2deg( atan2( $dy, $dx ) ); // 0 = East, CCW.
+		$dirs  = array( 'E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE' );
+		$index = (int) round( ( $angle < 0 ? $angle + 360 : $angle ) / 45 ) % 8;
+		return $dirs[ $index ];
 	}
 
 	/**
@@ -711,6 +791,56 @@ class MLS_Geogrid {
 					<div class="notice notice-error inline"><p><strong><?php esc_html_e( 'Scan error:', 'midland-local-seo' ); ?></strong> <?php echo esc_html( $mls_cell_error ); ?></p></div>
 				<?php endif; ?>
 				<?php $this->render_heatmap( $cells, (int) $latest->grid_size ); ?>
+				<?php
+				// Weak areas: not found or outside the top 10, worst first.
+				$mls_weak = array();
+				foreach ( $cells as $mls_c ) {
+					if ( null === $mls_c->rank || '' === (string) $mls_c->rank || (int) $mls_c->rank > 10 ) {
+						if ( null !== $mls_c->scanned_at ) {
+							$mls_weak[] = $mls_c;
+						}
+					}
+				}
+				usort(
+					$mls_weak,
+					static function ( $a, $b ) {
+						$ra = ( null === $a->rank || '' === (string) $a->rank ) ? 999 : (int) $a->rank;
+						$rb = ( null === $b->rank || '' === (string) $b->rank ) ? 999 : (int) $b->rank;
+						return $rb <=> $ra;
+					}
+				);
+				?>
+				<?php if ( ! empty( $mls_weak ) ) : ?>
+					<h3><?php esc_html_e( 'Weak Areas to Optimize (worst first)', 'midland-local-seo' ); ?></h3>
+					<table class="widefat striped" style="max-width:980px;">
+						<thead><tr>
+							<th><?php esc_html_e( 'Neighborhood / Area', 'midland-local-seo' ); ?></th>
+							<th><?php esc_html_e( 'ZIP', 'midland-local-seo' ); ?></th>
+							<th><?php esc_html_e( 'Direction', 'midland-local-seo' ); ?></th>
+							<th><?php esc_html_e( 'Rank', 'midland-local-seo' ); ?></th>
+							<th><?php esc_html_e( 'Do this', 'midland-local-seo' ); ?></th>
+						</tr></thead>
+						<tbody>
+							<?php foreach ( array_slice( $mls_weak, 0, 15 ) as $mls_c ) : ?>
+								<?php
+								$mls_loc  = self::locate_cell( (float) $mls_c->lat, (float) $mls_c->lng );
+								$mls_dir  = self::cell_direction( (float) $mls_c->lat, (float) $mls_c->lng, (float) $latest->center_lat, (float) $latest->center_lng );
+								$mls_rank = ( null === $mls_c->rank || '' === (string) $mls_c->rank ) ? __( 'not in top 100', 'midland-local-seo' ) : '#' . (int) $mls_c->rank;
+								$mls_act  = ( null === $mls_c->rank || '' === (string) $mls_c->rank || (int) $mls_c->rank > 20 )
+									? __( 'Add this area to a location page + GBP service areas; get a review from a customer here', 'midland-local-seo' )
+									: __( 'Mention this neighborhood on the nearest location page and in review replies', 'midland-local-seo' );
+								?>
+								<tr>
+									<td><?php echo esc_html( '' !== $mls_loc['label'] ? $mls_loc['label'] : ( round( $mls_c->lat, 4 ) . ', ' . round( $mls_c->lng, 4 ) ) ); ?></td>
+									<td><?php echo esc_html( $mls_loc['zip'] ); ?></td>
+									<td><?php echo esc_html( $mls_dir ); ?></td>
+									<td><?php echo esc_html( $mls_rank ); ?></td>
+									<td><?php echo esc_html( $mls_act ); ?></td>
+								</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+				<?php endif; ?>
 				<?php $mls_sample = get_option( 'mls_geogrid_sample_' . (int) $latest->id, array() ); ?>
 				<?php if ( ! empty( $mls_sample['results'] ) ) : ?>
 					<details style="margin-top:12px;">
