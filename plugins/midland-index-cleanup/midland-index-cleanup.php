@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Index Cleanup (Temp)
  * Description: Temporary cleanup for the GSC "Crawled - currently not indexed" junk (June 2026 drilldown: 1,132 URLs, ~94% shopdetail / index.php spam remnants). Serves 410 Gone for spam URL patterns, adds robots.txt disallows, and noindexes thin archives. Review and remove after ~90 days once GSC coverage is clean.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Midland Floor Care
  * License: GPL v2 or later
  * Text Domain: midland-index-cleanup
@@ -61,6 +61,17 @@ class Midland_Index_Cleanup {
 		if ( 0 === stripos( $uri, '/index.php/' ) ) {
 			return true;
 		}
+		// Japanese marketplace spam path prefixes from the 404 report. None of
+		// these segments exist as real content on this site.
+		foreach ( array( '/zhHant/', '/man/', '/feature/', '/toreka/', '/oreka/', '/hobby/', '/cargo/', '/safe_search/', '/pcsp.html', '/pcmypage' ) as $prefix ) {
+			if ( 0 === stripos( $uri, $prefix ) ) {
+				return true;
+			}
+		}
+		// Remnants of trashed posts Google discovered (e.g. /jobs/__trashed/).
+		if ( false !== strpos( $uri, '__trashed' ) ) {
+			return true;
+		}
 		return false;
 	}
 
@@ -102,6 +113,14 @@ class Midland_Index_Cleanup {
 		$output .= "Disallow: /*?*shopdetail\n";
 		$output .= "Disallow: /discount.php\n";
 		$output .= "Disallow: /index.php/\n";
+		$output .= "Disallow: /zhHant/\n";
+		$output .= "Disallow: /man/\n";
+		$output .= "Disallow: /feature/\n";
+		$output .= "Disallow: /toreka/\n";
+		$output .= "Disallow: /oreka/\n";
+		$output .= "Disallow: /hobby/\n";
+		$output .= "Disallow: /cargo/\n";
+		$output .= "Disallow: /safe_search/\n";
 		return $output;
 	}
 
@@ -110,7 +129,8 @@ class Midland_Index_Cleanup {
 	 * testimonial-category). Links remain crawlable; pages drop from coverage.
 	 */
 	public static function noindex_thin_archives() {
-		if ( is_tag() || is_author() || is_date() || is_tax( 'testimonial-category' ) ) {
+		$uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( is_tag() || is_author() || is_date() || is_tax( 'testimonial-category' ) || 0 === stripos( $uri, '/elementor-rshf/' ) ) {
 			header( 'X-Robots-Tag: noindex, follow' );
 		}
 	}
