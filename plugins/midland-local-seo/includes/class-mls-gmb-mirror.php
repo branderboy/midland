@@ -52,6 +52,8 @@ class MLS_GMB_Mirror {
 		add_action( 'admin_post_mls_rewrite_page', array( $this, 'handle_rewrite_page' ) );
 		add_action( 'admin_post_mls_rewrite_all_thin', array( $this, 'handle_rewrite_all_thin' ) );
 		add_action( 'admin_init', array( $this, 'handle_save_categories' ) );
+		add_action( 'admin_init', array( $this, 'maybe_ensure_hubs' ) );
+		add_action( 'admin_post_mls_save_links_menu', array( $this, 'handle_save_links_menu' ) );
 	}
 
 	/**
@@ -710,8 +712,18 @@ class MLS_GMB_Mirror {
 	 * @return string
 	 */
 	private function page_url( $post_id ) {
+		// Published posts: the REAL permalink. Works for pages AND custom post
+		// types (location pages). Building URLs by hand from the page URI
+		// produced wrong, 404ing links for CPT locations.
+		if ( 'publish' === get_post_status( $post_id ) ) {
+			$link = get_permalink( $post_id );
+			if ( $link ) {
+				return $link;
+			}
+		}
+		// Drafts (only ever linked in admin previews): predicted pretty URL.
 		$uri = get_page_uri( $post_id );
-		return $uri ? home_url( user_trailingslashit( $uri ) ) : get_permalink( $post_id );
+		return $uri ? home_url( user_trailingslashit( $uri ) ) : (string) get_permalink( $post_id );
 	}
 
 	/**
@@ -832,6 +844,17 @@ class MLS_GMB_Mirror {
 	}
 
 	/**
+	 * Run ensure_hubs once per plugin version on any wp-admin visit.
+	 */
+	public function maybe_ensure_hubs() {
+		if ( get_option( 'mls_hubs_checked' ) !== MLS_VERSION ) {
+			$this->ensure_hubs();
+			$this->sync_links_menu();
+			update_option( 'mls_hubs_checked', MLS_VERSION, false );
+		}
+	}
+
+	/**
 	 * Make sure both hub pages exist when there is anything for them to list.
 	 */
 	public function ensure_hubs() {
@@ -863,19 +886,19 @@ class MLS_GMB_Mirror {
 	 */
 	private function sync_links_menu() {
 		$this->ensure_hubs();
-		$menu_name = 'Service Links';
-		$menu      = wp_get_nav_menu_object( $menu_name );
-		$menu_id   = $menu ? (int) $menu->term_id : (int) wp_create_nav_menu( $menu_name );
-		if ( ! $menu_id || is_wp_error( $menu_id ) ) {
-			return;
+		$menu_id = (int) get_option( 'mls_links_menu_id', 0 );
+		if ( ! $menu_id || ! wp_get_nav_menu_object( $menu_id ) ) {
+			return; // No menu chosen: only the automatic footer bar runs.
 		}
 
-		// Rebuild: drop stale items, re-add the current set.
-		foreach ( (array) wp_get_nav_menu_items( $menu_id ) as $item ) {
-			wp_delete_post( $item->ID, true );
+		// Remove only items THIS PLUGIN added; user items are never touched.
+		foreach ( (array) wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'any' ) ) as $item ) {
+			if ( get_post_meta( $item->ID, '_mls_menu_item', true ) ) {
+				wp_delete_post( $item->ID, true );
+			}
 		}
 		foreach ( $this->core_pages() as $url => $label ) {
-			wp_update_nav_menu_item(
+			$item_id = wp_update_nav_menu_item(
 				$menu_id,
 				0,
 				array(
@@ -885,7 +908,38 @@ class MLS_GMB_Mirror {
 					'menu-item-status' => 'publish',
 				)
 			);
+			if ( ! is_wp_error( $item_id ) && $item_id ) {
+				update_post_meta( $item_id, '_mls_menu_item', 1 );
+			}
 		}
+	}
+
+	/**
+	 * Save which of the user's menus receives the core links.
+	 */
+	public function handle_save_links_menu() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_save_links_menu' );
+
+		$old_menu = (int) get_option( 'mls_links_menu_id', 0 );
+		$new_menu = isset( $_POST['mls_links_menu_id'] ) ? (int) $_POST['mls_links_menu_id'] : 0;
+
+		// Clean our items out of the previously selected menu.
+		if ( $old_menu && $old_menu !== $new_menu && wp_get_nav_menu_object( $old_menu ) ) {
+			foreach ( (array) wp_get_nav_menu_items( $old_menu, array( 'post_status' => 'any' ) ) as $item ) {
+				if ( get_post_meta( $item->ID, '_mls_menu_item', true ) ) {
+					wp_delete_post( $item->ID, true );
+				}
+			}
+		}
+
+		update_option( 'mls_links_menu_id', $new_menu, false );
+		$this->sync_links_menu();
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'mls-gmb-mirror', 'menu_saved' => 1 ), admin_url( 'admin.php' ) ) );
+		exit;
 	}
 
 	/**
@@ -1109,6 +1163,26 @@ class MLS_GMB_Mirror {
 					<a href="<?php echo esc_url( get_edit_post_link( (int) $_GET['rewritten'] ) ); ?>"><?php esc_html_e( 'Review it', 'midland-local-seo' ); ?></a> <?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 				</p></div>
 			<?php endif; ?>
+
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['menu_saved'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Links menu saved and synced.', 'midland-local-seo' ); ?></p></div>
+			<?php endif; ?>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
+				<?php wp_nonce_field( 'mls_save_links_menu' ); ?>
+				<input type="hidden" name="action" value="mls_save_links_menu">
+				<label><strong><?php esc_html_e( 'Add core links to your menu:', 'midland-local-seo' ); ?></strong>
+					<select name="mls_links_menu_id">
+						<option value="0"><?php esc_html_e( 'None (automatic footer bar only)', 'midland-local-seo' ); ?></option>
+						<?php $mls_selected = (int) get_option( 'mls_links_menu_id', 0 ); ?>
+						<?php foreach ( wp_get_nav_menus() as $mls_menu ) : ?>
+							<option value="<?php echo esc_attr( $mls_menu->term_id ); ?>" <?php selected( $mls_selected, (int) $mls_menu->term_id ); ?>><?php echo esc_html( $mls_menu->name ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</label>
+				<button type="submit" class="button button-secondary"><?php esc_html_e( 'Save', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'Adds the 3 core links to the menu you pick and keeps them updated. Your own menu items are never touched.', 'midland-local-seo' ); ?></span>
+			</form>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
 				<?php wp_nonce_field( 'mls_rewrite_all_thin' ); ?>
