@@ -646,33 +646,56 @@ class MLS_GMB_Mirror {
 	 */
 	private function build_links_html( $exclude_id = 0 ) {
 		$targets = $this->link_targets();
-		$html    = '';
+		$is_location = isset( $targets['locations'][ $exclude_id ] );
+		$group       = $is_location ? 'locations' : 'services';
 
-		if ( ! empty( $targets['services'] ) ) {
-			$items = '';
-			foreach ( $targets['services'] as $id => $label ) {
-				if ( (int) $id === (int) $exclude_id ) {
-					continue;
-				}
-				$items .= '<li><a href="' . esc_url( $this->page_url( $id ) ) . '">' . esc_html( $label ) . '</a></li>';
+		// Core hub links: the 3 pages that link to everything else.
+		$items = '';
+		foreach ( $this->core_pages() as $url => $label ) {
+			$items .= '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
+		}
+
+		// Plus up to 3 sibling pages for crawl depth, not the whole site.
+		$count = 0;
+		foreach ( $targets[ $group ] as $id => $label ) {
+			if ( (int) $id === (int) $exclude_id || $count >= 3 ) {
+				continue;
 			}
-			if ( '' !== $items ) {
-				$html .= '<h3>' . esc_html__( 'Our Services', 'midland-local-seo' ) . '</h3><ul>' . $items . '</ul>';
+			$text   = 'locations' === $group ? 'Floor Care in ' . $label : $label;
+			$items .= '<li><a href="' . esc_url( $this->page_url( $id ) ) . '">' . esc_html( $text ) . '</a></li>';
+			++$count;
+		}
+
+		return '' === $items ? '' : '<h3>' . esc_html__( 'Explore', 'midland-local-seo' ) . '</h3><ul>' . $items . '</ul>';
+	}
+
+	/**
+	 * The 3-4 core pages that link out to everything else (hub-and-spoke).
+	 *
+	 * @return array url => label.
+	 */
+	public function core_pages() {
+		$core = array();
+
+		$services_hub = get_page_by_path( 'services', OBJECT, 'page' );
+		if ( $services_hub ) {
+			$core[ $this->page_url( $services_hub->ID ) ] = __( 'Our Services', 'midland-local-seo' );
+		}
+		$areas_hub = get_page_by_path( 'service-areas', OBJECT, 'page' );
+		if ( $areas_hub ) {
+			$core[ $this->page_url( $areas_hub->ID ) ] = __( 'Areas We Serve', 'midland-local-seo' );
+		}
+		// Quote/contact page: first match wins, /contact/ as the fallback.
+		$quote = null;
+		foreach ( array( 'quote', 'contact', 'reach-us', 'schedule-a-visit' ) as $slug ) {
+			$quote = get_page_by_path( $slug, OBJECT, 'page' );
+			if ( $quote ) {
+				break;
 			}
 		}
-		if ( ! empty( $targets['locations'] ) ) {
-			$items = '';
-			foreach ( $targets['locations'] as $id => $label ) {
-				if ( (int) $id === (int) $exclude_id ) {
-					continue;
-				}
-				$items .= '<li><a href="' . esc_url( $this->page_url( $id ) ) . '">' . esc_html( 'Floor Care in ' . $label ) . '</a></li>';
-			}
-			if ( '' !== $items ) {
-				$html .= '<h3>' . esc_html__( 'Areas We Serve', 'midland-local-seo' ) . '</h3><ul>' . $items . '</ul>';
-			}
-		}
-		return $html;
+		$core[ $quote ? $this->page_url( $quote->ID ) : home_url( '/contact/' ) ] = __( 'Get a Free Quote', 'midland-local-seo' );
+
+		return $core;
 	}
 
 	/**
@@ -758,21 +781,17 @@ class MLS_GMB_Mirror {
 		foreach ( (array) wp_get_nav_menu_items( $menu_id ) as $item ) {
 			wp_delete_post( $item->ID, true );
 		}
-		$targets = $this->link_targets();
-		foreach ( array( 'services', 'locations' ) as $group ) {
-			foreach ( $targets[ $group ] as $id => $label ) {
-				wp_update_nav_menu_item(
-					$menu_id,
-					0,
-					array(
-						'menu-item-title'     => 'locations' === $group ? 'Floor Care in ' . $label : $label,
-						'menu-item-object'    => 'page',
-						'menu-item-object-id' => (int) $id,
-						'menu-item-type'      => 'post_type',
-						'menu-item-status'    => 'publish',
-					)
-				);
-			}
+		foreach ( $this->core_pages() as $url => $label ) {
+			wp_update_nav_menu_item(
+				$menu_id,
+				0,
+				array(
+					'menu-item-title'  => $label,
+					'menu-item-url'    => $url,
+					'menu-item-type'   => 'custom',
+					'menu-item-status' => 'publish',
+				)
+			);
 		}
 	}
 

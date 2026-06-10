@@ -88,24 +88,25 @@ class MLS_Link_Hub {
 	}
 
 	/**
-	 * [mls_footer_links] - both lists with headings, two columns on desktop.
+	 * [mls_footer_links] - the 3-4 CORE hub links only (hub-and-spoke: the
+	 * footer points at the hubs, the hubs link to everything). Keeps the
+	 * footer short no matter how many pages exist.
 	 *
 	 * @return string
 	 */
 	public static function footer_links() {
-		$services  = self::render_list( self::targets( 'services' ) );
-		$locations = self::render_list( self::targets( 'locations' ), 'Floor Care in ' );
-		if ( '' === $services && '' === $locations ) {
+		if ( ! class_exists( 'MLS_GMB_Mirror' ) ) {
 			return '';
 		}
-		$html = '<div class="mls-footer-links" style="display:flex;gap:40px;flex-wrap:wrap;">';
-		if ( '' !== $services ) {
-			$html .= '<div style="flex:1;min-width:220px;"><h4>' . esc_html__( 'Our Services', 'midland-local-seo' ) . '</h4>' . $services . '</div>';
+		$core = MLS_GMB_Mirror::get_instance()->core_pages();
+		if ( empty( $core ) ) {
+			return '';
 		}
-		if ( '' !== $locations ) {
-			$html .= '<div style="flex:1;min-width:220px;"><h4>' . esc_html__( 'Areas We Serve', 'midland-local-seo' ) . '</h4>' . $locations . '</div>';
+		$html = '<ul class="mls-link-hub mls-core-links">';
+		foreach ( $core as $url => $label ) {
+			$html .= '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
 		}
-		return $html . '</div>';
+		return $html . '</ul>';
 	}
 }
 
