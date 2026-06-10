@@ -579,7 +579,201 @@ class MLS_GMB_Mirror {
 			);
 		}
 
+		// Inner linking: every generated page links to the rest of the set.
+		$args['links_html'] = $this->build_links_html( (int) $post_id );
+
 		MLS_Elementor::apply( (int) $post_id, $args );
+
+		// Group under the right parent so the pages live under /services/ or
+		// /service-areas/ instead of floating at the root.
+		$this->assign_parent( (int) $post_id, $is_location );
+
+		// Keep the footer "Service Links" menu in sync.
+		$this->sync_links_menu();
+	}
+
+	/**
+	 * All mirror-managed pages: service pages + location pages that exist.
+	 *
+	 * @return array { services: [id => title], locations: [id => title] }
+	 */
+	public function link_targets() {
+		$targets = array(
+			'services'  => array(),
+			'locations' => array(),
+		);
+		foreach ( self::get_categories() as $service ) {
+			$id = $this->existing_post_id( $service );
+			if ( $id ) {
+				$targets['services'][ $id ] = $service;
+			}
+		}
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$biz      = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+		$areas    = array();
+		if ( ! empty( $identity['service_areas'] ) ) {
+			$areas = array_filter( array_map( 'trim', preg_split( '/
+|
+|
+/', (string) $identity['service_areas'] ) ) );
+		}
+		foreach ( $areas as $area ) {
+			$title = sprintf( '%1$s in %2$s', $biz, $area );
+			$id    = $this->existing_post_id( $title );
+			if ( $id ) {
+				$targets['locations'][ $id ] = $area;
+			}
+		}
+		return $targets;
+	}
+
+	/**
+	 * Pretty permalink that is correct even while the page is still a draft.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string
+	 */
+	private function page_url( $post_id ) {
+		$uri = get_page_uri( $post_id );
+		return $uri ? home_url( user_trailingslashit( $uri ) ) : get_permalink( $post_id );
+	}
+
+	/**
+	 * Two-column link hub HTML (services + areas), excluding the page itself.
+	 *
+	 * @param int $exclude_id Page being rendered.
+	 * @return string
+	 */
+	private function build_links_html( $exclude_id = 0 ) {
+		$targets = $this->link_targets();
+		$html    = '';
+
+		if ( ! empty( $targets['services'] ) ) {
+			$items = '';
+			foreach ( $targets['services'] as $id => $label ) {
+				if ( (int) $id === (int) $exclude_id ) {
+					continue;
+				}
+				$items .= '<li><a href="' . esc_url( $this->page_url( $id ) ) . '">' . esc_html( $label ) . '</a></li>';
+			}
+			if ( '' !== $items ) {
+				$html .= '<h3>' . esc_html__( 'Our Services', 'midland-local-seo' ) . '</h3><ul>' . $items . '</ul>';
+			}
+		}
+		if ( ! empty( $targets['locations'] ) ) {
+			$items = '';
+			foreach ( $targets['locations'] as $id => $label ) {
+				if ( (int) $id === (int) $exclude_id ) {
+					continue;
+				}
+				$items .= '<li><a href="' . esc_url( $this->page_url( $id ) ) . '">' . esc_html( 'Floor Care in ' . $label ) . '</a></li>';
+			}
+			if ( '' !== $items ) {
+				$html .= '<h3>' . esc_html__( 'Areas We Serve', 'midland-local-seo' ) . '</h3><ul>' . $items . '</ul>';
+			}
+		}
+		return $html;
+	}
+
+	/**
+	 * Parent the page under "Our Services" (/services/) or "Service Areas"
+	 * (/service-areas/), creating the hub page if needed. WordPress 301s the
+	 * old top-level URL to the new nested one automatically.
+	 *
+	 * @param int  $post_id     Page ID.
+	 * @param bool $is_location Whether this is a location page.
+	 */
+	private function assign_parent( $post_id, $is_location ) {
+		if ( 'page' !== get_post_type( $post_id ) ) {
+			return; // CPT location pages keep their own structure.
+		}
+		// Never let WP's "automatically add new top-level pages" menu option
+		// put the hub pages into the header nav.
+		add_filter( 'option_nav_menu_options', array( $this, 'suppress_menu_auto_add' ) );
+		$slug  = $is_location ? 'service-areas' : 'services';
+		$title = $is_location ? __( 'Service Areas', 'midland-local-seo' ) : __( 'Our Services', 'midland-local-seo' );
+
+		$parent = get_page_by_path( $slug, OBJECT, 'page' );
+		if ( ! $parent ) {
+			$parent_id = wp_insert_post(
+				array(
+					'post_title'   => $title,
+					'post_name'    => $slug,
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+					'post_content' => '',
+				)
+			);
+			if ( is_wp_error( $parent_id ) || ! $parent_id ) {
+				return;
+			}
+			// The hub page lists everything below it.
+			wp_update_post(
+				array(
+					'ID'           => $parent_id,
+					'post_content' => '[' . ( $is_location ? 'mls_location_links' : 'mls_service_links' ) . ']',
+				)
+			);
+		} else {
+			$parent_id = (int) $parent->ID;
+		}
+
+		if ( (int) get_post_field( 'post_parent', $post_id ) !== (int) $parent_id ) {
+			wp_update_post(
+				array(
+					'ID'          => (int) $post_id,
+					'post_parent' => (int) $parent_id,
+				)
+			);
+		}
+		remove_filter( 'option_nav_menu_options', array( $this, 'suppress_menu_auto_add' ) );
+	}
+
+	/**
+	 * Filter callback: disable menu auto-add while mirror pages are created.
+	 *
+	 * @param array $options nav_menu_options.
+	 * @return array
+	 */
+	public function suppress_menu_auto_add( $options ) {
+		if ( is_array( $options ) ) {
+			$options['auto_add'] = array();
+		}
+		return $options;
+	}
+
+	/**
+	 * Maintain a "Service Links" nav menu with every mirror page, ready to
+	 * assign to a footer menu location or an Elementor nav-menu widget.
+	 */
+	private function sync_links_menu() {
+		$menu_name = 'Service Links';
+		$menu      = wp_get_nav_menu_object( $menu_name );
+		$menu_id   = $menu ? (int) $menu->term_id : (int) wp_create_nav_menu( $menu_name );
+		if ( ! $menu_id || is_wp_error( $menu_id ) ) {
+			return;
+		}
+
+		// Rebuild: drop stale items, re-add the current set.
+		foreach ( (array) wp_get_nav_menu_items( $menu_id ) as $item ) {
+			wp_delete_post( $item->ID, true );
+		}
+		$targets = $this->link_targets();
+		foreach ( array( 'services', 'locations' ) as $group ) {
+			foreach ( $targets[ $group ] as $id => $label ) {
+				wp_update_nav_menu_item(
+					$menu_id,
+					0,
+					array(
+						'menu-item-title'     => 'locations' === $group ? 'Floor Care in ' . $label : $label,
+						'menu-item-object'    => 'page',
+						'menu-item-object-id' => (int) $id,
+						'menu-item-type'      => 'post_type',
+						'menu-item-status'    => 'publish',
+					)
+				);
+			}
+		}
 	}
 
 	/**

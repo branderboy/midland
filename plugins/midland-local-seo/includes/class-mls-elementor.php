@@ -37,6 +37,7 @@ class MLS_Elementor {
 			'body_html'   => (string) get_post_field( 'post_content', $post_id ),
 			'cta_heading' => __( 'Ready for floors that work as hard as you do?', 'midland-local-seo' ),
 			'cta_sub'     => __( 'Free on-site evaluation and a quote that does not change after the job starts.', 'midland-local-seo' ),
+			'links_html'  => '',
 		);
 		$args = wp_parse_args( $args, $defaults );
 
@@ -47,8 +48,11 @@ class MLS_Elementor {
 			$args['body_html'],
 			$args['cta_heading'],
 			$args['cta_sub'],
-			$phone
+			$phone,
+			$args['links_html']
 		);
+
+		$data = array_values( array_filter( $data ) );
 
 		// wp_slash because update_post_meta runs through wp_unslash on read,
 		// and Elementor expects the JSON to survive that round-trip intact.
@@ -72,7 +76,7 @@ class MLS_Elementor {
 	 * @param string $phone       Phone for the CTA button.
 	 * @return array
 	 */
-	private static function build_sections( $kicker, $hero_title, $intro, $body_html, $cta_heading, $cta_sub, $phone ) {
+	private static function build_sections( $kicker, $hero_title, $intro, $body_html, $cta_heading, $cta_sub, $phone, $links_html = '' ) {
 		$tel_href    = 'tel:' . preg_replace( '/[^0-9+]/', '', $phone );
 		$flex_gap_20 = array( 'column' => '20', 'row' => '20', 'isLinked' => true, 'unit' => 'px', 'size' => 20 );
 		$pad_zero    = array( 'unit' => 'px', 'top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0', 'isLinked' => true );
@@ -200,7 +204,52 @@ class MLS_Elementor {
 				),
 			),
 
-			// SECTION 3: CTA.
+			// SECTION 3: Internal links (kills orphan pages: every generated
+			// page links to the rest of the set).
+			'' === trim( $links_html ) ? null : array(
+				'id'       => self::eid(),
+				'elType'   => 'container',
+				'settings' => array(
+					'_title'                => 'Explore',
+					'background_background' => 'classic',
+					'background_color'      => '#F3FCF4',
+					'content_width'         => 'full',
+					'flex_direction'        => 'column',
+					'flex_gap'              => $flex_gap_20,
+					'padding'               => $pad_zero,
+				),
+				'elements' => array(
+					array(
+						'id'       => self::eid(),
+						'elType'   => 'container',
+						'settings' => array(
+							'flex_direction' => 'column',
+							'content_width'  => 'boxed',
+							'flex_gap'       => $flex_gap_20,
+							'boxed_width'    => $boxed,
+							'padding'        => array( 'unit' => 'em', 'top' => '2', 'right' => '1.5', 'bottom' => '2', 'left' => '1.5', 'isLinked' => false ),
+						),
+						'elements' => array(
+							array(
+								'id'         => self::eid(),
+								'elType'     => 'widget',
+								'widgetType' => 'text-editor',
+								'settings'   => array(
+									'editor'                 => $links_html,
+									'align'                  => 'left',
+									'text_color'             => '#0F1411',
+									'typography_typography'  => 'custom',
+									'typography_font_size'   => array( 'unit' => 'px', 'size' => 16, 'sizes' => array() ),
+									'typography_line_height' => array( 'unit' => 'em', 'size' => 1.7, 'sizes' => array() ),
+								),
+								'elements'   => array(),
+							),
+						),
+					),
+				),
+			),
+
+			// SECTION 4: CTA.
 			array(
 				'id'       => self::eid(),
 				'elType'   => 'container',
