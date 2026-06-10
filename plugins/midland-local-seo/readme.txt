@@ -4,7 +4,7 @@ Tags: local seo, google business profile, citations, schema, rank tracking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.2.4
+Stable tag: 1.3.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,24 @@ The Citation Audit and sameAs / Identity modules work without it. Geo-Grid, GMB 
 Encrypted with AES-256-CBC using a key derived from your site's auth salt, with a random IV per value. It is never echoed back into the settings field.
 
 == Changelog ==
+
+= 1.3.0 =
+* Location + service pages are now fully self-contained in Local SEO (no Smart SEO dependency). Fixes location pages stuck on "Missing". New "Location Pages" module clones a page you designed so generated pages match your site exactly.
+
+= 1.2.9 =
+* Fix: location pages stayed marked "Missing" after creation. The list now detects the mfc_location page the engine creates (by city/state) and shows "Have it" correctly.
+
+= 1.2.8 =
+* Added one-click "Create all location pages" button (builds every service-area page in the Elementor template via the Smart SEO engine).
+
+= 1.2.7 =
+* GMB Mirror service pages now generate through the Smart SEO engine with the Elementor template (renders in your site design); added a one-click "Create all missing service pages" button.
+
+= 1.2.6 =
+* GMB Mirror service pages now generate full structured content (H2 sections, process, FAQ, no dashes) instead of a thin stub.
+
+= 1.2.5 =
+* Competitor Audit falls back to the organic SERP local pack when the Maps SERP endpoint is unavailable, so it works on more DataForSEO plans.
 
 = 1.2.4 =
 * Removed the Citation Audit consistency/mismatch column.

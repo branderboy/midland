@@ -3,7 +3,7 @@
  * Plugin Name: Midland Local SEO
  * Plugin URI: https://midlandfloors.com/local-seo
  * Description: Local SEO toolkit for Midland Floors — citation audit, LocalBusiness sameAs identity schema, Local Falcon geo-grid rank tracking, local backlink tracking, Google Business Profile mirror, GBP optimizer, and GMB competitor audit. Powered by DataForSEO (bring your own key).
- * Version: 1.2.4
+ * Version: 1.3.0
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL-2.0-or-later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MLS_VERSION', '1.2.4' );
+define( 'MLS_VERSION', '1.3.0' );
 define( 'MLS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MLS_URL', plugin_dir_url( __FILE__ ) );
 define( 'MLS_FILE', __FILE__ );
@@ -154,6 +154,7 @@ class MLS_Plugin {
 		require_once MLS_PATH . 'includes/class-mls-citations.php';
 		require_once MLS_PATH . 'includes/class-mls-geogrid.php';
 		require_once MLS_PATH . 'includes/class-mls-gmb-mirror.php';
+		require_once MLS_PATH . 'includes/class-mls-location-pages.php';
 		require_once MLS_PATH . 'includes/class-mls-gmb-optimizer.php';
 		require_once MLS_PATH . 'includes/class-mls-backlinks.php';
 		require_once MLS_PATH . 'includes/class-mls-gmb-competitors.php';
@@ -169,6 +170,7 @@ class MLS_Plugin {
 		MLS_Citations::get_instance();
 		MLS_Geogrid::get_instance();
 		MLS_GMB_Mirror::get_instance();
+		MLS_Location_Pages::get_instance();
 		MLS_GMB_Optimizer::get_instance();
 		MLS_Backlinks::get_instance();
 		MLS_GMB_Competitors::get_instance();

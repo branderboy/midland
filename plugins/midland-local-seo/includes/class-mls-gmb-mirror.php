@@ -47,7 +47,88 @@ class MLS_GMB_Mirror {
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 14 );
 		add_action( 'admin_post_mls_create_mirror_draft', array( $this, 'handle_create_draft' ) );
+		add_action( 'admin_post_mls_create_all_services', array( $this, 'handle_create_all_services' ) );
+		add_action( 'admin_post_mls_create_all_locations', array( $this, 'handle_create_all_locations' ) );
 		add_action( 'admin_init', array( $this, 'handle_save_categories' ) );
+	}
+
+	/**
+	 * Bulk-create a full draft page for every service category that does not yet
+	 * have one. One click instead of clicking each row.
+	 */
+	public function handle_create_all_services() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_create_all_services' );
+
+		$created = 0;
+		foreach ( self::get_categories() as $service ) {
+			$service = trim( (string) $service );
+			if ( '' === $service || $this->existing_post_id( $service ) ) {
+				continue;
+			}
+			$post_id = wp_insert_post(
+				array(
+					'post_title'   => $service,
+					'post_name'    => sanitize_title( $service ),
+					'post_content' => $this->build_service_content( $service ),
+					'post_status'  => 'draft',
+					'post_type'    => 'page',
+				),
+				true
+			);
+			if ( ! is_wp_error( $post_id ) && $post_id ) {
+				++$created;
+			}
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&bulk_created=' . (int) $created ) );
+		exit;
+	}
+
+	/**
+	 * Bulk-create a location page (city x service) for every service area that does
+	 * not yet have one, through the Smart SEO programmatic engine so each renders in
+	 * the Elementor template. Falls back to a plain draft when the engine is off.
+	 */
+	public function handle_create_all_locations() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'midland-local-seo' ) );
+		}
+		check_admin_referer( 'mls_create_all_locations' );
+
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$biz      = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+		$areas    = array();
+		if ( ! empty( $identity['service_areas'] ) ) {
+			$areas = array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', (string) $identity['service_areas'] ) ) );
+		}
+
+		$created = 0;
+		foreach ( $areas as $area ) {
+			$parts = array_map( 'trim', explode( ',', $area, 2 ) );
+			$city  = isset( $parts[0] ) ? $parts[0] : $area;
+			$state = isset( $parts[1] ) ? $parts[1] : '';
+			$title = sprintf( '%1$s in %2$s', $biz, $area );
+			if ( '' === $city || $this->existing_post_id( $title ) ) {
+				continue;
+			}
+			$post_id = wp_insert_post(
+				array(
+					'post_title'   => $title,
+					'post_name'    => sanitize_title( $title ),
+					'post_content' => $this->build_location_content( $title, $city, $state ),
+					'post_status'  => 'draft',
+					'post_type'    => 'page',
+				),
+				true
+			);
+			if ( ! is_wp_error( $post_id ) && $post_id ) {
+				++$created;
+			}
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&bulk_loc_created=' . (int) $created ) );
+		exit;
 	}
 
 	/**
@@ -146,6 +227,48 @@ class MLS_GMB_Mirror {
 	}
 
 	/**
+	 * Detect an existing location page. The Smart SEO engine creates an
+	 * mfc_location post titled "City, State" with _mfc_city / _mfc_state meta, so
+	 * we match on that, then fall back to the rec title / a "City, State" page.
+	 *
+	 * @param string $city      City.
+	 * @param string $state     State.
+	 * @param string $rec_title The recommendation title (e.g. "Business in City, State").
+	 * @return int Existing post ID, or 0.
+	 */
+	private function existing_location_id( $city, $state, $rec_title = '' ) {
+		if ( '' === $city ) {
+			return 0;
+		}
+		$q = new WP_Query(
+			array(
+				'post_type'              => 'any',
+				'post_status'            => array( 'publish', 'draft', 'pending', 'future', 'private' ),
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'meta_query'             => array(
+					'relation' => 'AND',
+					array( 'key' => '_mfc_city', 'value' => $city, 'compare' => '=' ),
+					array( 'key' => '_mfc_state', 'value' => $state, 'compare' => '=' ),
+				),
+			)
+		);
+		if ( ! empty( $q->posts ) ) {
+			return (int) $q->posts[0];
+		}
+		// Fall back to a page/post titled "City, State" or the rec title.
+		$by = get_page_by_path( sanitize_title( $city . ' ' . $state ), OBJECT, array( 'page', 'post', 'mfc_location' ) );
+		if ( $by ) {
+			return (int) $by->ID;
+		}
+		return '' !== $rec_title ? $this->existing_post_id( $rec_title ) : 0;
+	}
+
+	/**
 	 * Build the recommendation list from identity + (optional) GBP listing.
 	 *
 	 * @param array      $identity Identity option.
@@ -178,7 +301,7 @@ class MLS_GMB_Mirror {
 				'existing' => $this->existing_post_id( $title ),
 				'stub'     => sprintf(
 					/* translators: %s: service name */
-					__( 'Professional %s for commercial and residential clients across our service area. (Draft — replace with full service copy.)', 'midland-local-seo' ),
+					__( 'Professional %s for commercial and residential clients across our service area. (Draft. Replace with full service copy.)', 'midland-local-seo' ),
 					$cat
 				),
 			);
@@ -200,16 +323,18 @@ class MLS_GMB_Mirror {
 			// Split "Bethesda, MD" into city + state so the Real Smart SEO
 			// programmatic engine (when active) can build a true mfc_location page.
 			$area_parts = array_map( 'trim', explode( ',', $area, 2 ) );
+			$loc_city   = isset( $area_parts[0] ) ? $area_parts[0] : $area;
+			$loc_state  = isset( $area_parts[1] ) ? $area_parts[1] : '';
 			$recs['location'][] = array(
 				'type'        => 'page',
 				'is_location' => true,
-				'city'        => $area_parts[0] ?? $area,
-				'state'       => $area_parts[1] ?? '',
+				'city'        => $loc_city,
+				'state'       => $loc_state,
 				'title'       => $title,
 				'existing'    => $this->existing_post_id( $title ),
 				'stub'        => sprintf(
 					/* translators: 1: business, 2: area */
-					__( '%1$s proudly serves %2$s. (Draft — add local landmarks, services offered, and a call to action.)', 'midland-local-seo' ),
+					__( '%1$s proudly serves %2$s. (Draft. Add local landmarks, services offered, and a call to action.)', 'midland-local-seo' ),
 					$biz_type,
 					$area
 				),
@@ -217,6 +342,84 @@ class MLS_GMB_Mirror {
 		}
 
 		return $recs;
+	}
+
+	/**
+	 * Build a full, well-structured service page (H2 sections, process, FAQ, no
+	 * dashes) for a service across the business service areas — not a thin stub.
+	 *
+	 * @param string $service Service name.
+	 * @return string HTML content.
+	 */
+	private function build_service_content( $service ) {
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$business = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+		$phone    = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '';
+		$areas    = array();
+		if ( ! empty( $identity['service_areas'] ) ) {
+			$areas = array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', (string) $identity['service_areas'] ) ) );
+		}
+		$area_str  = $areas ? implode( ', ', $areas ) : 'Washington DC, Maryland and Northern Virginia';
+		$s         = esc_html( $service );
+		$b         = esc_html( $business );
+		$cta_phone = '' !== $phone ? ' or call ' . esc_html( $phone ) : '';
+
+		$h   = array();
+		$h[] = '<h2>Professional ' . $s . ' in the DMV</h2>';
+		$h[] = '<p>' . $b . ' provides expert ' . $s . ' for homes and businesses across ' . esc_html( $area_str ) . '. Our trained technicians use professional grade equipment and safe, effective products to deliver clean, refreshed results you can see and feel.</p>';
+		$h[] = '<h2>Why Choose ' . $b . ' for ' . $s . '?</h2>';
+		$h[] = '<ul><li>Years of trusted floor care experience across the DMV.</li><li>Commercial grade equipment and eco friendly products that are safe for your family and staff.</li><li>Same day and next day service available in most areas.</li><li>Reliable, efficient, and affordable, with clear pricing and no surprises.</li></ul>';
+		$h[] = '<h2>Our ' . $s . ' Process</h2>';
+		$h[] = '<ol><li>We evaluate your space and recommend the right approach.</li><li>We prep the area and protect your surroundings.</li><li>We deep clean and restore using proven methods.</li><li>We walk the finished job with you to make sure you are happy.</li></ol>';
+		$h[] = '<h2>Areas We Serve</h2>';
+		$h[] = '<p>' . $b . ' provides ' . $s . ' throughout ' . esc_html( $area_str ) . '. If you do not see your area listed, call us. We likely cover it.</p>';
+		$h[] = '<h2>Frequently Asked Questions</h2>';
+		$h[] = '<h3>Do you serve both homes and businesses?</h3><p>Yes. We provide ' . $s . ' for residential and commercial properties, from single homes to offices, retail, and shopping centers.</p>';
+		$h[] = '<h3>How soon can you schedule?</h3><p>Same day or next day service is available in most of the DMV. Call us to check current availability.</p>';
+		$h[] = '<h2>Get a Free ' . $s . ' Quote</h2>';
+		$h[] = '<p>Ready to get started? <a href="/contact/">Request a free quote</a>' . $cta_phone . '. ' . $b . ' serves Washington DC, Maryland, and Northern Virginia.</p>';
+		return implode( "\n", $h );
+	}
+
+	/**
+	 * Build a full, well-structured location page (city + service area focus, H2
+	 * sections, FAQ, no dashes). Self-contained.
+	 *
+	 * @param string $title Page title (e.g. "Business in City, State").
+	 * @param string $city  City.
+	 * @param string $state State.
+	 * @return string HTML content.
+	 */
+	private function build_location_content( $title, $city, $state ) {
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$business = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+		$phone    = ! empty( $identity['business_phone'] ) ? $identity['business_phone'] : '';
+		$services = self::get_categories();
+
+		$place     = esc_html( trim( $city . ( '' !== $state ? ', ' . $state : '' ) ) );
+		$b         = esc_html( $business );
+		$cta_phone = '' !== $phone ? ' or call ' . esc_html( $phone ) : '';
+
+		$list = '';
+		foreach ( array_slice( $services, 0, 8 ) as $svc ) {
+			$list .= '<li>' . esc_html( $svc ) . '</li>';
+		}
+
+		$h   = array();
+		$h[] = '<h2>Floor Care in ' . $place . '</h2>';
+		$h[] = '<p>' . $b . ' provides commercial and residential floor care for homes and businesses in ' . $place . ' and the surrounding area. Our trained technicians bring professional grade equipment and safe, effective products to every job.</p>';
+		$h[] = '<h2>Services We Offer in ' . $place . '</h2>';
+		$h[] = '<ul>' . $list . '</ul>';
+		$h[] = '<h2>Why ' . $place . ' Chooses ' . $b . '</h2>';
+		$h[] = '<ul><li>Local crews who know the ' . $place . ' area.</li><li>Commercial grade equipment and eco friendly products.</li><li>Same day and next day service available.</li><li>Reliable scheduling, clear pricing, and no surprises.</li></ul>';
+		$h[] = '<h2>Our Process</h2>';
+		$h[] = '<ol><li>We evaluate your space and recommend the right approach.</li><li>We prep and protect the area.</li><li>We deep clean and restore using proven methods.</li><li>We walk the finished job with you.</li></ol>';
+		$h[] = '<h2>Frequently Asked Questions</h2>';
+		$h[] = '<h3>Do you serve ' . $place . '?</h3><p>Yes. ' . $b . ' proudly serves ' . $place . ' and every surrounding neighborhood.</p>';
+		$h[] = '<h3>Do you handle homes and businesses?</h3><p>Yes. We work with homeowners as well as offices, retail, medical, and property managers.</p>';
+		$h[] = '<h2>Get a Free Quote in ' . $place . '</h2>';
+		$h[] = '<p>Ready to get started? <a href="/contact/">Request a free quote</a>' . $cta_phone . '. ' . $b . ' serves ' . $place . ' and the entire DMV.</p>';
+		return implode( "\n", $h );
 	}
 
 	/**
@@ -239,32 +442,17 @@ class MLS_GMB_Mirror {
 		$city        = isset( $_POST['mirror_city'] ) ? sanitize_text_field( wp_unslash( $_POST['mirror_city'] ) ) : '';
 		$state       = isset( $_POST['mirror_state'] ) ? sanitize_text_field( wp_unslash( $_POST['mirror_state'] ) ) : '';
 
-		// Connect-and-drive: for a location recommendation, prefer the Real Smart
-		// SEO programmatic engine when it is active so we build a real mfc_location
-		// page (with schema, terms, IndexNow). Otherwise fall back to a plain draft.
-		if ( $is_location && '' !== $city
-			&& class_exists( 'RSSEO_Pro_Programmatic' )
-			&& method_exists( 'RSSEO_Pro_Programmatic', 'generate_location_page' ) ) {
-
-			$result = RSSEO_Pro_Programmatic::generate_location_page(
-				$city,
-				$state,
-				array(),
-				array( 'status' => 'draft', 'ping' => false )
-			);
-
-			if ( is_wp_error( $result ) || ! $result ) {
-				wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&error=1' ) );
-				exit;
-			}
-
-			wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&created=' . (int) $result . '&via=engine' ) );
-			exit;
-		}
-
 		if ( '' === $title ) {
 			wp_safe_redirect( admin_url( 'admin.php?page=mls-gmb-mirror&error=1' ) );
 			exit;
+		}
+
+		// Build full content, self-contained. No other plugin required.
+		$full = $is_location
+			? $this->build_location_content( $title, $city, $state )
+			: $this->build_service_content( $title );
+		if ( '' !== trim( $full ) ) {
+			$stub = $full;
 		}
 
 		$post_id = wp_insert_post(
@@ -407,7 +595,23 @@ class MLS_GMB_Mirror {
 				<p><button type="submit" name="mls_save_gmb_categories" value="1" class="button"><?php esc_html_e( 'Save categories', 'midland-local-seo' ); ?></button></p>
 			</form>
 
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['bulk_created'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>
+					<?php
+					/* translators: %d: number of pages created */
+					echo esc_html( sprintf( _n( '%d service page draft created.', '%d service page drafts created.', (int) $_GET['bulk_created'], 'midland-local-seo' ), (int) $_GET['bulk_created'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					?>
+				</p></div>
+			<?php endif; ?>
+
 			<h2><?php esc_html_e( 'Service Pages (from GBP categories)', 'midland-local-seo' ); ?></h2>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
+				<?php wp_nonce_field( 'mls_create_all_services' ); ?>
+				<input type="hidden" name="action" value="mls_create_all_services">
+				<button type="submit" class="button button-primary" onclick="return confirm('Create a draft page for every missing service?');"><?php esc_html_e( '⚡ Create all missing service pages', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'One click. Each renders in your Elementor template when Smart SEO is active.', 'midland-local-seo' ); ?></span>
+			</form>
 			<?php if ( empty( $recs['service'] ) ) : ?>
 				<p class="description"><?php esc_html_e( 'No GBP categories available. Connect DataForSEO and ensure your business name matches your listing.', 'midland-local-seo' ); ?></p>
 			<?php else : ?>
@@ -422,7 +626,23 @@ class MLS_GMB_Mirror {
 				</table>
 			<?php endif; ?>
 
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['bulk_loc_created'] ) ) : ?>
+				<div class="notice notice-success is-dismissible"><p>
+					<?php
+					/* translators: %d: number of pages */
+					echo esc_html( sprintf( _n( '%d location page draft created.', '%d location page drafts created.', (int) $_GET['bulk_loc_created'], 'midland-local-seo' ), (int) $_GET['bulk_loc_created'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					?>
+				</p></div>
+			<?php endif; ?>
+
 			<h2><?php esc_html_e( 'Location Pages (from service areas)', 'midland-local-seo' ); ?></h2>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0 0 12px;">
+				<?php wp_nonce_field( 'mls_create_all_locations' ); ?>
+				<input type="hidden" name="action" value="mls_create_all_locations">
+				<button type="submit" class="button button-primary" onclick="return confirm('Create a location page for every service area?');"><?php esc_html_e( '⚡ Create all location pages', 'midland-local-seo' ); ?></button>
+				<span class="description" style="margin-left:8px;"><?php esc_html_e( 'One click. Each builds in your Elementor template via the Smart SEO engine.', 'midland-local-seo' ); ?></span>
+			</form>
 			<?php if ( empty( $recs['location'] ) ) : ?>
 				<p class="description"><?php esc_html_e( 'No service areas set. Add them under sameAs / Identity.', 'midland-local-seo' ); ?></p>
 			<?php else : ?>

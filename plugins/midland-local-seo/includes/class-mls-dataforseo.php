@@ -670,8 +670,28 @@ class MLS_DataForSEO {
 		);
 
 		$result = self::post( 'serp/google/maps/live/advanced', $payload );
+
+		// Fallback: if the DataForSEO plan lacks the Maps SERP endpoint, retry with
+		// the organic SERP endpoint and pull the local pack (3-pack) from it — the
+		// parse loop below already accepts 'local_pack' item types.
 		if ( is_wp_error( $result ) ) {
-			return $result;
+			$msg     = $result->get_error_message();
+			$is_auth = ( false !== stripos( $msg, 'not authorized' ) || false !== stripos( $msg, 'access denied' ) || false !== stripos( $msg, '40301' ) );
+			if ( ! $is_auth ) {
+				return $result;
+			}
+			$organic = array(
+				array(
+					'keyword'             => $keyword,
+					'location_coordinate' => sprintf( '%F,%F,%d', (float) $lat, (float) $lng, 20 ),
+					'language_code'       => 'en',
+					'depth'               => 30,
+				),
+			);
+			$result = self::post( 'serp/google/organic/live/advanced', $organic );
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
 		}
 
 		$items = isset( $result['tasks'][0]['result'][0]['items'] ) && is_array( $result['tasks'][0]['result'][0]['items'] )

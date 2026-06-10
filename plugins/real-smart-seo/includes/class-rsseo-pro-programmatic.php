@@ -308,6 +308,80 @@ class RSSEO_Pro_Programmatic {
     }
 
     /**
+     * Generate a SERVICE page (e.g. "Hardwood Floor Cleaning") as a regular page,
+     * applying the SAME Elementor template the location pages use so it renders in
+     * the site design instead of as raw HTML. Returns int post_id or WP_Error.
+     * Callers enforce cap + nonce.
+     *
+     * @param string $service Service name.
+     * @param array  $args    Optional: status (draft|publish), overwrite (bool), ping (bool).
+     * @return int|WP_Error
+     */
+    public static function generate_service_page( $service, $args = array() ) {
+        $service = sanitize_text_field( (string) $service );
+        if ( '' === $service ) {
+            return new WP_Error( 'rsseo_no_service', __( 'A service is required to generate a service page.', 'real-smart-seo' ) );
+        }
+        if ( ! is_array( $args ) ) {
+            $args = array();
+        }
+        $status    = ( isset( $args['status'] ) && 'publish' === $args['status'] ) ? 'publish' : 'draft';
+        $overwrite = ! empty( $args['overwrite'] );
+        $ping      = ! isset( $args['ping'] ) || (bool) $args['ping'];
+
+        $self = self::get_instance();
+
+        // Anchor the Elementor hero on the DMV so it reads naturally for a service.
+        $city  = 'Washington DC';
+        $state = 'Maryland and Northern Virginia';
+
+        $slug     = sanitize_title( $service );
+        $existing = get_page_by_path( $slug, OBJECT, 'page' );
+        if ( $existing && ! $overwrite ) {
+            return (int) $existing->ID;
+        }
+
+        $content = $self->render_template( $self->get_templates()['body'], $city, $state, array( $service ) );
+
+        $postarr = array(
+            'post_type'    => 'page',
+            'post_title'   => $service,
+            'post_name'    => $slug,
+            'post_status'  => $status,
+            'post_content' => $content,
+            'post_author'  => get_current_user_id(),
+        );
+        if ( $existing ) {
+            $postarr['ID'] = (int) $existing->ID;
+            $post_id       = wp_update_post( $postarr, true );
+        } else {
+            $post_id = wp_insert_post( $postarr, true );
+        }
+
+        if ( is_wp_error( $post_id ) ) {
+            return $post_id;
+        }
+        if ( ! $post_id ) {
+            return new WP_Error( 'rsseo_insert_fail', __( 'Could not create the service page.', 'real-smart-seo' ) );
+        }
+
+        update_post_meta( $post_id, '_mfc_service_page', $service );
+
+        if ( ( ! $existing || $overwrite ) && $self->get_templates()['use_elementor'] ) {
+            $self->apply_elementor_template( $post_id, $city, $state, array( $service ) );
+        }
+
+        if ( $ping && 'publish' === get_post_status( $post_id ) ) {
+            $permalink = get_permalink( $post_id );
+            if ( $permalink ) {
+                do_action( 'rsseo_indexnow_ping', $permalink );
+            }
+        }
+
+        return (int) $post_id;
+    }
+
+    /**
      * Save or update a single location's meta (city, state, Wikipedia URL, service list).
      */
     public function handle_save_location() {

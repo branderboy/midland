@@ -28,6 +28,7 @@ $mls_options = array(
 	'mls_backlink_competitors',
 	'mls_linkgap_keys',
 	'mls_gmb_categories',
+	'mls_locpages_template',
 	'mls_identity_refreshed_120',
 	'mls_insights_recipient',
 	'mls_insights_cadence',
