@@ -70,22 +70,19 @@ class MLS_GMB_Mirror {
 			if ( '' === $service || $this->existing_post_id( $service ) ) {
 				continue;
 			}
-			if ( class_exists( 'RSSEO_Pro_Programmatic' ) ) {
-				// Smart SEO engine: full copy + Elementor template + schema.
-				$post_id = RSSEO_Pro_Programmatic::generate_service_page( $service, array( 'status' => 'draft', 'ping' => false ) );
-			} else {
-				$post_id = wp_insert_post(
-					array(
-						'post_title'   => $service,
-						'post_name'    => sanitize_title( $service ),
-						'post_content' => $this->build_service_content( $service ),
-						'post_status'  => 'draft',
-						'post_type'    => 'page',
-					),
-					true
-				);
-			}
+			$content = $this->build_service_content( $service );
+			$post_id = wp_insert_post(
+				array(
+					'post_title'   => $service,
+					'post_name'    => sanitize_title( $service ),
+					'post_content' => $content,
+					'post_status'  => 'draft',
+					'post_type'    => 'page',
+				),
+				true
+			);
 			if ( ! is_wp_error( $post_id ) && $post_id ) {
+				$this->apply_template( (int) $post_id, $service, false, '', '', $content );
 				++$created;
 			}
 		}
@@ -120,22 +117,19 @@ class MLS_GMB_Mirror {
 			if ( '' === $city || $this->existing_post_id( $title ) ) {
 				continue;
 			}
-			if ( class_exists( 'RSSEO_Pro_Programmatic' ) ) {
-				// Smart SEO engine: mfc_location CPT + Elementor template.
-				$post_id = RSSEO_Pro_Programmatic::generate_location_page( $city, $state, self::get_categories(), array( 'status' => 'draft', 'ping' => false ) );
-			} else {
-				$post_id = wp_insert_post(
-					array(
-						'post_title'   => $title,
-						'post_name'    => sanitize_title( $title ),
-						'post_content' => $this->build_location_content( $title, $city, $state ),
-						'post_status'  => 'draft',
-						'post_type'    => 'page',
-					),
-					true
-				);
-			}
+			$content = $this->build_location_content( $title, $city, $state );
+			$post_id = wp_insert_post(
+				array(
+					'post_title'   => $title,
+					'post_name'    => sanitize_title( $title ),
+					'post_content' => $content,
+					'post_status'  => 'draft',
+					'post_type'    => 'page',
+				),
+				true
+			);
 			if ( ! is_wp_error( $post_id ) && $post_id ) {
+				$this->apply_template( (int) $post_id, $title, true, $city, $state, $content );
 				++$created;
 			}
 		}
@@ -463,30 +457,26 @@ class MLS_GMB_Mirror {
 			exit;
 		}
 
-		// Smart SEO engine first: full copy + Elementor template + schema.
-		if ( class_exists( 'RSSEO_Pro_Programmatic' ) ) {
-			$post_id = $is_location
-				? RSSEO_Pro_Programmatic::generate_location_page( $city, $state, self::get_categories(), array( 'status' => 'draft', 'ping' => false ) )
-				: RSSEO_Pro_Programmatic::generate_service_page( $title, array( 'status' => 'draft', 'ping' => false ) );
-		} else {
-			// Fallback: self-contained full content, no other plugin required.
-			$full = $is_location
-				? $this->build_location_content( $title, $city, $state )
-				: $this->build_service_content( $title );
-			if ( '' !== trim( $full ) ) {
-				$stub = $full;
-			}
+		// Full content + the plugin's own Elementor template. Self-contained.
+		$full = $is_location
+			? $this->build_location_content( $title, $city, $state )
+			: $this->build_service_content( $title );
+		if ( '' !== trim( $full ) ) {
+			$stub = $full;
+		}
 
-			$post_id = wp_insert_post(
-				array(
-					'post_title'   => $title,
-					'post_name'    => sanitize_title( $title ),
-					'post_content' => $stub,
-					'post_status'  => 'draft',
-					'post_type'    => $type,
-				),
-				true
-			);
+		$post_id = wp_insert_post(
+			array(
+				'post_title'   => $title,
+				'post_name'    => sanitize_title( $title ),
+				'post_content' => $stub,
+				'post_status'  => 'draft',
+				'post_type'    => $type,
+			),
+			true
+		);
+		if ( ! is_wp_error( $post_id ) && $post_id ) {
+			$this->apply_template( (int) $post_id, $title, $is_location, $city, $state, $stub );
 		}
 
 		if ( is_wp_error( $post_id ) || ! $post_id ) {
@@ -551,12 +541,45 @@ class MLS_GMB_Mirror {
 			$content = (string) get_post_field( 'post_content', $post_id );
 		}
 
-		if ( class_exists( 'RSSEO_Pro_Programmatic' ) && method_exists( 'RSSEO_Pro_Programmatic', 'apply_template_to_post' ) ) {
-			$hero_city  = $is_location && '' !== $city ? $city : 'Washington DC';
-			$hero_state = $is_location && '' !== $state ? $state : 'Maryland and Northern Virginia';
-			$services   = $is_location ? self::get_categories() : array( $title );
-			RSSEO_Pro_Programmatic::apply_template_to_post( (int) $post_id, $hero_city, $hero_state, $services, $content );
+		$this->apply_template( (int) $post_id, $title, $is_location, $city, $state, $content );
+	}
+
+	/**
+	 * Wrap a page in the plugin's own Elementor template with the full copy in
+	 * the content section. Always available; no other plugin involved.
+	 *
+	 * @param int    $post_id     Post ID.
+	 * @param string $title       Service name or location title.
+	 * @param bool   $is_location Whether this is a location page.
+	 * @param string $city        City (locations).
+	 * @param string $state       State (locations).
+	 * @param string $body_html   Full page copy.
+	 */
+	private function apply_template( $post_id, $title, $is_location, $city, $state, $body_html ) {
+		if ( ! class_exists( 'MLS_Elementor' ) ) {
+			require_once MLS_PATH . 'includes/class-mls-elementor.php';
 		}
+		$identity = class_exists( 'MLS_SameAs' ) ? MLS_SameAs::get_identity() : array();
+		$business = ! empty( $identity['business_name'] ) ? $identity['business_name'] : get_bloginfo( 'name' );
+
+		if ( $is_location ) {
+			$place = trim( $city . ( '' !== $state ? ', ' . $state : '' ) );
+			$args  = array(
+				'hero_kicker' => __( 'Service Area', 'midland-local-seo' ),
+				'hero_title'  => '' !== $place ? 'Floor Care in ' . $place : $title,
+				'intro'       => sprintf( '%1$s serves %2$s with commercial and residential floor care, on time and on budget.', $business, '' !== $place ? $place : 'the DMV' ),
+				'body_html'   => $body_html,
+			);
+		} else {
+			$args = array(
+				'hero_kicker' => __( 'Our Services', 'midland-local-seo' ),
+				'hero_title'  => $title,
+				'intro'       => sprintf( '%1$s provides professional %2$s for homes and businesses across the DMV.', $business, strtolower( $title ) ),
+				'body_html'   => $body_html,
+			);
+		}
+
+		MLS_Elementor::apply( (int) $post_id, $args );
 	}
 
 	/**
