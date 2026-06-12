@@ -65,9 +65,9 @@ class SFCO_Pro_Notifications {
     public static function defaults(): array {
         return array(
             'autoreply_enabled'   => 0,
-            'autoreply_subject'   => 'We received your message — Midland Floors',
-            'autoreply_body'      => "Hi {name},\n\nThanks for reaching out to Midland Floors. We received your message and will respond within one business day.\n\nWhat you submitted:\n{fields}\n\nIf it's urgent, call or text us at (240) 532-9097.\n\nMidland Floors\nDC · Maryland · Northern Virginia",
-            'autoreply_from_name' => 'Midland Floors',
+            'autoreply_subject'   => 'We received your message, Midland Floor Care',
+            'autoreply_body'      => "Hi {name},\n\nThanks for reaching out to Midland Floor Care. We received your message and will respond within one business day.\n\n{fields}\n\nIf it is urgent, call or text us at (240) 532-9097.",
+            'autoreply_from_name' => 'Midland Floor Care',
             'autoreply_from_email' => get_option( 'admin_email' ),
 
             'admin_enabled'   => 1,
@@ -124,22 +124,57 @@ class SFCO_Pro_Notifications {
             $to      = $this->parse_recipients( $settings['admin_to'] );
             $subject = $this->replace( $settings['admin_subject'], $vars );
             $body    = $this->replace( $settings['admin_body'], $vars );
-            $headers = array();
+            $headers = array( 'Content-Type: text/html; charset=UTF-8' );
             if ( ! empty( $vars['{email}'] ) ) {
                 $headers[] = 'Reply-To: ' . $vars['{email}'];
             }
-            wp_mail( $to, $subject, $body, $headers );
+            wp_mail( $to, $subject, $this->wrap_html( $body ), $headers );
         }
 
         if ( $settings['autoreply_enabled'] && ! empty( $vars['{email}'] ) ) {
             $subject = $this->replace( $settings['autoreply_subject'], $vars );
             $body    = $this->replace( $settings['autoreply_body'], $vars );
-            $headers = array();
+            $headers = array( 'Content-Type: text/html; charset=UTF-8' );
             if ( ! empty( $settings['autoreply_from_name'] ) && ! empty( $settings['autoreply_from_email'] ) ) {
                 $headers[] = sprintf( 'From: %s <%s>', $settings['autoreply_from_name'], $settings['autoreply_from_email'] );
             }
-            wp_mail( $vars['{email}'], $subject, $body, $headers );
+            wp_mail( $vars['{email}'], $subject, $this->wrap_html( $body ), $headers );
         }
+    }
+
+    /**
+     * Wrap a plain-text body in the Midland-branded HTML email shell: green
+     * header with the logo, white card for the content, footer with contact.
+     * Inline styles only, so every mail client renders it.
+     *
+     * @param string $body Plain text (placeholders already replaced).
+     * @return string HTML email.
+     */
+    private function wrap_html( string $body ): string {
+        // Logo: the chat widget logo, falling back to the theme custom logo.
+        $logo = (string) get_option( 'smart_chat_chat_logo', '' );
+        if ( '' === $logo ) {
+            $logo_id = (int) get_theme_mod( 'custom_logo' );
+            if ( $logo_id ) {
+                $logo = (string) wp_get_attachment_image_url( $logo_id, 'medium' );
+            }
+        }
+
+        $header_inner = '' !== $logo
+            ? '<img src="' . esc_url( $logo ) . '" alt="Midland Floor Care" style="max-height:48px;width:auto;display:inline-block;">'
+            : '<span style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:1px;">Midland Floor Care</span>';
+
+        $content = nl2br( esc_html( $body ) );
+
+        return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F3FCF4;">'
+            . '<div style="max-width:600px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;">'
+            . '<div style="background:#0E2F14;text-align:center;padding:22px 24px;">' . $header_inner . '</div>'
+            . '<div style="background:#FFFFFF;padding:28px 28px 24px;color:#0F1411;font-size:15px;line-height:1.7;">' . $content . '</div>'
+            . '<div style="background:#0E2F14;text-align:center;padding:16px 24px;color:#B7E5BD;font-size:13px;line-height:1.8;">'
+            . 'Midland Floor Care &nbsp;|&nbsp; <a href="tel:2405329097" style="color:#FFFFFF;text-decoration:none;font-weight:700;">(240) 532-9097</a> &nbsp;|&nbsp; '
+            . '<a href="https://midlandfloors.com" style="color:#FFFFFF;text-decoration:none;font-weight:700;">midlandfloors.com</a>'
+            . '<br>Washington DC, Maryland and Northern Virginia'
+            . '</div></div></body></html>';
     }
 
     private function build_placeholders( $lead_id, $row, $form ): array {
@@ -148,14 +183,37 @@ class SFCO_Pro_Notifications {
         // Compiled "all fields" block — every non-empty column from the
         // lead row except internal columns. Useful for the admin body so
         // they see everything the lead typed without us hard-coding.
-        $skip = array( 'id', 'form_id', 'created_at', 'updated_at', 'status', 'ip', 'user_agent' );
+        $skip = array(
+            'id', 'form_id', 'created_at', 'updated_at', 'status', 'ip', 'user_agent',
+            // Internal/bridge columns: never show these to anyone in an email,
+            // least of all the customer (session ids, source slugs, raw JSON).
+            'lead_source', 'session_id', 'extra_fields_json', 'sfco_lead_id',
+            'source', 'intent', 'utm_source', 'utm_medium', 'utm_campaign', 'gclid',
+        );
         $compiled = array();
+        $seen_val = array();
         foreach ( $row as $k => $v ) {
             if ( in_array( $k, $skip, true ) || '' === (string) $v ) {
                 continue;
             }
+            // Raw JSON blobs are machine data, not email content.
+            if ( '_json' === substr( $k, -5 ) ) {
+                continue;
+            }
+            $v = is_scalar( $v ) ? (string) $v : wp_json_encode( $v );
+            // Scrub the internal session marker the chat bridge appends.
+            $v = trim( preg_replace( '/\s*\[sid:[^\]]*\]/i', '', $v ) );
+            if ( '' === $v ) {
+                continue;
+            }
+            // Don't repeat the same text under two labels (e.g. project type
+            // duplicated into the notes by the chat bridge).
+            if ( in_array( $v, $seen_val, true ) ) {
+                continue;
+            }
+            $seen_val[]  = $v;
             $label       = ucwords( str_replace( '_', ' ', preg_replace( '/^customer_/', '', $k ) ) );
-            $compiled[]  = $label . ': ' . ( is_scalar( $v ) ? (string) $v : wp_json_encode( $v ) );
+            $compiled[]  = $label . ': ' . $v;
         }
 
         $entry_url = admin_url( 'admin.php?page=smart-forms-form-entries&form_id=' . absint( $row['form_id'] ?? 0 ) . '&lead_id=' . absint( $lead_id ) );
