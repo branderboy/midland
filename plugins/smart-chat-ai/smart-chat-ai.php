@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.40
+ * Version: 1.9.41
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.40');
+define('SCAI_VERSION', '1.9.41');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -599,6 +599,13 @@ class SCAI_Plugin {
             $booking_url = $this->session_booking_url( $session_id );
             if ( '' !== $booking_url ) {
                 $response['booking_url'] = esc_url_raw( $booking_url );
+                // Deterministic card trigger: if the visitor asked to book at
+                // any point in this session, the widget must show the card now
+                // that the lead is captured, no matter how the AI phrased its
+                // reply. (The card once depended on the AI saying a booking
+                // cue like "grab a time"; when the model used the callback
+                // wording instead, the card silently never appeared.)
+                $response['show_booking'] = $this->session_wants_booking( $session_id );
             }
         } catch ( \Throwable $e ) {
             error_log( 'Smart Chat booking URL build failed: ' . $e->getMessage() );
@@ -628,10 +635,10 @@ class SCAI_Plugin {
         }
 
         // Only spend an extraction call once contact info actually appears.
-        $text = (string) $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-            "SELECT GROUP_CONCAT(message SEPARATOR ' ') FROM {$conv} WHERE session_id = %s AND sender = 'user'",
+        $text = implode( ' ', (array) $wpdb->get_col( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT message FROM {$conv} WHERE session_id = %s AND sender = 'user' ORDER BY id ASC",
             $session_id
-        ) );
+        ) ) );
         $has_email = (bool) preg_match( '/[^\s@]+@[^\s@]+\.[^\s@]+/', $text );
         $has_phone = (bool) preg_match( '/(?:\+?\d[\s().\-]?){7,}/', $text );
         if ( ! $has_email && ! $has_phone ) {
@@ -754,6 +761,23 @@ class SCAI_Plugin {
      * 1:1 and fire scai_lead_booked, which Smart CRM tags in ActiveCampaign.
      * This keeps the whole chat → Calendly → CRM path inside the chat plugin.
      */
+    /**
+     * Did the visitor signal booking intent anywhere in this session?
+     * Same pattern the lead-intent classifier uses.
+     *
+     * @param string $session_id Chat session.
+     * @return bool
+     */
+    private function session_wants_booking( $session_id ) {
+        global $wpdb;
+        $conv = $wpdb->prefix . 'smart_chat_conversations';
+        $text = implode( ' ', (array) $wpdb->get_col( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT message FROM {$conv} WHERE session_id = %s AND sender = 'user' ORDER BY id ASC",
+            $session_id
+        ) ) );
+        return (bool) preg_match( '/\b(schedul|book|appointment|set up a time|pick a time|come (out|by)|visit|walk[- ]?through)\b/i', $text );
+    }
+
     private function session_booking_url( $session_id ) {
         $base = $this->resolve_booking_url();
         if ( '' === $base ) {
