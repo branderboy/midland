@@ -65,8 +65,8 @@ class SFCO_Pro_Notifications {
     public static function defaults(): array {
         return array(
             'autoreply_enabled'   => 0,
-            'autoreply_subject'   => 'We received your message, Midland Floor Care',
-            'autoreply_body'      => "Hi {name},\n\nThanks for reaching out to Midland Floor Care. We received your message and will respond within one business day.\n\n{fields}\n\nIf it is urgent, call or text us at (240) 532-9097.",
+            'autoreply_subject'   => 'Got it. Your floor care request is in motion',
+            'autoreply_body'      => "Hi {name},\n\nThanks for reaching out to Midland Floor Care. Your request just landed with our team and we will get back to you ASAP, within 24 hours or less.\n\nWant a faster answer? Call or text (240) 532-9097, or grab a time on our calendar below.\n\n{fields}",
             'autoreply_from_name' => 'Midland Floor Care',
             'autoreply_from_email' => get_option( 'admin_email' ),
 
@@ -77,12 +77,35 @@ class SFCO_Pro_Notifications {
         );
     }
 
+    /**
+     * Old default copy that must not survive: the em dash subject and the
+     * "one business day" promise that parks hot leads. Only EXACT old defaults
+     * are migrated; custom admin copy is never rewritten.
+     */
+    private static function migrate_stale_defaults( array $s ): array {
+        $old_subjects = array(
+            'We received your message — Midland Floors',
+            'We received your message, Midland Floor Care',
+        );
+        if ( in_array( $s['autoreply_subject'] ?? '', $old_subjects, true ) ) {
+            $s['autoreply_subject'] = self::defaults()['autoreply_subject'];
+        }
+        $body = (string) ( $s['autoreply_body'] ?? '' );
+        if ( false !== strpos( $body, 'respond within one business day' ) ) {
+            $s['autoreply_body'] = self::defaults()['autoreply_body'];
+        }
+        if ( 'Midland Floors' === ( $s['autoreply_from_name'] ?? '' ) ) {
+            $s['autoreply_from_name'] = 'Midland Floor Care';
+        }
+        return $s;
+    }
+
     public static function get_settings(): array {
         $stored = get_option( self::OPTION, array() );
         if ( ! is_array( $stored ) ) {
             $stored = array();
         }
-        return wp_parse_args( $stored, self::defaults() );
+        return self::migrate_stale_defaults( wp_parse_args( $stored, self::defaults() ) );
     }
 
     public function handle_save() {
@@ -147,7 +170,7 @@ class SFCO_Pro_Notifications {
             if ( ! empty( $settings['autoreply_from_name'] ) && ! empty( $settings['autoreply_from_email'] ) ) {
                 $headers[] = sprintf( 'From: %s <%s>', $settings['autoreply_from_name'], $settings['autoreply_from_email'] );
             }
-            wp_mail( $vars['{email}'], $subject, $this->wrap_html( $body ), $headers );
+            wp_mail( $vars['{email}'], $subject, $this->wrap_html( $body, true ), $headers );
         }
     }
 
@@ -159,7 +182,7 @@ class SFCO_Pro_Notifications {
      * @param string $body Plain text (placeholders already replaced).
      * @return string HTML email.
      */
-    private function wrap_html( string $body ): string {
+    private function wrap_html( string $body, bool $with_cta = false ): string {
         // Logo: the chat widget logo, falling back to the theme custom logo.
         $logo = (string) get_option( 'smart_chat_chat_logo', '' );
         if ( '' === $logo ) {
@@ -171,13 +194,19 @@ class SFCO_Pro_Notifications {
 
         $header_inner = '' !== $logo
             ? '<img src="' . esc_url( $logo ) . '" alt="Midland Floor Care" style="max-height:48px;width:auto;display:inline-block;">'
-            : '<span style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:1px;">Midland Floor Care</span>';
+            : '<span style="color:#0E2F14;font-size:22px;font-weight:800;letter-spacing:1px;">Midland Floor Care</span>';
 
         $content = nl2br( esc_html( $body ) );
+        if ( $with_cta ) {
+            $content .= '<div style="text-align:center;margin:26px 0 6px;">'
+                . '<a href="' . esc_url( home_url( '/schedule-a-visit/' ) ) . '" style="display:inline-block;background:#43A94B;color:#FFFFFF;padding:16px 34px;border-radius:4px;font-weight:800;font-size:15px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">Schedule a Visit</a>'
+                . '<div style="margin-top:10px;font-size:14px;color:#4B5563;">or call <a href="tel:2405329097" style="color:#2F8137;font-weight:700;text-decoration:none;">(240) 532-9097</a> right now</div>'
+                . '</div>';
+        }
 
         return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F3FCF4;">'
             . '<div style="max-width:600px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;">'
-            . '<div style="background:#0E2F14;text-align:center;padding:22px 24px;">' . $header_inner . '</div>'
+            . '<div style="background:#FFFFFF;text-align:center;padding:22px 24px;border-bottom:3px solid #43A94B;">' . $header_inner . '</div>'
             . '<div style="background:#FFFFFF;padding:28px 28px 24px;color:#0F1411;font-size:15px;line-height:1.7;">' . $content . '</div>'
             . '<div style="background:#0E2F14;text-align:center;padding:16px 24px;color:#B7E5BD;font-size:13px;line-height:1.8;">'
             . 'Midland Floor Care &nbsp;|&nbsp; <a href="tel:2405329097" style="color:#FFFFFF;text-decoration:none;font-weight:700;">(240) 532-9097</a> &nbsp;|&nbsp; '
@@ -240,7 +269,13 @@ class SFCO_Pro_Notifications {
     }
 
     private function replace( string $template, array $vars ): string {
-        return strtr( $template, $vars );
+        // House rule: no em or en dashes in anything we send, whatever the
+        // stored template says.
+        return str_replace(
+            array( ' — ', ' – ', '—', '–' ),
+            array( ', ', ', ', ' ', ' ' ),
+            strtr( $template, $vars )
+        );
     }
 
     private function parse_recipients( string $raw ): array {
