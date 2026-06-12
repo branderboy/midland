@@ -128,9 +128,12 @@ jQuery(document).ready(function($) {
 
                 // Offer the "Pick a time" card when the lead is captured AND the
                 // AI's own reply points the visitor to booking, and only once.
+                // show_booking is the server's deterministic signal (visitor
+                // asked to book + lead captured). The wording cue is only a
+                // fallback for older server responses.
                 var aiSaid = (res.data.message || '').toLowerCase();
                 var bookingCue = /(grab (a |any )?time|pick a time|book a time|right here|grab a slot|schedule (it|that|your)|booking link|link (right )?here)/i;
-                if (bookingReady && !bookingShown && bookingCue.test(aiSaid)) {
+                if (bookingReady && !bookingShown && (res.data.show_booking || bookingCue.test(aiSaid))) {
                     showBooking();
                     bookingShown = true;
                 }

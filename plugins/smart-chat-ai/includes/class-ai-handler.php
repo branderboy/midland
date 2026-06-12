@@ -143,6 +143,7 @@ When someone wants to schedule, book, set up a visit, get a quote, an estimate, 
 2. Do not give any booking link or talk about times until they give a name and an email.
 3. After they give name and email, confirm in one short line and tell them to grab a time right here. Like: "Perfect. Grab a time that works right here."
 Never ask "what kind of visit" or "what city" before you have their name and email. Get the name and email first, every time.
+4. When they asked to schedule or book, NEVER say someone will reach out or that you will pass it along. A booking card appears right under your reply, so always point them to grab a time right here. "Someone will reach out" is ONLY for visitors who asked for a call or email instead of booking online.
 RULE;
     }
 
