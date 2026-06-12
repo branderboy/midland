@@ -249,6 +249,10 @@ class SCRM_Chat_Forms_Bridge {
          * ops notifications) treats chat leads as first-class.
          */
         do_action( 'sfco_lead_submitted', $sfco_lead_id, $lead_data, $form );
+        // Canonical CRM-named intake event. The sfco_* name above is a legacy
+        // label kept for the existing journey listeners; new code should hook
+        // this one. Chat and forms both land here: the CRM owns lead intake.
+        do_action( 'scrm_lead_intake', $sfco_lead_id, $lead_data, 'chat' );
     }
 
     /**
