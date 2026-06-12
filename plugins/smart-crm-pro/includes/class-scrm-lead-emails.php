@@ -1,6 +1,9 @@
 <?php
 /**
- * Form notifications — the two automations every form should ship with.
+ * Lead email responses. The CRM runs the ship: EVERY captured lead, from any
+ * source (forms, chat), gets its auto-reply and admin notification from here.
+ * The forms plugin renders forms; the chat captures conversations; email
+ * responses are CRM business.
  *
  *   1. Auto-reply to the submitter. The classic "Thanks, we got your
  *      message" email that confirms the form went through. Fires
@@ -30,10 +33,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class SFCO_Pro_Notifications {
+class SCRM_Lead_Emails {
 
-    const OPTION = 'sfco_pro_notifications';
-    const PAGE   = 'sfco-notifications';
+    const OPTION     = 'scrm_lead_emails';
+    const OLD_OPTION = 'sfco_pro_notifications';
+    const PAGE   = 'scrm-lead-emails';
 
     public function __construct() {
         add_action( 'admin_menu',         array( $this, 'add_menu' ), 30 );
@@ -47,9 +51,9 @@ class SFCO_Pro_Notifications {
         // Visible under the Smart Forms menu so the operator can turn on and
         // edit the instant email reply that goes to the person who submitted.
         add_submenu_page(
-            'smart-forms',
-            __( 'Email Notifications', 'smart-forms-for-midland' ),
-            __( 'Email Notifications', 'smart-forms-for-midland' ),
+            'smart-crm',
+            __( 'Email Notifications', 'smart-crm-pro' ),
+            __( 'Email Notifications', 'smart-crm-pro' ),
             'manage_options',
             self::PAGE,
             array( $this, 'render_page' )
@@ -68,6 +72,7 @@ class SFCO_Pro_Notifications {
             'autoreply_subject'   => 'Got it. Your floor care request is in motion',
             'autoreply_body'      => "Hi {name},\n\nThanks for reaching out to Midland Floor Care. Your request just landed with our team and we will get back to you ASAP, within 24 hours or less.\n\nWant a faster answer? Call or text (240) 532-9097, or grab a time on our calendar below.\n\n{fields}",
             'autoreply_from_name' => 'Midland Floor Care',
+            'email_logo'          => '',
             'autoreply_from_email' => get_option( 'admin_email' ),
 
             'admin_enabled'   => 1,
@@ -102,8 +107,13 @@ class SFCO_Pro_Notifications {
 
     public static function get_settings(): array {
         $stored = get_option( self::OPTION, array() );
-        if ( ! is_array( $stored ) ) {
-            $stored = array();
+        if ( ! is_array( $stored ) || empty( $stored ) ) {
+            // One-time migration from the forms-plugin era.
+            $legacy = get_option( self::OLD_OPTION, array() );
+            $stored = is_array( $legacy ) ? $legacy : array();
+            if ( ! empty( $stored ) ) {
+                update_option( self::OPTION, $stored, false );
+            }
         }
         return self::migrate_stale_defaults( wp_parse_args( $stored, self::defaults() ) );
     }
@@ -122,6 +132,7 @@ class SFCO_Pro_Notifications {
             'autoreply_body'       => wp_kses_post( wp_unslash( $_POST['autoreply_body'] ?? '' ) ),
             'autoreply_from_name'  => sanitize_text_field( wp_unslash( $_POST['autoreply_from_name'] ?? '' ) ),
             'autoreply_from_email' => sanitize_email( wp_unslash( $_POST['autoreply_from_email'] ?? '' ) ),
+            'email_logo'           => esc_url_raw( wp_unslash( $_POST['email_logo'] ?? '' ) ),
 
             'admin_enabled'  => isset( $_POST['admin_enabled'] ) ? 1 : 0,
             'admin_to'       => sanitize_text_field( wp_unslash( $_POST['admin_to'] ?? '' ) ), // can be comma-separated
@@ -140,15 +151,6 @@ class SFCO_Pro_Notifications {
      * and admin notification if enabled.
      */
     public function on_lead_submitted( $lead_id, $row, $form ) {
-        // Chat leads are confirmed conversationally in the widget and Smart
-        // Chat already notifies the team itself; the FORM emails firing too
-        // meant a redundant auto-reply and a duplicate admin notification.
-        // Forms notifications are for form submissions.
-        $source = is_array( $row ) ? (string) ( $row['lead_source'] ?? '' ) : (string) ( $row->lead_source ?? '' );
-        if ( 'chat' === $source && ! apply_filters( 'sfco_notify_chat_leads', false ) ) {
-            return;
-        }
-
         $settings = self::get_settings();
         $vars     = $this->build_placeholders( $lead_id, $row, $form );
 
@@ -183,18 +185,15 @@ class SFCO_Pro_Notifications {
      * @return string HTML email.
      */
     private function wrap_html( string $body, bool $with_cta = false ): string {
-        // Logo: the chat widget logo, falling back to the theme custom logo.
-        $logo = (string) get_option( 'smart_chat_chat_logo', '' );
-        if ( '' === $logo ) {
-            $logo_id = (int) get_theme_mod( 'custom_logo' );
-            if ( $logo_id ) {
-                $logo = (string) wp_get_attachment_image_url( $logo_id, 'medium' );
-            }
-        }
+        // Logo: the dedicated email logo setting. Must be the WHITE lettering
+        // variant (the site footer one) because the email header is dark green.
+        // The chat/theme logos are the dark variant, unreadable here, so they
+        // are deliberately NOT used as fallbacks.
+        $logo = (string) ( self::get_settings()['email_logo'] ?? '' );
 
         $header_inner = '' !== $logo
             ? '<img src="' . esc_url( $logo ) . '" alt="Midland Floor Care" style="max-height:48px;width:auto;display:inline-block;">'
-            : '<span style="color:#0E2F14;font-size:22px;font-weight:800;letter-spacing:1px;">Midland Floor Care</span>';
+            : '<span style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:1px;">Midland Floor Care</span>';
 
         $content = nl2br( esc_html( $body ) );
         if ( $with_cta ) {
@@ -206,7 +205,7 @@ class SFCO_Pro_Notifications {
 
         return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F3FCF4;">'
             . '<div style="max-width:600px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;">'
-            . '<div style="background:#FFFFFF;text-align:center;padding:22px 24px;border-bottom:3px solid #43A94B;">' . $header_inner . '</div>'
+            . '<div style="background:#0E2F14;text-align:center;padding:22px 24px;border-bottom:3px solid #43A94B;">' . $header_inner . '</div>'
             . '<div style="background:#FFFFFF;padding:28px 28px 24px;color:#0F1411;font-size:15px;line-height:1.7;">' . $content . '</div>'
             . '<div style="background:#0E2F14;text-align:center;padding:16px 24px;color:#B7E5BD;font-size:13px;line-height:1.8;">'
             . 'Midland Floor Care &nbsp;|&nbsp; <a href="tel:2405329097" style="color:#FFFFFF;text-decoration:none;font-weight:700;">(240) 532-9097</a> &nbsp;|&nbsp; '
@@ -296,77 +295,82 @@ class SFCO_Pro_Notifications {
         $s = self::get_settings();
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Form Notifications', 'smart-forms-for-midland' ); ?></h1>
+            <h1><?php esc_html_e( 'Form Notifications', 'smart-crm-pro' ); ?></h1>
             <p style="max-width:720px;color:#4B5563;font-size:15px;line-height:1.5;">
-                <?php esc_html_e( 'When a form is submitted, fire two emails: an auto-reply confirming receipt to the submitter, and an admin notification to your team. This is the "regular automation" path. Anything more (tagging, segmenting, sequencing, ActiveCampaign sync) lives in Smart CRM.', 'smart-forms-for-midland' ); ?>
+                <?php esc_html_e( 'When a form is submitted, fire two emails: an auto-reply confirming receipt to the submitter, and an admin notification to your team. This is the "regular automation" path. Anything more (tagging, segmenting, sequencing, ActiveCampaign sync) lives in Smart CRM.', 'smart-crm-pro' ); ?>
             </p>
 
             <?php if ( isset( $_GET['saved'] ) ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Notifications saved.', 'smart-forms-for-midland' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Notifications saved.', 'smart-crm-pro' ); ?></p></div>
             <?php endif; ?>
 
             <form method="post" style="max-width:780px;">
                 <?php wp_nonce_field( 'sfco_save_notifications', '_sfco_notif_nonce' ); ?>
 
-                <h2 style="margin-top:28px;color:#0F1411;border-bottom:1px solid #d6e6dc;padding-bottom:6px;"><?php esc_html_e( 'Admin notification', 'smart-forms-for-midland' ); ?></h2>
-                <p style="color:#6b8278;font-size:13px;margin:0 0 14px;"><?php esc_html_e( 'Sends to your team the moment a lead comes in. Reply-To is set to the submitter so you can hit reply.', 'smart-forms-for-midland' ); ?></p>
+                <h2 style="margin-top:28px;color:#0F1411;border-bottom:1px solid #d6e6dc;padding-bottom:6px;"><?php esc_html_e( 'Admin notification', 'smart-crm-pro' ); ?></h2>
+                <p style="color:#6b8278;font-size:13px;margin:0 0 14px;"><?php esc_html_e( 'Sends to your team the moment a lead comes in. Reply-To is set to the submitter so you can hit reply.', 'smart-crm-pro' ); ?></p>
                 <table class="form-table">
                     <tr>
-                        <th scope="row"><?php esc_html_e( 'Enable', 'smart-forms-for-midland' ); ?></th>
-                        <td><label><input type="checkbox" name="admin_enabled" value="1" <?php checked( $s['admin_enabled'], 1 ); ?>> <?php esc_html_e( 'Email an admin on every form submission', 'smart-forms-for-midland' ); ?></label></td>
+                        <th scope="row"><?php esc_html_e( 'Enable', 'smart-crm-pro' ); ?></th>
+                        <td><label><input type="checkbox" name="admin_enabled" value="1" <?php checked( $s['admin_enabled'], 1 ); ?>> <?php esc_html_e( 'Email an admin on every form submission', 'smart-crm-pro' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="admin_to"><?php esc_html_e( 'Send to', 'smart-forms-for-midland' ); ?></label></th>
+                        <th scope="row"><label for="email_logo"><?php esc_html_e( 'Email logo URL (white version)', 'smart-crm-pro' ); ?></label></th>
+                        <td><input type="url" id="email_logo" name="email_logo" class="regular-text" value="<?php echo esc_attr( $s['email_logo'] ?? '' ); ?>" placeholder="https://midlandfloors.com/wp-content/uploads/logo-white.png">
+                            <p class="description"><?php esc_html_e( 'Shown on the dark green email header, so use the WHITE lettering logo (the footer one). Empty = white text instead.', 'smart-crm-pro' ); ?></p></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="admin_to"><?php esc_html_e( 'Send to', 'smart-crm-pro' ); ?></label></th>
                         <td><input type="text" id="admin_to" name="admin_to" class="regular-text" value="<?php echo esc_attr( $s['admin_to'] ); ?>" placeholder="support@midlandfloors.com">
-                            <p class="description"><?php esc_html_e( 'One or more email addresses, comma or space separated.', 'smart-forms-for-midland' ); ?></p></td>
+                            <p class="description"><?php esc_html_e( 'One or more email addresses, comma or space separated.', 'smart-crm-pro' ); ?></p></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="admin_subject"><?php esc_html_e( 'Subject', 'smart-forms-for-midland' ); ?></label></th>
+                        <th scope="row"><label for="admin_subject"><?php esc_html_e( 'Subject', 'smart-crm-pro' ); ?></label></th>
                         <td><input type="text" id="admin_subject" name="admin_subject" class="large-text" value="<?php echo esc_attr( $s['admin_subject'] ); ?>"></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="admin_body"><?php esc_html_e( 'Body', 'smart-forms-for-midland' ); ?></label></th>
+                        <th scope="row"><label for="admin_body"><?php esc_html_e( 'Body', 'smart-crm-pro' ); ?></label></th>
                         <td><textarea id="admin_body" name="admin_body" rows="8" class="large-text"><?php echo esc_textarea( $s['admin_body'] ); ?></textarea></td>
                     </tr>
                 </table>
 
-                <h2 style="margin-top:36px;color:#0F1411;border-bottom:1px solid #d6e6dc;padding-bottom:6px;"><?php esc_html_e( 'Auto-reply to submitter', 'smart-forms-for-midland' ); ?></h2>
-                <p style="color:#6b8278;font-size:13px;margin:0 0 14px;"><?php esc_html_e( 'Confirms the submission went through. Use a real From address so it does not land in spam.', 'smart-forms-for-midland' ); ?></p>
+                <h2 style="margin-top:36px;color:#0F1411;border-bottom:1px solid #d6e6dc;padding-bottom:6px;"><?php esc_html_e( 'Auto-reply to submitter', 'smart-crm-pro' ); ?></h2>
+                <p style="color:#6b8278;font-size:13px;margin:0 0 14px;"><?php esc_html_e( 'Confirms the submission went through. Use a real From address so it does not land in spam.', 'smart-crm-pro' ); ?></p>
                 <table class="form-table">
                     <tr>
-                        <th scope="row"><?php esc_html_e( 'Enable', 'smart-forms-for-midland' ); ?></th>
-                        <td><label><input type="checkbox" name="autoreply_enabled" value="1" <?php checked( $s['autoreply_enabled'], 1 ); ?>> <?php esc_html_e( 'Send an auto-reply to the submitter on every form submission', 'smart-forms-for-midland' ); ?></label></td>
+                        <th scope="row"><?php esc_html_e( 'Enable', 'smart-crm-pro' ); ?></th>
+                        <td><label><input type="checkbox" name="autoreply_enabled" value="1" <?php checked( $s['autoreply_enabled'], 1 ); ?>> <?php esc_html_e( 'Send an auto-reply to the submitter on every form submission', 'smart-crm-pro' ); ?></label></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="autoreply_from_name"><?php esc_html_e( 'From name', 'smart-forms-for-midland' ); ?></label></th>
+                        <th scope="row"><label for="autoreply_from_name"><?php esc_html_e( 'From name', 'smart-crm-pro' ); ?></label></th>
                         <td><input type="text" id="autoreply_from_name" name="autoreply_from_name" class="regular-text" value="<?php echo esc_attr( $s['autoreply_from_name'] ); ?>"></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="autoreply_from_email"><?php esc_html_e( 'From email', 'smart-forms-for-midland' ); ?></label></th>
+                        <th scope="row"><label for="autoreply_from_email"><?php esc_html_e( 'From email', 'smart-crm-pro' ); ?></label></th>
                         <td><input type="email" id="autoreply_from_email" name="autoreply_from_email" class="regular-text" value="<?php echo esc_attr( $s['autoreply_from_email'] ); ?>">
-                            <p class="description"><?php esc_html_e( 'Must be an address on a domain you have authenticated in Resend (SPF/DKIM). Otherwise Resend rejects the send.', 'smart-forms-for-midland' ); ?></p></td>
+                            <p class="description"><?php esc_html_e( 'Must be an address on a domain you have authenticated in Resend (SPF/DKIM). Otherwise Resend rejects the send.', 'smart-crm-pro' ); ?></p></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="autoreply_subject"><?php esc_html_e( 'Subject', 'smart-forms-for-midland' ); ?></label></th>
+                        <th scope="row"><label for="autoreply_subject"><?php esc_html_e( 'Subject', 'smart-crm-pro' ); ?></label></th>
                         <td><input type="text" id="autoreply_subject" name="autoreply_subject" class="large-text" value="<?php echo esc_attr( $s['autoreply_subject'] ); ?>"></td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="autoreply_body"><?php esc_html_e( 'Body', 'smart-forms-for-midland' ); ?></label></th>
+                        <th scope="row"><label for="autoreply_body"><?php esc_html_e( 'Body', 'smart-crm-pro' ); ?></label></th>
                         <td><textarea id="autoreply_body" name="autoreply_body" rows="10" class="large-text"><?php echo esc_textarea( $s['autoreply_body'] ); ?></textarea></td>
                     </tr>
                 </table>
 
-                <h3 style="margin-top:32px;color:#0F1411;"><?php esc_html_e( 'Placeholders', 'smart-forms-for-midland' ); ?></h3>
+                <h3 style="margin-top:32px;color:#0F1411;"><?php esc_html_e( 'Placeholders', 'smart-crm-pro' ); ?></h3>
                 <p style="color:#4B5563;font-size:14px;line-height:1.6;">
-                    <?php esc_html_e( 'Drop any of these into the subject or body — they will be replaced when the email sends:', 'smart-forms-for-midland' ); ?><br>
+                    <?php esc_html_e( 'Drop any of these into the subject or body — they will be replaced when the email sends:', 'smart-crm-pro' ); ?><br>
                     <code>{name}</code> <code>{email}</code> <code>{phone}</code> <code>{position}</code> <code>{form_title}</code> <code>{site_name}</code> <code>{entry_url}</code> <code>{fields}</code>
                 </p>
 
-                <p class="submit"><button type="submit" name="sfco_save_notifications" class="button button-primary" style="background:#43A94B;border-color:#43A94B;font-weight:700;"><?php esc_html_e( 'Save Notifications', 'smart-forms-for-midland' ); ?></button></p>
+                <p class="submit"><button type="submit" name="sfco_save_notifications" class="button button-primary" style="background:#43A94B;border-color:#43A94B;font-weight:700;"><?php esc_html_e( 'Save Notifications', 'smart-crm-pro' ); ?></button></p>
             </form>
         </div>
         <?php
     }
 }
 
-new SFCO_Pro_Notifications();
+new SCRM_Lead_Emails();

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart Forms
  * Description: Multi-form lead capture for Midland Floor Care — floor-care templates, per-form shortcodes, file uploads, automation, Smart CRM Pro sync, Resend email, Google Calendar, branding, analytics, team management. (Formerly Smart Forms Basic + Smart Forms PRO, combined into one.)
- * Version: 2.19.14
+ * Version: 2.19.16
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Plugin constants. Internal SFCO_/SFCO_PRO_ prefixes preserved so all
 // existing class code keeps working with zero changes when we merged the
 // Pro plugin into this folder.
-define( 'SFCO_VERSION', '2.19.14' );
+define( 'SFCO_VERSION', '2.19.16' );
 define( 'SFCO_PLUGIN_FILE', __FILE__ );
 define( 'SFCO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SFCO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -79,7 +79,6 @@ class SFCO_Plugin {
         require_once SFCO_PLUGIN_DIR . 'includes/class-pro-team.php';
         require_once SFCO_PLUGIN_DIR . 'includes/class-pro-resend.php';
         require_once SFCO_PLUGIN_DIR . 'includes/class-pro-gcal.php';
-        require_once SFCO_PLUGIN_DIR . 'includes/class-pro-notifications.php';
         // Settings hub last — it lists every integration above and hides
         // their individual sidebar entries, so it has to load after them.
         require_once SFCO_PLUGIN_DIR . 'includes/class-pro-settings.php';

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Chat
  * Description: Midland-branded AI chat widget. Leverages site content (sitemap + pages) to answer 24/7, captures quote info, and offers a one-tap WhatsApp button so visitors can switch to a live conversation on the contractor's phone.
- * Version: 1.9.42
+ * Version: 1.9.43
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('SCAI_VERSION', '1.9.42');
+define('SCAI_VERSION', '1.9.43');
 define('SCAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SCAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -739,9 +739,8 @@ class SCAI_Plugin {
             'intent'       => $intent, // booking | quote | callback | '' (for the CRM bridge)
         ) );
 
-        if ( $lead_id && get_option( 'smart_chat_enable_email_notifications', true ) ) {
-            $this->send_lead_notification( $lead_id );
-        }
+        // Email responses (auto-reply + team notification) are sent by Smart
+        // CRM off the intake event; the chat captures and converses only.
     }
 
     /**
