@@ -68,6 +68,7 @@ class SFCO_Pro_Notifications {
             'autoreply_subject'   => 'Got it. Your floor care request is in motion',
             'autoreply_body'      => "Hi {name},\n\nThanks for reaching out to Midland Floor Care. Your request just landed with our team and we will get back to you ASAP, within 24 hours or less.\n\nWant a faster answer? Call or text (240) 532-9097, or grab a time on our calendar below.\n\n{fields}",
             'autoreply_from_name' => 'Midland Floor Care',
+            'email_logo'          => '',
             'autoreply_from_email' => get_option( 'admin_email' ),
 
             'admin_enabled'   => 1,
@@ -122,6 +123,7 @@ class SFCO_Pro_Notifications {
             'autoreply_body'       => wp_kses_post( wp_unslash( $_POST['autoreply_body'] ?? '' ) ),
             'autoreply_from_name'  => sanitize_text_field( wp_unslash( $_POST['autoreply_from_name'] ?? '' ) ),
             'autoreply_from_email' => sanitize_email( wp_unslash( $_POST['autoreply_from_email'] ?? '' ) ),
+            'email_logo'           => esc_url_raw( wp_unslash( $_POST['email_logo'] ?? '' ) ),
 
             'admin_enabled'  => isset( $_POST['admin_enabled'] ) ? 1 : 0,
             'admin_to'       => sanitize_text_field( wp_unslash( $_POST['admin_to'] ?? '' ) ), // can be comma-separated
@@ -183,18 +185,15 @@ class SFCO_Pro_Notifications {
      * @return string HTML email.
      */
     private function wrap_html( string $body, bool $with_cta = false ): string {
-        // Logo: the chat widget logo, falling back to the theme custom logo.
-        $logo = (string) get_option( 'smart_chat_chat_logo', '' );
-        if ( '' === $logo ) {
-            $logo_id = (int) get_theme_mod( 'custom_logo' );
-            if ( $logo_id ) {
-                $logo = (string) wp_get_attachment_image_url( $logo_id, 'medium' );
-            }
-        }
+        // Logo: the dedicated email logo setting. Must be the WHITE lettering
+        // variant (the site footer one) because the email header is dark green.
+        // The chat/theme logos are the dark variant, unreadable here, so they
+        // are deliberately NOT used as fallbacks.
+        $logo = (string) ( self::get_settings()['email_logo'] ?? '' );
 
         $header_inner = '' !== $logo
             ? '<img src="' . esc_url( $logo ) . '" alt="Midland Floor Care" style="max-height:48px;width:auto;display:inline-block;">'
-            : '<span style="color:#0E2F14;font-size:22px;font-weight:800;letter-spacing:1px;">Midland Floor Care</span>';
+            : '<span style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:1px;">Midland Floor Care</span>';
 
         $content = nl2br( esc_html( $body ) );
         if ( $with_cta ) {
@@ -206,7 +205,7 @@ class SFCO_Pro_Notifications {
 
         return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F3FCF4;">'
             . '<div style="max-width:600px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;">'
-            . '<div style="background:#FFFFFF;text-align:center;padding:22px 24px;border-bottom:3px solid #43A94B;">' . $header_inner . '</div>'
+            . '<div style="background:#0E2F14;text-align:center;padding:22px 24px;border-bottom:3px solid #43A94B;">' . $header_inner . '</div>'
             . '<div style="background:#FFFFFF;padding:28px 28px 24px;color:#0F1411;font-size:15px;line-height:1.7;">' . $content . '</div>'
             . '<div style="background:#0E2F14;text-align:center;padding:16px 24px;color:#B7E5BD;font-size:13px;line-height:1.8;">'
             . 'Midland Floor Care &nbsp;|&nbsp; <a href="tel:2405329097" style="color:#FFFFFF;text-decoration:none;font-weight:700;">(240) 532-9097</a> &nbsp;|&nbsp; '
@@ -314,6 +313,11 @@ class SFCO_Pro_Notifications {
                     <tr>
                         <th scope="row"><?php esc_html_e( 'Enable', 'smart-forms-for-midland' ); ?></th>
                         <td><label><input type="checkbox" name="admin_enabled" value="1" <?php checked( $s['admin_enabled'], 1 ); ?>> <?php esc_html_e( 'Email an admin on every form submission', 'smart-forms-for-midland' ); ?></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="email_logo"><?php esc_html_e( 'Email logo URL (white version)', 'smart-forms-for-midland' ); ?></label></th>
+                        <td><input type="url" id="email_logo" name="email_logo" class="regular-text" value="<?php echo esc_attr( $s['email_logo'] ?? '' ); ?>" placeholder="https://midlandfloors.com/wp-content/uploads/logo-white.png">
+                            <p class="description"><?php esc_html_e( 'Shown on the dark green email header, so use the WHITE lettering logo (the footer one). Empty = white text instead.', 'smart-forms-for-midland' ); ?></p></td>
                     </tr>
                     <tr>
                         <th scope="row"><label for="admin_to"><?php esc_html_e( 'Send to', 'smart-forms-for-midland' ); ?></label></th>
