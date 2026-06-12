@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Midland Smart CRM
  * Description: Passthrough between Smart Forms and the integrations (ActiveCampaign, ServiceM8, Vapi, Google Calendar, Floor Care Plan). One sidebar entry: Smart CRM → Settings.
- * Version: 2.4.2
+ * Version: 2.4.3
  * Author: Midland Floor Care
  * Author URI: https://midlandfloors.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'SCRM_PRO_VERSION', '2.4.2' );
+define( 'SCRM_PRO_VERSION', '2.4.3' );
 define( 'SCRM_PRO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRM_PRO_URL', plugin_dir_url( __FILE__ ) );
 
@@ -28,17 +28,10 @@ add_action( 'plugins_loaded', 'smart_crm_pro_init', 25 );
 function smart_crm_pro_init() {
     load_plugin_textdomain( 'smart-crm-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
-    if ( ! defined( 'SFCO_VERSION' ) ) {
-        add_action( 'admin_notices', function() {
-            $link = current_user_can( 'activate_plugins' )
-                ? ' <a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">' . esc_html__( 'Activate it on the Plugins page.', 'smart-crm-pro' ) . '</a>'
-                : '';
-            echo '<div class="notice notice-warning"><p><strong>'
-                . esc_html__( 'Midland Smart CRM is idle: it needs the "Midland Smart Forms" plugin active to pass leads through.', 'smart-crm-pro' )
-                . '</strong>' . $link . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        });
-        return;
-    }
+    // The CRM runs the ship, standalone. It does NOT depend on the forms
+    // plugin: the chat bridge creates its own leads table when forms is
+    // absent, intake events fire either way, and email responses are sent
+    // from here. Forms and chat are just doors into this CRM.
 
     require_once SCRM_PRO_DIR . 'includes/class-admin.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-activecampaign.php';
@@ -50,6 +43,7 @@ function smart_crm_pro_init() {
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-visit-draft.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-ops-notifications.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-chat-forms-bridge.php';
+    require_once SCRM_PRO_DIR . 'includes/class-scrm-lead-emails.php';
     require_once SCRM_PRO_DIR . 'includes/class-scrm-pro-settings.php';
 
     // Each module's class file self-instantiates its singleton at load
