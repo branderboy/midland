@@ -117,6 +117,15 @@ class SFCO_Pro_Notifications {
      * and admin notification if enabled.
      */
     public function on_lead_submitted( $lead_id, $row, $form ) {
+        // Chat leads are confirmed conversationally in the widget and Smart
+        // Chat already notifies the team itself; the FORM emails firing too
+        // meant a redundant auto-reply and a duplicate admin notification.
+        // Forms notifications are for form submissions.
+        $source = is_array( $row ) ? (string) ( $row['lead_source'] ?? '' ) : (string) ( $row->lead_source ?? '' );
+        if ( 'chat' === $source && ! apply_filters( 'sfco_notify_chat_leads', false ) ) {
+            return;
+        }
+
         $settings = self::get_settings();
         $vars     = $this->build_placeholders( $lead_id, $row, $form );
 
