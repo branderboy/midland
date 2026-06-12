@@ -67,15 +67,6 @@ jQuery(document).ready(function($) {
         $bubble.show();
     });
 
-    // "Schedule a Visit" no longer jumps straight to an undecorated Calendly
-    // link (that bypassed lead capture and the booking never tied back to the
-    // CRM). Instead it kicks off the capture conversation: the AI asks for a
-    // name + email, and only then does the "Pick a time" card appear.
-    $('#smart-chat-cta-visit').on('click', function() {
-        $input.val('I want to schedule a visit');
-        sendMessage();
-    });
-
     function showBooking() {
         var $card = $('<div class="smart-chat-msg smart-chat-msg-ai smart-chat-booking"></div>');
         $card.append(document.createTextNode('Grab any time that works for you.'));
