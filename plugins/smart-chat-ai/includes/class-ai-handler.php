@@ -61,7 +61,7 @@ class SCAI_AI_Handler {
      */
     public function get_response( $user_message, $session_id ) {
         $history       = $this->get_conversation_history( $session_id );
-        $system_prompt = $this->build_system_prompt();
+        $system_prompt = $this->build_system_prompt( $this->lead_already_captured( $session_id ) );
 
         // Build the turn list from history. The current user message was already
         // saved to the DB before this call, so it's the last 'user' row in
@@ -119,7 +119,7 @@ class SCAI_AI_Handler {
      * Build system prompt (Site Content module appends to this via the
      * scai_system_prompt filter).
      */
-    private function build_system_prompt() {
+    private function build_system_prompt( $lead_captured = false ) {
         $custom = trim( (string) get_option( 'smart_chat_preprompt', '' ) );
         $prompt = '' !== $custom ? $custom : self::default_preprompt();
 
@@ -129,7 +129,35 @@ class SCAI_AI_Handler {
         // says, so leads always get captured.
         $prompt .= "\n\n" . self::lead_capture_rule();
 
+        // Runtime state: once this session has a captured lead, the model must
+        // stop asking for contact info and just point at the booking card the
+        // widget is already showing.
+        if ( $lead_captured ) {
+            $prompt .= "\n\n" . <<<'STATE'
+RIGHT NOW, THIS SESSION
+This visitor's name and email are ALREADY captured and the booking card with the calendar is ALREADY visible in the chat. So:
+Do not ask for their name or email again.
+If they ask to schedule or book, reply one short line pointing at the card. Like: "You're all set. Grab any time on the card right here."
+If they share a name or email anyway, thank them in one short line and point at the card. Never say you will pass it along or that someone will reach out.
+STATE;
+        }
+
         return apply_filters( 'scai_system_prompt', $prompt );
+    }
+
+    /**
+     * Whether this session already produced a captured lead.
+     *
+     * @param string $session_id Chat session.
+     * @return bool
+     */
+    private function lead_already_captured( $session_id ) {
+        global $wpdb;
+        $leads = $wpdb->prefix . 'smart_chat_leads';
+        return (bool) $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            "SELECT COUNT(*) FROM {$leads} WHERE message LIKE %s",
+            '%' . $wpdb->esc_like( '[sid:' . $session_id . ']' ) . '%'
+        ) );
     }
 
     /**
